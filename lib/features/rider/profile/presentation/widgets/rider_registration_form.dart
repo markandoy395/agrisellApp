@@ -1,0 +1,213 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
+import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_draft.dart';
+import 'package:agresell_app/features/rider/profile/presentation/controllers/rider_sign_up_controller.dart';
+import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_sign_up_address_step.dart';
+import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_sign_up_documents_step.dart';
+import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_sign_up_personal_step.dart';
+import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_sign_up_review_step.dart';
+import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_sign_up_security_step.dart';
+import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_sign_up_vehicle_step.dart';
+import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_sign_up_widgets.dart';
+
+class RiderRegistrationForm extends StatefulWidget {
+  const RiderRegistrationForm({
+    required this.onSubmitted,
+    required this.onExit,
+    required this.onEmailOtpRequired,
+    this.controller,
+    super.key,
+  });
+  final ValueChanged<RiderProfile> onSubmitted;
+  final Future<void> Function() onExit;
+  final RiderSignUpController? controller;
+  final Future<bool> Function(String email) onEmailOtpRequired;
+  @override
+  State<RiderRegistrationForm> createState() => RiderRegistrationFormState();
+}
+
+class RiderRegistrationFormState extends State<RiderRegistrationForm>
+    with WidgetsBindingObserver {
+  late final RiderSignUpController _controller;
+  late final bool _ownsController;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _ownsController = widget.controller == null;
+    _controller = widget.controller ?? RiderSignUpController();
+    unawaited(_controller.initialize());
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    if (_ownsController) _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      unawaited(_controller.saveNow());
+    }
+  }
+
+  Future<bool> confirmExit() async {
+    final choice = await showDialog<_ExitChoice>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'Your Rider Sign-Up is not yet complete. What would you like to do?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () =>
+                Navigator.pop(context, _ExitChoice.continueRegistration),
+            child: const Text('Continue Registration'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, _ExitChoice.saveAndExit),
+            child: const Text('Save and Exit'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, _ExitChoice.discard),
+            child: const Text('Discard Registration'),
+          ),
+        ],
+      ),
+    );
+    if (choice == null || choice == _ExitChoice.continueRegistration) {
+      return false;
+    }
+    if (choice == _ExitChoice.saveAndExit) {
+      await _controller.saveNow();
+    }
+    if (choice == _ExitChoice.discard) {
+      await _controller.discard();
+    }
+    await widget.onExit();
+    return true;
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _controller,
+    builder: (context, _) {
+      if (_controller.isLoading) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      final step = _controller.draft.step;
+      return Material(
+        color: AgrisellColors.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 18, 14, 10),
+              child: Row(
+                children: [
+                  const Expanded(
+                    child: Text(
+                      'Rider Sign-Up',
+                      style: TextStyle(
+                        color: AgrisellColors.authGreen,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: confirmExit,
+                    child: const Text('Save & Exit'),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: CustomScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                slivers: [
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(18, 8, 18, 18),
+                    sliver: SliverList.list(
+                      children: [
+                        RiderSignUpHeader(step: step),
+                        const SizedBox(height: 18),
+                        _stepBody(step),
+                        if (_controller.errorMessage != null) ...[
+                          const SizedBox(height: 12),
+                          Text(
+                            _controller.errorMessage!,
+                            style: const TextStyle(
+                              color: AgrisellColors.statusRedText,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(18, 10, 18, 12),
+                child: RiderSignUpActions(
+                  isFirst: step == RiderSignUpStep.personal,
+                  isLast: step == RiderSignUpStep.review,
+                  enabled: _controller.canContinue,
+                  loading: _controller.isSubmitting,
+                  onPrevious: () => unawaited(_controller.previousStep()),
+                  onContinue: _continue,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+  Widget _stepBody(RiderSignUpStep step) => switch (step) {
+    RiderSignUpStep.personal => RiderSignUpPersonalStep(
+      controller: _controller,
+    ),
+    RiderSignUpStep.address => RiderSignUpAddressStep(controller: _controller),
+    RiderSignUpStep.vehicle => RiderSignUpVehicleStep(controller: _controller),
+    RiderSignUpStep.documents => RiderSignUpDocumentsStep(
+      controller: _controller,
+    ),
+    RiderSignUpStep.security => RiderSignUpSecurityStep(
+      controller: _controller,
+    ),
+    RiderSignUpStep.review => RiderSignUpReviewStep(controller: _controller),
+  };
+  Future<void> _continue() async {
+    if (_controller.draft.step != RiderSignUpStep.review) {
+      await _controller.continueToNextStep();
+      return;
+    }
+    final profile = await _controller.submit();
+    if (profile != null && mounted) {
+      widget.onSubmitted(profile);
+      return;
+    }
+    if (!_controller.awaitingEmailOtp || !mounted) return;
+    final verified = await widget.onEmailOtpRequired(
+      _controller.draft.value('email'),
+    );
+    if (!verified || !mounted) return;
+    final completed = await _controller.submit();
+    if (completed != null && mounted) widget.onSubmitted(completed);
+  }
+}
+
+enum _ExitChoice { continueRegistration, saveAndExit, discard }

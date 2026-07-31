@@ -1,0 +1,11 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "AgriSell with Supabase",
+      "request": "launch",
+      "type": "dart",
+      "toolArgs": ["--dart-define-from-file=supabase.local.json"]
+    }
+  ]
+}

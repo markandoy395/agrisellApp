@@ -1,0 +1,77 @@
+import 'package:flutter/material.dart';
+
+import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
+
+class FarmerOrderBuyerSummary extends StatelessWidget {
+  const FarmerOrderBuyerSummary({required this.order, super.key});
+
+  final PlacedOrder order;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(10),
+    decoration: BoxDecoration(
+      color: AgrisellColors.forestSoft,
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Row(
+          children: [
+            Icon(
+              Icons.person_add_alt_1_outlined,
+              size: 17,
+              color: AgrisellColors.headingGreen,
+            ),
+            SizedBox(width: 6),
+            Text(
+              'New buyer order',
+              style: TextStyle(
+                color: AgrisellColors.headingGreen,
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        _BuyerSummaryLine(
+          icon: Icons.location_on_outlined,
+          value: order.deliveryAddress,
+        ),
+        const SizedBox(height: 5),
+        _BuyerSummaryLine(icon: Icons.phone_outlined, value: order.phoneNumber),
+      ],
+    ),
+  );
+}
+
+class _BuyerSummaryLine extends StatelessWidget {
+  const _BuyerSummaryLine({required this.icon, required this.value});
+
+  final IconData icon;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Icon(icon, size: 16, color: AgrisellColors.mutedText),
+      const SizedBox(width: 7),
+      Expanded(
+        child: Text(
+          value,
+          style: const TextStyle(
+            color: AgrisellColors.brandBlack,
+            fontSize: 12,
+            height: 1.25,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    ],
+  );
+}

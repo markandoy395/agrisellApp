@@ -1,0 +1,84 @@
+part of 'rider_home_screen.dart';
+
+extension _RiderHomeNavigation on _RiderHomeScreenState {
+  Future<void> _selectTab(int index) async {
+    if (index == _activeIndex) return;
+    _setActiveIndex(index);
+    final disableAnimations =
+        MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    if (disableAnimations) {
+      _pageController.jumpToPage(index);
+      return;
+    }
+    await _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  void _openNotifications() {
+    Navigator.of(context).push(
+      agrisellPageRoute<void>(
+        builder: (_) => RiderNotificationsScreen(
+          riderId: _riderId ?? '',
+          onNotificationAction: (action) =>
+              unawaited(_openNotificationAction(action)),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openNotificationAction(RiderNotificationAction action) async {
+    if (!mounted) return;
+    Navigator.of(context).pop();
+    await Future<void>.delayed(Duration.zero);
+    if (!mounted) return;
+    switch (action.destination) {
+      case RiderNotificationDestination.delivery ||
+          RiderNotificationDestination.report:
+        final request = _deliveryController.requests
+            .where((item) => item.id == action.deliveryId)
+            .firstOrNull;
+        if (request == null) {
+          await _selectTab(RiderHomeScreen.deliveriesNavIndex);
+          return;
+        }
+        await Navigator.of(context).push(
+          agrisellPageRoute<void>(
+            builder: (_) => RiderDeliveryDetailsScreen(
+              request: request,
+              controller: _deliveryController,
+              riderId: _riderId ?? '',
+            ),
+          ),
+        );
+        return;
+      case RiderNotificationDestination.conversation:
+        final conversation = _messagesController.conversations
+            .where((item) => item.id == action.conversationId)
+            .firstOrNull;
+        if (conversation == null) {
+          await _selectTab(RiderHomeScreen.messagesNavIndex);
+          return;
+        }
+        await _messagesController.selectConversation(conversation);
+        if (!mounted) return;
+        await Navigator.of(context).push(
+          agrisellPageRoute<void>(
+            builder: (_) => RiderConversationPanel(
+              controller: _messagesController,
+              quickReplies: RiderQuickReply.defaults,
+            ),
+          ),
+        );
+        _messagesController.closeConversation();
+        return;
+      case RiderNotificationDestination.earnings:
+        _openEarnings();
+        return;
+      case RiderNotificationDestination.none:
+        return;
+    }
+  }
+}

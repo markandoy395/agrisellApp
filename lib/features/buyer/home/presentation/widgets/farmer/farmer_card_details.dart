@@ -1,0 +1,166 @@
+import 'package:flutter/material.dart';
+
+import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/features/buyer/home/domain/farmer_profile.dart';
+import 'package:agresell_app/features/buyer/home/presentation/widgets/farmer/farmer_rating_line.dart';
+
+class FarmerIdentity extends StatelessWidget {
+  const FarmerIdentity({required this.farmer, super.key});
+
+  final FarmerProfile farmer;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          farmer.name,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            color: AgrisellColors.headingGreen,
+            fontSize: 15,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Row(
+          children: [
+            const Icon(
+              Icons.location_on_outlined,
+              size: 15,
+              color: AgrisellColors.mutedText,
+            ),
+            const SizedBox(width: 3),
+            Expanded(
+              child: Text(
+                farmer.location,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: AgrisellColors.mutedText,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+        Row(
+          children: [
+            FarmerRatingLine(rating: farmer.rating, starSize: 13),
+            const SizedBox(width: 7),
+            Flexible(
+              child: Text(
+                '${farmer.followerCount} followers',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: AgrisellColors.mutedText,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class FarmerAvailabilityBadge extends StatelessWidget {
+  const FarmerAvailabilityBadge({required this.availableProducts, super.key});
+
+  final int availableProducts;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: AgrisellColors.limeSoft,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        children: [
+          Text(
+            '$availableProducts',
+            style: const TextStyle(
+              color: AgrisellColors.authGreen,
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const Text(
+            'available',
+            style: TextStyle(
+              color: AgrisellColors.authGreen,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class FarmerProductChip extends StatelessWidget {
+  const FarmerProductChip({required this.product, super.key});
+
+  final ProductAvailability product;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = product.isAvailable
+        ? AgrisellColors.statusGreenText
+        : AgrisellColors.statusRedText;
+    final background = product.isAvailable
+        ? AgrisellColors.statusGreenBackground
+        : AgrisellColors.statusRedBackground;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        product.name,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
+class FarmerMoreProductsChip extends StatelessWidget {
+  const FarmerMoreProductsChip({required this.count, super.key});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      decoration: BoxDecoration(
+        color: AgrisellColors.fieldFill,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        '+$count more',
+        style: const TextStyle(
+          color: AgrisellColors.headingGreen,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}

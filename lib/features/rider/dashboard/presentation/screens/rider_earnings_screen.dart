@@ -1,0 +1,202 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:agresell_app/core/widgets/app_snack_bar.dart';
+import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/utils/agrisellPageRoute.dart';
+import 'package:agresell_app/features/rider/dashboard/domain/rider_analytics_models.dart';
+import 'package:agresell_app/features/rider/dashboard/presentation/controllers/rider_analytics_controller.dart';
+import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_analytics_formatters.dart';
+import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_earnings_history.dart';
+import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_earnings_widgets.dart';
+import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
+import 'package:agresell_app/features/rider/presentation/widgets/rider_state_cards.dart';
+import 'package:agresell_app/features/rider/dashboard/presentation/screens/rider_ratings_screen.dart';
+import 'package:agresell_app/features/rider/dashboard/presentation/screens/rider_history_details_screen.dart';
+
+class RiderEarningsScreen extends StatefulWidget {
+  const RiderEarningsScreen({this.riderId = '', this.controller, super.key});
+  final String riderId;
+  final RiderAnalyticsController? controller;
+  @override
+  State<RiderEarningsScreen> createState() => _RiderEarningsScreenState();
+}
+
+class _RiderEarningsScreenState extends State<RiderEarningsScreen> {
+  late final RiderAnalyticsController _controller;
+  late final bool _ownsController;
+  var _period = RiderAnalyticsPeriod.today;
+  RiderDateRange? _customRange;
+  RiderDateRange get _dateRange =>
+      _customRange ?? RiderDateRange.forPeriod(_period, DateTime.now());
+  @override
+  void initState() {
+    super.initState();
+    _ownsController = widget.controller == null;
+    _controller = widget.controller ?? RiderAnalyticsController();
+    unawaited(_load());
+  }
+
+  @override
+  void dispose() {
+    if (_ownsController) _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: AgrisellColors.homeBackground,
+    body: Column(
+      children: [
+        RiderPageHeader(
+          title: 'Earnings',
+          subtitle: formatRiderDateRange(_dateRange),
+          action: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                tooltip: 'View ratings',
+                onPressed: _openRatings,
+                icon: const Icon(
+                  Icons.star_outline_rounded,
+                  color: AgrisellColors.surface,
+                ),
+              ),
+              IconButton(
+                tooltip: 'Close',
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(
+                  Icons.close_rounded,
+                  color: AgrisellColors.surface,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, _) => ListView(
+              padding: const EdgeInsets.all(14),
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final period in RiderAnalyticsPeriod.values)
+                      ChoiceChip(
+                        label: Text(period.label),
+                        selected: _period == period,
+                        onSelected: (_) => _selectPeriod(period),
+                        labelStyle: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                ..._content(),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+  List<Widget> _content() {
+    return switch (_controller.earningsState) {
+      RiderAnalyticsLoadState.idle || RiderAnalyticsLoadState.loading => const [
+        RiderLoadingStateCard(
+          title: 'Loading earnings',
+          message: 'Retrieving rider earnings and payout details.',
+        ),
+      ],
+      RiderAnalyticsLoadState.error => [
+        RiderErrorStateCard(
+          title: 'Earnings unavailable',
+          message: _controller.earningsError ?? 'Please try again.',
+          retryLabel: 'Retry',
+          onRetry: () => unawaited(_load()),
+        ),
+      ],
+      RiderAnalyticsLoadState.ready when !_controller.earnings.hasData => const [
+        RiderEmptyStateCard(
+          title: 'No earnings yet',
+          message:
+              'Completed delivery fees, incentives, bonuses, deductions, and payout status will appear here.',
+          icon: Icons.account_balance_wallet_outlined,
+        ),
+      ],
+      RiderAnalyticsLoadState.ready => [
+        RiderEarningsSummaryCard(summary: _controller.earnings.summary),
+        const SizedBox(height: 12),
+        RiderEarningsBreakdownCard(summary: _controller.earnings.summary),
+        if (_controller.earnings.entries.isNotEmpty) ...[
+          const SizedBox(height: 14),
+          RiderEarningsHistory(
+            entries: _controller.earnings.entries,
+            onOpenDelivery: _openDelivery,
+          ),
+        ],
+      ],
+    };
+  }
+
+  Future<void> _selectPeriod(RiderAnalyticsPeriod period) async {
+    if (period == RiderAnalyticsPeriod.custom) {
+      final today = DateTime.now();
+      final selected = await showDateRangePicker(
+        context: context,
+        firstDate: DateTime(2020),
+        lastDate: DateTime(today.year, today.month, today.day),
+        initialDateRange: DateTimeRange(
+          start: _dateRange.start,
+          end: _dateRange.end,
+        ),
+      );
+      if (selected == null || !mounted) return;
+      setState(() {
+        _period = period;
+        _customRange = RiderDateRange.fromDates(selected.start, selected.end);
+      });
+    } else {
+      setState(() {
+        _period = period;
+        _customRange = null;
+      });
+    }
+    await _load();
+  }
+
+  Future<void> _load() =>
+      _controller.loadEarnings(riderId: widget.riderId, dateRange: _dateRange);
+  void _openRatings() {
+    Navigator.of(context).push(
+      agrisellPageRoute<void>(
+        builder: (_) => RiderRatingsScreen(
+          riderId: widget.riderId,
+          controller: _controller,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openDelivery(String deliveryId) async {
+    await _controller.loadHistory(riderId: widget.riderId);
+    if (!mounted) return;
+    final matches = _controller.history.where(
+      (entry) => entry.id == deliveryId,
+    );
+    if (matches.isEmpty) {
+      ScaffoldMessenger.of(context).showAppSnackBar(
+        const SnackBar(content: Text('Delivery history is unavailable.')),
+      );
+      return;
+    }
+    await Navigator.of(context).push(
+      agrisellPageRoute<void>(
+        builder: (_) => RiderHistoryDetailsScreen(entry: matches.first),
+      ),
+    );
+  }
+}

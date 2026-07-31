@@ -1,0 +1,194 @@
+import 'package:flutter/material.dart';
+
+import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
+import 'package:agresell_app/features/buyer/home/data/home_categories.dart';
+import 'package:agresell_app/features/buyer/home/domain/home_category.dart';
+
+class HomeCategoriesCard extends StatelessWidget {
+  const HomeCategoriesCard({
+    this.selectedCategory = 'All',
+    this.onSelected,
+    super.key,
+  });
+
+  final String selectedCategory;
+  final ValueChanged<String>? onSelected;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: AgrisellColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: AgrisellColors.brandBlack.withValues(alpha: 0.1),
+            blurRadius: 14,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _CategoryHeader(
+            allSelected: selectedCategory == 'All',
+            onAllSelected: onSelected == null ? null : () => onSelected!('All'),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 14, 10, 14),
+            child: homeCategories.isEmpty
+                ? const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      'Categories from the backend will appear here.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AgrisellColors.mutedText,
+                        fontSize: 12,
+                      ),
+                    ),
+                  )
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (final category in homeCategories)
+                        Expanded(
+                          child: _CategoryTile(
+                            category: category,
+                            selected:
+                                selectedCategory == _normalized(category.label),
+                            onTap: onSelected == null
+                                ? null
+                                : () =>
+                                      onSelected!(_normalized(category.label)),
+                          ),
+                        ),
+                    ],
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static String _normalized(String value) => value.replaceAll('\n', ' ');
+}
+
+class _CategoryHeader extends StatelessWidget {
+  const _CategoryHeader({required this.allSelected, this.onAllSelected});
+
+  final bool allSelected;
+  final VoidCallback? onAllSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 42,
+      padding: const EdgeInsets.fromLTRB(16, 3, 8, 3),
+      color: AgrisellColors.authGreen,
+      child: Row(
+        children: [
+          const Expanded(
+            child: Text(
+              'Categories',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: AgrisellColors.surface,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: onAllSelected,
+            style: TextButton.styleFrom(
+              minimumSize: const Size(0, 34),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              foregroundColor: AgrisellColors.surface,
+              textStyle: TextStyle(
+                fontSize: 12,
+                fontWeight: allSelected ? FontWeight.w800 : FontWeight.w600,
+              ),
+            ),
+            child: Text(allSelected ? 'Showing all' : 'View all'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CategoryTile extends StatelessWidget {
+  const _CategoryTile({
+    required this.category,
+    required this.selected,
+    this.onTap,
+  });
+
+  final HomeCategory category;
+  final bool selected;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final iconSize = width < 380 ? 50.0 : 58.0;
+
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: '${category.label.replaceAll('\n', ' ')} category',
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+          child: Column(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                width: iconSize,
+                height: iconSize,
+                padding: EdgeInsets.all(iconSize * 0.2),
+                decoration: BoxDecoration(
+                  color: selected
+                      ? AgrisellColors.forestSoft
+                      : AgrisellColors.homeBackground,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: selected
+                        ? AgrisellColors.authGreen
+                        : Colors.transparent,
+                    width: 2,
+                  ),
+                ),
+                child: ResponsiveAssetImage(
+                  asset: category.asset,
+                  fit: BoxFit.contain,
+                  semanticLabel: category.label,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                category.label,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: selected
+                      ? AgrisellColors.authGreen
+                      : AgrisellColors.brandBlack,
+                  fontSize: 12,
+                  height: 1.05,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

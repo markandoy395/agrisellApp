@@ -1,0 +1,80 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# JavaScript tooling used by local project utilities
+/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local environment and credential files
+.env
+.env.*
+!.env.example
+!.env.*.example
+**/key.properties
+**/*.jks
+**/*.keystore
+**/*.p12
+**/*.pfx
+**/*.pem
+**/*.key
+
+# Local Flutter compile-time configuration. Copy the example and keep the
+# project-specific value out of source control.
+/supabase.local.json
+/android/app/google-services.json
+/ios/Runner/GoogleService-Info.plist
+
+# Local tool state and temporary database output
+/android/.kotlin/
+/supabase/.branches
+/supabase/.temp/
+/.tmp_remote_schema.sql
+/.baseline_logs/
+
+# Preserved invalid repository metadata from the pre-baseline recovery
+/.git_broken_backup/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release

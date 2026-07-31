@@ -68,6 +68,9 @@ yarn-error.log*
 # Preserved invalid repository metadata from the pre-baseline recovery
 /.git_broken_backup/
 
+# Superseded local progress report; the screenshot edition contains its text
+/AGRISELL_Application_Progress_Report_June_8_to_July_18_2026.docx
+
 # Symbolication related
 app.*.symbols
 

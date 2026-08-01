@@ -6,7 +6,7 @@ import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/domain/saved_account.dart';
 import 'package:agresell_app/features/auth/presentation/auth_dashboard_router.dart';
-import 'package:agresell_app/features/auth/presentation/screens/loginScreen.dart';
+import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/account_switcher_content.dart';
 
 class AccountSwitcherScreen extends StatefulWidget {

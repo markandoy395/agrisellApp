@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/authTextField.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_text_field.dart';
 
 class FarmerSignupField extends StatelessWidget {
   const FarmerSignupField({

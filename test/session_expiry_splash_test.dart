@@ -1,8 +1,8 @@
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
-import 'package:agresell_app/features/auth/presentation/screens/loginScreen.dart';
-import 'package:agresell_app/features/auth/presentation/screens/splashScreen.dart';
+import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
+import 'package:agresell_app/features/auth/presentation/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';

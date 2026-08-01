@@ -7,12 +7,12 @@ import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/domain/auth_route_guard.dart';
 import 'package:agresell_app/features/auth/domain/login_validator.dart';
 import 'package:agresell_app/features/auth/presentation/auth_dashboard_router.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/authBottomLink.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/authButton.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/authCheckbox.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/authScaffold.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/authTextField.dart';
-import 'package:agresell_app/features/auth/presentation/screens/roleSelectionScreen.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_bottom_link.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_button.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_checkbox.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_scaffold.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_text_field.dart';
+import 'package:agresell_app/features/auth/presentation/screens/role_selection_screen.dart';
 import 'package:agresell_app/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_controller.dart';
 

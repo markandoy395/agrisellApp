@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/utils/responsive.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/authBackground.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/authCard.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/logoHeader.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_background.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_card.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/logo_header.dart';
 
 class AuthScaffold extends StatelessWidget {
   const AuthScaffold({

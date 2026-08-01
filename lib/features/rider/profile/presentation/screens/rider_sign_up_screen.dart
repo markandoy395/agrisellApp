@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/core/utils/responsive.dart';
-import 'package:agresell_app/features/auth/presentation/screens/roleSelectionScreen.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/authBackground.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/logoHeader.dart';
+import 'package:agresell_app/features/auth/presentation/screens/role_selection_screen.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_background.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/logo_header.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/otp_verification_screen.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';

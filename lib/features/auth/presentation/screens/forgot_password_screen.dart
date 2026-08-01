@@ -4,11 +4,11 @@ import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/core/utils/password_policy.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
-import 'package:agresell_app/features/auth/presentation/screens/loginScreen.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/authButton.dart';
+import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_button.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_password_requirements.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/authScaffold.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/authTextField.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_scaffold.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/otp_verification_screen.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {

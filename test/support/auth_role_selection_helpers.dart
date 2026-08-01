@@ -1,6 +1,6 @@
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
-import 'package:agresell_app/features/auth/presentation/screens/loginScreen.dart';
-import 'package:agresell_app/features/auth/presentation/screens/roleSelectionScreen.dart';
+import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
+import 'package:agresell_app/features/auth/presentation/screens/role_selection_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

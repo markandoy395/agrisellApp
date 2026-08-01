@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/features/auth/presentation/widgets/authTextField.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:agresell_app/core/utils/philippine_phone_number.dart';
 import 'package:agresell_app/features/shared/widgets/profile/phone_number_sync_control.dart';
 

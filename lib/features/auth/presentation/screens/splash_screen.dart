@@ -6,8 +6,8 @@ import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/presentation/auth_dashboard_router.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/logoHeader.dart';
-import 'package:agresell_app/features/auth/presentation/screens/loginScreen.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/logo_header.dart';
+import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

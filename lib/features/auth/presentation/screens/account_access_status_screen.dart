@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
-import 'package:agresell_app/features/auth/presentation/screens/loginScreen.dart';
+import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
 
 class AccountAccessStatusScreen extends StatelessWidget {
   const AccountAccessStatusScreen({required this.message, super.key});

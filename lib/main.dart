@@ -16,7 +16,7 @@ import 'package:agresell_app/core/widgets/app_font_size_scope.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/auth/presentation/auth_dashboard_router.dart';
 import 'package:agresell_app/features/auth/presentation/auth_role_gate.dart';
-import 'package:agresell_app/features/auth/presentation/screens/splashScreen.dart';
+import 'package:agresell_app/features/auth/presentation/screens/splash_screen.dart';
 import 'package:agresell_app/features/buyer/home/domain/farmer_profile.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/screens/basket_screen.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/screens/checkout_screen.dart';

@@ -8,17 +8,17 @@ import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_validator.dart';
 import 'package:agresell_app/features/auth/presentation/auth_dashboard_router.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/authBottomLink.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/authButton.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/authCheckbox.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/authDivider.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_bottom_link.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_button.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_checkbox.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_divider.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_password_requirements.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/authScaffold.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/authTextField.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_scaffold.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/sign_up_identity_fields.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/socialSignInButton.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/social_sign_in_button.dart';
 import 'package:agresell_app/features/rider/profile/presentation/screens/rider_sign_up_screen.dart';
-import 'package:agresell_app/features/auth/presentation/screens/loginScreen.dart';
+import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({required this.role, super.key});

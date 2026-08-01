@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisellColors.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/features/buyer/home/presentation/controllers/home_product_browse_controller.dart';
-import 'package:agresell_app/features/buyer/home/presentation/screens/product_detail_screen.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_banner_carousel.dart';
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_categories_card.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_entrance_animation.dart';
@@ -23,6 +22,7 @@ class HomeProductScrollView extends StatelessWidget {
     required this.onShowFilters,
     required this.onReset,
     required this.onAddToBasket,
+    required this.onProductTap,
     required this.onRefresh,
     this.loadFailed = false,
     this.isLoading = false,
@@ -36,6 +36,7 @@ class HomeProductScrollView extends StatelessWidget {
   final VoidCallback onShowFilters;
   final VoidCallback onReset;
   final ValueChanged<HomeProduct> onAddToBasket;
+  final ValueChanged<HomeProduct> onProductTap;
   final RefreshCallback onRefresh;
   final bool loadFailed;
   final bool isLoading;
@@ -140,11 +141,7 @@ class HomeProductScrollView extends StatelessWidget {
                   onSavedToggle: (product) =>
                       browseController.toggleSaved(product.id),
                   onAddToBasket: onAddToBasket,
-                  onProductTap: (product) => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => ProductDetailScreen(product: product),
-                    ),
-                  ),
+                  onProductTap: onProductTap,
                 ),
               ),
             const SliverToBoxAdapter(child: SizedBox(height: 112)),

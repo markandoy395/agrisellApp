@@ -1,7 +1,12 @@
 import 'package:agresell_app/core/theme/agrisellTheme.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/home_screen.dart';
+import 'package:agresell_app/features/buyer/home/presentation/screens/product_detail_screen.dart';
+import 'package:agresell_app/features/shared/products/data/home_product_repository.dart';
+import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'support/home_product_fixture.dart';
 
 void main() {
   testWidgets('buyer home starts empty until backend products arrive', (
@@ -45,9 +50,30 @@ void main() {
     expect(find.text('No products available'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('buyer home opens the selected product details', (tester) async {
+    final product = testHomeProducts.first;
+    await _pumpHome(
+      tester,
+      productRepository: _FakeHomeProductRepository([product]),
+    );
+
+    await tester.tap(find.text(product.name));
+    await tester.pumpAndSettle();
+
+    final details = tester.widget<ProductDetailScreen>(
+      find.byType(ProductDetailScreen),
+    );
+    expect(details.product, same(product));
+    expect(find.byKey(const ValueKey('product-details-panel')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
 
-Future<void> _pumpHome(WidgetTester tester) async {
+Future<void> _pumpHome(
+  WidgetTester tester, {
+  HomeProductRepository productRepository = const HomeProductRepository(),
+}) async {
   await tester.binding.setSurfaceSize(const Size(430, 932));
   addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -55,8 +81,17 @@ Future<void> _pumpHome(WidgetTester tester) async {
     MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AgrisellTheme.light,
-      home: const HomeScreen(),
+      home: HomeScreen(productRepository: productRepository),
     ),
   );
   await tester.pumpAndSettle();
+}
+
+class _FakeHomeProductRepository extends HomeProductRepository {
+  const _FakeHomeProductRepository(this.products);
+
+  final List<HomeProduct> products;
+
+  @override
+  Future<List<HomeProduct>> loadProducts() async => products;
 }

@@ -14,10 +14,12 @@ import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_
 
 class HomeDashboardContent extends StatefulWidget {
   const HomeDashboardContent({
+    required this.onProductTap,
     this.productRepository = const HomeProductRepository(),
     super.key,
   });
 
+  final ValueChanged<HomeProduct> onProductTap;
   final HomeProductRepository productRepository;
 
   @override
@@ -131,6 +133,7 @@ class _HomeDashboardContentState extends State<HomeDashboardContent> {
           onShowFilters: _showFilters,
           onReset: _resetDiscovery,
           onAddToBasket: _addToBasket,
+          onProductTap: widget.onProductTap,
         );
       },
     );

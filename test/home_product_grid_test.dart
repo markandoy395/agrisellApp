@@ -36,7 +36,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Pumpkin / Kalabasa'));
-    expect(selected?.id, 'pumpkin-kalabasa');
+    expect(selected, same(testHomeProducts.first));
   });
 
   testWidgets('home product grid keeps the original image height', (
@@ -54,7 +54,12 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: CustomScrollView(
-              slivers: [HomeProductGrid(products: testHomeProducts)],
+              slivers: [
+                HomeProductGrid(
+                  products: testHomeProducts,
+                  onProductTap: (_) {},
+                ),
+              ],
             ),
           ),
         ),

@@ -6,11 +6,11 @@ import 'package:agresell_app/features/shared/products/presentation/widgets/home_
 
 class HomeProductGrid extends StatelessWidget {
   const HomeProductGrid({
+    required this.onProductTap,
     this.products = homeProducts,
     this.isSaved,
     this.onSavedToggle,
     this.onAddToBasket,
-    this.onProductTap,
     super.key,
   });
 
@@ -18,7 +18,7 @@ class HomeProductGrid extends StatelessWidget {
   final bool Function(String productId)? isSaved;
   final ValueChanged<HomeProduct>? onSavedToggle;
   final ValueChanged<HomeProduct>? onAddToBasket;
-  final ValueChanged<HomeProduct>? onProductTap;
+  final ValueChanged<HomeProduct> onProductTap;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +44,7 @@ class HomeProductGrid extends StatelessWidget {
           onAddToBasket: onAddToBasket == null
               ? null
               : () => onAddToBasket!(product),
-          onTap: () => onProductTap?.call(product),
+          onTap: () => onProductTap(product),
         );
       },
     );

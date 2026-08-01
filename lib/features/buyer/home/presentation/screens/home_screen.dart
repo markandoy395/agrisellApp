@@ -7,12 +7,15 @@ import 'package:agresell_app/features/auth/domain/signUpAccountData.dart';
 import 'package:agresell_app/core/theme/agrisellColors.dart';
 import 'package:agresell_app/features/shared/chat/data/marketplace_messaging_repository.dart';
 import 'package:agresell_app/features/shared/chat/data/marketplace_messaging_repository_factory.dart';
+import 'package:agresell_app/features/shared/products/data/home_product_repository.dart';
+import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/features/buyer/home/data/home_bottom_nav_items.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/common/buyer_responsive_text.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_dashboard_content.dart';
 import 'package:agresell_app/features/shared/widgets/navigation/custom_bottom_nav_bar.dart';
 import 'package:agresell_app/features/buyer/chat/presentation/screens/buyer_message_screen.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/farmer_screen.dart';
+import 'package:agresell_app/features/buyer/home/presentation/screens/product_detail_screen.dart';
 import 'package:agresell_app/features/shared/orders/presentation/screens/notification_screen.dart';
 import 'package:agresell_app/features/shared/orders/data/home_notification_badge_loader.dart';
 import 'package:agresell_app/features/shared/orders/domain/home_notification.dart';
@@ -24,6 +27,7 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({
     this.initialNavIndex = homeNavIndex,
     this.messagingRepository,
+    this.productRepository = const HomeProductRepository(),
     super.key,
   });
 
@@ -35,6 +39,7 @@ class HomeScreen extends StatefulWidget {
 
   final int initialNavIndex;
   final MarketplaceMessagingRepository? messagingRepository;
+  final HomeProductRepository productRepository;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -126,7 +131,12 @@ class _HomeScreenState extends State<HomeScreen> {
           onPageChanged: _handlePageChanged,
           physics: const ClampingScrollPhysics(),
           children: [
-            const _KeepAliveTab(child: HomeDashboardContent()),
+            _KeepAliveTab(
+              child: HomeDashboardContent(
+                productRepository: widget.productRepository,
+                onProductTap: _openProduct,
+              ),
+            ),
             _KeepAliveTab(
               child: BuyerMessageScreen(
                 isActive: _activeNavIndex == HomeScreen.messageNavIndex,
@@ -174,6 +184,14 @@ class _HomeScreenState extends State<HomeScreen> {
       case HomeNotificationDestination.none:
         break;
     }
+  }
+
+  void _openProduct(HomeProduct product) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ProductDetailScreen(product: product),
+      ),
+    );
   }
 }
 

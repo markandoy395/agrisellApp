@@ -13,7 +13,7 @@ import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/core/widgets/system_ui_scope.dart';
 import 'package:agresell_app/core/widgets/app_font_size_scope.dart';
-import 'package:agresell_app/features/auth/domain/signUpAccountData.dart';
+import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/auth/presentation/auth_dashboard_router.dart';
 import 'package:agresell_app/features/auth/presentation/auth_role_gate.dart';
 import 'package:agresell_app/features/auth/presentation/screens/splashScreen.dart';

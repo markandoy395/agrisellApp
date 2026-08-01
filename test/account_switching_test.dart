@@ -1,8 +1,8 @@
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
-import 'package:agresell_app/features/auth/data/authRegistrationService.dart';
+import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/domain/saved_account.dart';
-import 'package:agresell_app/features/auth/domain/signUpAccountData.dart';
+import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/account_switcher_content.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_controller.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';

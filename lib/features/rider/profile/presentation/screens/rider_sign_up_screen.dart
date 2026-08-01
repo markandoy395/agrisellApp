@@ -7,7 +7,7 @@ import 'package:agresell_app/core/utils/responsive.dart';
 import 'package:agresell_app/features/auth/presentation/screens/roleSelectionScreen.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/authBackground.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/logoHeader.dart';
-import 'package:agresell_app/features/auth/data/authRegistrationService.dart';
+import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/otp_verification_screen.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
 import 'package:agresell_app/features/rider/profile/presentation/screens/rider_application_submitted_screen.dart';

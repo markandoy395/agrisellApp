@@ -1,4 +1,4 @@
-import 'package:agresell_app/features/auth/domain/signUpAccountData.dart';
+import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/shared/notifications/domain/notification_category.dart';
 
 enum HomeNotificationType {

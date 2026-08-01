@@ -5,7 +5,7 @@ import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
-import 'package:agresell_app/features/auth/data/authRegistrationService.dart';
+import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/presentation/account_session_navigation.dart';
 import 'package:agresell_app/features/rider/profile/data/rider_registration_service.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';

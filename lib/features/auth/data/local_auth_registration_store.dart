@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:agresell_app/core/utils/philippine_phone_number.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_exception.dart';
 import 'package:agresell_app/features/auth/data/password_hasher.dart';
-import 'package:agresell_app/features/auth/domain/signUpAccountData.dart';
+import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 
 class LocalAuthRegistrationStore {
   final List<RegisteredAccount> _accounts = <RegisteredAccount>[];

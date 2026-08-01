@@ -1,5 +1,5 @@
 import 'package:agresell_app/core/models/user_profile.dart';
-import 'package:agresell_app/features/auth/data/authRegistrationService.dart';
+import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/domain/buyer_shipping_address.dart';
 

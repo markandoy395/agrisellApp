@@ -5,7 +5,7 @@ import 'package:agresell_app/features/auth/data/auth_registration_exception.dart
 import 'package:agresell_app/features/auth/data/local_auth_registration_store.dart';
 import 'package:agresell_app/features/auth/data/supabase_auth_service.dart';
 import 'package:agresell_app/features/auth/domain/buyer_shipping_address.dart';
-import 'package:agresell_app/features/auth/domain/signUpAccountData.dart';
+import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/farmer/registration/data/farmer_registration_service.dart';
 import 'package:agresell_app/features/farmer/registration/domain/farmer_signup_data.dart';
 

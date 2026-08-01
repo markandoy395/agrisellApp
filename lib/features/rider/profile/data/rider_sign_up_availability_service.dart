@@ -1,4 +1,4 @@
-import 'package:agresell_app/features/auth/data/authRegistrationService.dart';
+import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/rider/profile/data/rider_registration_service.dart';
 
 class RiderSignUpAvailabilityService {

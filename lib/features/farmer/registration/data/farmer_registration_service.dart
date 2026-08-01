@@ -4,7 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_exception.dart';
-import 'package:agresell_app/features/auth/domain/signUpAccountData.dart';
+import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/farmer/registration/domain/farmer_signup_data.dart';
 
 class FarmerRegistrationService {

@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/features/auth/data/authRegistrationService.dart';
+import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
-import 'package:agresell_app/features/auth/domain/signUpAccountData.dart';
+import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/services/push_notification_service.dart';
 import 'package:agresell_app/features/farmer/dashboard/data/farmer_bottom_nav_items.dart';

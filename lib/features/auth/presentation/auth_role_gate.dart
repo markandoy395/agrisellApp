@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/domain/auth_route_guard.dart';
-import 'package:agresell_app/features/auth/domain/signUpAccountData.dart';
+import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/auth/presentation/screens/account_access_status_screen.dart';
 
 typedef AuthRedirectBuilder = Widget Function(RegisteredAccount account);

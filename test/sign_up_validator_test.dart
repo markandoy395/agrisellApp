@@ -1,5 +1,5 @@
 import 'package:agresell_app/core/utils/philippine_phone_number.dart';
-import 'package:agresell_app/features/auth/domain/signUpValidator.dart';
+import 'package:agresell_app/features/auth/domain/sign_up_validator.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

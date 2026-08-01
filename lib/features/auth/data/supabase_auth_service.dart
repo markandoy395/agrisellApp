@@ -5,7 +5,7 @@ import 'package:agresell_app/core/utils/philippine_phone_number.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_exception.dart';
 import 'package:agresell_app/features/auth/data/buyer_shipping_address_repository.dart';
 import 'package:agresell_app/features/auth/domain/buyer_shipping_address.dart';
-import 'package:agresell_app/features/auth/domain/signUpAccountData.dart';
+import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 
 class SupabaseAuthService {
   const SupabaseAuthService();

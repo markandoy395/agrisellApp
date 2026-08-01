@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 import 'package:flutter/material.dart';
-import 'package:agresell_app/features/auth/domain/signUpAccountData.dart';
+import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/shared/orders/data/order_notification_factory.dart';
 import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
 import 'package:agresell_app/features/shared/orders/domain/home_notification.dart';

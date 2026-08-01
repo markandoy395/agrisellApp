@@ -8,7 +8,7 @@ import 'package:agresell_app/core/models/user_profile.dart';
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/core/utils/philippine_phone_number.dart';
 import 'package:agresell_app/core/utils/profile_birth_date.dart';
-import 'package:agresell_app/features/auth/data/authRegistrationService.dart';
+import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 
 class UserProfileSaveException implements Exception {

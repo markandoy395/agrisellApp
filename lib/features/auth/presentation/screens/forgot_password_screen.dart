@@ -3,7 +3,7 @@ import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/core/utils/password_policy.dart';
-import 'package:agresell_app/features/auth/data/authRegistrationService.dart';
+import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/presentation/screens/loginScreen.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/authButton.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_password_requirements.dart';

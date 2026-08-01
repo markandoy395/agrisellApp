@@ -1,5 +1,5 @@
 import 'package:agresell_app/features/auth/domain/auth_route_guard.dart';
-import 'package:agresell_app/features/auth/domain/signUpAccountData.dart';
+import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

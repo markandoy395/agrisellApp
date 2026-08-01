@@ -1,5 +1,5 @@
-import 'package:agresell_app/features/auth/data/authRegistrationService.dart';
-import 'package:agresell_app/features/auth/domain/signUpAccountData.dart';
+import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
+import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 
 Future<RegisteredAccount> registerTestAccount({
   AuthRole role = AuthRole.farmer,

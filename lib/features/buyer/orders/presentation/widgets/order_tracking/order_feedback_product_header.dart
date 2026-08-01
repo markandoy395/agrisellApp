@@ -8,15 +8,11 @@ class _FeedbackProductHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      ClipRRect(
-        borderRadius: BorderRadius.circular(9),
-        child: ResponsiveAssetImage(
-          asset: item.image,
-          width: 48,
-          height: 48,
-          fit: BoxFit.cover,
-          semanticLabel: '${item.productName} product photo',
-        ),
+      ProductThumbnail.square(
+        asset: item.image,
+        size: 48,
+        borderRadius: 9,
+        semanticLabel: '${item.productName} product photo',
       ),
       const SizedBox(width: 10),
       Expanded(

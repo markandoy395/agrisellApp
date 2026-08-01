@@ -49,15 +49,11 @@ class CheckoutItemTile extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: ResponsiveAssetImage(
-                    asset: item.image,
-                    width: 82,
-                    height: 82,
-                    fit: BoxFit.cover,
-                    semanticLabel: '${item.productName} product photo',
-                  ),
+                ProductThumbnail.square(
+                  asset: item.image,
+                  size: 82,
+                  borderRadius: 10,
+                  semanticLabel: '${item.productName} product photo',
                 ),
                 const SizedBox(width: 12),
                 Expanded(child: _CheckoutItemDetails(item: item)),

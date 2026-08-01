@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/features/shared/widgets/badges/animated_count_badge.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_text_styles.dart';
 
 class OrderStatusItem extends StatelessWidget {
@@ -67,7 +68,7 @@ class OrderStatusItem extends StatelessWidget {
                         key: ValueKey('order-count-$label'),
                         right: -7,
                         top: -7,
-                        child: _OrderCountBadge(count: count),
+                        child: AnimatedCountBadge(count: count),
                       ),
                   ],
                 ),
@@ -81,58 +82,6 @@ class OrderStatusItem extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _OrderCountBadge extends StatelessWidget {
-  const _OrderCountBadge({required this.count});
-
-  final int count;
-
-  @override
-  Widget build(BuildContext context) {
-    final label = count > 99 ? '99+' : '$count';
-
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 220),
-      switchInCurve: Curves.easeOutBack,
-      switchOutCurve: Curves.easeIn,
-      transitionBuilder: (child, animation) {
-        return ScaleTransition(
-          scale: animation,
-          child: FadeTransition(opacity: animation, child: child),
-        );
-      },
-      child: Container(
-        key: ValueKey(label),
-        constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: AgrisellColors.authGreen,
-          borderRadius: BorderRadius.circular(9),
-          border: Border.all(color: AgrisellColors.surface, width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: AgrisellColors.brandBlack.withValues(alpha: 0.16),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Text(
-          label,
-          maxLines: 1,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: AgrisellColors.surface,
-            fontSize: 12,
-            height: 1,
-            fontWeight: FontWeight.w700,
           ),
         ),
       ),

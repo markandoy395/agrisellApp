@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:agresell_app/core/constants/agrisellAssets.dart';
 import 'package:agresell_app/core/constants/agrisellRoutes.dart';
 import 'package:agresell_app/core/theme/agrisellColors.dart';
-import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
+import 'package:agresell_app/features/shared/products/presentation/widgets/product_thumbnail.dart';
 import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/widgets/basket/basket_item_content.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/widgets/basket/basket_selection_checkbox.dart';
@@ -77,15 +77,12 @@ class BasketItem extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(13),
-                  child: ResponsiveAssetImage(
-                    asset: item.image,
-                    width: 88,
-                    height: 96,
-                    fit: BoxFit.cover,
-                    semanticLabel: '${item.productName} product photo',
-                  ),
+                ProductThumbnail(
+                  asset: item.image,
+                  width: 88,
+                  height: 96,
+                  borderRadius: 13,
+                  semanticLabel: '${item.productName} product photo',
                 ),
                 const SizedBox(width: 12),
                 Expanded(child: BasketItemDetails(item: item)),

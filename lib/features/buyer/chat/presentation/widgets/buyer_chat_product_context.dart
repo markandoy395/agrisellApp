@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
-import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
 import 'package:agresell_app/features/shared/chat/domain/marketplace_conversation.dart';
+import 'package:agresell_app/features/shared/products/presentation/widgets/product_thumbnail.dart';
 
 class BuyerChatProductContext extends StatelessWidget {
   const BuyerChatProductContext({required this.thread, super.key});
@@ -20,18 +20,14 @@ class BuyerChatProductContext extends StatelessWidget {
       ),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: ResponsiveAssetImage(
-              asset: thread.productImageUrl == null
-                  ? 'assets/images/vege.jpeg'
-                  : null,
-              imageUrl: thread.productImageUrl,
-              width: 44,
-              height: 44,
-              fit: BoxFit.cover,
-              semanticLabel: '${thread.productName ?? thread.farmName} context',
-            ),
+          ProductThumbnail.square(
+            asset: thread.productImageUrl == null
+                ? 'assets/images/vege.jpeg'
+                : null,
+            imageUrl: thread.productImageUrl,
+            size: 44,
+            borderRadius: 8,
+            semanticLabel: '${thread.productName ?? thread.farmName} context',
           ),
           const SizedBox(width: 10),
           Expanded(

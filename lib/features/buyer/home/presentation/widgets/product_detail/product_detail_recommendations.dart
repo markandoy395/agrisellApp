@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
-import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
+import 'package:agresell_app/features/shared/products/presentation/widgets/product_thumbnail.dart';
 
 class ProductDetailRecommendations extends StatelessWidget {
   const ProductDetailRecommendations({
@@ -92,17 +92,14 @@ class _RecommendationCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: ResponsiveAssetImage(
-                    asset: product.image,
-                    imageUrl: product.imageUrl,
-                    width: 78,
-                    height: 82,
-                    fit: BoxFit.cover,
-                    semanticLabel: '${product.name} product photo',
-                    gaplessPlayback: true,
-                  ),
+                ProductThumbnail(
+                  asset: product.image,
+                  imageUrl: product.imageUrl,
+                  width: 78,
+                  height: 82,
+                  borderRadius: 12,
+                  semanticLabel: '${product.name} product photo',
+                  gaplessPlayback: true,
                 ),
                 const SizedBox(width: 10),
                 Expanded(

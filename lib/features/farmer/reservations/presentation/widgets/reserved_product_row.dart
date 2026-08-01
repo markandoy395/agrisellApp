@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
-import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
+import 'package:agresell_app/features/shared/products/presentation/widgets/product_thumbnail.dart';
 import 'package:agresell_app/features/farmer/reservations/domain/farmer_reservation.dart';
 
 class ReservedProductRow extends StatelessWidget {
@@ -19,15 +19,11 @@ class ReservedProductRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: ResponsiveAssetImage(
-              asset: product.image,
-              width: imageSize,
-              height: imageSize,
-              fit: BoxFit.cover,
-              semanticLabel: '${product.name} product photo',
-            ),
+          ProductThumbnail.square(
+            asset: product.image,
+            size: imageSize,
+            borderRadius: 10,
+            semanticLabel: '${product.name} product photo',
           ),
           const SizedBox(width: 12),
           Expanded(

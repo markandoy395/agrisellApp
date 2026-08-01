@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
 import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
+import 'package:agresell_app/features/shared/widgets/buttons/circular_header_icon_button.dart';
 
 class FarmerShopHeader extends StatelessWidget {
   const FarmerShopHeader({
@@ -48,10 +49,18 @@ class FarmerShopHeader extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(14, 4, 14, 0),
               child: Row(
                 children: [
-                  _HeaderIconButton(
+                  CircularHeaderIconButton(
                     semanticLabel: 'Back to farmers',
                     icon: Icons.arrow_back_rounded,
                     onTap: onBack,
+                    style: CircularHeaderIconButtonStyle.inkWell(
+                      dimension: 38,
+                      backgroundColor: AgrisellColors.brandBlack.withValues(
+                        alpha: 0.42,
+                      ),
+                      iconColor: AgrisellColors.surface,
+                      iconSize: 22,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -61,10 +70,18 @@ class FarmerShopHeader extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  _HeaderIconButton(
+                  CircularHeaderIconButton(
                     semanticLabel: 'More shop options',
                     icon: Icons.more_vert_rounded,
                     onTap: () {},
+                    style: CircularHeaderIconButtonStyle.inkWell(
+                      dimension: 38,
+                      backgroundColor: AgrisellColors.brandBlack.withValues(
+                        alpha: 0.42,
+                      ),
+                      iconColor: AgrisellColors.surface,
+                      iconSize: 22,
+                    ),
                   ),
                 ],
               ),
@@ -120,38 +137,6 @@ class _ShopSearchField extends StatelessWidget {
               color: AgrisellColors.surface.withValues(alpha: 0.9),
               size: 19,
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _HeaderIconButton extends StatelessWidget {
-  const _HeaderIconButton({
-    required this.semanticLabel,
-    required this.icon,
-    required this.onTap,
-  });
-
-  final String semanticLabel;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: semanticLabel,
-      child: SizedBox.square(
-        dimension: 38,
-        child: Material(
-          color: AgrisellColors.brandBlack.withValues(alpha: 0.42),
-          shape: const CircleBorder(),
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            onTap: onTap,
-            child: Icon(icon, color: AgrisellColors.surface, size: 22),
           ),
         ),
       ),

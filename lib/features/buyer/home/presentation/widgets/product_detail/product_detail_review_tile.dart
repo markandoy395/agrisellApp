@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
 import 'package:agresell_app/features/shared/products/domain/product_review.dart';
+import 'package:agresell_app/features/shared/widgets/ratings/rating_stars.dart';
 
 class ProductDetailReviewTile extends StatelessWidget {
   const ProductDetailReviewTile({required this.review, super.key});
@@ -47,18 +48,14 @@ class ProductDetailReviewTile extends StatelessWidget {
         ],
       ),
       const SizedBox(height: 6),
-      Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (var index = 0; index < 5; index++)
-            Icon(
-              review.rating >= index + 1
-                  ? Icons.star_rounded
-                  : Icons.star_border_rounded,
-              color: AgrisellColors.accentOrange,
-              size: 18,
-            ),
-        ],
+      RatingStars(
+        rating: review.rating,
+        precision: RatingStarPrecision.whole,
+        style: const RatingStarsStyle(
+          size: 18,
+          filledColor: AgrisellColors.accentOrange,
+          emptyColor: AgrisellColors.accentOrange,
+        ),
       ),
       if (review.comment.isNotEmpty) ...[
         const SizedBox(height: 5),

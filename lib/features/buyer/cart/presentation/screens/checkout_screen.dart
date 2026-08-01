@@ -5,7 +5,6 @@ import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
 import 'package:agresell_app/core/utils/agrisellPageRoute.dart';
-import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
 import 'package:agresell_app/core/utils/written_address.dart';
 import 'package:agresell_app/features/buyer/cart/data/checkout_payment_repository.dart';
 import 'package:agresell_app/features/shared/payments/domain/farmer_gcash_details.dart';
@@ -20,6 +19,7 @@ import 'package:agresell_app/features/shared/location/domain/confirmed_location.
 import 'package:agresell_app/features/shared/location/data/confirmed_location_repository.dart';
 import 'package:agresell_app/features/shared/location/presentation/location_selector.dart';
 import 'package:agresell_app/features/shared/payments/price_formatter.dart';
+import 'package:agresell_app/features/shared/products/presentation/widgets/product_thumbnail.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/widgets/basket/notched_checkout_footer.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/common/buyer_responsive_text.dart';
 import 'package:agresell_app/features/buyer/orders/presentation/screens/order_tracking_screen.dart';

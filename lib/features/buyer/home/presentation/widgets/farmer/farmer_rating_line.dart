@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/features/shared/widgets/ratings/rating_stars.dart';
 
 class FarmerRatingLine extends StatelessWidget {
   const FarmerRatingLine({required this.rating, this.starSize, super.key});
@@ -19,48 +20,19 @@ class FarmerRatingLine extends StatelessWidget {
           spacing: 8,
           runSpacing: 2,
           crossAxisAlignment: WrapCrossAlignment.center,
-          children: [_RatingStars(rating: rating, size: resolvedStarSize)],
+          children: [
+            RatingStars(
+              rating: rating,
+              style: RatingStarsStyle(
+                size: resolvedStarSize,
+                filledColor: AgrisellColors.accentOrange,
+                emptyColor: AgrisellColors.brandBlack,
+                emptyIcon: Icons.star_rounded,
+              ),
+            ),
+          ],
         );
       },
     );
-  }
-}
-
-class _RatingStars extends StatelessWidget {
-  const _RatingStars({required this.rating, required this.size});
-
-  final double rating;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (var index = 0; index < 5; index++)
-          Icon(_iconFor(index), color: _colorFor(index), size: size),
-      ],
-    );
-  }
-
-  IconData _iconFor(int index) {
-    final fullValue = index + 1;
-    if (rating >= fullValue) {
-      return Icons.star_rounded;
-    }
-
-    if (rating >= index + 0.5) {
-      return Icons.star_half_rounded;
-    }
-
-    return Icons.star_rounded;
-  }
-
-  Color _colorFor(int index) {
-    if (rating >= index + 0.5) {
-      return AgrisellColors.accentOrange;
-    }
-
-    return AgrisellColors.brandBlack;
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/constants/agrisellAssets.dart';
 import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/features/shared/widgets/badges/animated_count_badge.dart';
 import 'package:agresell_app/features/shared/widgets/navigation/home_asset_icon.dart';
 
 class BasketCountIconButton extends StatefulWidget {
@@ -103,72 +104,14 @@ class _BasketCountIconButtonState extends State<BasketCountIconButton>
               Positioned(
                 top: 0,
                 right: 0,
-                child: _BasketBadge(
-                  label: countLabel,
-                  background: widget.badgeColor,
-                  foreground: widget.badgeTextColor,
+                child: AnimatedCountBadge(
+                  count: widget.count,
+                  backgroundColor: widget.badgeColor,
+                  foregroundColor: widget.badgeTextColor,
                   borderColor: widget.badgeBorderColor,
                 ),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _BasketBadge extends StatelessWidget {
-  const _BasketBadge({
-    required this.label,
-    required this.background,
-    required this.foreground,
-    required this.borderColor,
-  });
-
-  final String label;
-  final Color background;
-  final Color foreground;
-  final Color borderColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 220),
-      switchInCurve: Curves.easeOutBack,
-      switchOutCurve: Curves.easeIn,
-      transitionBuilder: (child, animation) {
-        return ScaleTransition(
-          scale: animation,
-          child: FadeTransition(opacity: animation, child: child),
-        );
-      },
-      child: Container(
-        key: ValueKey(label),
-        constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: background,
-          borderRadius: BorderRadius.circular(9),
-          border: Border.all(color: borderColor, width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: AgrisellColors.brandBlack.withValues(alpha: 0.16),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Text(
-          label,
-          maxLines: 1,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: foreground,
-            fontSize: 12,
-            height: 1,
-            fontWeight: FontWeight.w700,
           ),
         ),
       ),

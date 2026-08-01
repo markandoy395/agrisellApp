@@ -57,15 +57,11 @@ class _TrackingOrderCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: ResponsiveAssetImage(
-                    asset: item.image,
-                    width: imageSize,
-                    height: imageSize,
-                    fit: BoxFit.cover,
-                    semanticLabel: '${item.productName} product photo',
-                  ),
+                ProductThumbnail.square(
+                  asset: item.image,
+                  size: imageSize,
+                  borderRadius: 12,
+                  semanticLabel: '${item.productName} product photo',
                 ),
                 const SizedBox(width: 12),
                 Expanded(child: _OrderItemSummary(item: item)),

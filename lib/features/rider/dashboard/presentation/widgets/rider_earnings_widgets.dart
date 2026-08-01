@@ -4,6 +4,7 @@ import 'package:agresell_app/core/theme/agrisellColors.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_analytics_models.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_analytics_formatters.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
+import 'package:agresell_app/features/shared/widgets/metrics/summary_metric.dart';
 
 class RiderEarningsSummaryCard extends StatelessWidget {
   const RiderEarningsSummaryCard({required this.summary, super.key});
@@ -39,21 +40,25 @@ class RiderEarningsSummaryCard extends StatelessWidget {
           spacing: 14,
           runSpacing: 12,
           children: [
-            _EarningsMetric(
+            SummaryMetric(
               label: 'Gross',
               value: formatRiderCurrency(summary.grossEarnings),
+              width: 92,
             ),
-            _EarningsMetric(
+            SummaryMetric(
               label: 'Completed',
               value: '${summary.completedDeliveries}',
+              width: 92,
             ),
-            _EarningsMetric(
+            SummaryMetric(
               label: 'Paid',
               value: formatRiderCurrency(summary.paidEarnings),
+              width: 92,
             ),
-            _EarningsMetric(
+            SummaryMetric(
               label: 'Pending',
               value: formatRiderCurrency(summary.pendingPayments),
+              width: 92,
             ),
           ],
         ),
@@ -103,39 +108,6 @@ class RiderEarningsBreakdownCard extends StatelessWidget {
           label: 'Penalties',
           value: '-${formatRiderCurrency(summary.penalties)}',
           color: AgrisellColors.statusRedText,
-        ),
-      ],
-    ),
-  );
-}
-
-class _EarningsMetric extends StatelessWidget {
-  const _EarningsMetric({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) => SizedBox(
-    width: 92,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: AgrisellColors.headingGreen,
-            fontSize: 13,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(
-            color: AgrisellColors.mutedText,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
         ),
       ],
     ),

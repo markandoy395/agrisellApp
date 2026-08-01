@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import 'package:agresell_app/features/buyer/cart/data/buyer_cart_repository.dart';
-import 'package:agresell_app/features/buyer/cart/domain/basket_cart_item.dart';
+import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
 
 class BasketCartSync {
   BasketCartSync({BuyerCartRepository? repository})

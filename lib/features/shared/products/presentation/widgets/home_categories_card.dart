@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
 import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
-import 'package:agresell_app/features/buyer/home/data/home_categories.dart';
-import 'package:agresell_app/features/buyer/home/domain/home_category.dart';
+import 'package:agresell_app/features/shared/products/data/home_categories.dart';
+import 'package:agresell_app/features/shared/products/domain/home_category.dart';
 
 class HomeCategoriesCard extends StatelessWidget {
   const HomeCategoriesCard({

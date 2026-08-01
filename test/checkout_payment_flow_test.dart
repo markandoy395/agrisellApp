@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:agresell_app/features/buyer/cart/data/checkout_payment_repository.dart';
-import 'package:agresell_app/features/buyer/cart/domain/farmer_gcash_details.dart';
+import 'package:agresell_app/features/shared/payments/domain/farmer_gcash_details.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_controller.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/screens/checkout_screen.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_payment.dart';

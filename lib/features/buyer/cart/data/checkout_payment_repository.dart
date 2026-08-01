@@ -1,7 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
-import 'package:agresell_app/features/buyer/cart/domain/farmer_gcash_details.dart';
+import 'package:agresell_app/features/shared/payments/domain/farmer_gcash_details.dart';
 
 abstract interface class CheckoutPaymentRepository {
   Future<List<FarmerGcashDetails>> loadGcashDetails(Iterable<int> farmIds);

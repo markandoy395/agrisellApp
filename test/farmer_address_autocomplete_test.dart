@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
 import 'package:agresell_app/core/theme/agrisellTheme.dart';
-import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_psgc_address_fields.dart';
+import 'package:agresell_app/features/shared/location/presentation/widgets/psgc_address_fields.dart';
 import 'package:agresell_app/features/shared/location/data/psgc_address_service.dart';
 
 void main() {
@@ -47,7 +47,7 @@ void main() {
       MaterialApp(
         theme: AgrisellTheme.light,
         home: Scaffold(
-          body: FarmerPsgcAddressFields(
+          body: PsgcAddressFields(
             provinceController: province,
             cityController: city,
             barangayController: barangay,
@@ -101,7 +101,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: FarmerPsgcAddressFields(
+          body: PsgcAddressFields(
             provinceController: province,
             cityController: city,
             barangayController: barangay,

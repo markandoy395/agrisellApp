@@ -6,7 +6,7 @@ import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/core/theme/agrisellColors.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/presentation/account_session_navigation.dart';
-import 'package:agresell_app/features/buyer/profile/data/user_profile_data.dart';
+import 'package:agresell_app/features/shared/profile/data/user_profile_data.dart';
 import 'package:agresell_app/core/models/user_profile.dart';
 import 'package:agresell_app/features/farmer/profile/presentation/widgets/farmer_history_card.dart';
 import 'package:agresell_app/features/farmer/profile/presentation/widgets/farmer_profile_edit_card.dart';

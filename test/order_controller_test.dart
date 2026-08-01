@@ -2,7 +2,7 @@ import 'support/home_product_fixture.dart';
 import 'package:agresell_app/features/shared/orders/data/order_local_repository.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_status.dart';
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
-import 'package:agresell_app/features/buyer/cart/domain/basket_cart_item.dart';
+import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_controller.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/order_controller.dart';
 import 'package:flutter_test/flutter_test.dart';

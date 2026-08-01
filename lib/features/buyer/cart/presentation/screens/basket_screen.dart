@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
-import 'package:agresell_app/features/buyer/cart/domain/basket_cart_item.dart';
+import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_controller.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/widgets/basket/basket_checkout_bar.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/widgets/basket/basket_header.dart';

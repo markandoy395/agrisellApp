@@ -10,7 +10,7 @@ import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_payment.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/order_controller.dart';
 import 'package:agresell_app/features/shared/orders/presentation/widgets/order_acceptance_deadline_card.dart';
-import 'package:agresell_app/features/buyer/cart/presentation/widgets/basket/basket_price_formatter.dart';
+import 'package:agresell_app/features/shared/payments/price_formatter.dart';
 import 'package:agresell_app/features/buyer/chat/presentation/buyer_conversation_launcher.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/common/buyer_responsive_text.dart';
 import 'package:agresell_app/features/buyer/orders/presentation/widgets/gcash_reference_retry_sheet.dart';

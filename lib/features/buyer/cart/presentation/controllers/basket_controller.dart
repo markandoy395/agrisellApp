@@ -2,7 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/features/buyer/cart/domain/basket_cart_item.dart';
+import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
 import 'package:agresell_app/features/buyer/cart/data/basket_cart_sync.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 

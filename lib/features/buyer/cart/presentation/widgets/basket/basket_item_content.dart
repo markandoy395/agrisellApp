@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
-import 'package:agresell_app/features/buyer/cart/domain/basket_cart_item.dart';
-import 'package:agresell_app/features/buyer/cart/presentation/widgets/basket/basket_price_formatter.dart';
+import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
+import 'package:agresell_app/features/shared/payments/price_formatter.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/widgets/basket/quantity_stepper.dart';
 
 class BasketItemDetails extends StatelessWidget {

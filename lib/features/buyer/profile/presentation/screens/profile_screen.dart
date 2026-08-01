@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
 import 'package:agresell_app/features/auth/presentation/account_session_navigation.dart';
-import 'package:agresell_app/features/buyer/profile/data/user_profile_data.dart';
+import 'package:agresell_app/features/shared/profile/data/user_profile_data.dart';
 import 'package:agresell_app/features/buyer/profile/data/buyer_shipping_address_saver.dart';
 import 'package:agresell_app/features/auth/domain/buyer_shipping_address.dart';
 import 'package:agresell_app/core/utils/profile_edit_validator.dart';

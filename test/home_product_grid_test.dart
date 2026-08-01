@@ -1,5 +1,6 @@
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_grid.dart';
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_grid_skeleton.dart';
+import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,6 +8,37 @@ import 'package:flutter_test/flutter_test.dart';
 import 'support/home_product_fixture.dart';
 
 void main() {
+  testWidgets('shared grid delegates product navigation to its owner', (
+    tester,
+  ) async {
+    HomeProduct? selected;
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(430, 932);
+    addTearDown(() {
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetPhysicalSize();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: CustomScrollView(
+            slivers: [
+              HomeProductGrid(
+                products: testHomeProducts,
+                onProductTap: (product) => selected = product,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Pumpkin / Kalabasa'));
+    expect(selected?.id, 'pumpkin-kalabasa');
+  });
+
   testWidgets('home product grid keeps the original image height', (
     tester,
   ) async {

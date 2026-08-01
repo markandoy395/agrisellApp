@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/utils/philippine_phone_number.dart';
 import 'package:agresell_app/core/utils/profile_birth_date.dart';
-import 'package:agresell_app/features/buyer/profile/presentation/widgets/profile_date_of_birth_row.dart';
-import 'package:agresell_app/features/buyer/profile/presentation/widgets/profile_edit_action_button.dart';
-import 'package:agresell_app/features/buyer/profile/presentation/widgets/profile_edit_form_rows.dart';
+import 'package:agresell_app/features/shared/widgets/profile/profile_date_of_birth_row.dart';
+import 'package:agresell_app/features/shared/widgets/profile/profile_edit_action_button.dart';
+import 'package:agresell_app/features/shared/widgets/profile/profile_edit_form_rows.dart';
 import 'package:agresell_app/features/shared/widgets/profile/phone_number_sync_control.dart';
 
 class ProfileIdentityEditFields extends StatelessWidget {

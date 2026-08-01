@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
-import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_psgc_address_fields.dart';
+import 'package:agresell_app/features/shared/location/presentation/widgets/psgc_address_fields.dart';
 
 class ShippingAddressForm extends StatelessWidget {
   const ShippingAddressForm({
@@ -54,7 +54,7 @@ class ShippingAddressForm extends StatelessWidget {
         ),
       ),
       const SizedBox(height: 10),
-      FarmerPsgcAddressFields(
+      PsgcAddressFields(
         provinceController: provinceController,
         cityController: cityController,
         barangayController: barangayController,

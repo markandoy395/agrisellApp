@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:agresell_app/features/buyer/cart/domain/basket_cart_item.dart';
+import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
 import 'package:agresell_app/features/farmer/reservations/presentation/screens/farmer_reserve_screen.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_payment.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/order_controller.dart';

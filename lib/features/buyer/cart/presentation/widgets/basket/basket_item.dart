@@ -4,7 +4,7 @@ import 'package:agresell_app/core/constants/agrisellAssets.dart';
 import 'package:agresell_app/core/constants/agrisellRoutes.dart';
 import 'package:agresell_app/core/theme/agrisellColors.dart';
 import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
-import 'package:agresell_app/features/buyer/cart/domain/basket_cart_item.dart';
+import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/widgets/basket/basket_item_content.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/widgets/basket/basket_selection_checkbox.dart';
 import 'package:agresell_app/features/buyer/home/domain/farmer_profile.dart';

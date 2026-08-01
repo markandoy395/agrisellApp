@@ -5,7 +5,7 @@ import 'package:agresell_app/features/farmer/registration/presentation/controlle
 import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_address_sync_control.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_field.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_options_field.dart';
-import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_psgc_address_fields.dart';
+import 'package:agresell_app/features/shared/location/presentation/widgets/psgc_address_fields.dart';
 import 'package:agresell_app/features/shared/location/presentation/widgets/location_map_preview.dart';
 
 class FarmerSignupFarmStep extends StatelessWidget {
@@ -70,7 +70,7 @@ class FarmerSignupFarmStep extends StatelessWidget {
           ),
         ),
       FarmerAddressSyncControl(controllers: controllers, onSynced: onChanged),
-      FarmerPsgcAddressFields(
+      PsgcAddressFields(
         provinceController: controllers.farmProvince,
         cityController: controllers.farmCity,
         barangayController: controllers.farmBarangay,

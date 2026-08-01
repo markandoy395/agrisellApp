@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/features/shared/products/data/home_products.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
-import 'package:agresell_app/features/buyer/home/presentation/screens/product_detail_screen.dart';
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_card.dart';
 
 class HomeProductGrid extends StatelessWidget {
@@ -11,6 +10,7 @@ class HomeProductGrid extends StatelessWidget {
     this.isSaved,
     this.onSavedToggle,
     this.onAddToBasket,
+    this.onProductTap,
     super.key,
   });
 
@@ -18,14 +18,7 @@ class HomeProductGrid extends StatelessWidget {
   final bool Function(String productId)? isSaved;
   final ValueChanged<HomeProduct>? onSavedToggle;
   final ValueChanged<HomeProduct>? onAddToBasket;
-
-  void _openProduct(BuildContext context, HomeProduct product) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => ProductDetailScreen(product: product),
-      ),
-    );
-  }
+  final ValueChanged<HomeProduct>? onProductTap;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +44,7 @@ class HomeProductGrid extends StatelessWidget {
           onAddToBasket: onAddToBasket == null
               ? null
               : () => onAddToBasket!(product),
-          onTap: () => _openProduct(context, product),
+          onTap: () => onProductTap?.call(product),
         );
       },
     );

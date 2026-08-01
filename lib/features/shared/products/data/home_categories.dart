@@ -1,6 +1,6 @@
 import 'package:agresell_app/core/constants/agrisellAssets.dart';
-import 'package:agresell_app/features/buyer/home/domain/home_category.dart';
 import 'package:agresell_app/features/shared/products/domain/product_categories.dart';
+import 'package:agresell_app/features/shared/products/domain/home_category.dart';
 
 const List<HomeCategory> homeCategories = <HomeCategory>[
   HomeCategory(

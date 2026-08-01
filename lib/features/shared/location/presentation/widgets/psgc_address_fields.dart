@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
-import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_address_autocomplete_field.dart';
 import 'package:agresell_app/features/shared/location/data/psgc_address_service.dart';
+import 'package:agresell_app/features/shared/location/presentation/widgets/address_autocomplete_field.dart';
 
-class FarmerPsgcAddressFields extends StatefulWidget {
-  const FarmerPsgcAddressFields({
+class PsgcAddressFields extends StatefulWidget {
+  const PsgcAddressFields({
     required this.provinceController,
     required this.cityController,
     required this.barangayController,
@@ -23,11 +23,10 @@ class FarmerPsgcAddressFields extends StatefulWidget {
   final PhilippineAddressLookup? lookup;
 
   @override
-  State<FarmerPsgcAddressFields> createState() =>
-      _FarmerPsgcAddressFieldsState();
+  State<PsgcAddressFields> createState() => _PsgcAddressFieldsState();
 }
 
-class _FarmerPsgcAddressFieldsState extends State<FarmerPsgcAddressFields> {
+class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
   late final PhilippineAddressLookup _lookup;
   List<PsgcAddressOption> _provinces = const [];
   List<PsgcAddressOption> _localities = const [];
@@ -109,7 +108,7 @@ class _FarmerPsgcAddressFieldsState extends State<FarmerPsgcAddressFields> {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      FarmerAddressAutocompleteField(
+      AddressAutocompleteField(
         label: 'Province',
         controller: widget.provinceController,
         options: _provinces,
@@ -124,14 +123,14 @@ class _FarmerPsgcAddressFieldsState extends State<FarmerPsgcAddressFields> {
           widget.onChanged();
         },
       ),
-      FarmerAddressAutocompleteField(
+      AddressAutocompleteField(
         label: 'City or municipality',
         controller: widget.cityController,
         options: _filteredLocalities,
         onChanged: _cityChanged,
         onSelected: _selectLocality,
       ),
-      FarmerAddressAutocompleteField(
+      AddressAutocompleteField(
         label: 'Barangay',
         controller: widget.barangayController,
         options: _barangays,

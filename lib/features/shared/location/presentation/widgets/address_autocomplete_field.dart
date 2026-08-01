@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisellColors.dart';
 import 'package:agresell_app/features/shared/location/data/psgc_address_service.dart';
 
-class FarmerAddressAutocompleteField extends StatefulWidget {
-  const FarmerAddressAutocompleteField({
+class AddressAutocompleteField extends StatefulWidget {
+  const AddressAutocompleteField({
     required this.label,
     required this.controller,
     required this.options,
@@ -20,12 +20,11 @@ class FarmerAddressAutocompleteField extends StatefulWidget {
   final ValueChanged<PsgcAddressOption> onSelected;
 
   @override
-  State<FarmerAddressAutocompleteField> createState() =>
-      _FarmerAddressAutocompleteFieldState();
+  State<AddressAutocompleteField> createState() =>
+      _AddressAutocompleteFieldState();
 }
 
-class _FarmerAddressAutocompleteFieldState
-    extends State<FarmerAddressAutocompleteField> {
+class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
   final _focusNode = FocusNode();
 
   @override
@@ -35,7 +34,7 @@ class _FarmerAddressAutocompleteFieldState
   }
 
   @override
-  void didUpdateWidget(covariant FarmerAddressAutocompleteField oldWidget) {
+  void didUpdateWidget(covariant AddressAutocompleteField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller == widget.controller) return;
     oldWidget.controller.removeListener(_textChanged);

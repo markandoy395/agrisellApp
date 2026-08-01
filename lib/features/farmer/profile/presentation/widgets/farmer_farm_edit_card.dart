@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
-import 'package:agresell_app/features/buyer/profile/presentation/widgets/profile_edit_action_button.dart';
-import 'package:agresell_app/features/buyer/profile/presentation/widgets/profile_edit_form_rows.dart';
+import 'package:agresell_app/features/shared/widgets/profile/profile_edit_action_button.dart';
+import 'package:agresell_app/features/shared/widgets/profile/profile_edit_form_rows.dart';
 import 'package:agresell_app/features/farmer/profile/data/farmer_farm_service.dart';
 import 'package:agresell_app/features/farmer/registration/domain/farm_model.dart';
-import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_psgc_address_fields.dart';
+import 'package:agresell_app/features/shared/location/presentation/widgets/psgc_address_fields.dart';
 import 'package:agresell_app/features/shared/location/domain/confirmed_location.dart';
 import 'package:agresell_app/features/shared/location/presentation/location_selector.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_card_shell.dart';
@@ -175,7 +175,7 @@ class _FarmerFarmEditCardState extends State<FarmerFarmEditCard> {
                       ),
                     ),
                   ),
-                  FarmerPsgcAddressFields(
+                  PsgcAddressFields(
                     provinceController: _provinceController,
                     cityController: _cityController,
                     barangayController: _barangayController,

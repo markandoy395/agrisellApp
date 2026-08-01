@@ -4,7 +4,7 @@ import 'package:agresell_app/core/utils/philippine_phone_number.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/controllers/farmer_signup_controllers.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_field.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_gender_choice.dart';
-import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_psgc_address_fields.dart';
+import 'package:agresell_app/features/shared/location/presentation/widgets/psgc_address_fields.dart';
 import 'package:agresell_app/features/shared/widgets/profile/phone_number_sync_control.dart';
 
 class FarmerSignupPersonalStep extends StatelessWidget {
@@ -83,7 +83,7 @@ class FarmerSignupPersonalStep extends StatelessWidget {
         controller: controllers.address,
         onChanged: (_) => onChanged(),
       ),
-      FarmerPsgcAddressFields(
+      PsgcAddressFields(
         provinceController: controllers.province,
         cityController: controllers.city,
         barangayController: controllers.barangay,

@@ -1,5 +1,5 @@
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
-import 'package:agresell_app/features/buyer/cart/domain/basket_cart_item.dart';
+import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
 
 class BuyerCartRepository {
   const BuyerCartRepository();

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
 import 'package:agresell_app/core/utils/profile_birth_date.dart';
-import 'package:agresell_app/features/buyer/profile/presentation/widgets/profile_edit_row_shell.dart';
+import 'package:agresell_app/features/shared/widgets/profile/profile_edit_row_shell.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_text_styles.dart';
 
 class ProfileDateOfBirthRow extends StatelessWidget {

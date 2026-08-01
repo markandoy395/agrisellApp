@@ -1,4 +1,4 @@
-import 'package:agresell_app/features/buyer/cart/domain/basket_cart_item.dart';
+import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_feedback.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_payment.dart';
 

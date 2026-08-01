@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisellColors.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/features/buyer/home/presentation/controllers/home_product_browse_controller.dart';
+import 'package:agresell_app/features/buyer/home/presentation/screens/product_detail_screen.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_banner_carousel.dart';
-import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_categories_card.dart';
+import 'package:agresell_app/features/shared/products/presentation/widgets/home_categories_card.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_entrance_animation.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_header.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_empty_products.dart';
@@ -139,6 +140,11 @@ class HomeProductScrollView extends StatelessWidget {
                   onSavedToggle: (product) =>
                       browseController.toggleSaved(product.id),
                   onAddToBasket: onAddToBasket,
+                  onProductTap: (product) => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => ProductDetailScreen(product: product),
+                    ),
+                  ),
                 ),
               ),
             const SliverToBoxAdapter(child: SizedBox(height: 112)),

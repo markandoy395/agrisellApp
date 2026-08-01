@@ -1,5 +1,5 @@
 begin; 
--- erd.png is the final public-schema contract. Preserve useful normalized
+-- docs/architecture/erd.png is the final public-schema contract. Preserve useful normalized
 -- values before removing every public table/column that is absent from it.
 alter table public.users add column if not exists password_hash text; alter table public.deliveries add column if not exists estimated_delivery_time timestamptz, add column if not exists actual_delivery_time timestamptz, add column if not exists vehicle_types text, add column if not exists cold_chain_available boolean, add column if not exists pickup_location text, add column if not exists dropoff_location text;
 alter table public.logistics_companies add column if not exists delivery_id bigint; alter table public.riders add column if not exists license_number text, add column if not exists full_name text, add column if not exists vehicle_type text, add column if not exists vehicle_plate_number text, add column if not exists rating numeric(3,2),

@@ -28,9 +28,9 @@ void main() {
   testWidgets('signup starts with a role choice before the form', (
     tester,
   ) async {
-    await pumpWelcome(tester);
+    await pumpLogin(tester);
 
-    await tester.tap(find.widgetWithText(OutlinedButton, 'Sign Up'));
+    await tester.tap(find.text('Create account'));
     await tester.pumpAndSettle();
 
     expect(find.text('Are you a'), findsOneWidget);

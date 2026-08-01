@@ -12,6 +12,7 @@ import 'package:agresell_app/features/rider/deliveries/domain/rider_live_locatio
 import 'package:agresell_app/features/rider/deliveries/domain/rider_location.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_location_quality.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_route_geometry.dart';
+import 'support/in_memory_rider_live_location_store.dart';
 
 void main() {
   final now = DateTime.now();

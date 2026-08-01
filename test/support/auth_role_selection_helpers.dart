@@ -1,6 +1,6 @@
 import 'package:agresell_app/core/theme/agrisellTheme.dart';
+import 'package:agresell_app/features/auth/presentation/screens/loginScreen.dart';
 import 'package:agresell_app/features/auth/presentation/screens/roleSelectionScreen.dart';
-import 'package:agresell_app/features/auth/presentation/screens/welcomeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -18,7 +18,7 @@ Future<void> pumpRoleSelection(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-Future<void> pumpWelcome(WidgetTester tester) async {
+Future<void> pumpLogin(WidgetTester tester) async {
   await tester.binding.setSurfaceSize(const Size(430, 932));
   addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -26,7 +26,7 @@ Future<void> pumpWelcome(WidgetTester tester) async {
     MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AgrisellTheme.light,
-      home: const WelcomeScreen(),
+      home: const LoginScreen(),
     ),
   );
   await tester.pumpAndSettle();

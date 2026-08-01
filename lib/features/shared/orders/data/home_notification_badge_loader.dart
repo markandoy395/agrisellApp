@@ -1,6 +1,5 @@
 import 'package:agresell_app/features/auth/domain/signUpAccountData.dart';
 import 'package:agresell_app/features/shared/orders/data/home_notification_repository.dart';
-import 'package:agresell_app/features/shared/orders/data/home_notifications.dart';
 import 'package:agresell_app/features/shared/orders/domain/home_notification.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/order_controller.dart';
 
@@ -45,7 +44,6 @@ int _unreadCount({
   return [
     ...orderController.orderNotifications,
     ...databaseNotifications,
-    ...homeNotifications,
   ].where((notification) {
     return notification.isVisibleTo(role, userId: userId) &&
         !orderController.isNotificationRead(notification);

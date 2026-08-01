@@ -5,21 +5,29 @@ import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
 import 'package:agresell_app/core/constants/agrisellRoutes.dart';
 import 'package:agresell_app/core/theme/agrisellColors.dart';
-import 'package:agresell_app/features/shared/products/data/home_products.dart';
+import 'package:agresell_app/features/shared/products/data/home_product_repository.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
+import 'package:agresell_app/features/shared/products/presentation/controllers/home_product_catalog_controller.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_controller.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/common/buyer_responsive_text.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_action_bar.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_bottom_bar.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_info_card.dart';
-import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_recommendations.dart';
+import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_recommendations_section.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_reviews.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_image_header.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  const ProductDetailScreen({required this.product, super.key});
+  const ProductDetailScreen({
+    required this.product,
+    this.catalogController,
+    this.productRepository = const HomeProductRepository(),
+    super.key,
+  });
 
   final HomeProduct product;
+  final HomeProductCatalogController? catalogController;
+  final HomeProductRepository productRepository;
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -30,15 +38,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   final _quantity = ValueNotifier<int>(1);
   final _showAddedFeedback = ValueNotifier<bool>(false);
   Timer? _addedFeedbackTimer;
-  late final List<HomeProduct> _recommendations;
+  late final HomeProductCatalogController _catalogController;
+  late final bool _ownsCatalogController;
 
   @override
   void initState() {
     super.initState();
-    _recommendations = homeProducts
-        .where((product) => product.id != widget.product.id)
-        .take(5)
-        .toList(growable: false);
+    _ownsCatalogController = widget.catalogController == null;
+    _catalogController =
+        widget.catalogController ??
+        HomeProductCatalogController(repository: widget.productRepository);
+    if (_catalogController.status == HomeProductCatalogStatus.idle) {
+      unawaited(_catalogController.load());
+    }
   }
 
   void _addToBasket() {
@@ -88,7 +100,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   void _openProduct(HomeProduct product) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => ProductDetailScreen(product: product),
+        builder: (_) => ProductDetailScreen(
+          product: product,
+          catalogController: _catalogController,
+        ),
       ),
     );
   }
@@ -98,6 +113,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     _addedFeedbackTimer?.cancel();
     _quantity.dispose();
     _showAddedFeedback.dispose();
+    if (_ownsCatalogController) _catalogController.dispose();
     super.dispose();
   }
 
@@ -170,8 +186,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
               ),
               SliverToBoxAdapter(
-                child: ProductDetailRecommendations(
-                  products: _recommendations,
+                child: ProductDetailRecommendationsSection(
+                  product: widget.product,
+                  catalogController: _catalogController,
                   onProductSelected: _openProduct,
                 ),
               ),

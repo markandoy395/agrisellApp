@@ -68,6 +68,21 @@ void main() {
     expect(find.byKey(const ValueKey('product-details-panel')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('buyer home retries a failed product query', (tester) async {
+    final repository = _RetryingHomeProductRepository();
+    await _pumpHome(tester, productRepository: repository);
+
+    expect(find.text('Unable to load products'), findsOneWidget);
+    expect(find.text('Try again'), findsOneWidget);
+
+    await tester.tap(find.text('Try again'));
+    await tester.pumpAndSettle();
+
+    expect(find.text(testHomeProducts.first.name), findsOneWidget);
+    expect(repository.attempts, 2);
+    expect(tester.takeException(), isNull);
+  });
 }
 
 Future<void> _pumpHome(
@@ -94,4 +109,15 @@ class _FakeHomeProductRepository extends HomeProductRepository {
 
   @override
   Future<List<HomeProduct>> loadProducts() async => products;
+}
+
+class _RetryingHomeProductRepository extends HomeProductRepository {
+  var attempts = 0;
+
+  @override
+  Future<List<HomeProduct>> loadProducts() async {
+    attempts++;
+    if (attempts == 1) throw Exception('temporary product failure');
+    return [testHomeProducts.first];
+  }
 }

@@ -123,12 +123,15 @@ class HomeProductScrollView extends StatelessWidget {
             else if (products.isEmpty)
               SliverToBoxAdapter(
                 child: HomeEmptyProducts(
-                  onReset: onReset,
+                  onReset: loadFailed ? onRefresh : onReset,
+                  actionLabel: loadFailed
+                      ? 'Try again'
+                      : 'Reset search and filters',
                   title: loadFailed
                       ? 'Unable to load products'
                       : 'No products available',
                   message: loadFailed
-                      ? 'Pull down to try again.'
+                      ? 'Check your connection and try again.'
                       : 'No commodities have been posted yet. Pull down to refresh the marketplace.',
                 ),
               )

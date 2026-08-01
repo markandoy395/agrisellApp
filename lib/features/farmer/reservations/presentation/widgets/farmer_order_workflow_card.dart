@@ -11,14 +11,18 @@ import 'package:agresell_app/features/farmer/reservations/presentation/widgets/f
 import 'package:agresell_app/features/shared/orders/presentation/widgets/order_acceptance_deadline_card.dart';
 
 class FarmerOrderWorkflowCard extends StatelessWidget {
-  const FarmerOrderWorkflowCard({required this.order, super.key});
+  const FarmerOrderWorkflowCard({
+    required this.order,
+    required this.controller,
+    super.key,
+  });
 
   final PlacedOrder order;
+  final OrderController controller;
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final controller = OrderController.instance;
     final action = _actionFor(controller);
 
     return DecoratedBox(

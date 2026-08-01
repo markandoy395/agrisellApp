@@ -100,7 +100,10 @@ class _FarmerShopScreenState extends State<FarmerShopScreen> {
 
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => ProductDetailScreen(product: product),
+        builder: (_) => ProductDetailScreen(
+          product: product,
+          productRepository: widget.productRepository,
+        ),
       ),
     );
   }

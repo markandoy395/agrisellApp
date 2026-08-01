@@ -7,12 +7,14 @@ class HomeEmptyProducts extends StatelessWidget {
     required this.onReset,
     required this.title,
     required this.message,
+    this.actionLabel = 'Reset search and filters',
     super.key,
   });
 
   final VoidCallback onReset;
   final String title;
   final String message;
+  final String actionLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +67,12 @@ class HomeEmptyProducts extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text(
-                'Reset search and filters',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+              child: Text(
+                actionLabel,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ),

@@ -9,7 +9,6 @@ import 'package:agresell_app/features/shared/notifications/domain/notification_c
 import 'package:agresell_app/features/shared/notifications/domain/notification_load_state.dart';
 import 'package:agresell_app/features/shared/notifications/presentation/widgets/notification_filter_tabs.dart';
 import 'package:agresell_app/features/shared/notifications/presentation/widgets/notification_state_view.dart';
-import 'package:agresell_app/features/shared/orders/data/home_notifications.dart';
 import 'package:agresell_app/features/shared/orders/data/home_notification_repository.dart';
 import 'package:agresell_app/features/shared/orders/domain/home_notification.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/notification_controller.dart';
@@ -24,25 +23,27 @@ class NotificationScreen extends StatefulWidget {
   const NotificationScreen({
     this.role = AuthRole.buyer,
     this.userId,
-    this.loadState = NotificationLoadState.ready,
+    this.loadState,
     this.errorMessage,
     this.onRetry,
     this.onNotificationSelected,
     this.onUnreadCountChanged,
     this.controller,
     this.notifications,
+    this.repository = const HomeNotificationRepository(),
     super.key,
   });
 
   final AuthRole role;
   final String? userId;
-  final NotificationLoadState loadState;
+  final NotificationLoadState? loadState;
   final String? errorMessage;
   final VoidCallback? onRetry;
   final ValueChanged<HomeNotification>? onNotificationSelected;
   final ValueChanged<int>? onUnreadCountChanged;
   final NotificationController? controller;
   final List<HomeNotification>? notifications;
+  final HomeNotificationRepository repository;
 
   @override
   State<NotificationScreen> createState() => _NotificationScreenState();
@@ -50,12 +51,14 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   final _orderController = OrderController.instance;
-  final _repository = const HomeNotificationRepository();
+  late HomeNotificationRepository _repository;
   late final NotificationController _controller;
   late final Listenable _updates;
   late final bool _ownsController;
   StreamSubscription<List<HomeNotification>>? _notificationSubscription;
   var _databaseNotifications = const <HomeNotification>[];
+  var _repositoryLoadState = NotificationLoadState.loading;
+  String? _repositoryError;
   final _shownApprovalIds = <String>{};
   var _filter = NotificationFilter.all;
   int? _lastReportedUnreadCount;
@@ -65,6 +68,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   void initState() {
     super.initState();
+    _repository = widget.repository;
     _ownsController = widget.controller == null;
     _controller = widget.controller ?? NotificationController();
     _updates = Listenable.merge([_orderController, _controller]);
@@ -75,9 +79,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
   void didUpdateWidget(covariant NotificationScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.userId == widget.userId &&
-        identical(oldWidget.notifications, widget.notifications)) {
+        identical(oldWidget.notifications, widget.notifications) &&
+        identical(oldWidget.repository, widget.repository)) {
       return;
     }
+    _repository = widget.repository;
     unawaited(_notificationSubscription?.cancel());
     _notificationSubscription = null;
     _databaseNotifications = const [];
@@ -99,6 +105,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
         animation: _updates,
         builder: (context, _) {
           final notifications = _notifications();
+          final loadState =
+              widget.loadState ??
+              (widget.notifications != null
+                  ? NotificationLoadState.ready
+                  : _repositoryLoadState);
           final unreadCount = notifications
               .where((notification) => !_controller.isRead(notification))
               .length;
@@ -117,7 +128,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     ? null
                     : () => _confirmClearAll(notifications),
               ),
-              Expanded(child: _content(notifications)),
+              Expanded(child: _content(notifications, loadState)),
             ],
           );
         },
@@ -126,7 +137,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   List<HomeNotification> _notifications() {
-    final source = widget.notifications ?? homeNotifications;
+    final source = widget.notifications ?? const <HomeNotification>[];
     final items =
         [
               ..._orderController.orderNotifications,
@@ -150,8 +161,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
     return items;
   }
 
-  Widget _content(List<HomeNotification> notifications) {
-    return switch (widget.loadState) {
+  Widget _content(
+    List<HomeNotification> notifications,
+    NotificationLoadState loadState,
+  ) {
+    return switch (loadState) {
       NotificationLoadState.loading => const NotificationStateView(
         icon: Icons.sync_rounded,
         title: 'Loading notifications',
@@ -163,16 +177,18 @@ class _NotificationScreenState extends State<NotificationScreen> {
         title: 'You are offline',
         message:
             'Reconnect to refresh notifications. Existing updates remain safe.',
-        actionLabel: widget.onRetry == null ? null : 'Try again',
-        onAction: widget.onRetry,
+        actionLabel: _retryAction == null ? null : 'Try again',
+        onAction: _retryAction,
       ),
       NotificationLoadState.error => NotificationStateView(
         icon: Icons.error_outline_rounded,
         title: 'Notifications unavailable',
         message:
-            widget.errorMessage ?? 'Something went wrong. Please try again.',
-        actionLabel: widget.onRetry == null ? null : 'Try again',
-        onAction: widget.onRetry,
+            widget.errorMessage ??
+            _repositoryError ??
+            'Something went wrong. Please try again.',
+        actionLabel: _retryAction == null ? null : 'Try again',
+        onAction: _retryAction,
       ),
       NotificationLoadState.ready => NotificationFeed(
         notifications: notifications,
@@ -183,5 +199,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
         onDelete: _delete,
       ),
     };
+  }
+
+  VoidCallback? get _retryAction {
+    if (widget.onRetry case final retry?) return retry;
+    if (widget.notifications != null || widget.loadState != null) return null;
+    return _retryDatabaseNotifications;
   }
 }

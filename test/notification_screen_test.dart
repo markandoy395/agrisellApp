@@ -5,6 +5,7 @@ import 'package:agresell_app/core/theme/agrisellTheme.dart';
 import 'package:agresell_app/features/auth/domain/signUpAccountData.dart';
 import 'package:agresell_app/features/shared/notifications/domain/notification_category.dart';
 import 'package:agresell_app/features/shared/notifications/domain/notification_load_state.dart';
+import 'package:agresell_app/features/shared/orders/data/home_notification_repository.dart';
 import 'package:agresell_app/features/shared/orders/domain/home_notification.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/notification_controller.dart';
 import 'package:agresell_app/features/shared/orders/presentation/screens/notification_screen.dart';
@@ -144,6 +145,30 @@ void main() {
     await _pumpScreen(tester, const NotificationScreen());
     expect(find.text('No notifications yet'), findsOneWidget);
   });
+
+  testWidgets('repository failure is visible and retry loads notifications', (
+    tester,
+  ) async {
+    final notification = _notification(
+      id: 'retry-success',
+      title: 'Loaded after retry',
+    );
+    final repository = _RetryingNotificationRepository(notification);
+
+    await _pumpScreen(
+      tester,
+      NotificationScreen(userId: 'buyer-1', repository: repository),
+    );
+
+    expect(find.text('Notifications unavailable'), findsOneWidget);
+    expect(find.textContaining('notification query failed'), findsOneWidget);
+
+    await tester.tap(find.text('Try again'));
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.text('Loaded after retry'), findsOneWidget);
+    expect(repository.attempts, 2);
+  });
 }
 
 Future<void> _pumpScreen(WidgetTester tester, Widget screen) async {
@@ -175,3 +200,19 @@ HomeNotification _notification({
   destination: destination,
   visibleTo: visibleTo,
 );
+
+class _RetryingNotificationRepository extends HomeNotificationRepository {
+  _RetryingNotificationRepository(this.notification);
+
+  final HomeNotification notification;
+  var attempts = 0;
+
+  @override
+  Stream<List<HomeNotification>> watchForUser(String? userId) {
+    attempts++;
+    if (attempts == 1) {
+      return Stream.error(Exception('notification query failed'));
+    }
+    return Stream.value([notification]);
+  }
+}

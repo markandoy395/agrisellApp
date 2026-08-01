@@ -1,48 +1,113 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/core/theme/agrisellColors.dart';
 import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
-import 'package:agresell_app/features/shared/products/data/home_products.dart';
+import 'package:agresell_app/features/shared/products/data/home_product_repository.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
+import 'package:agresell_app/features/shared/products/presentation/controllers/home_product_catalog_controller.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_controller.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/product_detail_screen.dart';
 
-class BasketSuggestions extends StatelessWidget {
-  const BasketSuggestions({required this.excludedProductIds, super.key});
-  static const _suggestionLimit = 10;
+class BasketSuggestions extends StatefulWidget {
+  const BasketSuggestions({
+    required this.excludedProductIds,
+    this.catalogController,
+    this.productRepository = const HomeProductRepository(),
+    super.key,
+  });
+
   final Set<String> excludedProductIds;
+  final HomeProductCatalogController? catalogController;
+  final HomeProductRepository productRepository;
+
   @override
-  Widget build(BuildContext context) {
+  State<BasketSuggestions> createState() => _BasketSuggestionsState();
+}
+
+class _BasketSuggestionsState extends State<BasketSuggestions> {
+  static const _suggestionLimit = 10;
+  late final HomeProductCatalogController _catalogController;
+  late final bool _ownsCatalogController;
+
+  @override
+  void initState() {
+    super.initState();
+    _ownsCatalogController = widget.catalogController == null;
+    _catalogController =
+        widget.catalogController ??
+        HomeProductCatalogController(repository: widget.productRepository);
+    if (_catalogController.status == HomeProductCatalogStatus.idle) {
+      unawaited(_catalogController.load());
+    }
+  }
+
+  @override
+  void dispose() {
+    if (_ownsCatalogController) _catalogController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _catalogController,
+    builder: (context, _) {
+      final content = switch (_catalogController.status) {
+        HomeProductCatalogStatus.idle ||
+        HomeProductCatalogStatus.loading => const _SuggestionState(
+          message: 'Loading product suggestions',
+          isLoading: true,
+        ),
+        HomeProductCatalogStatus.error => _SuggestionState(
+          message: 'Product suggestions are unavailable',
+          actionLabel: 'Try again',
+          onAction: _catalogController.load,
+        ),
+        HomeProductCatalogStatus.ready => _readyContent(),
+      };
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const _SuggestionLabel(),
+          const SizedBox(height: 10),
+          content,
+        ],
+      );
+    },
+  );
+
+  Widget _readyContent() {
     final suggestions = _suggestions();
     if (suggestions.isEmpty) {
-      return const SizedBox.shrink();
+      return const _SuggestionState(message: 'No other products available');
     }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const _SuggestionLabel(),
-        const SizedBox(height: 10),
-        _SuggestionGrid(suggestions: suggestions),
-      ],
+    return _SuggestionGrid(
+      suggestions: suggestions,
+      catalogController: _catalogController,
     );
   }
 
   List<HomeProduct> _suggestions() {
-    final products = homeProducts
-        .where((product) => !excludedProductIds.contains(product.id))
+    final products = _catalogController.products
+        .where((product) => !widget.excludedProductIds.contains(product.id))
         .take(_suggestionLimit)
         .toList();
     if (products.isNotEmpty) {
       return products;
     }
-    return homeProducts.take(_suggestionLimit).toList();
+    return _catalogController.products.take(_suggestionLimit).toList();
   }
 }
 
 class _SuggestionGrid extends StatelessWidget {
-  const _SuggestionGrid({required this.suggestions});
+  const _SuggestionGrid({
+    required this.suggestions,
+    required this.catalogController,
+  });
   static const _gap = 10.0;
   final List<HomeProduct> suggestions;
+  final HomeProductCatalogController catalogController;
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -63,7 +128,10 @@ class _SuggestionGrid extends StatelessWidget {
               SizedBox(
                 width: tileWidth,
                 height: tileHeight,
-                child: _SuggestionCard(product: product),
+                child: _SuggestionCard(
+                  product: product,
+                  catalogController: catalogController,
+                ),
               ),
           ],
         );
@@ -109,9 +177,65 @@ class _SuggestionLabel extends StatelessWidget {
   }
 }
 
+class _SuggestionState extends StatelessWidget {
+  const _SuggestionState({
+    required this.message,
+    this.isLoading = false,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  final String message;
+  final bool isLoading;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+    decoration: BoxDecoration(
+      color: AgrisellColors.surface,
+      borderRadius: BorderRadius.circular(10),
+      border: Border.all(color: AgrisellColors.borderLine),
+    ),
+    child: Row(
+      children: [
+        if (isLoading)
+          const SizedBox.square(
+            dimension: 20,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          )
+        else
+          const Icon(
+            Icons.inventory_2_outlined,
+            color: AgrisellColors.authGreen,
+            size: 21,
+          ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            message,
+            style: const TextStyle(
+              color: AgrisellColors.headingGreen,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        if (actionLabel != null)
+          TextButton(onPressed: onAction, child: Text(actionLabel!)),
+      ],
+    ),
+  );
+}
+
 class _SuggestionCard extends StatelessWidget {
-  const _SuggestionCard({required this.product});
+  const _SuggestionCard({
+    required this.product,
+    required this.catalogController,
+  });
   final HomeProduct product;
+  final HomeProductCatalogController catalogController;
   @override
   Widget build(BuildContext context) {
     return Semantics(
@@ -127,7 +251,10 @@ class _SuggestionCard extends StatelessWidget {
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute<void>(
-                builder: (_) => ProductDetailScreen(product: product),
+                builder: (_) => ProductDetailScreen(
+                  product: product,
+                  catalogController: catalogController,
+                ),
               ),
             );
           },

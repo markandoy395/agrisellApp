@@ -13,17 +13,43 @@ extension _NotificationScreenActions on _NotificationScreenState {
 
   void _watchDatabaseNotifications() {
     if (widget.notifications != null) return;
+    _updateUi(() {
+      _repositoryLoadState = NotificationLoadState.loading;
+      _repositoryError = null;
+    });
     _notificationSubscription = _repository
         .watchForUser(widget.userId)
-        .listen(_receiveDatabaseNotifications, onError: (_) {});
+        .listen(
+          _receiveDatabaseNotifications,
+          onError: (Object error) {
+            if (!mounted) return;
+            _updateUi(() {
+              _repositoryLoadState = NotificationLoadState.error;
+              _repositoryError = error
+                  .toString()
+                  .replaceFirst('Exception: ', '')
+                  .trim();
+            });
+          },
+        );
   }
 
   void _receiveDatabaseNotifications(List<HomeNotification> notifications) {
     if (!mounted) return;
-    _updateUi(() => _databaseNotifications = notifications);
+    _updateUi(() {
+      _databaseNotifications = notifications;
+      _repositoryLoadState = NotificationLoadState.ready;
+      _repositoryError = null;
+    });
     final approval = _repository.firstUnreadFarmerApproval(notifications);
     if (approval == null || !_shownApprovalIds.add(approval.id)) return;
     unawaited(showFarmerApprovalAlert(context, _repository, notifications));
+  }
+
+  void _retryDatabaseNotifications() {
+    unawaited(_notificationSubscription?.cancel());
+    _notificationSubscription = null;
+    _watchDatabaseNotifications();
   }
 
   void _open(HomeNotification notification) {

@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:agresell_app/features/farmer/reservations/presentation/widgets/farmer_order_workflow_card.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_payment.dart';
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
+import 'package:agresell_app/features/shared/orders/presentation/controllers/order_controller.dart';
 import 'package:agresell_app/features/shared/orders/presentation/widgets/order_acceptance_deadline_card.dart';
 
 void main() {
@@ -57,7 +58,10 @@ void main() {
         home: Scaffold(
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(12),
-            child: FarmerOrderWorkflowCard(order: order),
+            child: FarmerOrderWorkflowCard(
+              order: order,
+              controller: OrderController.instance,
+            ),
           ),
         ),
       ),

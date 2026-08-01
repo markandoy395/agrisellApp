@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/features/shared/products/data/home_products.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_card.dart';
 
 class HomeProductGrid extends StatelessWidget {
   const HomeProductGrid({
     required this.onProductTap,
-    this.products = homeProducts,
+    required this.products,
     this.isSaved,
     this.onSavedToggle,
     this.onAddToBasket,

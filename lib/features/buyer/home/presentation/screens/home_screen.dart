@@ -9,6 +9,7 @@ import 'package:agresell_app/features/shared/chat/data/marketplace_messaging_rep
 import 'package:agresell_app/features/shared/chat/data/marketplace_messaging_repository_factory.dart';
 import 'package:agresell_app/features/shared/products/data/home_product_repository.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
+import 'package:agresell_app/features/shared/products/presentation/controllers/home_product_catalog_controller.dart';
 import 'package:agresell_app/features/buyer/home/data/home_bottom_nav_items.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/common/buyer_responsive_text.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_dashboard_content.dart';
@@ -47,6 +48,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late final PageController _navigationController;
+  late final HomeProductCatalogController _productCatalogController;
   late final Map<int, int> _badgeCounts;
   late int _activeNavIndex;
   StreamSubscription<PushNotificationAction>? _pushSubscription;
@@ -61,11 +63,15 @@ class _HomeScreenState extends State<HomeScreen> {
         .clamp(0, homeBottomNavItems.length - 1)
         .toInt();
     _navigationController = PageController(initialPage: _activeNavIndex);
+    _productCatalogController = HomeProductCatalogController(
+      repository: widget.productRepository,
+    );
     _badgeCounts = <int, int>{};
     _pushSubscription = PushNotificationService.instance.actions.listen(
       _openPushAction,
     );
     _consumePendingPushAction();
+    unawaited(_productCatalogController.load());
     unawaited(_loadMessageUnreadCount());
     unawaited(_loadNotificationUnreadCount());
   }
@@ -74,6 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     _pushSubscription?.cancel();
     _navigationController.dispose();
+    _productCatalogController.dispose();
     super.dispose();
   }
 
@@ -133,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             _KeepAliveTab(
               child: HomeDashboardContent(
-                productRepository: widget.productRepository,
+                catalogController: _productCatalogController,
                 onProductTap: _openProduct,
               ),
             ),
@@ -189,7 +196,10 @@ class _HomeScreenState extends State<HomeScreen> {
   void _openProduct(HomeProduct product) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => ProductDetailScreen(product: product),
+        builder: (_) => ProductDetailScreen(
+          product: product,
+          catalogController: _productCatalogController,
+        ),
       ),
     );
   }

@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
-import 'package:agresell_app/features/shared/chat/domain/marketplace_conversation.dart';
+import 'package:agresell_app/features/shared/chat/presentation/models/chat_participant_data.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_avatar.dart';
 
-class FarmerMessageCard extends StatelessWidget {
-  const FarmerMessageCard({
-    required this.thread,
-    required this.isRead,
+class ChatConversationTile extends StatelessWidget {
+  const ChatConversationTile({
+    required this.data,
     required this.onTap,
+    this.avatarTextHeight,
     super.key,
   });
 
-  final MarketplaceConversation thread;
-  final bool isRead;
+  final ChatConversationTileData data;
   final VoidCallback onTap;
+  final double? avatarTextHeight;
 
   @override
   Widget build(BuildContext context) {
-    final hasUnread = thread.hasUnread && !isRead;
+    final hasUnread = data.hasUnread;
     return Semantics(
       button: true,
-      label: 'Open chat with ${thread.buyerName}',
+      label: data.semanticLabel,
       child: Material(
         color: hasUnread
             ? AgrisellColors.forestSoft.withValues(alpha: 0.42)
@@ -36,16 +37,25 @@ class FarmerMessageCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                _BuyerAvatar(initials: thread.initials),
-                const SizedBox(width: 11),
-                Expanded(
-                  child: _ConversationSummary(
-                    thread: thread,
-                    hasUnread: hasUnread,
+                ChatAvatar(
+                  participant: data.participant,
+                  style: ChatAvatarStyle(
+                    diameter: 46,
+                    backgroundColor: AgrisellColors.statusGreenBackground,
+                    foregroundColor: AgrisellColors.authGreen,
+                    textStyle: TextStyle(
+                      fontSize: 13,
+                      height: avatarTextHeight,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
+                const SizedBox(width: 11),
+                Expanded(
+                  child: _ConversationSummary(data: data, hasUnread: hasUnread),
+                ),
                 const SizedBox(width: 10),
-                _ConversationMeta(thread: thread, hasUnread: hasUnread),
+                _ConversationMeta(data: data, hasUnread: hasUnread),
               ],
             ),
           ),
@@ -55,32 +65,10 @@ class FarmerMessageCard extends StatelessWidget {
   }
 }
 
-class _BuyerAvatar extends StatelessWidget {
-  const _BuyerAvatar({required this.initials});
-
-  final String initials;
-
-  @override
-  Widget build(BuildContext context) => CircleAvatar(
-    radius: 23,
-    backgroundColor: AgrisellColors.statusGreenBackground,
-    child: Text(
-      initials,
-      maxLines: 1,
-      style: const TextStyle(
-        color: AgrisellColors.authGreen,
-        fontSize: 13,
-        height: 1,
-        fontWeight: FontWeight.w800,
-      ),
-    ),
-  );
-}
-
 class _ConversationSummary extends StatelessWidget {
-  const _ConversationSummary({required this.thread, required this.hasUnread});
+  const _ConversationSummary({required this.data, required this.hasUnread});
 
-  final MarketplaceConversation thread;
+  final ChatConversationTileData data;
   final bool hasUnread;
 
   @override
@@ -89,7 +77,7 @@ class _ConversationSummary extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        thread.buyerName,
+        data.participant.name,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
@@ -100,7 +88,7 @@ class _ConversationSummary extends StatelessWidget {
       ),
       const SizedBox(height: 3),
       Text(
-        thread.previewText,
+        data.previewText,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
@@ -117,9 +105,9 @@ class _ConversationSummary extends StatelessWidget {
 }
 
 class _ConversationMeta extends StatelessWidget {
-  const _ConversationMeta({required this.thread, required this.hasUnread});
+  const _ConversationMeta({required this.data, required this.hasUnread});
 
-  final MarketplaceConversation thread;
+  final ChatConversationTileData data;
   final bool hasUnread;
 
   @override
@@ -130,7 +118,7 @@ class _ConversationMeta extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
-          thread.timeLabel,
+          data.timeLabel,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(

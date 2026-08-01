@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
 
-class BuyerMessageHeader extends StatelessWidget {
-  const BuyerMessageHeader({
+class ChatInboxHeader extends StatelessWidget {
+  const ChatInboxHeader({
+    required this.title,
+    required this.searchHint,
     required this.controller,
     required this.onQueryChanged,
     super.key,
   });
 
+  final String title;
+  final String searchHint;
   final TextEditingController controller;
   final ValueChanged<String> onQueryChanged;
 
@@ -33,9 +37,9 @@ class BuyerMessageHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Chats',
-            style: TextStyle(
+          Text(
+            title,
+            style: const TextStyle(
               color: AgrisellColors.headingGreen,
               fontSize: 15,
               fontWeight: FontWeight.w800,
@@ -51,7 +55,7 @@ class BuyerMessageHeader extends StatelessWidget {
               fontSize: 13,
             ),
             decoration: InputDecoration(
-              hintText: 'Search farmers or products',
+              hintText: searchHint,
               hintStyle: const TextStyle(
                 color: AgrisellColors.mutedText,
                 fontSize: 13,

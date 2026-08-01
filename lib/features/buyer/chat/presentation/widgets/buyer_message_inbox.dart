@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
-import 'package:agresell_app/features/buyer/chat/presentation/widgets/buyer_message_card.dart';
-import 'package:agresell_app/features/buyer/chat/presentation/widgets/buyer_message_header.dart';
 import 'package:agresell_app/features/shared/chat/domain/marketplace_conversation.dart';
 import 'package:agresell_app/features/shared/chat/presentation/controllers/marketplace_messaging_controller.dart';
+import 'package:agresell_app/features/shared/chat/presentation/models/chat_participant_data.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_content_state.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_inbox_body.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_inbox_header.dart';
 
 class BuyerMessageInbox extends StatelessWidget {
   const BuyerMessageInbox({
@@ -27,148 +29,67 @@ class BuyerMessageInbox extends StatelessWidget {
   final Future<void> Function() onRetry;
 
   @override
-  Widget build(BuildContext context) {
-    return ColoredBox(
-      color: AgrisellColors.homeBackground,
-      child: Column(
-        children: [
-          BuyerMessageHeader(
-            controller: searchController,
-            onQueryChanged: onQueryChanged,
-          ),
-          Expanded(
-            child: switch (state) {
-              MarketplaceMessagingLoadState.initial ||
-              MarketplaceMessagingLoadState.loading => const _InboxLoading(),
-              MarketplaceMessagingLoadState.error => _InboxFailure(
-                onRetry: onRetry,
+  Widget build(BuildContext context) => ColoredBox(
+    color: AgrisellColors.homeBackground,
+    child: Column(
+      children: [
+        ChatInboxHeader(
+          title: 'Chats',
+          searchHint: 'Search farmers or products',
+          controller: searchController,
+          onQueryChanged: onQueryChanged,
+        ),
+        Expanded(
+          child: ChatInboxBody(
+            state: state,
+            conversations: threads,
+            dataBuilder: _tileData,
+            onConversationSelected: onThreadSelected,
+            onRefresh: onRetry,
+            failureState: ChatContentState(
+              data: const ChatContentStateData(
+                icon: Icons.cloud_off_rounded,
+                title: 'Messages are unavailable',
+                message:
+                    'Check your connection, then try loading your conversations again.',
               ),
-              MarketplaceMessagingLoadState.ready =>
-                threads.isEmpty
-                    ? _EmptyMessages(hasQuery: hasQuery)
-                    : RefreshIndicator(
-                        color: AgrisellColors.authGreen,
-                        onRefresh: onRetry,
-                        child: ListView.separated(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          keyboardDismissBehavior:
-                              ScrollViewKeyboardDismissBehavior.onDrag,
-                          padding: EdgeInsets.fromLTRB(0, 4, 0, 112),
-                          itemCount: threads.length,
-                          separatorBuilder: (_, _) => const SizedBox.shrink(),
-                          itemBuilder: (context, index) {
-                            final thread = threads[index];
-                            return BuyerMessageCard(
-                              thread: thread,
-                              isRead: !thread.hasUnread,
-                              onTap: () => onThreadSelected(thread),
-                            );
-                          },
-                        ),
-                      ),
-            },
+              action: SizedBox(
+                height: 36,
+                child: OutlinedButton(
+                  onPressed: onRetry,
+                  child: const Text('Try again'),
+                ),
+              ),
+            ),
+            emptyState: ChatContentState(
+              data: ChatContentStateData(
+                icon: Icons.forum_outlined,
+                title: hasQuery
+                    ? 'No matching conversations'
+                    : 'No conversations found',
+                message: hasQuery
+                    ? 'Try a farmer, farm, product, or message keyword.'
+                    : 'Open a farmer profile to start a secure conversation.',
+              ),
+            ),
           ),
-        ],
+        ),
+      ],
+    ),
+  );
+
+  ChatConversationTileData _tileData(MarketplaceConversation thread) {
+    return ChatConversationTileData(
+      participant: ChatParticipantData(
+        name: thread.farmerName,
+        initials: marketplaceInitials(thread.farmerName),
+        imageUrl: thread.farmerImageUrl,
+        imageSemanticLabel: '${thread.farmerName} profile photo',
       ),
+      previewText: thread.previewText,
+      timeLabel: thread.timeLabel,
+      hasUnread: thread.hasUnread,
+      semanticLabel: 'Open chat with ${thread.farmerName}',
     );
   }
-}
-
-class _InboxLoading extends StatelessWidget {
-  const _InboxLoading();
-
-  @override
-  Widget build(BuildContext context) => Center(
-    child: Semantics(
-      label: 'Loading conversations',
-      child: const CircularProgressIndicator(color: AgrisellColors.authGreen),
-    ),
-  );
-}
-
-class _InboxFailure extends StatelessWidget {
-  const _InboxFailure({required this.onRetry});
-  final Future<void> Function() onRetry;
-
-  @override
-  Widget build(BuildContext context) => Center(
-    child: Padding(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 100),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.cloud_off_rounded,
-            color: AgrisellColors.authGreen,
-            size: 34,
-          ),
-          const SizedBox(height: 10),
-          const Text(
-            'Messages are unavailable',
-            style: TextStyle(
-              color: AgrisellColors.headingGreen,
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 5),
-          const Text(
-            'Check your connection, then try loading your conversations again.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: AgrisellColors.mutedText, fontSize: 12),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 36,
-            child: OutlinedButton(
-              onPressed: onRetry,
-              child: const Text('Try again'),
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-class _EmptyMessages extends StatelessWidget {
-  const _EmptyMessages({required this.hasQuery});
-  final bool hasQuery;
-
-  @override
-  Widget build(BuildContext context) => Center(
-    child: Padding(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 100),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.forum_outlined,
-            color: AgrisellColors.authGreen,
-            size: 34,
-          ),
-          const SizedBox(height: 10),
-          Text(
-            hasQuery ? 'No matching conversations' : 'No conversations found',
-            style: const TextStyle(
-              color: AgrisellColors.headingGreen,
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            hasQuery
-                ? 'Try a farmer, farm, product, or message keyword.'
-                : 'Open a farmer profile to start a secure conversation.',
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AgrisellColors.mutedText,
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
 }

@@ -3,10 +3,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisellColors.dart';
-import 'package:agresell_app/features/buyer/chat/presentation/widgets/buyer_chat_header.dart';
-import 'package:agresell_app/features/buyer/chat/presentation/widgets/buyer_chat_message_widgets.dart';
+import 'package:agresell_app/features/buyer/chat/presentation/widgets/buyer_chat_product_context.dart';
 import 'package:agresell_app/features/shared/chat/domain/marketplace_conversation.dart';
 import 'package:agresell_app/features/shared/chat/presentation/controllers/marketplace_messaging_controller.dart';
+import 'package:agresell_app/features/shared/chat/presentation/models/chat_participant_data.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_avatar.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_content_state.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_detail_header.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_message_bubble.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_message_composer.dart';
 
 part 'buyer_chat_screen_send.dart';
 
@@ -57,16 +62,65 @@ class _BuyerChatScreenState extends State<BuyerChatScreen> {
       color: AgrisellColors.homeBackground,
       child: Column(
         children: [
-          BuyerChatHeader(thread: widget.thread, onBack: widget.onBack),
+          ChatDetailHeader(
+            participant: ChatParticipantData(
+              name: widget.thread.farmerName,
+              initials: marketplaceInitials(widget.thread.farmerName),
+              imageUrl: widget.thread.farmerImageUrl,
+              imageSemanticLabel: '${widget.thread.farmerName} profile photo',
+            ),
+            subtitle: widget.thread.farmName,
+            onBack: widget.onBack,
+            style: ChatDetailHeaderStyle(
+              padding: EdgeInsets.fromLTRB(
+                4,
+                MediaQuery.paddingOf(context).top + 8,
+                14,
+                10,
+              ),
+              decoration: const BoxDecoration(color: AgrisellColors.authGreen),
+              avatarStyle: const ChatAvatarStyle(
+                diameter: 40,
+                backgroundColor: AgrisellColors.surface,
+                foregroundColor: AgrisellColors.authGreen,
+                textStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+              ),
+              titleStyle: const TextStyle(
+                color: AgrisellColors.surface,
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+              ),
+              subtitleStyle: const TextStyle(
+                color: AgrisellColors.surface,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
           Expanded(
             child: isLoading && messages.isEmpty
-                ? const _ChatLoading()
+                ? const ChatLoadingState(semanticLabel: 'Loading messages')
                 : error != null && messages.isEmpty
-                ? _ChatLoadError(
-                    message: error,
-                    onRetry: () => controller.openConversation(
-                      widget.thread.id,
-                      refresh: true,
+                ? ChatContentState(
+                    data: ChatContentStateData(
+                      icon: Icons.cloud_off_rounded,
+                      message: error,
+                    ),
+                    style: const ChatContentStateStyle(
+                      padding: EdgeInsets.all(24),
+                      iconSize: 24,
+                      iconSpacing: 8,
+                      actionSpacing: 10,
+                    ),
+                    action: SizedBox(
+                      height: 36,
+                      child: OutlinedButton(
+                        onPressed: () => controller.openConversation(
+                          widget.thread.id,
+                          refresh: true,
+                        ),
+                        child: const Text('Try again'),
+                      ),
                     ),
                   )
                 : ListView(
@@ -77,10 +131,22 @@ class _BuyerChatScreenState extends State<BuyerChatScreen> {
                     children: [
                       BuyerChatProductContext(thread: widget.thread),
                       const SizedBox(height: 18),
-                      if (messages.isEmpty) const _NoMessagesYet(),
+                      if (messages.isEmpty)
+                        const ChatContentState(
+                          data: ChatContentStateData(
+                            icon: Icons.waving_hand_outlined,
+                            message: 'Say hello to start the conversation.',
+                          ),
+                          style: ChatContentStateStyle(
+                            padding: EdgeInsets.symmetric(vertical: 30),
+                            iconSize: 30,
+                            iconSpacing: 8,
+                          ),
+                        ),
                       for (final message in messages) ...[
-                        BuyerChatBubble(
+                        ChatMessageBubble(
                           message: message,
+                          currentActorRole: MarketplaceActorRole.buyer,
                           onRetry:
                               message.state == MarketplaceMessageState.failed
                               ? () => controller.retryMessage(
@@ -94,87 +160,32 @@ class _BuyerChatScreenState extends State<BuyerChatScreen> {
                     ],
                   ),
           ),
-          BuyerMessageComposer(
+          ChatMessageComposer(
             controller: _messageController,
             onSend: _sendMessage,
             isSending: controller.isSending(widget.thread.id),
-            bottomPadding: widget.bottomPadding,
+            style: ChatMessageComposerStyle(
+              padding: EdgeInsets.fromLTRB(12, 8, 12, widget.bottomPadding),
+              decoration: const BoxDecoration(color: AgrisellColors.surface),
+              hintText: 'Write a message',
+              inputDecoration: InputDecoration(
+                hintStyle: const TextStyle(fontSize: 13),
+                isDense: true,
+                filled: true,
+                fillColor: AgrisellColors.fieldFill,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 11,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(22),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
           ),
         ],
       ),
     );
   }
-}
-
-class _ChatLoading extends StatelessWidget {
-  const _ChatLoading();
-
-  @override
-  Widget build(BuildContext context) => Center(
-    child: Semantics(
-      label: 'Loading messages',
-      child: const CircularProgressIndicator(color: AgrisellColors.authGreen),
-    ),
-  );
-}
-
-class _ChatLoadError extends StatelessWidget {
-  const _ChatLoadError({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) => Center(
-    child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.cloud_off_rounded, color: AgrisellColors.authGreen),
-          const SizedBox(height: 8),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AgrisellColors.mutedText,
-              fontSize: 12,
-            ),
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 36,
-            child: OutlinedButton(
-              onPressed: onRetry,
-              child: const Text('Try again'),
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-class _NoMessagesYet extends StatelessWidget {
-  const _NoMessagesYet();
-
-  @override
-  Widget build(BuildContext context) => const Padding(
-    padding: EdgeInsets.symmetric(vertical: 30),
-    child: Column(
-      children: [
-        Icon(
-          Icons.waving_hand_outlined,
-          color: AgrisellColors.authGreen,
-          size: 30,
-        ),
-        SizedBox(height: 8),
-        Text(
-          'Say hello to start the conversation.',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: AgrisellColors.mutedText, fontSize: 12),
-        ),
-      ],
-    ),
-  );
 }

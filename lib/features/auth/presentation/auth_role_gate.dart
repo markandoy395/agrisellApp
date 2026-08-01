@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'package:agresell_app/core/utils/agrisellPageRoute.dart';
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/domain/auth_route_guard.dart';
 import 'package:agresell_app/features/auth/domain/signUpAccountData.dart';

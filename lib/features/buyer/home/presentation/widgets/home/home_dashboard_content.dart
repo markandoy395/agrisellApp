@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
-import 'package:agresell_app/core/constants/agrisellRoutes.dart';
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/constants/agrisell_routes.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/features/shared/products/presentation/controllers/home_product_catalog_controller.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_controller.dart';

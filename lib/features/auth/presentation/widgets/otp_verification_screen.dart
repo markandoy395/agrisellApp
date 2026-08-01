@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 /// A reusable full-screen OTP/PIN prompt for signup, password recovery, and
 /// other email or SMS verification flows.

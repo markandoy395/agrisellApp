@@ -1,4 +1,4 @@
-import 'package:agresell_app/core/theme/agrisellTheme.dart';
+import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/auth/domain/signUpAccountData.dart';
 import 'package:agresell_app/features/auth/presentation/screens/signUpScreen.dart';
 import 'package:agresell_app/core/models/user_profile.dart';

@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
+import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 
 class ProductThumbnail extends StatelessWidget {
   const ProductThumbnail({

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_history_models.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_analytics_models.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/controllers/rider_analytics_controller.dart';
@@ -12,7 +12,7 @@ import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widg
 import 'package:agresell_app/features/rider/presentation/widgets/rider_state_cards.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/screens/rider_history_details_screen.dart';
-import 'package:agresell_app/core/utils/agrisellPageRoute.dart';
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 
 part 'rider_history_filters.dart';
 

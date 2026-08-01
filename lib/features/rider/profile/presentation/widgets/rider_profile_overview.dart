@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_rating_models.dart';
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_profile_actions.dart';

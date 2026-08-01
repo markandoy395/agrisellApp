@@ -74,12 +74,14 @@ class RiderAvailabilityController extends ChangeNotifier {
   void _notify() {
     if (!_isDisposed) notifyListeners();
   }
+
   Future<void> initialize({required String riderId}) {
     _riderId = riderId;
     return _initialization ??= _initialize().whenComplete(
       () => _initialization = null,
     );
   }
+
   Future<void> _initialize() async {
     await _connectivitySubscription?.cancel();
     _connectivitySubscription = _connectivity.connectivityChanges.listen(

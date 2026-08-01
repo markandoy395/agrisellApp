@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_rating_models.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_analytics_formatters.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';

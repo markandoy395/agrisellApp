@@ -2,8 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/constants/agrisellAssets.dart';
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/constants/agrisell_assets.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 class AuthBackground extends StatelessWidget {
   const AuthBackground({this.onLoaded, super.key});

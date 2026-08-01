@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
 import 'package:agresell_app/features/shared/widgets/profile/phone_number_sync_control.dart';
 

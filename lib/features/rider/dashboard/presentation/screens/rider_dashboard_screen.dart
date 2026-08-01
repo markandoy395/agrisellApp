@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/controllers/rider_availability_controller.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/controllers/rider_dashboard_controller.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_active_delivery_summary.dart';

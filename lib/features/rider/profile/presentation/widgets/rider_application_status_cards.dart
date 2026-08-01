@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 class RiderApplicationReferenceCard extends StatelessWidget {
   const RiderApplicationReferenceCard({required this.reference, super.key});

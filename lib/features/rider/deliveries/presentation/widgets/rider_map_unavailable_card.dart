@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 /// A safe fallback while a map or location provider cannot render a route.
 class RiderMapUnavailableCard extends StatelessWidget {

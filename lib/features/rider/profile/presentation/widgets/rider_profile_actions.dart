@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_profile_components.dart';
 import 'package:agresell_app/features/shared/widgets/profile/font_size_settings_control.dart';

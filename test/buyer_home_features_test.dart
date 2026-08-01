@@ -1,4 +1,4 @@
-import 'package:agresell_app/core/theme/agrisellTheme.dart';
+import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/home_screen.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/product_detail_screen.dart';
 import 'package:agresell_app/features/shared/products/data/home_product_repository.dart';

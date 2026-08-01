@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 /// A compact sold-state treatment for products managed by a farmer.
 class FarmerSoldStatusOverlay extends StatelessWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
+import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 import 'package:agresell_app/features/shared/chat/presentation/models/chat_participant_data.dart';
 
 class ChatAvatarStyle {

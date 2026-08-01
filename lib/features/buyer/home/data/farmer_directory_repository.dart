@@ -75,9 +75,7 @@ class FarmerDirectoryRepository {
       coverImage: _cover,
       imageUrl: _optionalText(row['profile_image_url']),
       coverImageUrl: _optionalText(row['cover_image_url']),
-      followerCount: _integer(
-        row['follower_count'] ?? row['follow_count'],
-      ),
+      followerCount: _integer(row['follower_count'] ?? row['follow_count']),
       isFollowing: row['is_following'] == true,
       products: products is List
           ? products

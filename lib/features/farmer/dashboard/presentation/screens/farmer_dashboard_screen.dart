@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
-import 'package:agresell_app/core/constants/agrisellAssets.dart';
-import 'package:agresell_app/core/theme/agrisellColors.dart';
-import 'package:agresell_app/core/utils/agrisellPageRoute.dart';
-import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
+import 'package:agresell_app/core/constants/agrisell_assets.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
+import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_categories_card.dart';
 import 'package:agresell_app/features/farmer/products/domain/farmer_dashboard_product.dart';

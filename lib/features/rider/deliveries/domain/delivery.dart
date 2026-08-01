@@ -34,8 +34,7 @@ class Delivery {
     pickupLocation: json['pickup_location'] as String?,
     dropoffLocation: json['dropoff_location'] as String?,
     distanceKm: deliveryDouble(json['distance_km']),
-    assignedToCurrentRider:
-        json['assigned_to_current_rider'] as bool? ?? false,
+    assignedToCurrentRider: json['assigned_to_current_rider'] as bool? ?? false,
   );
 
   final String deliveryId;

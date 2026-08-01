@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/controllers/farmer_signup_controllers.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_address_sync_control.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_field.dart';

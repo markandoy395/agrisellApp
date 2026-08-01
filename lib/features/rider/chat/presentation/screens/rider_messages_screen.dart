@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisellColors.dart';
-import 'package:agresell_app/core/utils/agrisellPageRoute.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/rider/chat/domain/rider_communication_models.dart';
 import 'package:agresell_app/features/rider/chat/domain/rider_communication_state.dart';
 import 'package:agresell_app/features/rider/chat/domain/rider_conversation_access.dart';

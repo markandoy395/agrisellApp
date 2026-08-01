@@ -22,81 +22,81 @@ class _FarmerProductDetails extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          Text(
-            product.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: nameColor,
-              fontSize: 13,
-              height: 1.1,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text.rich(
-            TextSpan(
-              text: product.price,
+            Text(
+              product.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: valueColor,
-                fontSize: 14,
-                height: 1,
+                color: nameColor,
+                fontSize: 13,
+                height: 1.1,
                 fontWeight: FontWeight.w800,
               ),
+            ),
+            const SizedBox(height: 5),
+            Text.rich(
+              TextSpan(
+                text: product.price,
+                style: TextStyle(
+                  color: valueColor,
+                  fontSize: 14,
+                  height: 1,
+                  fontWeight: FontWeight.w800,
+                ),
+                children: [
+                  TextSpan(
+                    text: ' / ${product.unit}',
+                    style: const TextStyle(
+                      color: AgrisellColors.mutedText,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            if (description.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              Text(
+                description,
+                maxLines: isCompact ? 1 : 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: AgrisellColors.mutedText,
+                  fontSize: 12,
+                  height: 1.25,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+            const Spacer(),
+            Container(height: 1, color: AgrisellColors.borderLine),
+            const SizedBox(height: 7),
+            Row(
               children: [
-                TextSpan(
-                  text: ' / ${product.unit}',
-                  style: const TextStyle(
-                    color: AgrisellColors.mutedText,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+                Icon(
+                  Icons.calendar_today_outlined,
+                  color: valueColor,
+                  size: 14,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    product.harvestDate,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AgrisellColors.mutedText,
+                      fontSize: 12,
+                      height: 1,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          if (description.isNotEmpty) ...[
-            const SizedBox(height: 6),
-            Text(
-              description,
-              maxLines: isCompact ? 1 : 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AgrisellColors.mutedText,
-                fontSize: 12,
-                height: 1.25,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-          const Spacer(),
-          Container(height: 1, color: AgrisellColors.borderLine),
-          const SizedBox(height: 7),
-          Row(
-            children: [
-              Icon(
-                Icons.calendar_today_outlined,
-                color: valueColor,
-                size: 14,
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  product.harvestDate,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AgrisellColors.mutedText,
-                    fontSize: 12,
-                    height: 1,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
           ],
         ),
       );

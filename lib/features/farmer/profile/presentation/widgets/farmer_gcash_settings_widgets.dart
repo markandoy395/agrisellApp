@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 class FarmerGcashSettingsHeader extends StatelessWidget {
   const FarmerGcashSettingsHeader({required this.onClose, super.key});

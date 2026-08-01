@@ -1,7 +1,7 @@
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_grid.dart';
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_grid_skeleton.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
-import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
+import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

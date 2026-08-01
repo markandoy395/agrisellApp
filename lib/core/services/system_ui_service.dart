@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 abstract final class AgrisellSystemUi {
   static Future<void> applyAppSystemUi({Brightness? platformBrightness}) async {

@@ -1,4 +1,4 @@
-import 'package:agresell_app/core/theme/agrisellTheme.dart';
+import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_validator.dart';
 import 'package:agresell_app/features/rider/profile/presentation/controllers/rider_sign_up_controller.dart';
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_sign_up_personal_step.dart';

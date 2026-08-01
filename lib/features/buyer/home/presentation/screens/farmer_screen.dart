@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:agresell_app/core/constants/agrisellRoutes.dart';
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/constants/agrisell_routes.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/buyer/chat/presentation/buyer_conversation_launcher.dart';
 import 'package:agresell_app/features/buyer/home/data/farmer_directory_repository.dart';
 import 'package:agresell_app/features/buyer/home/domain/farmer_profile.dart';

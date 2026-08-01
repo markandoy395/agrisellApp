@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/constants/agrisellAssets.dart';
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/constants/agrisell_assets.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/widgets/navigation/home_asset_icon.dart';
 
 class ReserveHeader extends StatelessWidget {

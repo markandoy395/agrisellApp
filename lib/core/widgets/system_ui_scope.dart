@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 
-import 'package:agresell_app/core/services/systemUiService.dart';
+import 'package:agresell_app/core/services/system_ui_service.dart';
 
 class SystemUiScope extends StatefulWidget {
   const SystemUiScope({required this.child, super.key});

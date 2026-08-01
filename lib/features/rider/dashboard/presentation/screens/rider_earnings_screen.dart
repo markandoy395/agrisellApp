@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
-import 'package:agresell_app/core/theme/agrisellColors.dart';
-import 'package:agresell_app/core/utils/agrisellPageRoute.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_analytics_models.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/controllers/rider_analytics_controller.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_analytics_formatters.dart';

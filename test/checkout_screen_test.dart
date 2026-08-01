@@ -1,12 +1,12 @@
-import 'package:agresell_app/core/constants/agrisellRoutes.dart';
-import 'package:agresell_app/core/theme/agrisellTheme.dart';
+import 'package:agresell_app/core/constants/agrisell_routes.dart';
+import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'support/home_product_fixture.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_controller.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/order_controller.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/screens/basket_screen.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/screens/checkout_screen.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/product_detail_screen.dart';
-import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
+import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

@@ -1,4 +1,4 @@
-import 'package:agresell_app/core/theme/agrisellTheme.dart';
+import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'support/home_product_fixture.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_controller.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/screens/checkout_screen.dart';

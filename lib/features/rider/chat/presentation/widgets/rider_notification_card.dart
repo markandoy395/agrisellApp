@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/notification_date_label.dart';
 import 'package:agresell_app/features/rider/chat/domain/rider_notification.dart';
 import 'package:agresell_app/features/rider/chat/presentation/rider_notification_presentation.dart';

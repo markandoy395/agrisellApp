@@ -1,4 +1,4 @@
-import 'package:agresell_app/core/theme/agrisellTheme.dart';
+import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/buyer/home/data/farmer_directory_repository.dart';
 import 'package:agresell_app/features/buyer/home/domain/farmer_profile.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/farmer_screen.dart';

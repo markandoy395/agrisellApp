@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/constants/agrisellAssets.dart';
+import 'package:agresell_app/core/constants/agrisell_assets.dart';
 import 'package:agresell_app/core/models/home_bottom_nav_item.dart';
 
 const homeBottomNavItems = [

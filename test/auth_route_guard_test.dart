@@ -52,24 +52,15 @@ void main() {
 
   test('only verified farmers may create products', () {
     expect(
-      _account(
-        role: 'farmer',
-        verificationStatus: 'pending',
-      ).isFarmerVerified,
+      _account(role: 'farmer', verificationStatus: 'pending').isFarmerVerified,
       isFalse,
     );
     expect(
-      _account(
-        role: 'farmer',
-        verificationStatus: 'verified',
-      ).isFarmerVerified,
+      _account(role: 'farmer', verificationStatus: 'verified').isFarmerVerified,
       isTrue,
     );
     expect(
-      _account(
-        role: 'buyer',
-        verificationStatus: 'pending',
-      ).isFarmerVerified,
+      _account(role: 'buyer', verificationStatus: 'pending').isFarmerVerified,
       isFalse,
     );
   });

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_delivery_search.dart';
 import 'package:agresell_app/features/rider/deliveries/data/rider_map_view_cache.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';

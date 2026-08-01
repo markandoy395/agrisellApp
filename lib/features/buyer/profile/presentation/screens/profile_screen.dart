@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/auth/presentation/account_session_navigation.dart';
 import 'package:agresell_app/features/shared/profile/data/user_profile_data.dart';
 import 'package:agresell_app/features/buyer/profile/data/buyer_shipping_address_saver.dart';

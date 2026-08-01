@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/constants/agrisellAssets.dart';
+import 'package:agresell_app/core/constants/agrisell_assets.dart';
 import 'package:agresell_app/core/utils/responsive.dart';
-import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
+import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 
 enum LogoHeaderStyle { horizontal, stacked, mark }
 

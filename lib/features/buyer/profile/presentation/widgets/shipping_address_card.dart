@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/auth/domain/buyer_shipping_address.dart';
 import 'package:agresell_app/features/buyer/profile/presentation/widgets/shipping_address_editor.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_card_shell.dart';

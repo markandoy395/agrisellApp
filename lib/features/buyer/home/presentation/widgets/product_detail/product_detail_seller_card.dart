@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/constants/agrisellRoutes.dart';
-import 'package:agresell_app/core/theme/agrisellColors.dart';
-import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
+import 'package:agresell_app/core/constants/agrisell_routes.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 import 'package:agresell_app/features/buyer/home/data/farmer_shop_products.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/farmer_avatar.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/farmer/farmer_follow_button.dart';

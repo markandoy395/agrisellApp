@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:agresell_app/core/widgets/responsiveAssetImage.dart';
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_card_actions.dart';
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_card_details.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/utils/agrisellPageRoute.dart';
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_history_models.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/screens/rider_history_details_screen.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_history_widgets.dart';

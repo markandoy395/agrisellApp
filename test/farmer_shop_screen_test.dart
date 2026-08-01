@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:agresell_app/core/theme/agrisellTheme.dart';
+import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/farmer/dashboard/presentation/screens/farmer_dashboard_screen.dart';
 import 'package:agresell_app/features/shared/products/domain/product_availability_date_rules.dart';
 import 'package:flutter/material.dart';

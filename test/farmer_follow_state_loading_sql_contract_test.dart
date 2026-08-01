@@ -10,7 +10,10 @@ void main() {
   test('missing buyer identity returns an empty optional state set', () {
     expect(migration, contains('if current_buyer_id is null then'));
     expect(migration, contains('return;'));
-    expect(migration, isNot(contains("raise exception 'Buyer account required'")));
+    expect(
+      migration,
+      isNot(contains("raise exception 'Buyer account required'")),
+    );
   });
 
   test('follow-state RPC remains authenticated and security definer', () {

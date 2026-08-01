@@ -7,6 +7,7 @@ import 'package:agresell_app/features/auth/domain/buyer_shipping_address.dart';
 import 'package:agresell_app/features/buyer/profile/presentation/screens/shipping_address_map_editor_screen.dart';
 import 'package:agresell_app/features/buyer/profile/presentation/widgets/shipping_address_editor_content.dart';
 import 'package:agresell_app/features/shared/location/data/nominatim_geocoding_service.dart';
+
 class ShippingAddressEditor extends StatefulWidget {
   const ShippingAddressEditor({
     required this.onSave,
@@ -53,6 +54,7 @@ class _ShippingAddressEditorState extends State<ShippingAddressEditor> {
     _streetController.addListener(_scheduleGeocode);
     _postalCodeController.addListener(_scheduleGeocode);
   }
+
   @override
   void dispose() {
     _geocodeTimer?.cancel();

@@ -1,4 +1,4 @@
-import 'package:agresell_app/core/theme/agrisellTheme.dart';
+import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/screens/farmer_sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

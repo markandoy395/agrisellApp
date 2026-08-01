@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisellColors.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/profile_birth_date.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_edit_row_shell.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_text_styles.dart';

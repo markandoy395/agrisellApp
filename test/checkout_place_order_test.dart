@@ -38,6 +38,7 @@ void main() {
   });
 
   testWidgets('place order moves checkout items to To Ship', (tester) async {
+    final semantics = tester.ensureSemantics();
     await tester.binding.setSurfaceSize(const Size(430, 932));
     addTearDown(() => tester.binding.setSurfaceSize(null));
     basket.addProduct(testHomeProducts[0], quantity: 2);
@@ -64,8 +65,10 @@ void main() {
     );
     expect(basket.items, isEmpty);
     expect(find.text('Order Tracking'), findsOneWidget);
+    expect(find.text('To Pay'), findsAtLeastNWidgets(1));
     expect(find.text('To Ship'), findsAtLeastNWidgets(1));
-    expect(find.text('Shipping'), findsAtLeastNWidgets(1));
+    expect(find.text('To Receive'), findsAtLeastNWidgets(1));
+    expect(find.text('To Rate'), findsAtLeastNWidgets(1));
     expect(find.text('Completed'), findsAtLeastNWidgets(1));
     expect(find.text('Cancelled'), findsOneWidget);
     expect(find.text(testHomeProducts[0].name), findsOneWidget);
@@ -73,7 +76,10 @@ void main() {
       find.byKey(const ValueKey('to-ship-quantity-counter')),
       findsOneWidget,
     );
-    expect(find.bySemanticsLabel('Order Placed, reached'), findsOneWidget);
+    expect(
+      find.bySemanticsLabel(RegExp(r'Order Placed, reached')),
+      findsOneWidget,
+    );
     expect(find.text('Details'), findsOneWidget);
     expect(find.text('Cancel'), findsOneWidget);
     expect(find.text('Chat'), findsOneWidget);
@@ -82,5 +88,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Order Details'), findsOneWidget);
     expect(find.text('Delivery Address'), findsOneWidget);
+    semantics.dispose();
   });
 }

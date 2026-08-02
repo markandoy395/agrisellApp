@@ -107,7 +107,7 @@ class _SkeletonCard extends StatelessWidget {
                     _SkeletonLine(widthFactor: 0.72, color: baseColor),
                     const SizedBox(height: 9),
                     _SkeletonLine(widthFactor: 0.48, color: baseColor),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
                     _SkeletonLine(widthFactor: 0.62, color: baseColor),
                     const SizedBox(height: 9),
                     _SkeletonLine(widthFactor: 0.4, color: baseColor),

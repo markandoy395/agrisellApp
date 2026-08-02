@@ -23,7 +23,7 @@ void main() {
     await tester.pump();
 
     expect(
-      find.text('Choose your province, city, and barangay.'),
+      find.text('Set an exact delivery pin, then complete your address.'),
       findsOneWidget,
     );
     expect(find.text('Complete address'), findsOneWidget);

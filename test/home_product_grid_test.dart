@@ -1,5 +1,6 @@
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_grid.dart';
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_grid_skeleton.dart';
+import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_card.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 import 'package:flutter/material.dart';
@@ -112,7 +113,10 @@ void main() {
 
     final cards = find.byKey(const ValueKey('home-product-skeleton-card'));
     expect(cards, findsNWidgets(4));
-    expect(tester.getSize(cards.first).height, 270);
+    expect(
+      tester.getSize(cards.first).height,
+      HomeProductCard.heightForWidth(430),
+    );
     expect(find.bySemanticsLabel('Loading product'), findsNWidgets(4));
     expect(tester.takeException(), isNull);
   });

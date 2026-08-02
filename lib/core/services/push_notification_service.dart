@@ -78,7 +78,9 @@ class PushNotificationService {
   }
 
   Future<void> registerForUser(String? userId) async {
-    if (userId == null || userId.isEmpty || kIsWeb) return;
+    if (userId == null || userId.isEmpty || kIsWeb || Firebase.apps.isEmpty) {
+      return;
+    }
     _userId = userId;
     final recipient = _pendingAction?.recipientUserId;
     if (recipient != null && recipient != userId) {

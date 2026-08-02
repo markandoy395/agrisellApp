@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/farmer/dashboard/presentation/screens/farmer_dashboard_screen.dart';
 import 'package:agresell_app/features/shared/products/domain/product_availability_date_rules.dart';
+import 'package:agresell_app/features/shared/products/domain/product_production_stage.dart';
+import 'package:agresell_app/features/shared/products/domain/product_sale_status.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -56,7 +58,10 @@ void main() {
     await tester.enterText(find.byType(TextField).at(3), '40');
     await tester.enterText(find.byType(TextField).at(4), '2');
 
-    await tester.tap(find.byType(DropdownButtonFormField<String>).at(0));
+    final categoryDropdown = find.byType(DropdownButtonFormField<String>).at(0);
+    await tester.ensureVisible(categoryDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(categoryDropdown);
     await tester.pumpAndSettle();
     for (final category in const [
       'Vegetables',
@@ -70,8 +75,16 @@ void main() {
     await tester.tap(find.text('Vegetables').last);
     await tester.pumpAndSettle();
 
-    await _selectDropdownItem(tester, 2, 'Harvesting soon');
-    await _selectDropdownItem(tester, 3, 'Pre-order');
+    await _selectDropdownItem(
+      tester,
+      find.byType(DropdownButtonFormField<ProductProductionStage>),
+      'Harvesting soon',
+    );
+    await _selectDropdownItem(
+      tester,
+      find.byType(DropdownButtonFormField<ProductSaleStatus>),
+      'Pre-order',
+    );
     expect(find.text('Expected availability *'), findsOneWidget);
     expect(
       find.text('Choose a date 3\u201314 days from today.'),
@@ -129,10 +142,9 @@ Future<void> _pumpDashboard(WidgetTester tester) async {
 
 Future<void> _selectDropdownItem(
   WidgetTester tester,
-  int index,
+  Finder dropdown,
   String value,
 ) async {
-  final dropdown = find.byType(DropdownButtonFormField<String>).at(index);
   await tester.ensureVisible(dropdown);
   await tester.pumpAndSettle();
   await tester.tap(dropdown);

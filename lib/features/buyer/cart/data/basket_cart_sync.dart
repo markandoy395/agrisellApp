@@ -8,7 +8,7 @@ class BasketCartSync {
     : _repository = repository ?? const BuyerCartRepository();
 
   final BuyerCartRepository _repository;
-  Future<void> _saveQueue = Future.value();
+  Future<void> _saveQueue = SynchronousFuture<void>(null);
 
   void save(Iterable<BasketCartItem> items) {
     final snapshot = List<BasketCartItem>.of(items);

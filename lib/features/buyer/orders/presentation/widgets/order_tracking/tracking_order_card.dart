@@ -50,7 +50,15 @@ class _TrackingOrderCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                _StatusChip(status: order.status, label: _statusLabel(order)),
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: width < 380 ? 190 : 250,
+                  ),
+                  child: _StatusChip(
+                    status: order.status,
+                    label: _statusLabel(order),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 12),

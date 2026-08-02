@@ -31,7 +31,6 @@ class AuthScaffold extends StatelessWidget {
     final compactCardHeight = lerpDouble(430, 480, layoutScale);
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       body: Stack(
         fit: StackFit.expand,
         children: [

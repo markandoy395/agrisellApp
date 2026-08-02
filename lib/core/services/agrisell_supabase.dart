@@ -1,7 +1,3 @@
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:agresell_app/core/services/secure_supabase_local_storage.dart';
@@ -20,9 +16,8 @@ class AgrisellSupabase {
   );
 
   static bool _isInitialized = false;
-  static String _resolvedPublishableKey = publishableKey;
 
-  static bool get isConfigured => _resolvedPublishableKey.trim().isNotEmpty;
+  static bool get isConfigured => publishableKey.trim().isNotEmpty;
   static bool get isInitialized => _isInitialized;
 
   static SupabaseClient get client {
@@ -34,16 +29,10 @@ class AgrisellSupabase {
 
   static Future<bool> initialize() async {
     if (_isInitialized) return true;
-    if (!isConfigured) {
-      final localConfig = await _loadLocalConfig();
-      _resolvedPublishableKey = _stringValue(
-        localConfig['SUPABASE_PUBLISHABLE_KEY'],
-      );
-    }
     if (!isConfigured) return false;
     await Supabase.initialize(
       url: projectUrl,
-      publishableKey: _resolvedPublishableKey,
+      publishableKey: publishableKey,
       authOptions: FlutterAuthClientOptions(
         localStorage: SecureSupabaseLocalStorage(
           legacySessionKey:
@@ -54,19 +43,4 @@ class AgrisellSupabase {
     _isInitialized = true;
     return true;
   }
-
-  static Future<Map<String, Object?>> _loadLocalConfig() async {
-    try {
-      final contents = await rootBundle.loadString('supabase.local.json');
-      final decoded = jsonDecode(contents);
-      if (decoded is Map<String, Object?>) return decoded;
-    } on FlutterError {
-      return const {};
-    } on FormatException {
-      return const {};
-    }
-    return const {};
-  }
-
-  static String _stringValue(Object? value) => value is String ? value : '';
 }

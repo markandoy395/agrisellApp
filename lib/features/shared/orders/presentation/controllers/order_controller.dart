@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/shared/orders/data/order_notification_factory.dart';
 import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
@@ -27,7 +27,7 @@ class OrderController extends ChangeNotifier {
   final OrderRepository _repository;
   String? _accountId;
   var _loadGeneration = 0;
-  Future<void> _pendingPersistence = Future<void>.value();
+  Future<void> _pendingPersistence = SynchronousFuture<void>(null);
   final List<PlacedOrder> _orders = <PlacedOrder>[];
   final List<HomeNotification> _orderNotifications = <HomeNotification>[];
   final Set<String> _readNotificationIds = <String>{};

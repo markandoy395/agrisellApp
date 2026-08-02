@@ -124,13 +124,20 @@ class _StatusChip extends StatelessWidget {
         children: [
           Icon(_statusIcon(status), size: 15, color: colors.text),
           const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              color: colors.text,
-              fontSize: 12,
-              height: 1,
-              fontWeight: FontWeight.w800,
+          Flexible(
+            child: Tooltip(
+              message: label,
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: colors.text,
+                  fontSize: 12,
+                  height: 1,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
             ),
           ),
         ],

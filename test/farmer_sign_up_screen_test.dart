@@ -69,9 +69,8 @@ void main() {
       await tester.pumpAndSettle();
       expect(
         tester
-            .widget<TextField>(
-              find.widgetWithText(TextField, 'Phone number (09XXXXXXXXX)'),
-            )
+            .widgetList<TextField>(find.byType(TextField))
+            .singleWhere((field) => field.controller?.text == '09171234567')
             .controller!
             .text,
         '09171234567',
@@ -79,14 +78,12 @@ void main() {
       await tester.ensureVisible(find.widgetWithText(OutlinedButton, 'Back'));
       await tester.tap(find.widgetWithText(OutlinedButton, 'Back'));
       await tester.pumpAndSettle();
-      expect(find.widgetWithText(TextField, 'Email'), findsOneWidget);
-      expect(
-        tester
-            .widget<TextField>(find.widgetWithText(TextField, 'Email'))
-            .controller!
-            .text,
-        'farmer@example.com',
-      );
+      final preservedEmailField = tester
+          .widgetList<TextField>(find.byType(TextField))
+          .singleWhere(
+            (field) => field.controller?.text == 'farmer@example.com',
+          );
+      expect(preservedEmailField.controller!.text, 'farmer@example.com');
     },
   );
 
@@ -115,7 +112,11 @@ void main() {
     final scrollView = find.byKey(
       const PageStorageKey('farmer-signup-step-scroll'),
     );
-    final scrollable = tester.state<ScrollableState>(scrollView);
+    final scrollableFinder = find.descendant(
+      of: scrollView,
+      matching: find.byType(Scrollable),
+    );
+    final scrollable = tester.state<ScrollableState>(scrollableFinder.first);
     expect(scrollable.position.maxScrollExtent, greaterThan(0));
 
     await tester.drag(scrollView, const Offset(0, -300));

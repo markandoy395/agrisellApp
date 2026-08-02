@@ -128,6 +128,7 @@ class _RouteStop extends StatelessWidget {
 
     return Tooltip(
       message: step.label,
+      excludeFromSemantics: true,
       child: Semantics(
         label: '${step.label}${isActive ? ', reached' : ', upcoming'}',
         excludeSemantics: true,

@@ -57,7 +57,7 @@ void main() {
     final signUpButton = find.widgetWithText(FilledButton, 'Sign up');
     await tester.ensureVisible(signUpButton);
     await tester.tap(signUpButton);
-    await tester.pumpAndSettle();
+    await _pumpUntilFound(tester, find.byType(CustomBottomNavBar));
 
     final account = AuthRegistrationService.instance.registeredAccounts.single;
 
@@ -144,12 +144,37 @@ void main() {
     );
     await tester.ensureVisible(find.widgetWithText(FilledButton, 'Log In'));
     await tester.tap(find.widgetWithText(FilledButton, 'Log In'));
-    // Rider Home intentionally keeps reconnect checks alive. Pump through the
-    // navigation transition without waiting for every background timer.
-    for (var i = 0; i < 10; i++) {
-      await tester.pump(const Duration(milliseconds: 100));
-    }
+    // Rider Home intentionally keeps reconnect checks alive. Wait only for the
+    // navigation result instead of settling unrelated background timers.
+    await _pumpUntilFound(tester, find.byType(RiderHomeScreen));
 
     expect(find.byType(RiderHomeScreen), findsOneWidget);
   });
+}
+
+Future<void> _pumpUntilFound(
+  WidgetTester tester,
+  Finder finder, {
+  Duration timeout = const Duration(seconds: 10),
+}) async {
+  final pumps = timeout.inMilliseconds ~/ 100;
+  for (var index = 0; index < pumps; index++) {
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 10)),
+    );
+    await tester.pump(const Duration(milliseconds: 100));
+    if (finder.evaluate().isNotEmpty) return;
+  }
+  final visibleText = tester
+      .widgetList<Text>(find.byType(Text))
+      .map((widget) => widget.data)
+      .whereType<String>()
+      .toSet()
+      .take(20)
+      .join(' | ');
+  fail(
+    'Timed out waiting for ${finder.describeMatch(Plurality.one)}; '
+    'activeAccount=${AuthSessionService.instance.currentAccount?.email}; '
+    'visibleText=$visibleText.',
+  );
 }

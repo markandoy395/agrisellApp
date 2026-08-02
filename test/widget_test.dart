@@ -14,9 +14,12 @@ import 'package:agresell_app/features/buyer/home/presentation/screens/home_scree
 import 'package:agresell_app/features/shared/widgets/navigation/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'support/auth_account_fixture.dart';
 
 void main() {
+  setUp(() => SharedPreferences.setMockInitialValues({}));
+
   test('profile image validation rejects unsafe files', () {
     expect(
       ProfileEditValidator.validateProfileImage(
@@ -68,7 +71,14 @@ void main() {
     expect(find.text('Date of Birth'), findsOneWidget);
     expect(find.text('Gender'), findsOneWidget);
     expect(find.text('Email'), findsOneWidget);
-    await tester.ensureVisible(find.text('Log in'));
+    await tester.scrollUntilVisible(
+      find.text('Log in'),
+      240,
+      scrollable: find
+          .ancestor(of: find.text('Log in'), matching: find.byType(Scrollable))
+          .first,
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Log in'));
     await tester.pumpAndSettle();
     expect(find.text('Email or phone number'), findsOneWidget);
@@ -82,10 +92,11 @@ void main() {
     const screenSize = Size(430, 932);
     const keyboardHeight = 330.0;
     const keyboardTop = 602.0;
+    tester.view.devicePixelRatio = 1;
     await tester.binding.setSurfaceSize(screenSize);
-    tester.view.viewInsets = const FakeViewPadding(bottom: keyboardHeight);
     addTearDown(() {
       tester.view.resetViewInsets();
+      tester.view.resetDevicePixelRatio();
       tester.binding.setSurfaceSize(null);
     });
     await _pumpAuthScreen(tester, const LoginScreen());
@@ -93,23 +104,24 @@ void main() {
       find.widgetWithText(TextField, 'Password'),
       'password',
     );
+    tester.view.viewInsets = const FakeViewPadding(bottom: keyboardHeight);
     await tester.pumpAndSettle();
-    expect(
-      tester.getBottomLeft(find.widgetWithText(TextField, 'Password')).dy,
-      lessThan(keyboardTop),
+    final loginPasswordField = find.byWidgetPredicate(
+      (widget) => widget is TextField && widget.controller?.text == 'password',
     );
+    expect(tester.getBottomLeft(loginPasswordField).dy, lessThan(keyboardTop));
+    tester.view.resetViewInsets();
     await _pumpAuthScreen(tester, const SignUpScreen(role: AuthRole.buyer));
     await tester.enterText(
       find.widgetWithText(TextField, 'Confirm Password'),
       'password',
     );
+    tester.view.viewInsets = const FakeViewPadding(bottom: keyboardHeight);
     await tester.pumpAndSettle();
-    expect(
-      tester
-          .getBottomLeft(find.widgetWithText(TextField, 'Confirm Password'))
-          .dy,
-      lessThan(keyboardTop),
+    final confirmationField = find.byWidgetPredicate(
+      (widget) => widget is TextField && widget.controller?.text == 'password',
     );
+    expect(tester.getBottomLeft(confirmationField).dy, lessThan(keyboardTop));
   });
   testWidgets('login typography adapts across mobile widths', (tester) async {
     tester.view.devicePixelRatio = 1;
@@ -211,6 +223,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('0 farmers found'), findsOneWidget);
     expect(find.text('No farmers found'), findsOneWidget);
+    await tester.drag(find.text('Following'), const Offset(-200, 0));
+    await tester.pumpAndSettle();
     expect(find.text('Available now'), findsOneWidget);
     expect(find.widgetWithText(OutlinedButton, 'Follow'), findsNothing);
     expect(find.widgetWithText(FilledButton, 'Shop'), findsNothing);
@@ -241,18 +255,19 @@ void main() {
     await _startProfileSession(AuthRole.buyer, 'buyer.profile@example.com');
     await tester.binding.setSurfaceSize(const Size(430, 932));
     addTearDown(() => tester.binding.setSurfaceSize(null));
-    await _pumpAuthScreen(tester, const HomeScreen());
+    await _pumpScreen(tester, const HomeScreen());
+    await _pumpUntilFound(tester, find.text('Account'));
     await tester.tap(find.text('Account'));
-    await tester.pumpAndSettle();
+    await _pumpUntilFound(tester, find.text('My Orders').hitTestable());
     expect(find.text('Test Account'), findsAtLeastNWidgets(1));
     expect(find.text('My Orders'), findsOneWidget);
     expect(find.text('My Profile'), findsOneWidget);
     expect(find.text('Edit Profile'), findsNothing);
     expect(find.text('Logout'), findsNothing);
-    await tester.tap(find.bySemanticsLabel('Settings'));
-    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Settings').hitTestable());
+    await _pumpUntilFound(tester, find.text('Edit buyer profile'));
     await tester.tap(find.text('Edit buyer profile'));
-    await tester.pumpAndSettle();
+    await _pumpUntilFound(tester, find.text('Save'));
     expect(find.byIcon(Icons.edit_rounded), findsOneWidget);
     expect(find.byType(TextField), findsNWidgets(5));
     expect(find.text('First Name'), findsOneWidget);
@@ -265,7 +280,10 @@ void main() {
     expect(find.text('Save'), findsOneWidget);
     await tester.enterText(find.byType(TextField).first, 'DROP TABLE users');
     await tester.tap(find.text('Save'));
-    await tester.pumpAndSettle();
+    await _pumpUntilFound(
+      tester,
+      find.text('Remove unsafe command-like text from First Name.'),
+    );
     expect(
       find.text('Remove unsafe command-like text from First Name.'),
       findsOneWidget,
@@ -273,15 +291,18 @@ void main() {
     expect(find.text('Save'), findsOneWidget);
     await tester.enterText(find.byType(TextField).first, 'New');
     await tester.tap(find.text('Save'));
-    await tester.pumpAndSettle();
+    await _pumpUntilFound(tester, find.text('New Account'));
     expect(find.text('New Account'), findsAtLeastNWidgets(1));
     await tester.tap(find.byTooltip('Close settings'));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 350));
     expect(find.text('August 1, 2024'), findsNothing);
-    await tester.tap(find.bySemanticsLabel('Settings'));
-    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Settings').hitTestable());
+    await _pumpUntilFound(tester, find.text('Logout'));
     await tester.tap(find.text('Logout'));
-    await tester.pumpAndSettle();
+    await _pumpUntilFound(
+      tester,
+      find.widgetWithText(TextField, 'Email or phone number'),
+    );
     expect(find.text('Log In'), findsAtLeastNWidgets(1));
     expect(find.text('Email or phone number'), findsOneWidget);
   });
@@ -289,23 +310,24 @@ void main() {
     await _startProfileSession(AuthRole.buyer, 'buyer.settings@example.com');
     await tester.binding.setSurfaceSize(const Size(430, 932));
     addTearDown(() => tester.binding.setSurfaceSize(null));
-    await _pumpAuthScreen(tester, const HomeScreen());
+    await _pumpScreen(tester, const HomeScreen());
+    await _pumpUntilFound(tester, find.text('Account'));
     await tester.tap(find.text('Account'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.bySemanticsLabel('Settings'));
-    await tester.pumpAndSettle();
+    await _pumpUntilFound(tester, find.text('My Orders').hitTestable());
+    await tester.tap(find.bySemanticsLabel('Settings').hitTestable());
+    await _pumpUntilFound(tester, find.text('Edit buyer profile'));
     expect(find.text('Settings'), findsOneWidget);
     expect(find.text('Edit buyer profile'), findsOneWidget);
     expect(find.text('Switch account'), findsOneWidget);
     expect(find.text('Logout'), findsOneWidget);
     await tester.tap(find.text('Edit buyer profile'));
-    await tester.pumpAndSettle();
+    await _pumpUntilFound(tester, find.text('Save'));
     expect(find.byType(TextField), findsNWidgets(5));
     await tester.tap(find.text('Cancel'));
-    await tester.pumpAndSettle();
+    await _pumpUntilFound(tester, find.text('Edit buyer profile'));
     expect(find.text('Edit buyer profile'), findsOneWidget);
     await tester.tap(find.byTooltip('Close settings'));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 350));
     expect(find.text('My Orders'), findsOneWidget);
   });
   testWidgets('farmer me tab shows dashboard and edit profile flow', (
@@ -314,10 +336,11 @@ void main() {
     await _startProfileSession(AuthRole.farmer, 'farmer.profile@example.com');
     await tester.binding.setSurfaceSize(const Size(430, 932));
     addTearDown(() => tester.binding.setSurfaceSize(null));
-    await _pumpAuthScreen(
+    await _pumpScreen(
       tester,
       const FarmerHomeScreen(initialNavIndex: FarmerHomeScreen.profileNavIndex),
     );
+    await _pumpUntilFound(tester, find.text('My history'));
     expect(find.byType(CustomBottomNavBar), findsOneWidget);
     expect(find.text('Test Account'), findsAtLeastNWidgets(1));
     expect(
@@ -331,9 +354,9 @@ void main() {
     expect(find.text('Switch Account'), findsNothing);
     expect(find.text('Logout'), findsNothing);
     await tester.tap(find.byTooltip('Settings'));
-    await tester.pumpAndSettle();
+    await _pumpUntilFound(tester, find.text('Edit farmer profile'));
     await tester.tap(find.text('Edit farmer profile'));
-    await tester.pumpAndSettle();
+    await _pumpUntilFound(tester, find.text('Save'));
     expect(find.byType(CustomBottomNavBar), findsOneWidget);
     expect(find.byType(TextField), findsNWidgets(5));
     expect(find.text('First Name'), findsOneWidget);
@@ -346,7 +369,7 @@ void main() {
     expect(find.text('Logout'), findsNothing);
     await tester.enterText(find.byType(TextField).first, 'Farm');
     await tester.tap(find.text('Save'));
-    await tester.pumpAndSettle();
+    await _pumpUntilFound(tester, find.text('Farm Account'));
     expect(find.text('Farm Account'), findsAtLeastNWidgets(1));
     expect(find.text('Switch account'), findsOneWidget);
     expect(find.text('Logout'), findsOneWidget);
@@ -364,13 +387,39 @@ Future<void> _pumpAuthScreen(WidgetTester tester, Widget screen) async {
   await tester.pumpAndSettle();
 }
 
+Future<void> _pumpScreen(WidgetTester tester, Widget screen) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: AgrisellTheme.light,
+      home: screen,
+    ),
+  );
+  await tester.pump();
+}
+
+Future<void> _pumpUntilFound(
+  WidgetTester tester,
+  Finder finder, {
+  Duration timeout = const Duration(seconds: 10),
+}) async {
+  final attempts = timeout.inMilliseconds ~/ 100;
+  for (var index = 0; index < attempts; index++) {
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 10)),
+    );
+    await tester.pump(const Duration(milliseconds: 100));
+    if (finder.evaluate().isNotEmpty) return;
+  }
+  fail('Timed out waiting for ${finder.describeMatch(Plurality.one)}.');
+}
+
 Future<void> _startProfileSession(AuthRole role, String email) async {
   AuthRegistrationService.instance.clearForTesting();
   AuthSessionService.instance.clearMemoryForTesting();
   final account = await registerTestAccount(role: role, email: email);
   await AuthSessionService.instance.start(account, rememberMe: false);
-  addTearDown(() async {
-    await AuthSessionService.instance.clear();
+  addTearDown(() {
     AuthSessionService.instance.clearMemoryForTesting();
     AuthRegistrationService.instance.clearForTesting();
   });

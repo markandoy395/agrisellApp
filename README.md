@@ -19,15 +19,15 @@ samples, guidance on mobile development, and a full API reference.
 ## Supabase Flutter connection
 
 Copy `supabase.local.example.json` to `supabase.local.json`, replace the
-publishable-key placeholder, then use a normal `flutter run`. The app loads the
-ignored local file automatically and the file remains outside source control.
-
-`--dart-define-from-file` remains available when an explicit build-time
-override is preferred:
+publishable-key placeholder, then pass the ignored local file as build-time
+configuration:
 
 ```sh
 flutter run --dart-define-from-file=supabase.local.json
 ```
+
+A normal build without this flag remains reproducible, but Supabase-backed
+features stay unavailable until configuration is supplied.
 
 The shared login accepts an email, Philippine mobile number, or username, then
 reads the authenticated account's stored role and status to choose the

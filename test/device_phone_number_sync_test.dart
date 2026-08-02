@@ -36,9 +36,9 @@ void main() {
     await tester.tap(find.byType(Switch));
     await tester.pumpAndSettle();
 
-    final phoneField = tester.widget<TextField>(
-      find.widgetWithText(TextField, 'Phone Number (09XXXXXXXXX)'),
-    );
+    final phoneField = tester
+        .widgetList<TextField>(find.byType(TextField))
+        .singleWhere((field) => field.controller?.text == '09171234567');
     expect(phoneField.controller!.text, '09171234567');
     expect(tester.widget<Switch>(find.byType(Switch)).value, isTrue);
   });

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/constants/agrisell_routes.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
+import 'package:agresell_app/features/farmer/profile/domain/farmer_history_section.dart';
+import 'package:agresell_app/features/farmer/profile/presentation/screens/farmer_history_screen.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_card_shell.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_section_label.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_text_styles.dart';
@@ -21,7 +23,7 @@ class FarmerHistoryCard extends StatelessWidget {
                 const ProfileSectionLabel(text: 'My history'),
                 const Spacer(),
                 TextButton(
-                  onPressed: () => _openToShip(context),
+                  onPressed: () => _openHistory(context),
                   style: TextButton.styleFrom(
                     foregroundColor: AgrisellColors.brandBlack,
                     padding: const EdgeInsets.symmetric(horizontal: 7),
@@ -54,7 +56,7 @@ class FarmerHistoryCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 7),
               child: Row(
                 children: [
@@ -62,25 +64,28 @@ class FarmerHistoryCard extends StatelessWidget {
                     child: HistoryShortcut(
                       label: 'To Ship',
                       icon: Icons.format_list_bulleted_rounded,
-                      opensToShip: true,
+                      section: FarmerHistorySection.toShip,
                     ),
                   ),
                   Expanded(
                     child: HistoryShortcut(
                       label: 'Completed',
                       icon: Icons.assignment_turned_in_outlined,
+                      section: FarmerHistorySection.completed,
                     ),
                   ),
                   Expanded(
                     child: HistoryShortcut(
                       label: 'Feedback',
                       icon: Icons.rate_review_outlined,
+                      section: FarmerHistorySection.feedback,
                     ),
                   ),
                   Expanded(
                     child: HistoryShortcut(
                       label: 'Confirm',
                       icon: Icons.verified_rounded,
+                      section: FarmerHistorySection.confirm,
                     ),
                   ),
                 ],
@@ -92,8 +97,15 @@ class FarmerHistoryCard extends StatelessWidget {
     );
   }
 
-  static void _openToShip(BuildContext context) {
-    Navigator.of(context).pushNamed(AgrisellRoutes.toShip);
+  static void _openHistory(
+    BuildContext context, {
+    FarmerHistorySection section = FarmerHistorySection.toShip,
+  }) {
+    Navigator.of(context).push(
+      agrisellPageRoute<void>(
+        builder: (_) => FarmerHistoryScreen(initialSection: section),
+      ),
+    );
   }
 }
 
@@ -101,13 +113,13 @@ class HistoryShortcut extends StatelessWidget {
   const HistoryShortcut({
     required this.label,
     required this.icon,
-    this.opensToShip = false,
+    required this.section,
     super.key,
   });
 
   final String label;
   final IconData icon;
-  final bool opensToShip;
+  final FarmerHistorySection section;
 
   @override
   Widget build(BuildContext context) {
@@ -115,9 +127,7 @@ class HistoryShortcut extends StatelessWidget {
       button: true,
       label: label,
       child: InkResponse(
-        onTap: opensToShip
-            ? () => Navigator.of(context).pushNamed(AgrisellRoutes.toShip)
-            : () {},
+        onTap: () => FarmerHistoryCard._openHistory(context, section: section),
         radius: 27,
         child: Column(
           mainAxisSize: MainAxisSize.min,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_request_query.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_request_filter_choices.dart';
 
@@ -98,6 +99,10 @@ class _RiderRequestFilterSheetState extends State<_RiderRequestFilterSheet> {
             if (widget.categories.isNotEmpty) ...[
               const SizedBox(height: 8),
               DropdownButtonFormField<String?>(
+                dropdownColor: AppDropdownStyle.menuColor,
+                borderRadius: AppDropdownStyle.menuBorderRadius,
+                style: AppDropdownStyle.textStyle,
+                iconEnabledColor: AppDropdownStyle.iconColor,
                 initialValue: _category,
                 decoration: const InputDecoration(
                   labelText: 'Product category',

@@ -54,7 +54,7 @@ class HomeProductFilterSheet extends StatelessWidget {
                 const SizedBox(height: 8),
                 _FilterSwitch(
                   title: 'Accepting orders',
-                  subtitle: 'Show available and pre-order products',
+                  subtitle: 'Buyer listings always show orderable products',
                   value: controller.availableOnly,
                   onChanged: controller.setAvailableOnly,
                 ),

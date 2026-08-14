@@ -27,6 +27,7 @@ enum DeliveryAcceptanceFailure {
   vehicleMismatch,
   capacityMismatch,
   batchIncompatible,
+  codUnavailable,
   activeDeliveryLimit,
   conflictingAssignment,
   transactionConflict,
@@ -63,6 +64,8 @@ extension DeliveryAcceptanceFailureDetails on DeliveryAcceptanceFailure {
       'Your current vehicle capacity is not sufficient for this delivery.',
     DeliveryAcceptanceFailure.batchIncompatible =>
       'This delivery is not compatible with your current delivery batch.',
+    DeliveryAcceptanceFailure.codUnavailable =>
+      'Your logistics company does not support Cash on Delivery.',
     DeliveryAcceptanceFailure.activeDeliveryLimit =>
       'You have reached the active-delivery limit.',
     DeliveryAcceptanceFailure.conflictingAssignment =>

@@ -62,6 +62,34 @@ void main() {
     expect(failure, DeliveryAcceptanceFailure.riderOffline);
   });
 
+  test('manually booked offline Rider can accept before expiration', () async {
+    final repository = InMemoryRiderDeliveryRepository(
+      requests: [
+        acceptanceRequest(
+          reservedRiderId: 'rider-a',
+          reservedUntil: acceptanceNow.add(const Duration(minutes: 45)),
+        ),
+      ],
+      riderStates: [acceptanceRider(availability: RiderAvailability.offline)],
+      clock: () => acceptanceNow,
+    );
+
+    final receipt = await repository.acceptDelivery(acceptanceCommand());
+
+    expect(receipt.request.assignedRiderId, 'rider-a');
+  });
+
+  test('expired offline booking cannot be accepted', () async {
+    final failure = await _failure(
+      request: acceptanceRequest(
+        reservedRiderId: 'rider-a',
+        reservedUntil: acceptanceNow.subtract(const Duration(seconds: 1)),
+      ),
+      rider: acceptanceRider(availability: RiderAvailability.offline),
+    );
+    expect(failure, DeliveryAcceptanceFailure.riderOffline);
+  });
+
   test('unacceptable Rider location is rejected', () async {
     final failure = await _failure(rider: acceptanceRider(hasLocation: false));
     expect(failure, DeliveryAcceptanceFailure.locationUnacceptable);

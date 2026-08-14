@@ -48,7 +48,7 @@ class DeliveryBundle {
           ? null
           : DeliveryRequirement.fromJson(requirementJson),
       history: _bundleMaps(json['history']).map(DeliveryStatusHistory.fromJson),
-      proofs: const [],
+      proofs: _bundleMaps(json['proofs']).map(DeliveryProof.fromJson),
       raw: Map.unmodifiable(json),
     );
   }

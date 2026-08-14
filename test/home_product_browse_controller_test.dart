@@ -16,18 +16,18 @@ void main() {
     );
 
     controller.updateQuery('cagayan');
-    expect(controller.visibleProducts(testHomeProducts), hasLength(13));
+    expect(controller.visibleProducts(testHomeProducts), hasLength(11));
   });
 
   test('category and availability filters work together', () {
     controller.selectCategory('Spices');
-    expect(controller.visibleProducts(testHomeProducts), hasLength(2));
+    expect(controller.visibleProducts(testHomeProducts), hasLength(1));
 
     controller.setAvailableOnly(true);
     final visible = controller.visibleProducts(testHomeProducts);
     expect(visible, hasLength(1));
     expect(visible.single.id, 'fresh-picks');
-    expect(controller.activeFilterCount, 2);
+    expect(controller.activeFilterCount, 1);
   });
 
   test('saved-only mode and reset keep saved product data', () {
@@ -38,7 +38,7 @@ void main() {
     expect(controller.savedCount, 1);
 
     controller.resetDiscoveryOptions();
-    expect(controller.visibleProducts(testHomeProducts), hasLength(13));
+    expect(controller.visibleProducts(testHomeProducts), hasLength(11));
     expect(controller.isSaved('pumpkin-kalabasa'), isTrue);
   });
 

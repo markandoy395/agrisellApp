@@ -63,23 +63,25 @@ DeliveryRequest batchRequest({
   assignedRiderId: assignedRiderId,
 );
 
-RiderAcceptanceState batchRiderState({double capacityKg = 100}) =>
-    RiderAcceptanceState(
-      riderId: 'rider-a',
-      isAllowedToDeliver: true,
-      availability: RiderAvailability.onlineAvailable,
-      vehicleType: RiderVehicleType.motorcycle,
-      activeDeliveryCount: 0,
-      maximumActiveDeliveries: 3,
-      capacityKg: capacityKg,
-      serviceArea: 'Cagayan de Oro',
-      serviceRadiusKm: 20,
-      registeredLatitude: 8.48,
-      registeredLongitude: 124.65,
-      location: const RiderDeliverySearch(latitude: 8.48, longitude: 124.65),
-      gpsAccuracyMeters: 5,
-      handlingCapabilityKeys: const {'fragileProtection'},
-    );
+RiderAcceptanceState batchRiderState({
+  double capacityKg = 100,
+  int maximumActiveDeliveries = 3,
+}) => RiderAcceptanceState(
+  riderId: 'rider-a',
+  isAllowedToDeliver: true,
+  availability: RiderAvailability.onlineAvailable,
+  vehicleType: RiderVehicleType.motorcycle,
+  activeDeliveryCount: 0,
+  maximumActiveDeliveries: maximumActiveDeliveries,
+  capacityKg: capacityKg,
+  serviceArea: 'Cagayan de Oro',
+  serviceRadiusKm: 20,
+  registeredLatitude: 8.48,
+  registeredLongitude: 124.65,
+  location: const RiderDeliverySearch(latitude: 8.48, longitude: 124.65),
+  gpsAccuracyMeters: 5,
+  handlingCapabilityKeys: const {'fragileProtection', 'temperatureSensitive'},
+);
 
 RiderProfile batchRiderProfile() => const RiderProfile(
   id: 'rider-a',
@@ -102,6 +104,6 @@ RiderProfile batchRiderProfile() => const RiderProfile(
   serviceArea: 'Cagayan de Oro',
   serviceRadiusKm: 20,
   capacityKg: 100,
-  handlingCapabilityKeys: {'fragileProtection'},
+  handlingCapabilityKeys: {'fragileProtection', 'temperatureSensitive'},
   maximumActiveDeliveries: 3,
 );

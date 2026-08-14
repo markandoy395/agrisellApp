@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import '../../domain/delivery_payment.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
 
@@ -94,14 +95,33 @@ class RiderCashCollectionCard extends StatelessWidget {
             ),
           ),
           DropdownButtonFormField<CashCollectionIssue?>(
+            dropdownColor: AppDropdownStyle.menuColor,
+            borderRadius: AppDropdownStyle.menuBorderRadius,
+            style: AppDropdownStyle.textStyle,
+            iconEnabledColor: AppDropdownStyle.iconColor,
             initialValue: issue,
+            isExpanded: true,
             decoration: const InputDecoration(
               labelText: 'Payment issue (optional)',
             ),
             items: [
-              const DropdownMenuItem(value: null, child: Text('No issue')),
+              const DropdownMenuItem(
+                value: null,
+                child: Text(
+                  'No issue',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               for (final value in CashCollectionIssue.values)
-                DropdownMenuItem(value: value, child: Text(value.label)),
+                DropdownMenuItem(
+                  value: value,
+                  child: Text(
+                    value.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
             ],
             onChanged: enabled ? onIssue : null,
           ),

@@ -117,16 +117,28 @@ extension RiderDeliveryControllerRequests on RiderDeliveryController {
     if (_watchedRiderId == riderId) return;
     _watchedRiderId = riderId;
     unawaited(_requestUpdates?.cancel());
-    _requestUpdates = _repository.watchRequestChanges(riderId: riderId).listen((
-      _,
-    ) {
-      _realtimeDebounce?.cancel();
-      _realtimeDebounce = Timer(const Duration(milliseconds: 250), () {
-        if (canReceiveAdditionalDelivery ||
-            _status.availability.isHandlingDelivery) {
-          unawaited(load(riderId: riderId));
-        }
-      });
-    });
+    _requestUpdates = _repository
+        .watchRequestChanges(riderId: riderId)
+        .listen(
+          (_) {
+            _realtimeDebounce?.cancel();
+            _realtimeDebounce = Timer(const Duration(milliseconds: 250), () {
+              if (canReceiveAdditionalDelivery ||
+                  _status.availability.isHandlingDelivery) {
+                if (_activeRequestLoads > 0) {
+                  _realtimeRefreshPending = true;
+                  return;
+                }
+                unawaited(load(riderId: riderId));
+              }
+            });
+          },
+          onError: (Object _, StackTrace __) {
+            if (_watchedRiderId == riderId) _watchedRiderId = null;
+            _errorMessage =
+                'Live delivery updates are unavailable. Pull to refresh.';
+            _notify();
+          },
+        );
   }
 }

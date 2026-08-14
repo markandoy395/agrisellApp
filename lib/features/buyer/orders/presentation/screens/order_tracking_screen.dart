@@ -33,8 +33,12 @@ const _orderTrackingTabs = OrderTrackingFilter.values;
 typedef _SubmitOrderFeedback =
     Future<void> Function({
       required String orderId,
+      required String productId,
       required int rating,
       required String comment,
+      int? riderRating,
+      String riderComment,
+      bool reviewProduct,
     });
 
 class OrderTrackingScreen extends StatefulWidget {

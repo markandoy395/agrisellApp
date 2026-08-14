@@ -17,7 +17,6 @@ class HomeProductBrowseController extends ChangeNotifier {
   String _query = '';
   String _selectedCategory = 'All';
   HomeProductSort _sort = HomeProductSort.recommended;
-  bool _availableOnly = false;
   bool _savedOnly = false;
   final Set<String> _savedProductIds = {};
   final Expando<_HomeProductMetadata> _metadata =
@@ -26,14 +25,12 @@ class HomeProductBrowseController extends ChangeNotifier {
   String get query => _query;
   String get selectedCategory => _selectedCategory;
   HomeProductSort get sort => _sort;
-  bool get availableOnly => _availableOnly;
+  bool get availableOnly => true;
   bool get savedOnly => _savedOnly;
   int get savedCount => _savedProductIds.length;
 
   int get activeFilterCount {
-    return (_selectedCategory == 'All' ? 0 : 1) +
-        (_availableOnly ? 1 : 0) +
-        (_savedOnly ? 1 : 0);
+    return (_selectedCategory == 'All' ? 0 : 1) + (_savedOnly ? 1 : 0);
   }
 
   bool get hasActiveDiscoveryOptions {
@@ -65,9 +62,7 @@ class HomeProductBrowseController extends ChangeNotifier {
   }
 
   void setAvailableOnly(bool value) {
-    if (_availableOnly == value) return;
-    _availableOnly = value;
-    notifyListeners();
+    // Buyer listings are always limited to orderable products.
   }
 
   void setSavedOnly(bool value) {
@@ -89,7 +84,6 @@ class HomeProductBrowseController extends ChangeNotifier {
     _query = '';
     _selectedCategory = 'All';
     _sort = HomeProductSort.recommended;
-    _availableOnly = false;
     _savedOnly = false;
     notifyListeners();
   }
@@ -103,7 +97,10 @@ class HomeProductBrowseController extends ChangeNotifier {
           final matchesCategory =
               _selectedCategory == 'All' ||
               product.category == _selectedCategory;
-          final matchesAvailability = !_availableOnly || product.canOrder;
+          // The buyer marketplace never exposes products that cannot be
+          // ordered. The repository applies the same rule server-side; this
+          // remains as defense in depth for cached and injected catalogs.
+          final matchesAvailability = product.canOrder;
           final matchesSaved = !_savedOnly || isSaved(product.id);
 
           return matchesSearch &&

@@ -56,6 +56,7 @@ yarn-error.log*
 # Local Flutter compile-time configuration. Copy the example and keep the
 # project-specific value out of source control.
 /supabase.local.json
+/assets/config/supabase.local.json
 /android/app/google-services.json
 /ios/Runner/GoogleService-Info.plist
 

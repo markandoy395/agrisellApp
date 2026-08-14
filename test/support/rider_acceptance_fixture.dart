@@ -12,6 +12,8 @@ DeliveryRequest acceptanceRequest({
   String id = 'delivery-1',
   DeliveryStage stage = DeliveryStage.readyForPickup,
   String? assignedRiderId,
+  String? reservedRiderId,
+  DateTime? reservedUntil,
   DateTime? expiresAt,
   double weightKg = 20,
   Set<RiderVehicleType> vehicleTypes = const {RiderVehicleType.motorcycle},
@@ -39,6 +41,8 @@ DeliveryRequest acceptanceRequest({
   deliveryFee: 180,
   stage: stage,
   assignedRiderId: assignedRiderId,
+  reservedRiderId: reservedRiderId,
+  reservedUntil: reservedUntil,
 );
 
 RiderAcceptanceState acceptanceRider({

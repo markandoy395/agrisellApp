@@ -10,6 +10,15 @@ extension RiderDeliveryControllerPickup on RiderDeliveryController {
   );
 
   Future<DeliveryActionResult> completePickup(PickupCompletionCommand command) {
+    final validation = validatePickupCompletion(command);
+    if (!validation.isValid) {
+      return Future.value(
+        DeliveryActionResult.failure(
+          failure: DeliveryActionFailure.proofRequired,
+          message: validation.message,
+        ),
+      );
+    }
     final running = _pickupOperations[command.deliveryId];
     if (running != null) return running;
     late final Future<DeliveryActionResult> operation;

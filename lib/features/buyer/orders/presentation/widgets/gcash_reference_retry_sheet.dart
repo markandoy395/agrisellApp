@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/features/shared/orders/domain/order_payment.dart';
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/order_controller.dart';
 
@@ -36,8 +37,7 @@ class _GcashReferenceRetrySheetState extends State<_GcashReferenceRetrySheet> {
   var _saving = false;
   String? _error;
 
-  bool get _isValid =>
-      RegExp(r'^[A-Za-z0-9 _-]{6,40}$').hasMatch(_controller.text.trim());
+  bool get _isValid => OrderPayment.isValidGcashReference(_controller.text);
 
   @override
   void dispose() {
@@ -106,11 +106,14 @@ class _GcashReferenceRetrySheetState extends State<_GcashReferenceRetrySheet> {
             key: const ValueKey('replacement-gcash-reference'),
             controller: _controller,
             enabled: !_saving,
-            maxLength: 40,
+            maxLength: 17,
+            keyboardType: TextInputType.number,
             style: const TextStyle(fontSize: 13),
             onChanged: (_) => setState(() {}),
             decoration: InputDecoration(
               labelText: 'New GCash reference number',
+              helperText: 'Enter the 13-digit number from your receipt.',
+              helperMaxLines: 2,
               prefixIcon: const Icon(Icons.receipt_long_outlined, size: 19),
               filled: true,
               fillColor: AgrisellColors.searchBackground,

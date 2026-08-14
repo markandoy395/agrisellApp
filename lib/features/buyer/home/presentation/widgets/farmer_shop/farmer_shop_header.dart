@@ -4,6 +4,8 @@ import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 import 'package:agresell_app/features/shared/widgets/buttons/circular_header_icon_button.dart';
 
+enum FarmerShopMenuAction { viewAllProducts, messageFarmer }
+
 class FarmerShopHeader extends StatelessWidget {
   const FarmerShopHeader({
     required this.coverImage,
@@ -12,6 +14,7 @@ class FarmerShopHeader extends StatelessWidget {
     required this.searchController,
     required this.onSearchChanged,
     required this.onBack,
+    required this.onMenuSelected,
     super.key,
   });
 
@@ -21,6 +24,7 @@ class FarmerShopHeader extends StatelessWidget {
   final TextEditingController searchController;
   final ValueChanged<String> onSearchChanged;
   final VoidCallback onBack;
+  final ValueChanged<FarmerShopMenuAction> onMenuSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -70,17 +74,47 @@ class FarmerShopHeader extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  CircularHeaderIconButton(
-                    semanticLabel: 'More shop options',
-                    icon: Icons.more_vert_rounded,
-                    onTap: () {},
-                    style: CircularHeaderIconButtonStyle.inkWell(
-                      dimension: 38,
-                      backgroundColor: AgrisellColors.brandBlack.withValues(
-                        alpha: 0.42,
+                  PopupMenuButton<FarmerShopMenuAction>(
+                    tooltip: 'More shop options',
+                    onSelected: onMenuSelected,
+                    itemBuilder: (_) => const [
+                      PopupMenuItem(
+                        value: FarmerShopMenuAction.viewAllProducts,
+                        child: ListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          leading: Icon(Icons.storefront_outlined),
+                          title: Text('View all products'),
+                        ),
                       ),
-                      iconColor: AgrisellColors.surface,
-                      iconSize: 22,
+                      PopupMenuItem(
+                        value: FarmerShopMenuAction.messageFarmer,
+                        child: ListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          leading: Icon(Icons.chat_bubble_outline_rounded),
+                          title: Text('Message farmer'),
+                        ),
+                      ),
+                    ],
+                    child: Semantics(
+                      button: true,
+                      label: 'More shop options',
+                      child: Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: AgrisellColors.brandBlack.withValues(
+                            alpha: 0.42,
+                          ),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.more_vert_rounded,
+                          color: AgrisellColors.surface,
+                          size: 22,
+                        ),
+                      ),
                     ),
                   ),
                 ],

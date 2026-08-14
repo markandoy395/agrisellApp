@@ -4,18 +4,20 @@ class _CheckoutBottomBar extends StatelessWidget {
   const _CheckoutBottomBar({
     required this.selectedQuantity,
     required this.total,
+    required this.isPlacingOrder,
     required this.onPlaceOrder,
   });
 
   final int selectedQuantity;
   final double total;
+  final bool isPlacingOrder;
   final VoidCallback onPlaceOrder;
 
   @override
   Widget build(BuildContext context) {
-    final enabled = selectedQuantity > 0;
+    final enabled = selectedQuantity > 0 && !isPlacingOrder;
     return NotchedCheckoutFooter(
-      actionLabel: 'Place Order',
+      actionLabel: isPlacingOrder ? 'Placing...' : 'Place Order',
       enabled: enabled,
       onActionTap: onPlaceOrder,
       leading: Align(

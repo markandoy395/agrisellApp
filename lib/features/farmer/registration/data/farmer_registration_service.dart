@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
+import 'package:agresell_app/features/auth/data/auth_otp_error_mapper.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_exception.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/farmer/registration/domain/farmer_signup_data.dart';
@@ -14,17 +15,46 @@ class FarmerRegistrationService {
 
   Future<RegisteredAccount> register(FarmerSignupData data) async {
     final client = AgrisellSupabase.client;
-    final response = await client.auth.signUp(
-      email: data.email.trim().toLowerCase(),
-      password: data.password,
-      data: data.toAuthMetadata(),
-    );
+    final email = data.email.trim().toLowerCase();
+    late final AuthResponse response;
+    try {
+      response = await client.auth.signUp(
+        email: email,
+        password: data.password,
+        data: data.toAuthMetadata(),
+      );
+    } on AuthException catch (error) {
+      throw AuthOtpErrorMapper.signUp(error);
+    }
     final user = response.user;
     if (user == null) {
       throw const AuthRegistrationException('Account creation failed.');
     }
+    if (user.identities?.isEmpty == true) {
+      throw const AuthRegistrationException(
+        'This email is already registered. Log in or use another email.',
+      );
+    }
     if (response.session == null) {
       throw const AuthEmailConfirmationRequired();
+    }
+
+    return completeVerifiedRegistration(data);
+  }
+
+  Future<RegisteredAccount> completeVerifiedRegistration(
+    FarmerSignupData data,
+  ) async {
+    final client = AgrisellSupabase.client;
+    final user = client.auth.currentUser;
+    final email = data.email.trim().toLowerCase();
+    if (user == null || user.email?.trim().toLowerCase() != email) {
+      throw const AuthRegistrationException(
+        'Sign in with the Farmer account before completing registration.',
+      );
+    }
+    if (user.emailConfirmedAt == null) {
+      throw const AuthEmailNotVerified();
     }
 
     try {
@@ -33,7 +63,7 @@ class FarmerRegistrationService {
           .from('farmers')
           .select(
             'first_name,last_name,suffix,phone_number,date_of_birth,'
-            'account_status,verification_status',
+            'account_status,verification_status,profile_image_url',
           )
           .eq('auth_user_id', user.id)
           .single();
@@ -41,7 +71,7 @@ class FarmerRegistrationService {
         id: user.id,
         firstName: _text(farmer['first_name']),
         lastName: _text(farmer['last_name']),
-        email: data.email.trim().toLowerCase(),
+        email: email,
         passwordHash: '',
         passwordSalt: '',
         role: AuthRole.farmer.value,
@@ -50,6 +80,7 @@ class FarmerRegistrationService {
         phoneNumber: _optionalText(farmer['phone_number']),
         dateOfBirth: _optionalText(farmer['date_of_birth']),
         verificationStatus: _optionalText(farmer['verification_status']),
+        profileImageUrl: _optionalText(farmer['profile_image_url']),
       );
     } on PostgrestException catch (error) {
       throw AuthRegistrationException(_databaseMessage(error));
@@ -117,10 +148,21 @@ class FarmerRegistrationService {
 }
 
 String _databaseMessage(PostgrestException error) => switch (error.code) {
-  '23505' => 'An account with this information already exists.',
+  '23505' => _uniqueViolationMessage(error),
   '42501' => 'Your account could not be authorized. Please sign in again.',
   _ => 'Farmer registration could not be completed. Please try again.',
 };
+
+String _uniqueViolationMessage(PostgrestException error) {
+  final details = '${error.message} ${error.details}'.toLowerCase();
+  if (details.contains('email')) {
+    return 'This email is already registered. Please log in or use another email.';
+  }
+  if (details.contains('phone') || details.contains('contact')) {
+    return 'This phone number is already registered. Please use another phone number.';
+  }
+  return 'This account information is already registered.';
+}
 
 String _text(Object? value, {String fallback = ''}) =>
     _optionalText(value) ?? fallback;

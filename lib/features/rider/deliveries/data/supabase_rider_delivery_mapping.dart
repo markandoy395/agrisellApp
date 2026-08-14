@@ -6,6 +6,18 @@ extension _SupabaseRiderDeliveryMapping on SupabaseRiderDeliveryRepository {
     final paymentMethod = bundle.raw['payment_method']?.toString() ?? '';
     final paymentStatus = bundle.raw['payment_status']?.toString() ?? '';
     final amountToCollect = _requestNumber(bundle.raw['amount_to_collect']);
+    final assignmentRequestId = _requestText(
+      bundle.raw['assignment_request_id'],
+    );
+    final assignmentStatusValue = _requestText(
+      bundle.raw['assignment_request_status'],
+    );
+    final assignmentStatus = assignmentStatusValue == null
+        ? null
+        : RiderAssignmentRequestStatus.fromValue(assignmentStatusValue);
+    final assignmentExpiresAt =
+        _requestDate(bundle.raw['assignment_request_expires_at']) ??
+        _requestDate(bundle.raw['expires_at']);
     final pickup =
         bundle.pickup ??
         const DeliveryLocation(address: 'Pickup location unavailable');
@@ -26,17 +38,24 @@ extension _SupabaseRiderDeliveryMapping on SupabaseRiderDeliveryRepository {
     return DeliveryRequest(
       id: delivery.deliveryId,
       orderNumber: 'Order #${delivery.orderId}',
-      productName: 'Farm produce',
-      sellerName: 'Farmer',
-      buyerName: 'Buyer',
+      productName: _requestText(bundle.raw['goods_summary']) ?? 'Farm produce',
+      sellerName: _requestText(bundle.raw['seller_name']) ?? 'Farmer',
+      buyerName: _requestText(bundle.raw['buyer_name']) ?? 'Buyer',
       pickupLocation: pickup,
       deliveryLocation: dropoff,
-      pickupDeadline: delivery.createdAt,
-      totalWeightKg: delivery.totalWeightKg,
+      pickupDeadline:
+          _requestDate(bundle.raw['requested_schedule']) ?? delivery.createdAt,
+      quantityDescription: _requestText(bundle.raw['goods_summary']) ?? '',
+      totalWeightKg:
+          _requestNumber(bundle.raw['total_weight_kg']) ??
+          delivery.totalWeightKg,
       packageDimensions: dimensions,
       distanceKm: delivery.distanceKm,
       estimatedTravelMinutes: delivery.estimatedTravelMinutes,
-      deliveryFee: 0,
+      deliveryFee:
+          _requestNumber(bundle.raw['proposed_delivery_fee']) ??
+          _requestNumber(bundle.raw['delivery_fee']) ??
+          0,
       priority: delivery.priority,
       paymentMethod: paymentMethod,
       cashOnDelivery:
@@ -57,8 +76,9 @@ extension _SupabaseRiderDeliveryMapping on SupabaseRiderDeliveryRepository {
       deliveryInstructions: '',
       deliveryDeadline: delivery.deliveryDeadline,
       availableAt: delivery.availableAt,
-      expiresAt: delivery.expiresAt,
-      serviceArea: delivery.serviceArea,
+      expiresAt: assignmentExpiresAt ?? delivery.expiresAt,
+      serviceArea:
+          _requestText(bundle.raw['service_area']) ?? delivery.serviceArea,
       requiredCapacityKg:
           requirement?.minimumCapacityKg ?? delivery.requiredCapacityKg,
       requiredVehicleTypes: _vehicles(requirement?.requiredVehicleType),
@@ -66,6 +86,14 @@ extension _SupabaseRiderDeliveryMapping on SupabaseRiderDeliveryRepository {
       cancellationConditions: requirement?.cancellationConditions ?? '',
       stage: legacyStageForDeliveryStatus(delivery.deliveryStatus),
       assignedRiderId: delivery.riderId == null ? null : riderId,
+      assignmentRequestId: assignmentRequestId,
+      assignmentRequestStatus: assignmentStatus,
+      reservedRiderId: assignmentStatus == RiderAssignmentRequestStatus.pending
+          ? riderId
+          : null,
+      reservedUntil: assignmentStatus == RiderAssignmentRequestStatus.pending
+          ? assignmentExpiresAt
+          : null,
       closedAt: delivery.closedAt,
       proofs: bundle.proofs,
     );
@@ -129,3 +157,11 @@ double? _requestNumber(Object? value) {
   if (value is num) return value.toDouble();
   return double.tryParse(value?.toString() ?? '');
 }
+
+String? _requestText(Object? value) {
+  final text = value?.toString().trim() ?? '';
+  return text.isEmpty ? null : text;
+}
+
+DateTime? _requestDate(Object? value) =>
+    DateTime.tryParse(value?.toString() ?? '')?.toLocal();

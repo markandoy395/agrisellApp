@@ -54,14 +54,22 @@ extension _RiderLocationTracking on RiderLocationController {
   }
 
   void _setPosition(Position position) {
+    if (!_isUsablePositionSample(position)) return;
     final location = RiderDeviceLocation(
       latitude: position.latitude,
       longitude: position.longitude,
       accuracyMeters: position.accuracy,
       altitudeMeters: position.altitude,
       timestamp: position.timestamp,
-      speedMetersPerSecond: position.speed,
-      headingDegrees: position.heading,
+      speedMetersPerSecond: position.speed.isFinite && position.speed >= 0
+          ? position.speed
+          : 0,
+      headingDegrees:
+          position.heading.isFinite &&
+              position.heading >= 0 &&
+              position.heading <= 360
+          ? position.heading
+          : 0,
       isMocked: position.isMocked,
       isApproximate: _isApproximate,
     );
@@ -73,6 +81,22 @@ extension _RiderLocationTracking on RiderLocationController {
     _scheduleFreshnessUpdate(location.timestamp);
     _notify();
     if (_currentRiderId != null) unawaited(_publishIfMeaningful(location));
+  }
+
+  bool _isUsablePositionSample(Position position) {
+    if (!position.latitude.isFinite ||
+        !position.longitude.isFinite ||
+        position.latitude < -90 ||
+        position.latitude > 90 ||
+        position.longitude < -180 ||
+        position.longitude > 180 ||
+        !position.accuracy.isFinite ||
+        position.accuracy < 0) {
+      return false;
+    }
+    final age = _clock().difference(position.timestamp);
+    return age >= -RiderLocationQualityRules.futureTolerance &&
+        age <= RiderLocationQualityRules.maxAge;
   }
 
   void _scheduleFreshnessUpdate(DateTime capturedAt) {

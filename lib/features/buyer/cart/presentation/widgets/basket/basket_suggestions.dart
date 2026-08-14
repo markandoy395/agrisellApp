@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
-import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 import 'package:agresell_app/features/shared/products/data/home_product_repository.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/features/shared/products/presentation/controllers/home_product_catalog_controller.dart';
+import 'package:agresell_app/features/shared/products/presentation/widgets/product_thumbnail.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_controller.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/product_detail_screen.dart';
 
@@ -70,7 +70,7 @@ class _BasketSuggestionsState extends State<BasketSuggestions> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const _SuggestionLabel(),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           content,
         ],
       );
@@ -105,37 +105,28 @@ class _SuggestionGrid extends StatelessWidget {
     required this.suggestions,
     required this.catalogController,
   });
-  static const _gap = 10.0;
   final List<HomeProduct> suggestions;
   final HomeProductCatalogController catalogController;
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final fallbackWidth = MediaQuery.sizeOf(context).width;
-        final availableWidth = constraints.maxWidth.isFinite
-            ? constraints.maxWidth
-            : fallbackWidth;
-        final columnCount = availableWidth < 250 ? 1 : 2;
-        final tileWidth =
-            (availableWidth - _gap * (columnCount - 1)) / columnCount;
-        final tileHeight = tileWidth / 1.05;
-        return Wrap(
-          spacing: _gap,
-          runSpacing: _gap,
-          children: [
-            for (final product in suggestions)
-              SizedBox(
-                width: tileWidth,
-                height: tileHeight,
-                child: _SuggestionCard(
-                  product: product,
-                  catalogController: catalogController,
-                ),
-              ),
-          ],
-        );
-      },
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final cardWidth = screenWidth < 380 ? 154.0 : 166.0;
+
+    return SizedBox(
+      height: 226,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        itemCount: suggestions.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
+        itemBuilder: (context, index) => SizedBox(
+          width: cardWidth,
+          child: _SuggestionCard(
+            product: suggestions[index],
+            catalogController: catalogController,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -145,31 +136,54 @@ class _SuggestionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Divider(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.24),
-            thickness: 1,
+        Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: AgrisellColors.forestSoft,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Icon(
+            Icons.eco_outlined,
+            color: AgrisellColors.authGreen,
+            size: 21,
+          ),
+        ),
+        const SizedBox(width: 11),
+        const Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'You may also like',
+                style: TextStyle(
+                  color: AgrisellColors.headingGreen,
+                  fontSize: 15,
+                  height: 1.15,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              SizedBox(height: 4),
+              Text(
+                'More fresh picks from local farmers',
+                style: TextStyle(
+                  color: AgrisellColors.mutedText,
+                  fontSize: 12,
+                  height: 1.2,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ),
         const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
-          child: Text(
-            'Check other products',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: AgrisellColors.brandBlack,
-              fontSize: 12,
-              height: 1,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        Expanded(
-          child: Divider(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.24),
-            thickness: 1,
+          padding: EdgeInsets.only(top: 7),
+          child: Icon(
+            Icons.swipe_left_rounded,
+            color: AgrisellColors.mutedText,
+            size: 20,
           ),
         ),
       ],
@@ -238,16 +252,19 @@ class _SuggestionCard extends StatelessWidget {
   final HomeProductCatalogController catalogController;
   @override
   Widget build(BuildContext context) {
+    final canAddToBasket = product.canOrder;
+    final radius = BorderRadius.circular(16);
+
     return Semantics(
       button: true,
       label: 'View ${product.name}',
       child: Material(
         color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(8),
-        elevation: 3,
-        shadowColor: AgrisellColors.brandBlack.withValues(alpha: 0.16),
+        borderRadius: radius,
+        elevation: 0,
         clipBehavior: Clip.antiAlias,
         child: InkWell(
+          borderRadius: radius,
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute<void>(
@@ -258,84 +275,126 @@ class _SuggestionCard extends StatelessWidget {
               ),
             );
           },
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              ResponsiveAssetImage(
-                asset: product.image,
-                fit: BoxFit.cover,
-                semanticLabel: '${product.name} product photo',
-              ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Material(
-                  color: AgrisellColors.surface,
-                  shape: const CircleBorder(),
-                  elevation: 2,
-                  child: IconButton(
-                    tooltip: product.isAvailable
-                        ? 'Add ${product.name} to basket'
-                        : 'Product unavailable',
-                    constraints: const BoxConstraints.tightFor(
-                      width: 36,
-                      height: 36,
-                    ),
-                    padding: EdgeInsets.zero,
-                    onPressed: product.isAvailable
-                        ? () {
-                            BasketController.instance.addProduct(product);
-                            ScaffoldMessenger.of(context)
-                              ..hideCurrentSnackBar()
-                              ..showAppSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    '${product.name} added to your basket.',
-                                  ),
-                                ),
-                              );
-                          }
-                        : null,
-                    icon: Icon(
-                      product.isAvailable
-                          ? Icons.add_shopping_cart_rounded
-                          : Icons.block_rounded,
-                      size: 18,
-                      color: product.isAvailable
-                          ? AgrisellColors.authGreen
-                          : AgrisellColors.mutedText,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: AgrisellColors.brandBlack.withValues(alpha: 0.48),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 7, 8, 7),
-                    child: Text(
-                      product.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AgrisellColors.surface,
-                        fontSize: 12,
-                        height: 1,
-                        fontWeight: FontWeight.w600,
+          child: Ink(
+            decoration: BoxDecoration(
+              borderRadius: radius,
+              border: Border.all(color: AgrisellColors.borderLine),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  height: 126,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      ColoredBox(
+                        color: AgrisellColors.searchBackground,
+                        child: ProductThumbnail(
+                          asset: product.image,
+                          imageUrl: product.imageUrl,
+                          width: double.infinity,
+                          height: 126,
+                          borderRadius: 0,
+                          semanticLabel: '${product.name} product photo',
+                          filterQuality: FilterQuality.medium,
+                          gaplessPlayback: true,
+                        ),
                       ),
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Material(
+                          color: AgrisellColors.surface.withValues(alpha: 0.94),
+                          shape: const CircleBorder(),
+                          elevation: 1,
+                          child: IconButton(
+                            tooltip: canAddToBasket
+                                ? 'Add ${product.name} to basket'
+                                : 'Product unavailable',
+                            constraints: const BoxConstraints.tightFor(
+                              width: 34,
+                              height: 34,
+                            ),
+                            padding: EdgeInsets.zero,
+                            onPressed: canAddToBasket
+                                ? () => _addToBasket(context)
+                                : null,
+                            icon: Icon(
+                              canAddToBasket
+                                  ? Icons.add_shopping_cart_rounded
+                                  : Icons.block_rounded,
+                              size: 17,
+                              color: canAddToBasket
+                                  ? AgrisellColors.authGreen
+                                  : AgrisellColors.mutedText,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 9, 10, 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          product.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AgrisellColors.headingGreen,
+                            fontSize: 13,
+                            height: 1.15,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          product.sellerName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AgrisellColors.mutedText,
+                            fontSize: 11,
+                            height: 1.15,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          '${product.price} ${product.unit}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AgrisellColors.authGreen,
+                            fontSize: 12,
+                            height: 1.1,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  void _addToBasket(BuildContext context) {
+    BasketController.instance.addProduct(product);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showAppSnackBar(
+        SnackBar(content: Text('${product.name} added to your basket.')),
+      );
   }
 }

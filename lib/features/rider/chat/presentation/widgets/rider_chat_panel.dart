@@ -83,26 +83,48 @@ class RiderConversationPanel extends StatelessWidget {
       conversationId: conversation.id,
       deliveryId: conversation.deliveryId,
     );
-    await onAction?.call(action);
-    final reference = await onAttachmentRequested?.call(action);
-    if (reference != null) {
-      final sent = type == RiderCommunicationActionType.attachPhoto
-          ? await controller.sendPhoto(reference)
-          : type == RiderCommunicationActionType.shareLocation
-          ? await controller.sendLocation(reference)
-          : true;
-      if (!sent && context.mounted) {
-        ScaffoldMessenger.of(context).showAppSnackBar(
-          const SnackBar(content: Text('Attachment could not be sent.')),
+    final needsAttachment =
+        type == RiderCommunicationActionType.attachPhoto ||
+        type == RiderCommunicationActionType.shareLocation;
+    if (needsAttachment) {
+      final attachmentRequested = onAttachmentRequested;
+      if (attachmentRequested == null) {
+        _showActionMessage(
+          context,
+          '${riderActionLabel(type)} is unavailable.',
         );
         return;
       }
-    }
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showAppSnackBar(
-        SnackBar(content: Text('${riderActionLabel(type)} request is ready.')),
+      final reference = await attachmentRequested(action);
+      if (reference == null || !context.mounted) return;
+      final sent = type == RiderCommunicationActionType.attachPhoto
+          ? await controller.sendPhoto(reference)
+          : await controller.sendLocation(reference);
+      if (!context.mounted) return;
+      _showActionMessage(
+        context,
+        sent
+            ? '${riderActionLabel(type)} sent.'
+            : 'Attachment could not be sent.',
       );
+      return;
     }
+
+    final runAction = onAction;
+    if (runAction == null) {
+      _showActionMessage(context, '${riderActionLabel(type)} is unavailable.');
+      return;
+    }
+    await runAction(action);
+    if (context.mounted) {
+      _showActionMessage(context, '${riderActionLabel(type)} opened.');
+    }
+  }
+
+  void _showActionMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showAppSnackBar(SnackBar(content: Text(message)));
   }
 }
 

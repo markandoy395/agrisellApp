@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_request_query.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
@@ -56,17 +57,16 @@ class _RiderRequestToolbarState extends State<RiderRequestToolbar> {
         children: [
           Expanded(
             child: DropdownButtonFormField<RiderRequestSort>(
+              dropdownColor: AppDropdownStyle.menuColor,
+              borderRadius: AppDropdownStyle.menuBorderRadius,
+              iconEnabledColor: AppDropdownStyle.iconColor,
               initialValue: widget.controller.requestSort,
               isExpanded: true,
               decoration: const InputDecoration(
                 labelText: 'Sort by',
                 isDense: true,
               ),
-              style: const TextStyle(
-                color: AgrisellColors.brandBlack,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
+              style: AppDropdownStyle.textStyle.copyWith(fontSize: 12),
               items: [
                 for (final sort in RiderRequestSort.values)
                   DropdownMenuItem(value: sort, child: Text(sort.label)),

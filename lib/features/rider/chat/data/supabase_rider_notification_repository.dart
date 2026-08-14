@@ -97,6 +97,13 @@ class SupabaseRiderNotificationRepository
   }
 
   RiderNotificationType _type(HomeNotification value) {
+    final requestStatus = _metadataText(value, 'request_status');
+    if (requestStatus == 'expired') {
+      return RiderNotificationType.requestExpired;
+    }
+    if (requestStatus == 'cancelled' || requestStatus == 'failed') {
+      return RiderNotificationType.cancellation;
+    }
     return switch (value.type) {
       HomeNotificationType.deliveryRequest =>
         RiderNotificationType.deliveryRequest,

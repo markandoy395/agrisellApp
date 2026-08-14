@@ -46,6 +46,11 @@ class RiderSignUpSubmissionService {
     gpsLatitude: double.tryParse(draft.value(RiderSignUpFields.latitude)),
     gpsLongitude: double.tryParse(draft.value(RiderSignUpFields.longitude)),
     locationLabel: draft.value(RiderSignUpFields.location),
+    addressLine: draft.value(RiderSignUpFields.addressLine),
+    barangay: draft.value(RiderSignUpFields.barangay),
+    cityMunicipality: draft.value(RiderSignUpFields.cityMunicipality),
+    province: draft.value(RiderSignUpFields.province),
+    postalCode: draft.value(RiderSignUpFields.postalCode),
     locationNotes: draft.value(RiderSignUpFields.locationNotes),
     gpsAccuracyMeters: double.tryParse(
       draft.value(RiderSignUpFields.locationAccuracy),

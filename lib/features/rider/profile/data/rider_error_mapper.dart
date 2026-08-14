@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:agresell_app/features/rider/profile/data/rider_repository_exception.dart';
@@ -32,6 +33,12 @@ Future<T> guardRiderOperation<T>(Future<T> Function() action) async {
       type: RiderFailureType.storage,
     );
   } on PostgrestException catch (error) {
+    if (kDebugMode) {
+      debugPrint(
+        'Rider database request failed (${error.code}): ${error.message}; '
+        'details=${error.details}; hint=${error.hint}',
+      );
+    }
     final isConflict = error.code == '23505';
     throw RiderRepositoryException(
       isConflict

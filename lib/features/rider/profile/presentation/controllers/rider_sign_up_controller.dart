@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:agresell_app/features/rider/profile/domain/rider_address.dart';
 import 'package:agresell_app/features/rider/profile/data/rider_sign_up_availability_service.dart';
 import 'package:agresell_app/features/rider/profile/data/rider_document_upload_service.dart';
 import 'package:agresell_app/features/rider/profile/data/rider_registration_service.dart';
@@ -9,6 +11,7 @@ import 'package:agresell_app/features/rider/profile/data/rider_sign_up_submissio
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_draft.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_validator.dart';
+import 'package:agresell_app/features/shared/location/data/gps_location_gateway.dart';
 part 'rider_sign_up_controller_actions.dart';
 
 enum RiderFieldAvailability { idle, checking, available, unavailable }
@@ -19,14 +22,17 @@ class RiderSignUpController extends ChangeNotifier {
     RiderDocumentUploadService? documents,
     RiderSignUpAvailabilityService? availability,
     RiderSignUpSubmissionService? submission,
+    GpsLocationGateway? gpsGateway,
   }) : _storage = storage ?? SharedPreferencesRiderSignUpDraftStorage(),
        _documents = documents ?? RiderDocumentUploadService(),
        _availabilityService = availability ?? RiderSignUpAvailabilityService(),
-       _submissionService = submission ?? RiderSignUpSubmissionService();
+       _submissionService = submission ?? RiderSignUpSubmissionService(),
+       _gpsGateway = gpsGateway ?? GeolocatorGpsLocationGateway();
   final RiderSignUpDraftStorage _storage;
   final RiderDocumentUploadService _documents;
   final RiderSignUpAvailabilityService _availabilityService;
   final RiderSignUpSubmissionService _submissionService;
+  final GpsLocationGateway _gpsGateway;
   final _touched = <String>{};
   final _availability = <String, RiderFieldAvailability>{};
   final _availabilityTimers = <String, Timer>{};
@@ -37,12 +43,14 @@ class RiderSignUpController extends ChangeNotifier {
   String _licenseNumber = '';
   bool _loading = true;
   bool _submitting = false;
+  bool _capturingLocation = false;
   bool _showStepErrors = false;
   bool _awaitingEmailOtp = false;
   String? _error;
   RiderSignUpDraft get draft => _draft;
   bool get isLoading => _loading;
   bool get isSubmitting => _submitting;
+  bool get isCapturingLocation => _capturingLocation;
   bool get awaitingEmailOtp => _awaitingEmailOtp;
   String? get errorMessage => _error;
   String get password => _password;
@@ -131,6 +139,7 @@ class RiderSignUpController extends ChangeNotifier {
       licenseNumber: _licenseNumber,
       password: _password,
       confirmPassword: _confirmPassword,
+      requireCoordinates: _draft.step != RiderSignUpStep.address,
     );
     final checking =
         _draft.step == RiderSignUpStep.personal &&
@@ -146,6 +155,12 @@ class RiderSignUpController extends ChangeNotifier {
       notifyListeners();
       return false;
     }
+    if (_draft.step == RiderSignUpStep.address &&
+        !await _captureCurrentLocation()) {
+      _showStepErrors = true;
+      notifyListeners();
+      return false;
+    }
     final nextIndex = _draft.step.index + 1;
     if (nextIndex >= RiderSignUpStep.values.length) return true;
     _draft = _draft.copyWith(step: RiderSignUpStep.values[nextIndex]);
@@ -154,6 +169,71 @@ class RiderSignUpController extends ChangeNotifier {
     notifyListeners();
     return true;
   }
+
+  Future<bool> _captureCurrentLocation() async {
+    if (_capturingLocation) return false;
+    _capturingLocation = true;
+    _error = null;
+    notifyListeners();
+    try {
+      if (!await _gpsGateway.isServiceEnabled()) {
+        await _gpsGateway.openLocationSettings();
+        _error = 'Turn on location services, then try continuing again.';
+        return false;
+      }
+      var permission = await _gpsGateway.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await _gpsGateway.requestPermission();
+      }
+      if (permission == LocationPermission.denied) {
+        _error = 'Allow location access so we can capture your exact location.';
+        return false;
+      }
+      if (permission == LocationPermission.deniedForever) {
+        await _gpsGateway.openAppSettings();
+        _error =
+            'Allow location permission in app settings, then try continuing again.';
+        return false;
+      }
+      if (await _gpsGateway.getAccuracyStatus() ==
+          LocationAccuracyStatus.reduced) {
+        await _gpsGateway.openAppSettings();
+        _error = 'Enable precise location, then try continuing again.';
+        return false;
+      }
+      final position = await _gpsGateway.currentPosition(
+        settings: const LocationSettings(
+          accuracy: LocationAccuracy.bestForNavigation,
+          timeLimit: Duration(seconds: 15),
+        ),
+      );
+      updateLocation(
+        label: _addressLabel(),
+        latitude: position.latitude,
+        longitude: position.longitude,
+        accuracyMeters: position.accuracy,
+        capturedAt: position.timestamp,
+      );
+      return true;
+    } on TimeoutException {
+      _error = 'Location capture timed out. Please try continuing again.';
+      return false;
+    } catch (_) {
+      _error = 'We could not capture your exact location. Please try again.';
+      return false;
+    } finally {
+      _capturingLocation = false;
+      notifyListeners();
+    }
+  }
+
+  String _addressLabel() => RiderAddress.format(
+    addressLine: _draft.value(RiderSignUpFields.addressLine),
+    barangay: _draft.value(RiderSignUpFields.barangay),
+    cityMunicipality: _draft.value(RiderSignUpFields.cityMunicipality),
+    province: _draft.value(RiderSignUpFields.province),
+    postalCode: _draft.value(RiderSignUpFields.postalCode),
+  );
 
   Future<void> previousStep() async {
     if (_draft.step == RiderSignUpStep.personal) return;

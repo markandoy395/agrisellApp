@@ -4,7 +4,8 @@ import 'package:agresell_app/features/shared/orders/data/order_repository.dart';
 import 'package:agresell_app/features/shared/orders/data/supabase_order_repository.dart';
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
 
-class CachedOrderRepository implements OrderRepository {
+class CachedOrderRepository
+    implements OrderRepository, FarmerOrderCancellationRepository {
   CachedOrderRepository({OrderLocalRepository? local})
     : _local = local ?? OrderLocalRepository();
 
@@ -30,12 +31,82 @@ class CachedOrderRepository implements OrderRepository {
   }
 
   @override
+  Future<void> cancelFarmerOrder({
+    required String accountId,
+    required String orderId,
+    required String reason,
+  }) async {
+    if (_hasRemoteSession) {
+      await SupabaseOrderRepository(AgrisellSupabase.client).cancelFarmerOrder(
+        accountId: accountId,
+        orderId: orderId,
+        reason: reason,
+      );
+    }
+    await _local.cancelFarmerOrder(
+      accountId: accountId,
+      orderId: orderId,
+      reason: reason,
+    );
+  }
+
+  @override
   Future<void> save(String accountId, Iterable<PlacedOrder> orders) async {
     final snapshot = List<PlacedOrder>.of(orders);
     if (_hasRemoteSession) {
       await SupabaseOrderRepository(
         AgrisellSupabase.client,
       ).save(accountId, snapshot);
+    }
+    await _local.save(accountId, snapshot);
+  }
+
+  @override
+  Future<void> submitFeedback({
+    required String accountId,
+    required String orderId,
+    required String productId,
+    int? productRating,
+    required String productComment,
+    int? riderRating,
+    String riderComment = '',
+  }) async {
+    if (_hasRemoteSession) {
+      await SupabaseOrderRepository(AgrisellSupabase.client).submitFeedback(
+        accountId: accountId,
+        orderId: orderId,
+        productId: productId,
+        productRating: productRating,
+        productComment: productComment,
+        riderRating: riderRating,
+        riderComment: riderComment,
+      );
+    }
+    await _local.submitFeedback(
+      accountId: accountId,
+      orderId: orderId,
+      productId: productId,
+      productRating: productRating,
+      productComment: productComment,
+      riderRating: riderRating,
+      riderComment: riderComment,
+    );
+  }
+
+  @override
+  Future<void> createOrders({
+    required String accountId,
+    required Iterable<PlacedOrder> newOrders,
+    required Iterable<PlacedOrder> currentOrders,
+  }) async {
+    final additions = List<PlacedOrder>.of(newOrders);
+    final snapshot = List<PlacedOrder>.of(currentOrders);
+    if (_hasRemoteSession) {
+      await SupabaseOrderRepository(AgrisellSupabase.client).createOrders(
+        accountId: accountId,
+        newOrders: additions,
+        currentOrders: snapshot,
+      );
     }
     await _local.save(accountId, snapshot);
   }

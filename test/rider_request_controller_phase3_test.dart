@@ -57,6 +57,23 @@ void main() {
     expect(controller.requests, hasLength(2));
   });
 
+  test(
+    'active delivery remains visible with a non-empty nearby page',
+    () async {
+      final repository = _NearbyAndAssignedRepository();
+      final controller = _readyController(repository);
+      addTearDown(controller.dispose);
+
+      await controller.load(riderId: 'rider-a');
+
+      expect(controller.requests.map((item) => item.id).toSet(), {
+        'nearby',
+        'active',
+      });
+      expect(controller.hasActiveDelivery, isTrue);
+    },
+  );
+
   test('real-time invalidation removes a request assigned elsewhere', () async {
     final repository = InMemoryRiderDeliveryRepository(
       requests: [_request('a')],
@@ -77,6 +94,44 @@ void main() {
     await Future<void>.delayed(const Duration(milliseconds: 350));
 
     expect(controller.requests, isEmpty);
+  });
+
+  test('real-time invalidation waits for an active nearby load', () async {
+    final repository = _RealtimeQueuedRepository();
+    final controller = _readyController(repository);
+    addTearDown(controller.dispose);
+
+    final initialLoad = controller.load(riderId: 'rider-a');
+    await Future<void>.delayed(Duration.zero);
+    expect(repository.calls, hasLength(1));
+
+    repository.invalidate();
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+
+    expect(repository.calls, hasLength(1));
+    repository.complete(0, const []);
+    await initialLoad;
+    await Future<void>.delayed(Duration.zero);
+
+    expect(repository.calls, hasLength(2));
+    repository.complete(1, [_request('latest')]);
+    await Future<void>.delayed(Duration.zero);
+
+    expect(controller.loadState, RiderRequestLoadState.ready);
+    expect(controller.requests.map((item) => item.id), ['latest']);
+  });
+
+  test('real-time authorization errors do not escape the controller', () async {
+    final controller = _readyController(_FailingRealtimeRepository());
+    addTearDown(controller.dispose);
+
+    await controller.load(riderId: 'rider-a');
+    await Future<void>.delayed(Duration.zero);
+
+    expect(
+      controller.errorMessage,
+      'Live delivery updates are unavailable. Pull to refresh.',
+    );
   });
 }
 
@@ -120,6 +175,16 @@ class _QueuedRepository extends InMemoryRiderDeliveryRepository {
   }
 }
 
+class _RealtimeQueuedRepository extends _QueuedRepository {
+  final StreamController<void> _changes = StreamController<void>.broadcast();
+
+  @override
+  Stream<void> watchRequestChanges({required String riderId}) =>
+      _changes.stream;
+
+  void invalidate() => _changes.add(null);
+}
+
 class _PagedRepository extends InMemoryRiderDeliveryRepository {
   _PagedRepository() : super(requests: const []);
 
@@ -129,6 +194,25 @@ class _PagedRepository extends InMemoryRiderDeliveryRepository {
         ? RiderRequestPage(items: [_request('a')], nextCursor: 'next')
         : RiderRequestPage(items: [_request('a'), _request('b')]);
   }
+}
+
+class _NearbyAndAssignedRepository extends InMemoryRiderDeliveryRepository {
+  _NearbyAndAssignedRepository() : super(requests: const []);
+
+  @override
+  Future<RiderRequestPage> fetchNearbyRequests(RiderRequestQuery query) async =>
+      RiderRequestPage(
+        items: [_request('nearby')],
+        assignedItems: [_request('active').acceptFor(query.matching.riderId)],
+      );
+}
+
+class _FailingRealtimeRepository extends InMemoryRiderDeliveryRepository {
+  _FailingRealtimeRepository() : super(requests: const []);
+
+  @override
+  Stream<void> watchRequestChanges({required String riderId}) =>
+      Stream<void>.error(StateError('permission denied'));
 }
 
 DeliveryRequest _request(String id) {

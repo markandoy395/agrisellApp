@@ -25,6 +25,9 @@ class HomeProductRepository {
       final rows = await AgrisellSupabase.client
           .from('commodities')
           .select(_commoditySelect)
+          .eq('commodity_status', 'available')
+          .gt('available_quantity', 0)
+          .neq('availability_status', 'not_accepting_orders')
           .order('created_at', ascending: false);
       final commodities = (rows as List)
           .whereType<Map<String, dynamic>>()
@@ -55,6 +58,9 @@ class HomeProductRepository {
           .from('commodities')
           .select(_commoditySelect)
           .eq('farm_id', farmId)
+          .eq('commodity_status', 'available')
+          .gt('available_quantity', 0)
+          .neq('availability_status', 'not_accepting_orders')
           .order('created_at', ascending: false);
       final farm = <String, dynamic>{
         'farmer_name': sellerName,
@@ -144,7 +150,7 @@ class HomeProductRepository {
         fallback: 'Uncategorized',
       ),
       isAvailable:
-          commodityStatus != 'sold' &&
+          commodityStatus == 'available' &&
           HomeProductFormat.number(row['available_quantity']) > 0,
       isSold: commodityStatus == 'sold',
       saleStatus: saleStatus,

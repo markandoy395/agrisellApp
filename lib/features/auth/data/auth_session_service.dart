@@ -46,6 +46,7 @@ class AuthSessionService {
 
   static final AuthSessionService instance = AuthSessionService._();
   static const _accountIdKey = 'auth.session.account-id';
+  static const _rememberedIdentifierKey = 'auth.login.remembered-identifier';
 
   final AccountSessionStore _sessionStore = AccountSessionStore();
   StreamSubscription<AuthState>? _authSubscription;
@@ -72,10 +73,25 @@ class AuthSessionService {
     await _activate(account);
     if (!rememberMe) {
       await _clearPersistedAccount();
+      await _clearRememberedIdentifier();
       return;
     }
     await _remember(account);
     await _persistActiveAccount(account.id);
+    await _persistRememberedIdentifier(account.email);
+    _currentAccountRemembered = true;
+  }
+
+  Future<String?> loadRememberedIdentifier() async {
+    final preferences = await SharedPreferences.getInstance();
+    final identifier = preferences.getString(_rememberedIdentifierKey)?.trim();
+    return identifier == null || identifier.isEmpty ? null : identifier;
+  }
+
+  Future<void> preserveCurrentAccountForSwitch() async {
+    final account = currentAccount;
+    if (account == null) return;
+    await _remember(account);
     _currentAccountRemembered = true;
   }
 
@@ -91,6 +107,8 @@ class AuthSessionService {
         'This account is no longer saved on this device.',
       );
     }
+
+    await preserveCurrentAccountForSwitch();
 
     await BasketController.instance.flush();
     late final RegisteredAccount? account;
@@ -181,5 +199,15 @@ class AuthSessionService {
   Future<void> _clearPersistedAccount() async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.remove(_accountIdKey);
+  }
+
+  Future<void> _persistRememberedIdentifier(String identifier) async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString(_rememberedIdentifierKey, identifier.trim());
+  }
+
+  Future<void> _clearRememberedIdentifier() async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.remove(_rememberedIdentifierKey);
   }
 }

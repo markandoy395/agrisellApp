@@ -18,6 +18,7 @@ void main() {
     expect(controller.items.single.productId, product.id);
     expect(controller.items.single.productName, product.name);
     expect(controller.items.single.image, product.image);
+    expect(controller.items.single.imageUrl, product.imageUrl);
     expect(controller.items.single.sellerName, product.sellerName);
     expect(controller.items.single.quantity, 2);
     expect(controller.totalQuantity, 2);
@@ -60,6 +61,22 @@ void main() {
 
     expect(controller.items, isEmpty);
     expect(controller.totalQuantity, 0);
+  });
+
+  test('inventory refresh removes depleted items and caps reduced stock', () {
+    controller.addProduct(testHomeProducts[0], quantity: 5);
+    controller.addProduct(testHomeProducts[1], quantity: 4);
+
+    final changed = controller.reconcileAvailableQuantities({
+      testHomeProducts[0].id: 0,
+      testHomeProducts[1].id: 2,
+    });
+
+    expect(changed, isTrue);
+    expect(controller.items, hasLength(1));
+    expect(controller.items.single.productId, testHomeProducts[1].id);
+    expect(controller.items.single.quantity, 2);
+    expect(controller.totalQuantity, 2);
   });
 
   test(

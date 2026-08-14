@@ -1,9 +1,17 @@
 part of 'package:agresell_app/features/farmer/dashboard/presentation/screens/farmer_dashboard_screen.dart';
 
 class _FarmerDashboardHeader extends StatelessWidget {
-  const _FarmerDashboardHeader({required this.horizontalPadding});
+  const _FarmerDashboardHeader({
+    required this.horizontalPadding,
+    required this.searchController,
+    required this.onSearchChanged,
+    required this.onMenuTap,
+  });
 
   final double horizontalPadding;
+  final TextEditingController searchController;
+  final ValueChanged<String> onSearchChanged;
+  final VoidCallback onMenuTap;
 
   @override
   Widget build(BuildContext context) {
@@ -30,13 +38,18 @@ class _FarmerDashboardHeader extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              const Expanded(child: _FarmerSearchBar()),
+              Expanded(
+                child: _FarmerSearchBar(
+                  controller: searchController,
+                  onChanged: onSearchChanged,
+                ),
+              ),
               const SizedBox(width: 8),
               _IconAssetButton(
                 semanticLabel: 'Menu',
                 icon: AgrisellAssets.iconMenu,
                 size: 31,
-                onTap: () {},
+                onTap: onMenuTap,
               ),
             ],
           ),
@@ -47,7 +60,10 @@ class _FarmerDashboardHeader extends StatelessWidget {
 }
 
 class _FarmerSearchBar extends StatelessWidget {
-  const _FarmerSearchBar();
+  const _FarmerSearchBar({required this.controller, required this.onChanged});
+
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -64,32 +80,35 @@ class _FarmerSearchBar extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              'Search in AgriSell',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: AgrisellColors.brandBlack.withValues(alpha: 0.55),
-                fontSize: 12,
-                height: 1,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
+      child: TextField(
+        controller: controller,
+        onChanged: onChanged,
+        textInputAction: TextInputAction.search,
+        style: const TextStyle(
+          color: AgrisellColors.brandBlack,
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+        decoration: InputDecoration(
+          hintText: 'Search products',
+          hintStyle: TextStyle(
+            color: AgrisellColors.brandBlack.withValues(alpha: 0.55),
+            fontSize: 12,
           ),
-          ResponsiveAssetImage(
-            asset: AgrisellAssets.iconSearch,
-            width: 23,
-            height: 23,
-            color: AgrisellColors.brandBlack,
-            colorBlendMode: BlendMode.srcIn,
-            semanticLabel: 'Search',
-          ),
-          const SizedBox(width: 14),
-        ],
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 11),
+          prefixIcon: const Icon(Icons.search_rounded, size: 21),
+          suffixIcon: controller.text.isEmpty
+              ? null
+              : IconButton(
+                  tooltip: 'Clear search',
+                  onPressed: () {
+                    controller.clear();
+                    onChanged('');
+                  },
+                  icon: const Icon(Icons.close_rounded, size: 19),
+                ),
+        ),
       ),
     );
   }

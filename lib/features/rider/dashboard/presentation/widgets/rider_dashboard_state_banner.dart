@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_dashboard_state.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/controllers/rider_availability_controller.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/controllers/rider_dashboard_controller.dart';
@@ -74,31 +75,20 @@ class RiderDashboardStateBanner extends StatelessWidget {
       onRefreshLocation: onRefreshLocation,
     );
     if (gpsBanner != null) return gpsBanner;
-    if (availability.isSynchronizing) {
-      return const RiderLoadingStateCard(
-        title: 'Synchronizing availability',
-        message: 'Confirming the authoritative Rider work status.',
-      );
-    }
     if (dashboard.state == RiderDashboardLoadState.partialData ||
+        (dashboard.data?.isPartial ?? false) ||
         dashboard.usesTemporaryData ||
         availability.usesTemporaryData) {
+      final hasRefreshError = dashboard.errorMessage != null;
+      if (!hasRefreshError) {
+        return _DashboardStatsBanner(metrics: dashboard.metrics);
+      }
       return RiderEmptyStateCard(
         title: 'Partial dashboard data',
-        message: dashboard.usesTemporaryData || availability.usesTemporaryData
-            ? 'Backend data is unavailable; no sample records are shown.'
-            : dashboard.errorMessage ??
-                  'Some sections are unavailable. Pull down to refresh.',
+        message: dashboard.errorMessage!,
         actionLabel: 'Retry',
         onAction: onRetry,
         icon: Icons.info_outline_rounded,
-      );
-    }
-    if (dashboard.state == RiderDashboardLoadState.refreshing) {
-      return Semantics(
-        label: 'Refreshing Rider dashboard',
-        liveRegion: true,
-        child: const LinearProgressIndicator(minHeight: 3),
       );
     }
     return const SizedBox.shrink();
@@ -157,3 +147,118 @@ Widget? _gpsBanner(
   ),
   RiderGpsStatus.checking || RiderGpsStatus.ready => null,
 };
+
+class _DashboardStatsBanner extends StatelessWidget {
+  const _DashboardStatsBanner({required this.metrics});
+
+  final RiderDashboardMetrics metrics;
+
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+    decoration: BoxDecoration(
+      color: AgrisellColors.surface,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: AgrisellColors.borderLine),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(
+                Icons.query_stats_rounded,
+                color: AgrisellColors.authGreen,
+                size: 20,
+              ),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Dashboard stats',
+                  style: TextStyle(
+                    color: AgrisellColors.headingGreen,
+                    fontSize: 14,
+                    height: 1.1,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _StatsChip(
+                label: 'Completed',
+                value: '${metrics.todayCompletedDeliveries}',
+              ),
+              _StatsChip(
+                label: 'Earnings',
+                value:
+                    'PHP ${metrics.todayEstimatedEarnings.toStringAsFixed(2)}',
+              ),
+              _StatsChip(
+                label: 'Messages',
+                value: '${metrics.unreadMessageCount}',
+              ),
+              _StatsChip(
+                label: 'Alerts',
+                value: '${metrics.unreadNotificationCount}',
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+class _StatsChip extends StatelessWidget {
+  const _StatsChip({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    constraints: const BoxConstraints(minWidth: 92),
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+    decoration: BoxDecoration(
+      color: AgrisellColors.homeBackground,
+      borderRadius: BorderRadius.circular(10),
+      border: Border.all(color: AgrisellColors.borderLine),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          value,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            color: AgrisellColors.headingGreen,
+            fontSize: 13,
+            height: 1.1,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            color: AgrisellColors.mutedText,
+            fontSize: 10,
+            height: 1.1,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    ),
+  );
+}

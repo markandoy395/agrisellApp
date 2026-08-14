@@ -27,15 +27,22 @@ extension _RiderHomeLifecycle on _RiderHomeScreenState {
 
   void _handleLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      _isAppInForeground = true;
+      _syncLiveLocationSharing();
       final backgroundedAt = _backgroundedAt;
       _backgroundedAt = null;
-      unawaited(
-        _availabilityController.refreshEnvironment(refreshLocation: true),
-      );
-      unawaited(_deliveryController.synchronizeOfflineActions());
-      if (backgroundedAt != null &&
+      final shouldRefreshRiderState =
+          backgroundedAt == null ||
           DateTime.now().difference(backgroundedAt) >=
-              _dashboardController.staleAfter) {
+              _dashboardController.staleAfter;
+      if (shouldRefreshRiderState ||
+          _availabilityController.internetStatus ==
+              RiderInternetStatus.unknown) {
+        unawaited(_availabilityController.refreshEnvironment());
+      }
+      unawaited(_deliveryController.synchronizeOfflineActions());
+      if (shouldRefreshRiderState) {
+        unawaited(_refreshRiderProfile());
         final riderId = _riderId;
         if (riderId != null) {
           unawaited(_dashboardController.load(riderId: riderId));
@@ -47,6 +54,8 @@ extension _RiderHomeLifecycle on _RiderHomeScreenState {
         state == AppLifecycleState.hidden ||
         state == AppLifecycleState.detached) {
       _backgroundedAt ??= DateTime.now();
+      _isAppInForeground = false;
+      _syncLiveLocationSharing();
     }
   }
 
@@ -100,7 +109,9 @@ extension _RiderHomeLifecycle on _RiderHomeScreenState {
       deliveryId: allowed ? active.id : null,
       riderId: allowed ? riderId : null,
     );
-    final shouldTrack = allowed || _activeIndex == RiderHomeScreen.mapNavIndex;
+    final shouldTrack =
+        allowed ||
+        (_isAppInForeground && _activeIndex == RiderHomeScreen.mapNavIndex);
     if (_lastTrackingRequested == shouldTrack) return;
     _lastTrackingRequested = shouldTrack;
     if (shouldTrack) {
@@ -162,15 +173,6 @@ extension _RiderHomeLifecycle on _RiderHomeScreenState {
     if (internet == RiderInternetStatus.backendUnavailable) {
       return RiderRequestAccessState.backendUnavailable;
     }
-    if (!profile.hasRegisteredServiceArea) {
-      return RiderRequestAccessState.serviceAreaMissing;
-    }
-    if (!profile.hasRegisteredServiceCoordinates) {
-      return RiderRequestAccessState.registeredLocationMissing;
-    }
-    if (!profile.hasValidServiceRadius) {
-      return RiderRequestAccessState.invalidServiceRadius;
-    }
     final gps = _availabilityController.gpsStatus;
     if (gps == RiderGpsStatus.disabled) {
       return RiderRequestAccessState.gpsDisabled;
@@ -186,14 +188,6 @@ extension _RiderHomeLifecycle on _RiderHomeScreenState {
     if (gps != RiderGpsStatus.ready || currentLocation == null) {
       return RiderRequestAccessState.locationUnavailable;
     }
-    final serviceArea = RiderRegisteredServiceArea(
-      name: profile.serviceArea,
-      latitude: profile.gpsLatitude,
-      longitude: profile.gpsLongitude,
-      radiusKm: profile.serviceRadiusKm,
-    );
-    return serviceArea.containsCurrentLocation(currentLocation)
-        ? RiderRequestAccessState.eligible
-        : RiderRequestAccessState.outsideRegisteredServiceArea;
+    return RiderRequestAccessState.eligible;
   }
 }

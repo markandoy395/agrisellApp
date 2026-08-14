@@ -13,6 +13,8 @@ import 'package:agresell_app/features/farmer/products/presentation/controllers/p
 import 'package:agresell_app/features/farmer/products/presentation/screens/add_product_screen.dart';
 import 'package:agresell_app/features/farmer/products/presentation/screens/farmer_product_edit_screen.dart';
 import 'package:agresell_app/features/farmer/products/presentation/widgets/farm_creation_dialog.dart';
+import 'package:agresell_app/features/farmer/products/presentation/widgets/farmer_restock_dialog.dart';
+import 'package:agresell_app/features/farmer/dashboard/presentation/widgets/farmer_quick_menu.dart';
 import 'package:agresell_app/features/farmer/dashboard/presentation/widgets/farmer_sold_status_overlay.dart';
 part 'package:agresell_app/features/farmer/dashboard/presentation/widgets/farmer_dashboard_header.dart';
 part 'package:agresell_app/features/farmer/dashboard/presentation/widgets/farmer_add_product_button.dart';
@@ -27,19 +29,25 @@ class FarmerDashboardScreen extends StatefulWidget {
   const FarmerDashboardScreen({
     this.pickProductImageBytes,
     this.commodityRepository = const FarmerCommodityRepository(),
+    this.onNavigate,
     super.key,
   });
   final ProductImagePicker? pickProductImageBytes;
   final FarmerCommodityRepository commodityRepository;
+  final ValueChanged<FarmerQuickDestination>? onNavigate;
   @override
   State<FarmerDashboardScreen> createState() => _FarmerDashboardScreenState();
 }
 
 class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
   late final List<FarmerDashboardProduct> _products;
+  final _searchController = TextEditingController();
   var _activeTab = _FarmerDashboardTab.products;
+  var _selectedCategory = 'All';
+  var _searchQuery = '';
   var _isLoadingProducts = false;
   var _isSavingProduct = false;
+  final _restockingProductIds = <int>{};
   @override
   void initState() {
     super.initState();
@@ -48,8 +56,29 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<FarmerDashboardProduct> get _visibleProducts {
+    final query = _searchQuery.trim().toLowerCase();
+    return [
+      for (final product in _products)
+        if ((_selectedCategory == 'All' ||
+                product.category == _selectedCategory) &&
+            (query.isEmpty ||
+                product.name.toLowerCase().contains(query) ||
+                product.category.toLowerCase().contains(query) ||
+                product.description.toLowerCase().contains(query)))
+          product,
+    ];
+  }
+
+  @override
   Widget build(BuildContext context) {
     final canPostProducts = _canPostProducts;
+    final visibleProducts = _visibleProducts;
     final width = MediaQuery.sizeOf(context).width;
     final horizontalPadding = width < 380 ? 12.0 : 14.0;
     final gridSpacing = width < 380 ? 9.0 : 11.0;
@@ -61,7 +90,17 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
         bottom: false,
         child: Column(
           children: [
-            _FarmerDashboardHeader(horizontalPadding: horizontalPadding),
+            _FarmerDashboardHeader(
+              horizontalPadding: horizontalPadding,
+              searchController: _searchController,
+              onSearchChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                  _activeTab = _FarmerDashboardTab.products;
+                });
+              },
+              onMenuTap: _openQuickMenu,
+            ),
             Expanded(
               child: CustomScrollView(
                 physics: const ClampingScrollPhysics(),
@@ -102,6 +141,12 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
                               'Products from the backend will appear here.',
                         ),
                       )
+                    else if (visibleProducts.isEmpty)
+                      const SliverToBoxAdapter(
+                        child: _FarmerDashboardEmptyState(
+                          message: 'No products match your search or category.',
+                        ),
+                      )
                     else
                       SliverPadding(
                         padding: EdgeInsets.fromLTRB(
@@ -111,7 +156,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
                           0,
                         ),
                         sliver: SliverGrid.builder(
-                          itemCount: _products.length,
+                          itemCount: visibleProducts.length,
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
@@ -119,10 +164,22 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
                                 mainAxisSpacing: gridSpacing + 2,
                                 childAspectRatio: productRatio,
                               ),
-                          itemBuilder: (context, index) => _FarmerProductCard(
-                            product: _products[index],
-                            onEdit: () => _openEditProduct(index),
-                          ),
+                          itemBuilder: (context, index) {
+                            final product = visibleProducts[index];
+                            return _FarmerProductCard(
+                              product: product,
+                              onEdit: () =>
+                                  _openEditProduct(_products.indexOf(product)),
+                              onRestock: () => _openRestockProduct(
+                                _products.indexOf(product),
+                              ),
+                              isRestocking:
+                                  product.commodityId != null &&
+                                  _restockingProductIds.contains(
+                                    product.commodityId,
+                                  ),
+                            );
+                          },
                         ),
                       )
                   else
@@ -133,8 +190,16 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
                         horizontalPadding,
                         0,
                       ),
-                      sliver: const SliverToBoxAdapter(
-                        child: HomeCategoriesCard(),
+                      sliver: SliverToBoxAdapter(
+                        child: HomeCategoriesCard(
+                          selectedCategory: _selectedCategory,
+                          onSelected: (category) {
+                            setState(() {
+                              _selectedCategory = category;
+                              _activeTab = _FarmerDashboardTab.products;
+                            });
+                          },
+                        ),
                       ),
                     ),
                   SliverToBoxAdapter(child: SizedBox(height: navClearance)),
@@ -145,6 +210,14 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _openQuickMenu() async {
+    final destination = await showFarmerQuickMenu(
+      context,
+      current: FarmerQuickDestination.products,
+    );
+    if (destination != null && mounted) widget.onNavigate?.call(destination);
   }
 
   Future<void> _openAddProductScreen() async {
@@ -194,6 +267,49 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
     if (savedProduct == null || !mounted) return;
     setState(() => _products[index] = savedProduct);
     _showMessage('${savedProduct.name} has been saved.');
+  }
+
+  Future<void> _openRestockProduct(int index) async {
+    if (index < 0 || index >= _products.length) return;
+    final product = _products[index];
+    final commodityId = product.commodityId;
+    if (commodityId == null || commodityId <= 0) {
+      _showMessage('Save this product before adding stock.');
+      return;
+    }
+    if (_restockingProductIds.contains(commodityId)) return;
+
+    final request = await showFarmerRestockDialog(context, product: product);
+    if (request == null || !mounted) return;
+
+    setState(() => _restockingProductIds.add(commodityId));
+    try {
+      final updatedProduct = await widget.commodityRepository.restock(
+        product: product,
+        quantity: request.quantity,
+        reason: request.reason,
+      );
+      if (!mounted) return;
+      final currentIndex = _products.indexWhere(
+        (candidate) => candidate.commodityId == commodityId,
+      );
+      if (currentIndex >= 0) {
+        setState(() => _products[currentIndex] = updatedProduct);
+      }
+      _showMessage(
+        '${updatedProduct.name} now has ${updatedProduct.availableWeight} in stock.',
+      );
+    } on FarmerCommodityException catch (error) {
+      if (mounted) _showMessage(error.message);
+    } on Object {
+      if (mounted) {
+        _showMessage('Stock could not be added. Please try again.');
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _restockingProductIds.remove(commodityId));
+      }
+    }
   }
 
   Future<FarmerDashboardProduct?> _saveProduct(

@@ -5,6 +5,7 @@ Future<GcashPaymentSelection?> chooseGcashPayment(
   required List<BasketCartItem> items,
   required double total,
   required CheckoutPaymentRepository repository,
+  GcashReceiptImagePicker? receiptImagePicker,
 }) async {
   final sellerKeys = items
       .map(
@@ -23,6 +24,7 @@ Future<GcashPaymentSelection?> chooseGcashPayment(
     items: items,
     total: total,
     repository: repository,
+    receiptImagePicker: receiptImagePicker,
   );
 }
 

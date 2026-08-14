@@ -77,7 +77,7 @@ void main() {
       ),
     );
     expect(productImage.fit, BoxFit.cover);
-    expect(productImage.decodeWidth, 1200);
+    expect(productImage.decodeWidth, isNull);
     expect(productImage.gaplessPlayback, isTrue);
     expect(
       tester.widget<Hero>(find.byType(Hero).first).transitionOnUserGestures,

@@ -31,11 +31,12 @@ class RiderSignUpReviewStep extends StatelessWidget {
           onEdit: () => controller.editStep(RiderSignUpStep.personal),
         ),
         _ReviewCard(
-          title: 'GPS location',
+          title: 'Address and exact location',
           values: [
             draft.value(RiderSignUpFields.location),
-            '${draft.value(RiderSignUpFields.latitude)}, '
-                '${draft.value(RiderSignUpFields.longitude)}',
+            RiderSignUpValidator.hasValidCoordinates(draft)
+                ? 'Exact GPS location captured'
+                : 'Exact GPS location pending',
           ],
           onEdit: () => controller.editStep(RiderSignUpStep.address),
         ),

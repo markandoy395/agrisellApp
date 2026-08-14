@@ -31,6 +31,24 @@ void main() {
     expect(requests, 1);
   });
 
+  test('PSGC service reads a nested municipality province', () async {
+    final service = PsgcAddressService(
+      baseUrl: 'https://example.test/api/v2',
+      client: MockClient(
+        (_) async => http.Response(
+          '{"data":[{"code":"1043050000","name":"Cagayan de Oro",'
+          '"province":{"code":"1043000000","name":"Misamis Oriental"}}]}',
+          200,
+        ),
+      ),
+    );
+
+    final locality = (await service.citiesMunicipalities()).single;
+
+    expect(locality.province, 'Misamis Oriental');
+    expect(locality.provinceCode, '1043000000');
+  });
+
   testWidgets('farmer address supports suggestions and manual typing', (
     tester,
   ) async {
@@ -122,6 +140,47 @@ void main() {
     expect(province.text, 'Agusan del Sur');
     expect(city.text, 'Esperanza');
     expect(find.text('Region: Caraga'), findsOneWidget);
+  });
+
+  testWidgets('changing province rebuilds the municipality list', (
+    tester,
+  ) async {
+    final province = TextEditingController(text: 'Masbate');
+    final city = TextEditingController(text: 'Esperanza');
+    final barangay = TextEditingController();
+    addTearDown(() {
+      province.dispose();
+      city.dispose();
+      barangay.dispose();
+    });
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: PsgcAddressFields(
+            provinceController: province,
+            cityController: city,
+            barangayController: barangay,
+            lookup: const _DuplicateLocalityLookup(),
+            onChanged: () {},
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.widgetWithText(TextField, 'Province (select or type)'),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Agusan del Sur').last);
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.widgetWithText(TextField, 'City or municipality (select or type)'),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Esperanza â€” Agusan del Sur'), findsOneWidget);
+    expect(find.text('Esperanza â€” Masbate'), findsNothing);
   });
 }
 

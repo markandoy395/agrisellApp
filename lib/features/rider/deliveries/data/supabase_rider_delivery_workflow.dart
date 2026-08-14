@@ -14,15 +14,27 @@ extension _SupabaseRiderDeliveryWorkflow on SupabaseRiderDeliveryRepository {
 
   Future<RiderRequestPage> _fetchNearbyRequests(RiderRequestQuery query) async {
     final all = await _fetchRequests(query.matching.riderId);
+    final assigned = all
+        .where(
+          (request) =>
+              request.isAssignedTo(query.matching.riderId) &&
+              !request.stage.isTerminal,
+        )
+        .toList(growable: false);
     final search = query.searchText.trim().toLowerCase();
     final filtered = all.where((request) {
       if (!request.isAvailableTo(query.matching.riderId)) return false;
-      if (riderRequestRejection(
-            request,
-            query.matching,
-            requireCurrentGps: !query.matching.usesRegisteredLocationEstimate,
-          ) !=
-          null) {
+      // A farmer-selected request has already been matched to this Rider by
+      // the server. Keep it visible even when nearby-request estimates are
+      // incomplete; acceptance is still validated server-side.
+      if (!request.isFarmerSelectedRequest &&
+          riderRequestRejection(
+                request,
+                query.matching,
+                requireCurrentGps:
+                    !query.matching.usesRegisteredLocationEstimate,
+              ) !=
+              null) {
         return false;
       }
       if (!query.filters.allows(
@@ -45,10 +57,13 @@ extension _SupabaseRiderDeliveryWorkflow on SupabaseRiderDeliveryRepository {
       pickupDistanceKm: query.matching.pickupDistanceKm,
     );
     final offset = int.tryParse(query.cursor ?? '') ?? 0;
-    if (offset >= filtered.length) return const RiderRequestPage(items: []);
+    if (offset >= filtered.length) {
+      return RiderRequestPage(items: const [], assignedItems: assigned);
+    }
     final end = (offset + query.pageSize).clamp(0, filtered.length);
     return RiderRequestPage(
       items: filtered.sublist(offset, end),
+      assignedItems: assigned,
       nextCursor: end < filtered.length ? '$end' : null,
     );
   }
@@ -75,27 +90,66 @@ extension _SupabaseRiderDeliveryWorkflow on SupabaseRiderDeliveryRepository {
         riderAvailability: RiderAvailability.deliveryReserved,
       );
     } on DeliveryDataException catch (error) {
-      throw DeliveryAcceptanceException(switch (error.type) {
-        DeliveryDataFailureType.conflict =>
-          DeliveryAcceptanceFailure.alreadyAssigned,
-        DeliveryDataFailureType.timeout =>
-          DeliveryAcceptanceFailure.networkTimeout,
-        DeliveryDataFailureType.offline =>
-          DeliveryAcceptanceFailure.networkTimeout,
-        DeliveryDataFailureType.authentication ||
-        DeliveryDataFailureType.authorization =>
-          DeliveryAcceptanceFailure.riderNotAllowed,
-        DeliveryDataFailureType.validation =>
-          DeliveryAcceptanceFailure.riderIneligible,
-        _ => DeliveryAcceptanceFailure.serverError,
-      });
+      developer.log(
+        'Rider delivery acceptance failed: ${error.message}',
+        name: 'agrisell.rider.acceptance',
+        error: error.cause ?? error,
+      );
+      throw DeliveryAcceptanceException(_acceptanceFailure(error));
     }
+  }
+
+  DeliveryAcceptanceFailure _acceptanceFailure(DeliveryDataException error) {
+    final message = error.message.toLowerCase();
+    if (message.contains('active_delivery_limit_reached')) {
+      return DeliveryAcceptanceFailure.activeDeliveryLimit;
+    }
+    if (message.contains('delivery_request_expired') ||
+        message.contains('delivery request expired') ||
+        message.contains('deadline_conflict')) {
+      return DeliveryAcceptanceFailure.expired;
+    }
+    if (message.contains('delivery_request_missing') ||
+        message.contains('delivery not found')) {
+      return DeliveryAcceptanceFailure.requestNotFound;
+    }
+    if (message.contains('capacity_conflict')) {
+      return DeliveryAcceptanceFailure.capacityMismatch;
+    }
+    if (message.contains('vehicle_type_conflict')) {
+      return DeliveryAcceptanceFailure.vehicleMismatch;
+    }
+    if (message.contains('route_incompatible') ||
+        message.contains('product_handling_conflict')) {
+      return DeliveryAcceptanceFailure.batchIncompatible;
+    }
+    if (message.contains('cod_responsibility_unavailable')) {
+      return DeliveryAcceptanceFailure.codUnavailable;
+    }
+    return switch (error.type) {
+      DeliveryDataFailureType.conflict =>
+        DeliveryAcceptanceFailure.alreadyAssigned,
+      DeliveryDataFailureType.timeout =>
+        DeliveryAcceptanceFailure.networkTimeout,
+      DeliveryDataFailureType.offline =>
+        DeliveryAcceptanceFailure.networkTimeout,
+      DeliveryDataFailureType.authentication ||
+      DeliveryDataFailureType.authorization =>
+        DeliveryAcceptanceFailure.riderNotAllowed,
+      DeliveryDataFailureType.validation =>
+        DeliveryAcceptanceFailure.riderIneligible,
+      _ => DeliveryAcceptanceFailure.serverError,
+    };
   }
 
   Future<DeliveryRequest> _decline({
     required String requestId,
     required String riderId,
-  }) async => (await _requestById(requestId, riderId)).declineFor(riderId);
+  }) async {
+    final request = await _requestById(requestId, riderId);
+    await _dataSource.declineDeliveryRequest(deliveryId: requestId);
+    return request.declineFor(riderId);
+  }
 
   Future<DeliveryRequest> _cancel({
     required String requestId,

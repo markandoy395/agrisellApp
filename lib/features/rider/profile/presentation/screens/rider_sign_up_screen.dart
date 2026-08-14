@@ -12,9 +12,12 @@ import 'package:agresell_app/features/auth/presentation/widgets/otp_verification
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
 import 'package:agresell_app/features/rider/profile/presentation/screens/rider_application_submitted_screen.dart';
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_registration_form.dart';
+import 'package:agresell_app/features/shared/location/data/gps_location_gateway.dart';
 
 class RiderSignUpScreen extends StatefulWidget {
-  const RiderSignUpScreen({super.key});
+  const RiderSignUpScreen({this.gpsGateway, super.key});
+
+  final GpsLocationGateway? gpsGateway;
 
   @override
   State<RiderSignUpScreen> createState() => _RiderSignUpScreenState();
@@ -67,6 +70,7 @@ class _RiderSignUpScreenState extends State<RiderSignUpScreen> {
                       onExit: _exitToRoleSelection,
                       onSubmitted: _showSubmitted,
                       onEmailOtpRequired: _verifyEmailOtp,
+                      gpsGateway: widget.gpsGateway,
                     ),
                   ),
                 ],
@@ -100,6 +104,7 @@ class _RiderSignUpScreenState extends State<RiderSignUpScreen> {
         builder: (_) => OtpVerificationScreen(
           destination: email,
           title: 'We just sent an email',
+          changeDestinationLabel: 'Change email',
           onVerify: (otp) => AuthRegistrationService.instance.verifyEmailOtp(
             email: email,
             otp: otp,

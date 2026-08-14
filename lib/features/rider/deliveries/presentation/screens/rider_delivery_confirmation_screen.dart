@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
@@ -7,6 +8,7 @@ import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/deliveries/data/delivery_proof_storage.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_completion.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
+import 'package:agresell_app/features/rider/deliveries/domain/delivery_status_update.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_payment.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_confirmation_form.dart';
@@ -42,7 +44,6 @@ class _RiderDeliveryConfirmationScreenState
   late final String _idempotencyKey;
   final _code = TextEditingController();
   final _qr = TextEditingController();
-  final _recipient = TextEditingController();
   final _notes = TextEditingController();
   final _cashAmount = TextEditingController();
   final _cashNotes = TextEditingController();
@@ -50,6 +51,9 @@ class _RiderDeliveryConfirmationScreenState
   String? _error;
   String? _signatureReference;
   String? _photoReference;
+  Uint8List? _photoPreviewBytes;
+  DateTime? _photoCapturedAt;
+  DeliveryStatusLocation? _photoLocation;
   bool _buyerConfirmed = false;
   bool _cashConfirmed = false;
   CashCollectionIssue? _cashIssue;
@@ -62,7 +66,6 @@ class _RiderDeliveryConfirmationScreenState
     _idempotencyKey =
         '${widget.request.id}-${DateTime.now().microsecondsSinceEpoch}';
     _restoreRecovery();
-    _recipient.addListener(_saveRecovery);
     _notes.addListener(_saveRecovery);
     _cashAmount.addListener(_saveRecovery);
     _cashNotes.addListener(_saveRecovery);
@@ -73,7 +76,6 @@ class _RiderDeliveryConfirmationScreenState
   void dispose() {
     _code.dispose();
     _qr.dispose();
-    _recipient.dispose();
     _notes.dispose();
     _cashAmount.dispose();
     _cashNotes.dispose();
@@ -84,11 +86,26 @@ class _RiderDeliveryConfirmationScreenState
 
   void _restoreRecovery() {
     final saved = widget.controller.recoveryDataFor(_recoveryScope);
-    _recipient.text = saved['recipientName'] as String? ?? '';
     _notes.text = saved['deliveryNotes'] as String? ?? '';
     _buyerConfirmed = saved['buyerConfirmed'] as bool? ?? false;
     _signatureReference = saved['signatureReference'] as String?;
     _photoReference = saved['photoReference'] as String?;
+    _photoCapturedAt = DateTime.tryParse(
+      saved['photoCapturedAt'] as String? ?? '',
+    )?.toLocal();
+    final photoLatitude = saved['photoLatitude'] as num?;
+    final photoLongitude = saved['photoLongitude'] as num?;
+    final photoAccuracy = saved['photoAccuracyMeters'] as num?;
+    if (photoLatitude != null &&
+        photoLongitude != null &&
+        photoAccuracy != null) {
+      _photoLocation = DeliveryStatusLocation(
+        latitude: photoLatitude.toDouble(),
+        longitude: photoLongitude.toDouble(),
+        accuracyMeters: photoAccuracy.toDouble(),
+        timestamp: _photoCapturedAt,
+      );
+    }
     _cashAmount.text = saved['cashAmount'] as String? ?? '';
     _cashNotes.text = saved['cashNotes'] as String? ?? '';
     _cashConfirmed = saved['cashConfirmed'] as bool? ?? false;
@@ -100,11 +117,14 @@ class _RiderDeliveryConfirmationScreenState
 
   void _saveRecovery() => unawaited(
     widget.controller.saveRecoveryData(_recoveryScope, {
-      'recipientName': _recipient.text,
       'deliveryNotes': _notes.text,
       'buyerConfirmed': _buyerConfirmed,
       'signatureReference': _signatureReference,
       'photoReference': _photoReference,
+      'photoCapturedAt': _photoCapturedAt?.toUtc().toIso8601String(),
+      'photoLatitude': _photoLocation?.latitude,
+      'photoLongitude': _photoLocation?.longitude,
+      'photoAccuracyMeters': _photoLocation?.accuracyMeters,
       'cashAmount': _cashAmount.text,
       'cashNotes': _cashNotes.text,
       'cashConfirmed': _cashConfirmed,
@@ -128,31 +148,40 @@ class _RiderDeliveryConfirmationScreenState
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: AgrisellColors.homeBackground,
-    body: Column(
-      children: [
-        RiderPageHeader(
-          title: 'Confirm delivery',
-          subtitle: 'Order ${widget.request.orderNumber}',
-          action: IconButton(
-            tooltip: 'Close',
-            onPressed: _submitting ? null : () => Navigator.of(context).pop(),
-            icon: const Icon(
-              Icons.close_rounded,
-              color: AgrisellColors.surface,
+  Widget build(BuildContext context) {
+    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+
+    return Scaffold(
+      backgroundColor: AgrisellColors.homeBackground,
+      // Keep the header and its surrounding Column at the full screen height.
+      // The list accounts for the keyboard so focused cash fields remain
+      // reachable without making the outer Column overflow on short screens.
+      resizeToAvoidBottomInset: false,
+      body: Column(
+        children: [
+          RiderPageHeader(
+            title: 'Confirm delivery',
+            subtitle: 'Order ${widget.request.orderNumber}',
+            action: IconButton(
+              tooltip: 'Close',
+              onPressed: _submitting ? null : () => Navigator.of(context).pop(),
+              icon: const Icon(
+                Icons.close_rounded,
+                color: AgrisellColors.surface,
+              ),
             ),
           ),
-        ),
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(14, 14, 14, 28),
-            children: [_content()],
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.fromLTRB(14, 14, 14, keyboardInset + 28),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              children: [_content()],
+            ),
           ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 
   Widget _content() {
     final configuration = _configuration;
@@ -175,11 +204,14 @@ class _RiderDeliveryConfirmationScreenState
       location: widget.controller.currentRiderLocation,
       codeController: _code,
       qrController: _qr,
-      recipientController: _recipient,
+      recipientName: widget.request.buyerName,
       notesController: _notes,
       buyerConfirmed: _buyerConfirmed,
       signatureCaptured: _signatureReference != null,
       photoCaptured: _photoReference != null,
+      photoPreviewBytes: _photoPreviewBytes,
+      photoCapturedAt: _photoCapturedAt,
+      photoLocation: _photoLocation,
       isSubmitting: _submitting,
       onBuyerConfirmed: _setBuyerConfirmed,
       onCaptureSignature: _captureSignature,

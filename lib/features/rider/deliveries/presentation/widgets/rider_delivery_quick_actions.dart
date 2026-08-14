@@ -12,7 +12,7 @@ class RiderDeliveryQuickActions extends StatelessWidget {
   });
 
   final VoidCallback onRoute;
-  final VoidCallback onMessage;
+  final VoidCallback? onMessage;
   final VoidCallback onProblem;
   final VoidCallback onSafety;
 

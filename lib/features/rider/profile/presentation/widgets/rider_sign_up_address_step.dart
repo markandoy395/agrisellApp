@@ -1,73 +1,103 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/features/rider/profile/domain/rider_address.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_validator.dart';
 import 'package:agresell_app/features/rider/profile/presentation/controllers/rider_sign_up_controller.dart';
-import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_sign_up_location_picker.dart';
+import 'package:agresell_app/features/shared/location/presentation/widgets/psgc_address_fields.dart';
 
-class RiderSignUpAddressStep extends StatelessWidget {
+class RiderSignUpAddressStep extends StatefulWidget {
   const RiderSignUpAddressStep({required this.controller, super.key});
   final RiderSignUpController controller;
 
   @override
+  State<RiderSignUpAddressStep> createState() => _RiderSignUpAddressStepState();
+}
+
+class _RiderSignUpAddressStepState extends State<RiderSignUpAddressStep> {
+  late final _street = _controller(RiderSignUpFields.addressLine);
+  late final _province = _controller(RiderSignUpFields.province);
+  late final _city = _controller(RiderSignUpFields.cityMunicipality);
+  late final _barangay = _controller(RiderSignUpFields.barangay);
+  late final _postal = _controller(RiderSignUpFields.postalCode);
+
+  RiderSignUpController get controller => widget.controller;
+  TextEditingController _controller(String key) =>
+      TextEditingController(text: controller.draft.value(key));
+
+  @override
+  void dispose() {
+    for (final item in [_street, _province, _city, _barangay, _postal]) {
+      item.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final label = controller.draft.value(RiderSignUpFields.location);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Confirm the GPS coordinates used for rider matching.',
+          'Enter your official address by province, city or municipality, and barangay. We will capture your exact GPS location when you continue.',
           style: TextStyle(fontSize: 12, color: AgrisellColors.mutedText),
         ),
         const SizedBox(height: 12),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: AgrisellColors.fieldFill,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Current GPS location',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                label.isEmpty ? 'Not set yet' : label,
-                style: const TextStyle(fontSize: 12),
-              ),
-              const SizedBox(height: 8),
-              OutlinedButton.icon(
-                onPressed: () => _selectOnMap(context),
-                icon: const Icon(Icons.my_location_rounded, size: 17),
-                label: const Text('Choose GPS location'),
-              ),
-            ],
-          ),
+        _field(
+          'House, building, street, or sitio',
+          _street,
+          RiderSignUpFields.addressLine,
+          TextInputType.streetAddress,
+        ),
+        PsgcAddressFields(
+          provinceController: _province,
+          cityController: _city,
+          barangayController: _barangay,
+          onChanged: _saveAddress,
+        ),
+        _field(
+          'Postal code (optional)',
+          _postal,
+          RiderSignUpFields.postalCode,
+          TextInputType.number,
         ),
       ],
     );
   }
 
-  Future<void> _selectOnMap(BuildContext context) async {
-    final draft = controller.draft;
-    final location = await showRiderSignUpLocationPicker(
-      context,
-      latitude: double.tryParse(draft.value(RiderSignUpFields.latitude)),
-      longitude: double.tryParse(draft.value(RiderSignUpFields.longitude)),
-      address: draft.value(RiderSignUpFields.location),
-    );
-    if (location == null) return;
-    controller.updateLocation(
-      label: location.label,
-      latitude: location.latitude,
-      longitude: location.longitude,
-      accuracyMeters: location.accuracyMeters,
-      capturedAt: location.capturedAt,
-      notes: location.notes,
+  Widget _field(
+    String label,
+    TextEditingController field,
+    String key,
+    TextInputType type,
+  ) => Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: TextField(
+      controller: field,
+      keyboardType: type,
+      onChanged: (_) => _saveAddress(),
+      decoration: InputDecoration(
+        labelText: label,
+        errorText: controller.errorFor(key),
+      ),
+    ),
+  );
+
+  void _saveAddress() {
+    controller.updateValue(RiderSignUpFields.addressLine, _street.text);
+    controller.updateValue(RiderSignUpFields.province, _province.text);
+    controller.updateValue(RiderSignUpFields.cityMunicipality, _city.text);
+    controller.updateValue(RiderSignUpFields.barangay, _barangay.text);
+    controller.updateValue(RiderSignUpFields.postalCode, _postal.text);
+    controller.updateValue(
+      RiderSignUpFields.location,
+      RiderAddress.format(
+        addressLine: _street.text,
+        barangay: _barangay.text,
+        cityMunicipality: _city.text,
+        province: _province.text,
+        postalCode: _postal.text,
+      ),
     );
   }
 }

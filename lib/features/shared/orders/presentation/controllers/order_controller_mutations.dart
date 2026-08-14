@@ -105,6 +105,44 @@ extension OrderControllerMutations on OrderController {
     }
   }
 
+  Future<void> cancelFarmerOrder(String orderId, String reason) async {
+    final index = _orders.indexWhere((order) => order.id == orderId);
+    if (index == -1 || !_orders[index].status.canFarmerCancel) return;
+    if (_repository is! FarmerOrderCancellationRepository) {
+      throw StateError('Farmer order cancellation is unavailable.');
+    }
+    final repository = _repository as FarmerOrderCancellationRepository;
+    final cleanReason = reason.trim();
+    if (cleanReason.isEmpty) {
+      throw StateError('Select a cancellation reason.');
+    }
+    final accountId = _accountId;
+    if (accountId == null) throw StateError('Sign in before cancelling.');
+    await repository.cancelFarmerOrder(
+      accountId: accountId,
+      orderId: orderId,
+      reason: cleanReason,
+    );
+    final previousOrder = _orders[index];
+    final cancelledPaymentStatus =
+        previousOrder.payment.status == OrderPaymentStatus.verified
+        ? OrderPaymentStatus.refundRequired
+        : OrderPaymentStatus.cancelled;
+    _orders[index] = previousOrder.copyWith(
+      status: PlacedOrderStatus.cancelled,
+      payment: previousOrder.payment.copyWith(status: cancelledPaymentStatus),
+      cancellationReason: cleanReason,
+      cancelledBy: 'farmer',
+      cancelledAt: DateTime.now(),
+    );
+    _addOrderNotification(
+      order: _orders[index],
+      title: 'Order cancelled',
+      description: '${_orders[index].title} was cancelled: $cleanReason.',
+    );
+    _commitChange(persist: false);
+  }
+
   Future<void> _changeFarmerOrderStatus({
     required String orderId,
     required PlacedOrderStatus from,

@@ -71,6 +71,24 @@ class _ReservationRepository implements OrderRepository {
   Completer<List<PlacedOrder>>? pendingLoad;
 
   @override
+  Future<void> submitFeedback({
+    required String accountId,
+    required String orderId,
+    required String productId,
+    int? productRating,
+    required String productComment,
+    int? riderRating,
+    String riderComment = '',
+  }) async {}
+
+  @override
+  Future<void> createOrders({
+    required String accountId,
+    required Iterable<PlacedOrder> newOrders,
+    required Iterable<PlacedOrder> currentOrders,
+  }) async {}
+
+  @override
   Future<List<PlacedOrder>> load(String accountId) {
     loadAttempts++;
     if (shouldFail) return Future.error(Exception('reservation query failed'));

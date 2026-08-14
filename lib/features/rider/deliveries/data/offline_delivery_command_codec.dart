@@ -106,6 +106,8 @@ Map<String, Object?> encodeDeliveryCommand(
   'proofReferences': command.proofReferences.map(
     (key, value) => MapEntry(key.name, value),
   ),
+  'evidenceCapturedAt': command.evidenceCapturedAt?.toUtc().toIso8601String(),
+  'evidenceLocation': _encodeLocation(command.evidenceLocation),
   'confirmationCode': command.confirmationCode,
   'qrPayload': command.qrPayload,
   'recipientName': command.recipientName,
@@ -139,6 +141,10 @@ DeliveryCompletionCommand decodeDeliveryCommand(OfflineDeliveryAction action) {
         value as String,
       ),
     ),
+    evidenceCapturedAt: DateTime.tryParse(
+      action.payload['evidenceCapturedAt'] as String? ?? '',
+    )?.toLocal(),
+    evidenceLocation: _decodeLocation(action.payload['evidenceLocation']),
     confirmationCode: action.payload['confirmationCode'] as String?,
     qrPayload: action.payload['qrPayload'] as String?,
     recipientName: action.payload['recipientName'] as String?,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/features/buyer/profile/presentation/widgets/shipping_address_form.dart';
-import 'package:agresell_app/features/buyer/profile/presentation/widgets/shipping_address_map_preview.dart';
 
 class ShippingAddressEditorContent extends StatelessWidget {
   const ShippingAddressEditorContent({
@@ -12,12 +11,8 @@ class ShippingAddressEditorContent extends StatelessWidget {
     required this.cityController,
     required this.barangayController,
     required this.postalCodeController,
-    required this.latitude,
-    required this.longitude,
-    required this.isGeocoding,
     required this.isSaving,
     required this.error,
-    required this.onMapTap,
     required this.onAddressChanged,
     required this.onSave,
     super.key,
@@ -30,12 +25,8 @@ class ShippingAddressEditorContent extends StatelessWidget {
   final TextEditingController cityController;
   final TextEditingController barangayController;
   final TextEditingController postalCodeController;
-  final double? latitude;
-  final double? longitude;
-  final bool isGeocoding;
   final bool isSaving;
   final String? error;
-  final VoidCallback onMapTap;
   final VoidCallback onAddressChanged;
   final VoidCallback onSave;
 
@@ -59,14 +50,8 @@ class ShippingAddressEditorContent extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           const Text(
-            'Set an exact delivery pin, then complete your address.',
+            'Complete your address. We will capture your delivery GPS location when you save.',
             style: TextStyle(fontSize: 12),
-          ),
-          const SizedBox(height: 14),
-          ShippingAddressMapPreview(
-            latitude: latitude,
-            longitude: longitude,
-            onTap: onMapTap,
           ),
           const SizedBox(height: 14),
           ShippingAddressForm(
@@ -77,7 +62,7 @@ class ShippingAddressEditorContent extends StatelessWidget {
             cityController: cityController,
             barangayController: barangayController,
             postalCodeController: postalCodeController,
-            isGeocoding: isGeocoding,
+            isGeocoding: false,
             isSaving: isSaving,
             error: error,
             onAddressChanged: onAddressChanged,

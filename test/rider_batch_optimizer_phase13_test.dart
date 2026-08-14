@@ -1,9 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request_metadata.dart';
+import 'package:agresell_app/features/rider/deliveries/domain/delivery_payment.dart';
+import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_batch_delivery.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_batch_optimizer.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_delivery_search.dart';
+import 'package:agresell_app/features/rider/profile/domain/rider_registration.dart';
 import 'support/rider_batch_fixture.dart';
 
 void main() {
@@ -135,18 +138,69 @@ void main() {
     expect(deadline.rejection, RiderBatchRejection.deadlineConflict);
     expect(route.rejection, RiderBatchRejection.routeIncompatible);
   });
+
+  test('vehicle, handling, and COD responsibilities are validated', () {
+    final vehicle = optimizer.evaluate(
+      activeDeliveries: [batchRequest(id: 'a')],
+      candidate: batchRequest(id: 'b'),
+      context: _context(vehicleType: RiderVehicleType.van),
+    );
+    final handling = optimizer.evaluate(
+      activeDeliveries: [batchRequest(id: 'a')],
+      candidate: batchRequest(
+        id: 'b',
+        handling: const [
+          ProductHandlingRequirement(
+            type: ProductHandlingType.temperatureSensitive,
+          ),
+        ],
+      ),
+      context: _context(capabilities: const {'fragileProtection'}),
+    );
+    final cod = optimizer.evaluate(
+      activeDeliveries: [batchRequest(id: 'a')],
+      candidate: batchRequest(
+        id: 'b',
+        cashOnDelivery: const CashOnDeliveryRequirement(amountToCollect: 500),
+      ),
+      context: _context(),
+    );
+
+    expect(vehicle.rejection, RiderBatchRejection.vehicleIncompatible);
+    expect(handling.rejection, RiderBatchRejection.handlingCapabilityRequired);
+    expect(cod.rejection, RiderBatchRejection.codResponsibilityUnavailable);
+  });
+
+  test('picked-up delivery has no second pickup stop', () {
+    final result = optimizer.evaluate(
+      activeDeliveries: [batchRequest(id: 'a', stage: DeliveryStage.pickedUp)],
+      candidate: batchRequest(id: 'b'),
+      context: _context(),
+    );
+
+    expect(result.plan?.pickupSequence.map((stop) => stop.deliveryId), ['b']);
+    expect(result.plan?.deliverySequence.map((stop) => stop.deliveryId), [
+      'a',
+      'b',
+    ]);
+  });
 }
 
 RiderBatchContext _context({
   int maximumActive = 3,
   double maximumDistance = 100,
-  Set<String> capabilities = const {'fragileProtection'},
+  Set<String> capabilities = const {
+    'fragileProtection',
+    'temperatureSensitive',
+  },
+  RiderVehicleType vehicleType = RiderVehicleType.motorcycle,
 }) => RiderBatchContext(
   riderEligible: true,
   maximumActiveDeliveries: maximumActive,
   capacityKg: 100,
   now: batchNow,
   currentLocation: const RiderDeliverySearch(latitude: 8.48, longitude: 124.65),
+  vehicleType: vehicleType,
   handlingCapabilityKeys: capabilities,
   maximumBatchDistanceKm: maximumDistance,
 );

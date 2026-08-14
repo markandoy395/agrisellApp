@@ -6,11 +6,14 @@ import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/presentation/auth_dashboard_router.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_background.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/logo_header.dart';
 import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  const SplashScreen({this.supabaseInitialization, super.key});
+
+  final Future<bool>? supabaseInitialization;
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -32,14 +35,11 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _resolveLaunchDestination() async {
-    final accountFuture = AuthSessionService.instance.restore();
-    await Future<void>.delayed(const Duration(milliseconds: 900));
-
-    if (!mounted) {
-      return;
-    }
-
-    final session = await accountFuture.timeout(
+    unawaited(AuthBackground.precache(context));
+    final supabaseInitialization = widget.supabaseInitialization;
+    if (supabaseInitialization != null) await supabaseInitialization;
+    if (!mounted) return;
+    final session = await AuthSessionService.instance.restore().timeout(
       const Duration(seconds: 8),
       onTimeout: AuthSessionRestoreResult.noSession,
     );

@@ -104,6 +104,8 @@ extension DeliveryRequestActions on DeliveryRequest {
     route: route,
     stage: stage ?? this.stage,
     assignedRiderId: assignedRiderId ?? this.assignedRiderId,
+    assignmentRequestId: assignmentRequestId,
+    assignmentRequestStatus: assignmentRequestStatus,
     reservedRiderId: reservedRiderId,
     reservedUntil: reservedUntil,
     outcome: outcome ?? this.outcome,

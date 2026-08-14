@@ -192,6 +192,8 @@ DeliveryCompletionCommand _completion() => DeliveryCompletionCommand(
   proofReferences: const {
     DeliveryConfirmationMethod.buyerConfirmation:
         'protected://delivery/delivery-1/buyer',
+    DeliveryConfirmationMethod.handoverPhoto:
+        'local-secure://delivery/delivery-1/handoverPhoto/evidence.jpg',
     DeliveryConfirmationMethod.recipientName:
         'protected://delivery/delivery-1/recipient',
     DeliveryConfirmationMethod.gpsLocation:
@@ -199,4 +201,10 @@ DeliveryCompletionCommand _completion() => DeliveryCompletionCommand(
     DeliveryConfirmationMethod.timestamp:
         'protected://delivery/delivery-1/time',
   },
+  evidenceCapturedAt: DateTime.now(),
+  evidenceLocation: _command(
+    previous: DeliveryStatus.goingToPickup,
+    next: DeliveryStatus.arrivedAtPickup,
+    key: 'evidence-location',
+  ).location,
 );

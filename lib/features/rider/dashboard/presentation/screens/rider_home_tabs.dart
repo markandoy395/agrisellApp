@@ -22,64 +22,70 @@ extension _RiderHomeTabs on _RiderHomeScreenState {
     ).showAppSnackBar(SnackBar(content: Text(message)));
   }
 
-  List<Widget> _tabs(RiderProfile? profile) => [
-    RiderKeepAliveTab(
-      child: RiderDashboardScreen(
-        profile: profile,
-        deliveryController: _deliveryController,
-        availabilityController: _availabilityController,
-        dashboardController: _dashboardController,
-        riderId: _riderId,
-        onOpenDeliveries: () => _selectTab(RiderHomeScreen.deliveriesNavIndex),
-        onOpenMap: () => _selectTab(RiderHomeScreen.mapNavIndex),
-        onOpenMessages: () => _selectTab(RiderHomeScreen.messagesNavIndex),
-        onOpenEarnings: _openEarnings,
-        onOpenNotifications: _openNotifications,
-        onSafetySupport: _openSafetySupport,
-      ),
-    ),
-    RiderKeepAliveTab(
-      child: RiderDeliveriesScreen(
-        profile: profile,
-        deliveryController: _deliveryController,
-        riderId: _riderId,
-        onRetryLocation: () => unawaited(
-          _availabilityController.refreshEnvironment(refreshLocation: true),
+  Widget _buildTab(int index, RiderProfile? profile) {
+    return switch (index) {
+      RiderHomeScreen.homeNavIndex => RiderKeepAliveTab(
+        child: RiderDashboardScreen(
+          profile: profile,
+          deliveryController: _deliveryController,
+          availabilityController: _availabilityController,
+          dashboardController: _dashboardController,
+          riderId: _riderId,
+          onOpenDeliveries: () =>
+              _selectTab(RiderHomeScreen.deliveriesNavIndex),
+          onOpenMap: () => _selectTab(RiderHomeScreen.mapNavIndex),
+          onOpenMessages: () => _selectTab(RiderHomeScreen.messagesNavIndex),
+          onOpenEarnings: _openEarnings,
+          onOpenNotifications: _openNotifications,
+          onSafetySupport: _openSafetySupport,
         ),
-        onOpenLocationSettings: () =>
-            unawaited(_locationController.openLocationSettings()),
-        onOpenAppSettings: () =>
-            unawaited(_locationController.openAppSettings()),
-        onOpenProfile: () => _selectTab(RiderHomeScreen.profileNavIndex),
       ),
-    ),
-    RiderKeepAliveTab(
-      child: RiderMapScreen(
-        profile: profile,
-        deliveryController: _deliveryController,
-        locationController: _locationController,
-        availabilityController: _availabilityController,
-        isActive: _activeIndex == RiderHomeScreen.mapNavIndex,
-        onOpenList: () => _selectTab(RiderHomeScreen.homeNavIndex),
+      RiderHomeScreen.deliveriesNavIndex => RiderKeepAliveTab(
+        child: RiderDeliveriesScreen(
+          profile: profile,
+          deliveryController: _deliveryController,
+          riderId: _riderId,
+          locationController: _locationController,
+          onRetryLocation: () => unawaited(
+            _availabilityController.refreshEnvironment(refreshLocation: true),
+          ),
+          onOpenLocationSettings: () =>
+              unawaited(_locationController.openLocationSettings()),
+          onOpenAppSettings: () =>
+              unawaited(_locationController.openAppSettings()),
+          onOpenProfile: () => _selectTab(RiderHomeScreen.profileNavIndex),
+          onOpenConversation: _openDeliveryConversation,
+        ),
       ),
-    ),
-    RiderKeepAliveTab(
-      child: RiderMessagesScreen(
-        riderId: _riderId ?? '',
-        controller: _messagesController,
-        access: _conversationAccess,
-        onAttachmentRequested: _captureCommunicationAttachment,
+      RiderHomeScreen.mapNavIndex => RiderKeepAliveTab(
+        child: RiderMapScreen(
+          profile: profile,
+          deliveryController: _deliveryController,
+          locationController: _locationController,
+          availabilityController: _availabilityController,
+          isActive: _activeIndex == RiderHomeScreen.mapNavIndex,
+          onOpenList: () => _selectTab(RiderHomeScreen.homeNavIndex),
+        ),
       ),
-    ),
-    RiderKeepAliveTab(
-      child: RiderProfileScreen(
-        profile: profile,
-        analyticsController: _analyticsController,
-        deliveryController: _deliveryController,
-        prepareForLogout: _availabilityController.prepareForLogout,
+      RiderHomeScreen.messagesNavIndex => RiderKeepAliveTab(
+        child: RiderMessagesScreen(
+          riderId: _riderId ?? '',
+          controller: _messagesController,
+          access: _conversationAccess,
+          onAttachmentRequested: _captureCommunicationAttachment,
+        ),
       ),
-    ),
-  ];
+      RiderHomeScreen.profileNavIndex => RiderKeepAliveTab(
+        child: RiderProfileScreen(
+          profile: profile,
+          analyticsController: _analyticsController,
+          deliveryController: _deliveryController,
+          prepareForLogout: _availabilityController.prepareForLogout,
+        ),
+      ),
+      _ => const SizedBox.shrink(),
+    };
+  }
 
   RiderConversationAccess get _conversationAccess => RiderConversationAccess(
     activeDeliveryIds: {
@@ -105,7 +111,19 @@ extension _RiderHomeTabs on _RiderHomeScreenState {
         .firstOrNull
         ?.id;
     final deliveryId = action.deliveryId ?? activeId;
-    if (deliveryId == null) return null;
+    if (deliveryId == null) {
+      _showCommunicationMessage(
+        'An active delivery is required to share an attachment.',
+      );
+      return null;
+    }
+    if (action.type == RiderCommunicationActionType.shareLocation &&
+        _deliveryController.currentRiderLocation == null) {
+      _showCommunicationMessage(
+        'Current GPS location is unavailable. Enable precise location and try again.',
+      );
+      return null;
+    }
     try {
       return switch (action.type) {
         RiderCommunicationActionType.attachPhoto =>
@@ -128,6 +146,13 @@ extension _RiderHomeTabs on _RiderHomeScreenState {
       }
       return null;
     }
+  }
+
+  void _showCommunicationMessage(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showAppSnackBar(SnackBar(content: Text(message)));
   }
 
   void _openEarnings() {

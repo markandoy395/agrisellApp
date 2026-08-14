@@ -57,6 +57,18 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Maria Santos'), findsOneWidget);
+    for (final productName in const [
+      'Tomatoes',
+      'Carrots',
+      'Potatoes',
+      'Cabbage',
+      'Eggplant',
+    ]) {
+      expect(find.text(productName), findsNothing);
+    }
+    expect(find.text('+2 more'), findsNothing);
+    expect(find.text('4'), findsOneWidget);
+    expect(find.text('available'), findsOneWidget);
     expect(repository.attempts, 2);
     expect(tester.takeException(), isNull);
   });
@@ -76,7 +88,13 @@ class _RetryingFarmerDirectoryRepository extends FarmerDirectoryRepository {
         location: 'Bukidnon',
         rating: 4.8,
         coverImage: 'assets/images/farm.jpg',
-        products: [ProductAvailability(name: 'Tomatoes', isAvailable: true)],
+        products: [
+          ProductAvailability(name: 'Tomatoes', isAvailable: true),
+          ProductAvailability(name: 'Carrots', isAvailable: true),
+          ProductAvailability(name: 'Potatoes', isAvailable: true),
+          ProductAvailability(name: 'Cabbage', isAvailable: true),
+          ProductAvailability(name: 'Eggplant', isAvailable: false),
+        ],
       ),
     ];
   }

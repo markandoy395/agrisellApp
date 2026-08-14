@@ -6,9 +6,12 @@ import 'package:agresell_app/features/shared/orders/presentation/controllers/ord
 import 'package:agresell_app/features/buyer/cart/presentation/screens/basket_screen.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/screens/checkout_screen.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/product_detail_screen.dart';
+import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'support/marketplace_messaging_fakes.dart';
 
 void main() {
   final controller = BasketController.instance;
@@ -50,6 +53,130 @@ void main() {
       expect(find.textContaining('\u20B1 135'), findsOneWidget);
     },
   );
+  testWidgets(
+    'checkout message button opens the selected farmer conversation',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(430, 932));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      final repository = FakeMarketplaceMessagingRepository();
+      final base = testHomeProducts.first;
+      final product = HomeProduct(
+        id: '8',
+        name: base.name,
+        price: base.price,
+        unit: base.unit,
+        image: base.image,
+        harvestDate: base.harvestDate,
+        availableWeight: base.availableWeight,
+        sellerName: 'Maria Santos',
+        sellerLocation: base.sellerLocation,
+        category: base.category,
+        farmId: 3,
+      );
+      controller.addProduct(product);
+      await tester.pumpWidget(
+        MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: AgrisellTheme.light,
+          home: CheckoutScreen(messagingRepository: repository),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.bySemanticsLabel('Open messages'));
+      await tester.pumpAndSettle();
+
+      expect(repository.startCalls, hasLength(1));
+      expect(repository.startCalls.single.commodityId, '8');
+      expect(repository.startCalls.single.farmId, 3);
+      expect(find.text('Hello buyer'), findsOneWidget);
+      expect(find.text('Search farmers or products'), findsNothing);
+    },
+  );
+  testWidgets('checkout message handles an invalid conversation reference', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(430, 932));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final repository = FakeMarketplaceMessagingRepository();
+    controller.addProduct(testHomeProducts.first);
+    await tester.pumpWidget(
+      MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: AgrisellTheme.light,
+        home: CheckoutScreen(messagingRepository: repository),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.bySemanticsLabel('Open messages'));
+    await tester.pumpAndSettle();
+
+    expect(repository.startCalls, isEmpty);
+    expect(
+      find.text(
+        'This farmer conversation is unavailable because its reference is invalid.',
+      ),
+      findsOneWidget,
+    );
+  });
+  testWidgets('checkout never guesses a conversation for multiple farmers', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(430, 932));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final repository = FakeMarketplaceMessagingRepository();
+    final base = testHomeProducts.first;
+    controller
+      ..addProduct(
+        HomeProduct(
+          id: '8',
+          name: base.name,
+          price: base.price,
+          unit: base.unit,
+          image: base.image,
+          harvestDate: base.harvestDate,
+          availableWeight: base.availableWeight,
+          sellerName: 'Maria Santos',
+          sellerLocation: base.sellerLocation,
+          category: base.category,
+          farmId: 3,
+        ),
+      )
+      ..addProduct(
+        HomeProduct(
+          id: '9',
+          name: 'Other farmer product',
+          price: base.price,
+          unit: base.unit,
+          image: base.image,
+          harvestDate: base.harvestDate,
+          availableWeight: base.availableWeight,
+          sellerName: 'Other Farmer',
+          sellerLocation: 'Bukidnon',
+          category: base.category,
+          farmId: 4,
+        ),
+      );
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AgrisellTheme.light,
+        home: CheckoutScreen(messagingRepository: repository),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.bySemanticsLabel('Open messages'));
+    await tester.pumpAndSettle();
+
+    expect(repository.startCalls, isEmpty);
+    expect(
+      find.text(
+        'This checkout contains multiple farmers. Select items from one farmer to open the correct conversation.',
+      ),
+      findsOneWidget,
+    );
+  });
   testWidgets('basket product removal can be undone', (tester) async {
     await tester.binding.setSurfaceSize(const Size(430, 932));
     addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -96,6 +223,48 @@ void main() {
     expect(find.text('Place Order'), findsOneWidget);
     expect(controller.selectedQuantity, 1);
     expect(controller.selectedTotal, 15);
+  });
+  testWidgets('checkout uses uploaded product image URL when available', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(430, 932));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    const imageUrl = 'https://example.com/uploads/fresh-tomatoes.jpg';
+    final base = testHomeProducts.first;
+    final product = HomeProduct(
+      id: base.id,
+      name: base.name,
+      price: base.price,
+      unit: base.unit,
+      image: base.image,
+      harvestDate: base.harvestDate,
+      availableWeight: base.availableWeight,
+      sellerName: base.sellerName,
+      sellerLocation: base.sellerLocation,
+      category: base.category,
+      imageUrl: imageUrl,
+    );
+    controller.addProduct(product);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: AgrisellTheme.light,
+        home: const CheckoutScreen(),
+      ),
+    );
+    await tester.pump();
+
+    final image = tester.widget<ResponsiveAssetImage>(
+      find
+          .byWidgetPredicate(
+            (widget) =>
+                widget is ResponsiveAssetImage && widget.imageUrl == imageUrl,
+          )
+          .first,
+    );
+    expect(image.asset, base.image);
+    expect(image.imageUrl, imageUrl);
   });
   testWidgets('product details show content within the first mobile viewport', (
     tester,

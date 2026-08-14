@@ -97,29 +97,22 @@ class SupabaseRiderDataSource
 
   @override
   Future<RiderLocation> upsertLocation(RiderLocation location) async {
-    await updateRider(location.riderId!, {
-      'gps_lat': location.latitude,
-      'gps_long': location.longitude,
-    });
-    return location;
+    final row = await _client
+        .from('rider_locations')
+        .upsert(location.toDatabaseJson(), onConflict: 'rider_id')
+        .select()
+        .single();
+    return RiderLocation.fromDatabaseJson(_map(row));
   }
 
   @override
   Future<RiderLocation?> getLocation(String riderId) async {
-    final rider = await getCurrentRider();
-    if (rider == null ||
-        rider.riderId != riderId ||
-        rider.gpsLatitude == null ||
-        rider.gpsLongitude == null) {
-      return null;
-    }
-    return RiderLocation(
-      riderId: rider.riderId,
-      latitude: rider.gpsLatitude!,
-      longitude: rider.gpsLongitude!,
-      accuracyMeters: 0,
-      timestamp: DateTime.now(),
-    );
+    final row = await _client
+        .from('rider_locations')
+        .select()
+        .eq('rider_id', riderId)
+        .maybeSingle();
+    return row == null ? null : RiderLocation.fromDatabaseJson(_map(row));
   }
 
   @override
@@ -165,7 +158,14 @@ Map<String, Object?> _writableRider(Map<String, Object?> source) =>
       'profile_photo_url',
       'gps_lat',
       'gps_long',
+      'location_label',
+      'address_line',
+      'barangay',
+      'city_municipality',
+      'province',
+      'postal_code',
       'total_deliveries',
+      'maximum_active_deliveries',
       'employment_status',
     });
 Map<String, Object?> _registrationRider(Rider rider) =>

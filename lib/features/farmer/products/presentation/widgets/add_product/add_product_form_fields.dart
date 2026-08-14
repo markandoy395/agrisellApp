@@ -122,6 +122,10 @@ class _CompactDropdown<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<T>(
+      dropdownColor: AppDropdownStyle.menuColor,
+      borderRadius: AppDropdownStyle.menuBorderRadius,
+      style: AppDropdownStyle.textStyle.copyWith(fontSize: 12),
+      iconEnabledColor: AppDropdownStyle.iconColor,
       initialValue: value,
       isExpanded: true,
       icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18),

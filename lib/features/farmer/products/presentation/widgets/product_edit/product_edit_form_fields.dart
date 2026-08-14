@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 class ProductEditInputRow extends StatelessWidget {
@@ -48,6 +49,7 @@ class ProductEditRoundedTextField extends StatelessWidget {
     this.textInputAction,
     this.prefixText,
     this.suffixText,
+    this.readOnly = false,
     super.key,
   });
 
@@ -56,6 +58,7 @@ class ProductEditRoundedTextField extends StatelessWidget {
   final TextInputAction? textInputAction;
   final String? prefixText;
   final String? suffixText;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +66,7 @@ class ProductEditRoundedTextField extends StatelessWidget {
       height: 31,
       child: TextField(
         controller: controller,
+        readOnly: readOnly,
         keyboardType: keyboardType,
         textInputAction: textInputAction,
         style: const TextStyle(fontSize: 12, height: 1),
@@ -113,6 +117,10 @@ class ProductEditCompactDropdown extends StatelessWidget {
     return SizedBox(
       height: 31,
       child: DropdownButtonFormField<String>(
+        dropdownColor: AppDropdownStyle.menuColor,
+        borderRadius: AppDropdownStyle.menuBorderRadius,
+        style: AppDropdownStyle.textStyle.copyWith(fontSize: 11),
+        iconEnabledColor: AppDropdownStyle.iconColor,
         initialValue: value,
         isExpanded: true,
         icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 17),

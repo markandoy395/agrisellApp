@@ -9,6 +9,7 @@ abstract final class AgrisellAssets {
   static const facebookLogo = 'assets/logo/facebookLogo.png';
   static const googleLogo = 'assets/logo/googleLogo.jpg';
   static const homeBannerVegetables = 'assets/images/vege.jpeg';
+  static const authBackground = 'assets/images/auth_farm.jpg';
   static const loginBackground = 'assets/images/farm.jpg';
   static const categoryVegetable = 'assets/images/home/vegetable.png';
   static const categoryFruits = 'assets/images/home/fruits.png';

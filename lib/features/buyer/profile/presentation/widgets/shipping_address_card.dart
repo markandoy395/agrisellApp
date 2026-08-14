@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/features/auth/domain/buyer_shipping_address.dart';
 import 'package:agresell_app/features/buyer/profile/presentation/widgets/shipping_address_editor.dart';
+import 'package:agresell_app/features/shared/location/data/gps_location_gateway.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_card_shell.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_section_label.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_text_styles.dart';
@@ -15,6 +17,7 @@ class ShippingAddressCard extends StatelessWidget {
     this.phoneNumber = '',
     this.latitude,
     this.longitude,
+    this.gpsGateway,
     super.key,
   });
 
@@ -24,6 +27,7 @@ class ShippingAddressCard extends StatelessWidget {
   final String phoneNumber;
   final double? latitude;
   final double? longitude;
+  final GpsLocationGateway? gpsGateway;
 
   @override
   Widget build(BuildContext context) {
@@ -58,18 +62,27 @@ class ShippingAddressCard extends StatelessWidget {
     );
   }
 
-  Future<void> _showEditor(BuildContext context) => showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    builder: (_) => ShippingAddressEditor(
-      onSave: onSave,
-      initialAddress: address,
-      fullName: fullName,
-      phoneNumber: phoneNumber,
-      latitude: latitude,
-      longitude: longitude,
-    ),
-  );
+  Future<void> _showEditor(BuildContext context) async {
+    final saved = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => ShippingAddressEditor(
+        onSave: onSave,
+        initialAddress: address,
+        fullName: fullName,
+        phoneNumber: phoneNumber,
+        latitude: latitude,
+        longitude: longitude,
+        gpsGateway: gpsGateway,
+      ),
+    );
+    if (saved != true || !context.mounted) return;
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showAppSnackBar(
+        const SnackBar(content: Text('Shipping address saved.')),
+      );
+  }
 }
 
 class _AddressIcon extends StatelessWidget {

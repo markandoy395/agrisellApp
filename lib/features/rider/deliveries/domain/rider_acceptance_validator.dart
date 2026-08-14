@@ -29,22 +29,41 @@ DeliveryAcceptanceFailure? validateDeliveryAcceptance({
   if (rider == null || !rider.isAllowedToDeliver) {
     return DeliveryAcceptanceFailure.riderNotAllowed;
   }
-  if (rider.availability == RiderAvailability.offline) {
+  final isActiveManualOfflineBooking =
+      rider.availability == RiderAvailability.offline &&
+      request.reservedRiderId == rider.riderId &&
+      request.reservedUntil != null &&
+      request.reservedUntil!.isAfter(now);
+  if (rider.availability == RiderAvailability.offline &&
+      !isActiveManualOfflineBooking) {
     return DeliveryAcceptanceFailure.riderOffline;
+  }
+  if (rider.activeDeliveryCount >= rider.maximumActiveDeliveries) {
+    return DeliveryAcceptanceFailure.activeDeliveryLimit;
   }
   final continuingBatch =
       rider.availability.isHandlingDelivery &&
       rider.activeDeliveryCount > 0 &&
       rider.activeDeliveryCount < rider.maximumActiveDeliveries;
   if (rider.availability != RiderAvailability.onlineAvailable &&
-      !continuingBatch) {
+      !continuingBatch &&
+      !isActiveManualOfflineBooking) {
     return DeliveryAcceptanceFailure.riderUnavailable;
   }
   if (rider.conflictingDeliveryId != null && !continuingBatch) {
     return DeliveryAcceptanceFailure.conflictingAssignment;
   }
+  if (rider.serviceArea.trim().isNotEmpty &&
+      !rider.matching.registeredServiceArea.matchesArea(request.serviceArea)) {
+    return DeliveryAcceptanceFailure.serviceAreaMismatch;
+  }
   return _matchingFailure(
-    riderRequestRejection(request, rider.matching, at: now),
+    riderRequestRejection(
+      request,
+      rider.matching,
+      at: now,
+      allowReservedOffline: isActiveManualOfflineBooking,
+    ),
   );
 }
 

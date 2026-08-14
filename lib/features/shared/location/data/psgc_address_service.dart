@@ -8,12 +8,14 @@ class PsgcAddressOption {
     required this.code,
     required this.name,
     this.province = '',
+    this.provinceCode = '',
     this.region = '',
   });
 
   final String code;
   final String name;
   final String province;
+  final String provinceCode;
   final String region;
 }
 
@@ -68,8 +70,11 @@ class PsgcAddressService implements PhilippineAddressLookup {
             (value) => PsgcAddressOption(
               code: _text(value['code']),
               name: _text(value['name']),
-              province: _text(value['province']),
-              region: _text(value['region']),
+              province: _placeName(value['province'] ?? value['province_name']),
+              provinceCode: _placeCode(
+                value['province'] ?? value['province_code'],
+              ),
+              region: _placeName(value['region'] ?? value['region_name']),
             ),
           )
           .where((option) => option.code.isNotEmpty && option.name.isNotEmpty)
@@ -81,3 +86,13 @@ class PsgcAddressService implements PhilippineAddressLookup {
 }
 
 String _text(Object? value) => value?.toString().trim() ?? '';
+
+String _placeName(Object? value) => switch (value) {
+  Map map => _text(map['name']),
+  _ => _text(value),
+};
+
+String _placeCode(Object? value) => switch (value) {
+  Map map => _text(map['code']),
+  _ => _text(value),
+};

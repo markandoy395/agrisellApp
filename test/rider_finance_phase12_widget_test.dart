@@ -47,6 +47,42 @@ void main() {
     expect(find.text('I confirm the cash was collected'), findsOneWidget);
   });
 
+  testWidgets('COD payment issue fits on a narrow screen', (tester) async {
+    tester.view.physicalSize = const Size(320, 700);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final amount = TextEditingController();
+    final notes = TextEditingController();
+    addTearDown(amount.dispose);
+    addTearDown(notes.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(14),
+            child: RiderCashCollectionCard(
+              requirement: const CashOnDeliveryRequirement(
+                amountToCollect: 725,
+              ),
+              amountController: amount,
+              notesController: notes,
+              confirmed: true,
+              issue: CashCollectionIssue.alternateApprovedMethod,
+              enabled: true,
+              onConfirmed: (_) {},
+              onIssue: (_) {},
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Buyer used another approved method'), findsOneWidget);
+  });
+
   testWidgets('earnings screen renders full summary and period filters', (
     tester,
   ) async {

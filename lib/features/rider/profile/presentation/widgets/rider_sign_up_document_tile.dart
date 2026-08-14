@@ -102,12 +102,15 @@ class _Preview extends StatelessWidget {
         ),
       );
     }
+    final previewExtent = (46 * MediaQuery.devicePixelRatioOf(context)).ceil();
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: Image.file(
         File(item.path),
         width: 46,
         height: 46,
+        cacheWidth: previewExtent,
+        cacheHeight: previewExtent,
         fit: BoxFit.cover,
         errorBuilder: (_, _, _) => const SizedBox.square(
           dimension: 46,

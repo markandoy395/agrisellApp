@@ -43,6 +43,65 @@ void main() {
     },
   );
 
+  test(
+    'configured limit accepts up to the limit and rejects the next',
+    () async {
+      final repository = InMemoryRiderDeliveryRepository(
+        requests: [
+          batchRequest(id: 'a'),
+          batchRequest(id: 'b'),
+          batchRequest(id: 'c'),
+          batchRequest(id: 'd'),
+        ],
+        riderStates: [batchRiderState()],
+        clock: () => batchNow,
+      );
+      for (final id in ['a', 'b', 'c']) {
+        expect(
+          (await repository.acceptDelivery(_accept(id, id))).request.id,
+          id,
+        );
+      }
+
+      await expectLater(
+        repository.acceptDelivery(_accept('d', 'd')),
+        throwsA(
+          isA<DeliveryAcceptanceException>().having(
+            (error) => error.failure,
+            'failure',
+            DeliveryAcceptanceFailure.activeDeliveryLimit,
+          ),
+        ),
+      );
+      expect(repository.activeDeliveriesFor('rider-a'), hasLength(3));
+    },
+  );
+
+  test('simultaneous acceptance requests cannot exceed the limit', () async {
+    final repository = InMemoryRiderDeliveryRepository(
+      requests: [
+        batchRequest(id: 'a'),
+        batchRequest(id: 'b'),
+      ],
+      riderStates: [batchRiderState(maximumActiveDeliveries: 1)],
+      clock: () => batchNow,
+    );
+
+    final outcomes = await Future.wait(
+      ['a', 'b'].map((id) async {
+        try {
+          await repository.acceptDelivery(_accept(id, id));
+          return true;
+        } on DeliveryAcceptanceException {
+          return false;
+        }
+      }),
+    );
+
+    expect(outcomes.where((accepted) => accepted), hasLength(1));
+    expect(repository.activeDeliveriesFor('rider-a'), hasLength(1));
+  });
+
   test('backend atomically rejects an incompatible second delivery', () async {
     final repository = InMemoryRiderDeliveryRepository(
       requests: [
@@ -108,7 +167,10 @@ void main() {
   test(
     'proof, COD payment, and earnings remain keyed to each delivery',
     () async {
-      const cod = CashOnDeliveryRequirement(amountToCollect: 850);
+      const cod = CashOnDeliveryRequirement(
+        amountToCollect: 850,
+        riderCashResponsibility: 'Collect and remit the exact amount.',
+      );
       final repository = InMemoryRiderDeliveryRepository(
         requests: [
           batchRequest(id: 'a', earning: 100),

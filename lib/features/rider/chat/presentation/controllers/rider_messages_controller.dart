@@ -36,6 +36,7 @@ class RiderMessagesController extends ChangeNotifier {
   var _isLoadingMessages = false;
   var _isSending = false;
   var _backendReachable = true;
+  var _isDisposed = false;
   RiderConversationAccess? _access;
 
   RiderCommunicationLoadState get state => _state;
@@ -54,12 +55,14 @@ class RiderMessagesController extends ChangeNotifier {
     RiderConversationAccess access = const RiderConversationAccess(),
   }) async {
     await _subscription?.cancel();
+    if (_isDisposed) return;
     _riderId = riderId;
     _access = access;
     _state = RiderCommunicationLoadState.loading;
     _errorMessage = null;
     notifyListeners();
     await _offlineQueue.initialize(riderId);
+    if (_isDisposed) return;
     _subscription = _repository
         .watchConversations(riderId: riderId)
         .listen(_onConversations, onError: _onConversationError);
@@ -152,7 +155,14 @@ class RiderMessagesController extends ChangeNotifier {
   void _notify() => notifyListeners();
 
   @override
+  void notifyListeners() {
+    if (!_isDisposed) super.notifyListeners();
+  }
+
+  @override
   void dispose() {
+    if (_isDisposed) return;
+    _isDisposed = true;
     _subscription?.cancel();
     if (_ownsQueue) _offlineQueue.dispose();
     super.dispose();

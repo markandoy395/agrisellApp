@@ -22,6 +22,7 @@ import 'package:agresell_app/features/buyer/cart/presentation/screens/basket_scr
 import 'package:agresell_app/features/buyer/cart/presentation/screens/checkout_screen.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/farmer_shop_screen.dart';
 import 'package:agresell_app/features/buyer/orders/presentation/screens/order_tracking_screen.dart';
+import 'package:agresell_app/features/farmer/profile/presentation/screens/farmer_history_screen.dart';
 import 'package:agresell_app/firebase_options.dart';
 
 Future<void> main() async {
@@ -29,12 +30,14 @@ Future<void> main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   _configureImageCache();
   unawaited(AgrisellSystemUi.applyAppSystemUi());
-  await AppFontSizeController.instance.load();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await PushNotificationService.instance.initialize();
-  await AgrisellSupabase.initialize();
+  await Future.wait<Object?>([
+    AppFontSizeController.instance.load(),
+    Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),
+  ]);
+  final supabaseInitialization = AgrisellSupabase.initialize();
 
-  runApp(const AgrisellApp());
+  runApp(AgrisellApp(supabaseInitialization: supabaseInitialization));
+  unawaited(PushNotificationService.instance.initialize());
 }
 
 void _configureImageCache() {
@@ -44,7 +47,9 @@ void _configureImageCache() {
 }
 
 class AgrisellApp extends StatelessWidget {
-  const AgrisellApp({super.key});
+  const AgrisellApp({this.supabaseInitialization, super.key});
+
+  final Future<bool>? supabaseInitialization;
 
   @override
   Widget build(BuildContext context) {
@@ -71,14 +76,19 @@ class AgrisellApp extends StatelessWidget {
           redirectFor: AuthDashboardRouter.destinationFor,
           child: CheckoutScreen(),
         ),
-        AgrisellRoutes.toShip: (_) => const AuthRoleGate(
-          requiredRole: AuthRole.farmer,
+        AgrisellRoutes.buyerOrders: (_) => const AuthRoleGate(
+          requiredRole: AuthRole.buyer,
           redirectFor: AuthDashboardRouter.destinationFor,
           child: OrderTrackingScreen(),
         ),
+        AgrisellRoutes.toShip: (_) => const AuthRoleGate(
+          requiredRole: AuthRole.farmer,
+          redirectFor: AuthDashboardRouter.destinationFor,
+          child: FarmerHistoryScreen(),
+        ),
       },
       onGenerateRoute: _onGenerateRoute,
-      home: const SplashScreen(),
+      home: SplashScreen(supabaseInitialization: supabaseInitialization),
     );
   }
 

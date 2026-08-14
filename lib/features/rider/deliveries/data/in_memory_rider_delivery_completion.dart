@@ -16,6 +16,7 @@ extension _InMemoryRiderDeliveryCompletion on InMemoryRiderDeliveryRepository {
         const DeliveryCompletionConfiguration(
           requiredMethods: {
             DeliveryConfirmationMethod.buyerConfirmation,
+            DeliveryConfirmationMethod.handoverPhoto,
             DeliveryConfirmationMethod.recipientName,
             DeliveryConfirmationMethod.gpsLocation,
             DeliveryConfirmationMethod.timestamp,

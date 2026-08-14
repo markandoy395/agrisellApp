@@ -22,7 +22,12 @@ class RiderDocumentUploadService {
     required RiderDraftDocumentType type,
     required ImageSource source,
   }) async {
-    final selected = await _picker.pickImage(source: source, imageQuality: 88);
+    final selected = await _picker.pickImage(
+      source: source,
+      maxWidth: 2048,
+      maxHeight: 2048,
+      imageQuality: 88,
+    );
     if (selected == null) return null;
     final extension = selected.name.split('.').last.toLowerCase();
     if (!_extensions.contains(extension)) {

@@ -14,6 +14,7 @@ class BasketCartItem {
     required this.unit,
     required this.quantity,
     required this.isSelected,
+    this.imageUrl,
     this.farmId,
   });
 
@@ -22,6 +23,7 @@ class BasketCartItem {
       productId: product.id,
       productName: product.name,
       image: product.image,
+      imageUrl: product.imageUrl,
       sellerName: product.sellerName,
       sellerLocation: product.sellerLocation,
       harvestDate: product.harvestDate,
@@ -38,6 +40,7 @@ class BasketCartItem {
   final String productId;
   final String productName;
   final String image;
+  final String? imageUrl;
   final String sellerName;
   final String sellerLocation;
   final String harvestDate;
@@ -56,6 +59,7 @@ class BasketCartItem {
       productId: productId,
       productName: productName,
       image: image,
+      imageUrl: imageUrl,
       sellerName: sellerName,
       sellerLocation: sellerLocation,
       harvestDate: harvestDate,

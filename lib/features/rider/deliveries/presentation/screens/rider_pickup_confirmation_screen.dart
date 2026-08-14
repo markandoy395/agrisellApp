@@ -7,8 +7,10 @@ import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/deliveries/data/pickup_proof_storage.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request_metadata.dart';
+import 'package:agresell_app/features/rider/deliveries/domain/delivery_status_update.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/pickup_confirmation.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_location_controller.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_pickup_problem_dialog.dart';
 
 part 'rider_pickup_confirmation_actions.dart';
@@ -19,12 +21,14 @@ class RiderPickupConfirmationScreen extends StatefulWidget {
     required this.request,
     required this.riderId,
     required this.controller,
+    this.locationController,
     super.key,
   });
 
   final DeliveryRequest request;
   final String riderId;
   final RiderDeliveryController controller;
+  final RiderLocationController? locationController;
 
   @override
   State<RiderPickupConfirmationScreen> createState() =>
@@ -40,9 +44,12 @@ class _RiderPickupConfirmationScreenState
   final _proofs = <PickupConfirmationMethod, String>{};
   final _checks = <String, bool>{};
   final _storage = PickupProofStorage();
+  final _idempotencyKey = Random.secure().nextInt(1 << 32).toString();
   PickupConfiguration? _configuration;
   String? _error;
+  List<PickupValidationIssue> _validationIssues = const [];
   var _submitting = false;
+  var _refreshingLocation = false;
   Timer? _waitingTimer;
   var _now = DateTime.now();
 
@@ -50,6 +57,7 @@ class _RiderPickupConfirmationScreenState
   void initState() {
     super.initState();
     _restoreRecovery();
+    widget.locationController?.addListener(_locationChanged);
     if (_quantity.text.isEmpty) {
       _quantity.text = _quantityFrom(widget.request.quantityDescription);
     }
@@ -65,6 +73,7 @@ class _RiderPickupConfirmationScreenState
         )
         .then((value) => _setConfiguration(value))
         .catchError((_) => _setError('Pickup setup could not load.'));
+    unawaited(_refreshPickupLocation(requestPermission: false));
   }
 
   @override
@@ -74,6 +83,7 @@ class _RiderPickupConfirmationScreenState
     _quantity.dispose();
     _weight.dispose();
     _waitingTimer?.cancel();
+    widget.locationController?.removeListener(_locationChanged);
     super.dispose();
   }
 
@@ -140,7 +150,20 @@ class _RiderPickupConfirmationScreenState
   }
 
   void _setError(String? value) {
-    if (mounted) setState(() => _error = value);
+    if (mounted) {
+      setState(() {
+        _error = value;
+        if (value == null) _validationIssues = const [];
+      });
+    }
+  }
+
+  void _setValidation(PickupCompletionValidation validation) {
+    if (!mounted) return;
+    setState(() {
+      _error = validation.isValid ? null : PickupCompletionValidation.heading;
+      _validationIssues = validation.issues;
+    });
   }
 
   void _setCheck(String label, bool value) {
@@ -155,5 +178,20 @@ class _RiderPickupConfirmationScreenState
 
   void _setSubmitting(bool value) {
     if (mounted) setState(() => _submitting = value);
+  }
+
+  void _locationChanged() {
+    final location = widget.locationController?.location;
+    widget.controller.updateCurrentRiderLocation(location);
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _refreshPickupLocation({required bool requestPermission}) async {
+    final locationController = widget.locationController;
+    if (locationController == null || _refreshingLocation) return;
+    setState(() => _refreshingLocation = true);
+    await locationController.refresh(requestPermission: requestPermission);
+    _locationChanged();
+    if (mounted) setState(() => _refreshingLocation = false);
   }
 }

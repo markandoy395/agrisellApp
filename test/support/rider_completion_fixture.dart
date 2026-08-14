@@ -44,6 +44,7 @@ InMemoryRiderDeliveryRepository completionRepository({
   Set<DeliveryConfirmationMethod> methods = const {
     DeliveryConfirmationMethod.confirmationCode,
     DeliveryConfirmationMethod.buyerConfirmation,
+    DeliveryConfirmationMethod.handoverPhoto,
     DeliveryConfirmationMethod.gpsLocation,
     DeliveryConfirmationMethod.timestamp,
   },
@@ -108,11 +109,15 @@ DeliveryCompletionCommand completionCommand({
       const {
         DeliveryConfirmationMethod.buyerConfirmation:
             'protected://delivery/delivery-1/buyer',
+        DeliveryConfirmationMethod.handoverPhoto:
+            'local-secure://delivery/delivery-1/handoverPhoto/evidence.jpg',
         DeliveryConfirmationMethod.gpsLocation:
             'protected://delivery/delivery-1/gps',
         DeliveryConfirmationMethod.timestamp:
             'protected://delivery/delivery-1/time',
       },
+  evidenceCapturedAt: location?.timestamp ?? DateTime.now(),
+  evidenceLocation: location ?? completionLocation(),
 );
 
 Future<void> reachGoingToBuyer(

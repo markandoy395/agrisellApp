@@ -19,7 +19,14 @@ class Rider {
     this.rating = 0,
     this.gpsLatitude,
     this.gpsLongitude,
+    this.locationLabel = '',
+    this.addressLine = '',
+    this.barangay = '',
+    this.cityMunicipality = '',
+    this.province = '',
+    this.postalCode = '',
     this.totalDeliveries = 0,
+    this.maximumActiveDeliveries = 1,
     this.employmentStatus = RiderEmploymentStatus.inactive,
     this.profilePhotoPath,
   });
@@ -38,7 +45,14 @@ class Rider {
   final String email;
   final double? gpsLatitude;
   final double? gpsLongitude;
+  final String locationLabel;
+  final String addressLine;
+  final String barangay;
+  final String cityMunicipality;
+  final String province;
+  final String postalCode;
   final int totalDeliveries;
+  final int maximumActiveDeliveries;
   final RiderEmploymentStatus employmentStatus;
   final String? profilePhotoPath;
 
@@ -46,7 +60,7 @@ class Rider {
     RiderEmploymentStatus.active => RiderVerificationStatus.verified,
     RiderEmploymentStatus.suspended => RiderVerificationStatus.suspended,
     RiderEmploymentStatus.pending => RiderVerificationStatus.pending,
-    RiderEmploymentStatus.inactive => RiderVerificationStatus.rejected,
+    RiderEmploymentStatus.inactive => RiderVerificationStatus.pending,
   };
 
   RiderDeliveryProgress get deliveryStatus =>
@@ -72,7 +86,16 @@ class Rider {
     email: _text(json['email']),
     gpsLatitude: _nullableNumber(json['gps_lat']),
     gpsLongitude: _nullableNumber(json['gps_long']),
+    locationLabel: _text(json['location_label']),
+    addressLine: _text(json['address_line']),
+    barangay: _text(json['barangay']),
+    cityMunicipality: _text(json['city_municipality']),
+    province: _text(json['province']),
+    postalCode: _text(json['postal_code']),
     totalDeliveries: _integer(json['total_deliveries']),
+    maximumActiveDeliveries: _positiveInteger(
+      json['maximum_active_deliveries'],
+    ),
     employmentStatus: RiderEmploymentStatus.values.firstWhere(
       (item) => item.name == json['employment_status'],
       orElse: () => RiderEmploymentStatus.inactive,
@@ -95,7 +118,14 @@ class Rider {
     'email': email.trim().toLowerCase(),
     'gps_lat': gpsLatitude,
     'gps_long': gpsLongitude,
+    'location_label': _blankToNull(locationLabel),
+    'address_line': _blankToNull(addressLine),
+    'barangay': _blankToNull(barangay),
+    'city_municipality': _blankToNull(cityMunicipality),
+    'province': _blankToNull(province),
+    'postal_code': _blankToNull(postalCode),
     'total_deliveries': totalDeliveries,
+    'maximum_active_deliveries': maximumActiveDeliveries,
     'employment_status': employmentStatus == RiderEmploymentStatus.pending
         ? RiderEmploymentStatus.inactive.name
         : employmentStatus.name,
@@ -113,8 +143,15 @@ class Rider {
     String? profilePhotoPath,
     double? gpsLatitude,
     double? gpsLongitude,
+    String? locationLabel,
+    String? addressLine,
+    String? barangay,
+    String? cityMunicipality,
+    String? province,
+    String? postalCode,
     RiderEmploymentStatus? employmentStatus,
     RiderDatabaseAvailability? availabilityStatus,
+    int? maximumActiveDeliveries,
   }) => Rider(
     riderId: riderId,
     logisticsCompanyId: logisticsCompanyId,
@@ -130,7 +167,15 @@ class Rider {
     email: email,
     gpsLatitude: gpsLatitude ?? this.gpsLatitude,
     gpsLongitude: gpsLongitude ?? this.gpsLongitude,
+    locationLabel: locationLabel ?? this.locationLabel,
+    addressLine: addressLine ?? this.addressLine,
+    barangay: barangay ?? this.barangay,
+    cityMunicipality: cityMunicipality ?? this.cityMunicipality,
+    province: province ?? this.province,
+    postalCode: postalCode ?? this.postalCode,
     totalDeliveries: totalDeliveries,
+    maximumActiveDeliveries:
+        maximumActiveDeliveries ?? this.maximumActiveDeliveries,
     employmentStatus: employmentStatus ?? this.employmentStatus,
     profilePhotoPath: profilePhotoPath ?? this.profilePhotoPath,
   );
@@ -152,3 +197,7 @@ double? _nullableNumber(Object? value) =>
     value is num ? value.toDouble() : double.tryParse(value?.toString() ?? '');
 int _integer(Object? value) =>
     value is num ? value.toInt() : int.tryParse(value?.toString() ?? '') ?? 0;
+int _positiveInteger(Object? value) {
+  final parsed = _integer(value);
+  return parsed > 0 ? parsed : 1;
+}

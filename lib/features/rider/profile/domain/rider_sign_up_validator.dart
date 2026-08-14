@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/utils/written_address.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_registration.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_registration_validator.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_draft.dart';
@@ -11,6 +12,11 @@ abstract final class RiderSignUpFields {
   static const mobile = 'mobile';
   static const email = 'email';
   static const location = 'location';
+  static const addressLine = 'addressLine';
+  static const province = 'province';
+  static const cityMunicipality = 'cityMunicipality';
+  static const barangay = 'barangay';
+  static const postalCode = 'postalCode';
   static const latitude = 'latitude';
   static const longitude = 'longitude';
   static const locationAccuracy = 'locationAccuracy';
@@ -39,6 +45,14 @@ abstract final class RiderSignUpValidator {
         'Enter a valid mobile number.',
       RiderSignUpFields.email when !_email.hasMatch(clean) =>
         'Enter a valid email address.',
+      RiderSignUpFields.location when !WrittenAddress.isValid(clean) =>
+        'Enter your written address.',
+      RiderSignUpFields.addressLine when clean.isEmpty =>
+        'Enter your house, building, or street address.',
+      RiderSignUpFields.province when clean.isEmpty => 'Select your province.',
+      RiderSignUpFields.cityMunicipality when clean.isEmpty =>
+        'Select your city or municipality.',
+      RiderSignUpFields.barangay when clean.isEmpty => 'Select your barangay.',
       RiderSignUpFields.vehicleType when _vehicle(draft) == null =>
         'Select a vehicle type.',
       RiderSignUpFields.plate when _requiresPlate(draft) && clean.isEmpty =>
@@ -53,6 +67,7 @@ abstract final class RiderSignUpValidator {
     required String licenseNumber,
     required String password,
     required String confirmPassword,
+    bool requireCoordinates = true,
   }) {
     final fields = switch (step) {
       RiderSignUpStep.personal => [
@@ -63,7 +78,12 @@ abstract final class RiderSignUpValidator {
         RiderSignUpFields.mobile,
         RiderSignUpFields.email,
       ],
-      RiderSignUpStep.address => const <String>[],
+      RiderSignUpStep.address => [
+        RiderSignUpFields.addressLine,
+        RiderSignUpFields.province,
+        RiderSignUpFields.cityMunicipality,
+        RiderSignUpFields.barangay,
+      ],
       RiderSignUpStep.vehicle => [
         RiderSignUpFields.vehicleType,
         RiderSignUpFields.plate,
@@ -76,8 +96,10 @@ abstract final class RiderSignUpValidator {
       final error = fieldError(field, draft.value(field), draft);
       if (error != null) return error;
     }
-    if (step == RiderSignUpStep.address && !_validCoordinates(draft)) {
-      return 'Choose a valid GPS location to continue.';
+    if (step == RiderSignUpStep.address &&
+        requireCoordinates &&
+        !hasValidCoordinates(draft)) {
+      return 'Allow location access so we can capture your exact location.';
     }
     if (step == RiderSignUpStep.documents &&
         _requiresLicense(draft) &&
@@ -124,7 +146,7 @@ abstract final class RiderSignUpValidator {
       _vehicle(draft)?.requiresLicense ?? false;
   static String _phone(String value) => value.replaceAll(RegExp(r'[ -]'), '');
 
-  static bool _validCoordinates(RiderSignUpDraft draft) {
+  static bool hasValidCoordinates(RiderSignUpDraft draft) {
     final latitude = double.tryParse(draft.value(RiderSignUpFields.latitude));
     final longitude = double.tryParse(draft.value(RiderSignUpFields.longitude));
     return latitude != null &&

@@ -4,17 +4,7 @@ extension _RiderHomeNavigation on _RiderHomeScreenState {
   Future<void> _selectTab(int index) async {
     if (index == _activeIndex) return;
     _setActiveIndex(index);
-    final disableAnimations =
-        MediaQuery.maybeOf(context)?.disableAnimations ?? false;
-    if (disableAnimations) {
-      _pageController.jumpToPage(index);
-      return;
-    }
-    await _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 280),
-      curve: Curves.easeOutCubic,
-    );
+    _pageController.jumpToPage(index);
   }
 
   void _openNotifications() {
@@ -50,6 +40,8 @@ extension _RiderHomeNavigation on _RiderHomeScreenState {
               request: request,
               controller: _deliveryController,
               riderId: _riderId ?? '',
+              locationController: _locationController,
+              onOpenConversation: _openDeliveryConversation,
             ),
           ),
         );
@@ -69,6 +61,7 @@ extension _RiderHomeNavigation on _RiderHomeScreenState {
             builder: (_) => RiderConversationPanel(
               controller: _messagesController,
               quickReplies: RiderQuickReply.defaults,
+              onAttachmentRequested: _captureCommunicationAttachment,
             ),
           ),
         );
@@ -80,5 +73,25 @@ extension _RiderHomeNavigation on _RiderHomeScreenState {
       case RiderNotificationDestination.none:
         return;
     }
+  }
+
+  Future<bool> _openDeliveryConversation(String deliveryId) async {
+    final conversation = _messagesController.conversations
+        .where((item) => item.deliveryId == deliveryId)
+        .firstOrNull;
+    if (conversation == null) return false;
+    await _messagesController.selectConversation(conversation);
+    if (!mounted) return false;
+    await Navigator.of(context).push(
+      agrisellPageRoute<void>(
+        builder: (_) => RiderConversationPanel(
+          controller: _messagesController,
+          quickReplies: RiderQuickReply.defaults,
+          onAttachmentRequested: _captureCommunicationAttachment,
+        ),
+      ),
+    );
+    _messagesController.closeConversation();
+    return true;
   }
 }

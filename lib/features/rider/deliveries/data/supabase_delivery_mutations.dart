@@ -1,6 +1,51 @@
 part of 'supabase_delivery_data_source.dart';
 
 extension SupabaseDeliveryMutations on SupabaseDeliveryDataSource {
+  Future<DeliveryStatusHistory> completePickupStatus({
+    required String deliveryId,
+    required DeliveryStatus previousStatus,
+    required String idempotencyKey,
+    required PickupCompletionCommand command,
+  }) => _guard(() async {
+    final checklist = command.checklist;
+    final location = command.location;
+    final value = await client.rpc(
+      'complete_pickup',
+      params: {
+        'p_delivery_id': deliveryId,
+        'p_previous_status': previousStatus.databaseValue,
+        'p_idempotency_key': idempotencyKey,
+        'p_latitude': location.latitude,
+        'p_longitude': location.longitude,
+        'p_accuracy_meters': location.accuracyMeters,
+        'p_location_captured_at': location.timestamp?.toUtc().toIso8601String(),
+        'p_is_mocked': location.isMocked,
+        'p_is_approximate': location.isApproximate,
+        'p_checklist': {
+          'correct_product': checklist.correctProduct,
+          'correct_quantity': checklist.correctQuantity,
+          'correct_weight': checklist.correctWeight,
+          'secure_packaging': checklist.securePackaging,
+          'not_visibly_damaged': checklist.notVisiblyDamaged,
+          'matches_request': checklist.matchesRequest,
+          'fits_vehicle': checklist.fitsVehicle,
+          'handling_instructions_received':
+              checklist.handlingInstructionsReceived,
+        },
+        'p_quantity': checklist.confirmedQuantity,
+        'p_weight_kg': checklist.confirmedWeightKg,
+      },
+    );
+    final history = _map(value)['history'];
+    if (history == null) {
+      throw const DeliveryDataException(
+        DeliveryDataFailureType.database,
+        'The pickup status history was not returned.',
+      );
+    }
+    return DeliveryStatusHistory.fromJson(_map(history));
+  });
+
   Future<Delivery> createDelivery(
     Delivery delivery, {
     Iterable<DeliveryLocation> locations = const [],
@@ -28,6 +73,14 @@ extension SupabaseDeliveryMutations on SupabaseDeliveryDataSource {
     );
     return Delivery.fromJson(_map(value));
   });
+
+  Future<void> declineDeliveryRequest({required String deliveryId}) =>
+      _guard(() async {
+        await client.rpc<Object?>(
+          'decline_delivery_request',
+          params: {'p_delivery_id': deliveryId},
+        );
+      });
 
   Future<DeliveryStatusHistory> updateDeliveryStatus({
     required String deliveryId,

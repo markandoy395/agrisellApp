@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_status_update.dart';
 
 class RiderManualArrivalOverride {
@@ -59,6 +60,10 @@ class _RiderManualArrivalDialogState extends State<RiderManualArrivalDialog> {
         ),
         const SizedBox(height: 10),
         DropdownButtonFormField<String>(
+          dropdownColor: AppDropdownStyle.menuColor,
+          borderRadius: AppDropdownStyle.menuBorderRadius,
+          style: AppDropdownStyle.textStyle,
+          iconEnabledColor: AppDropdownStyle.iconColor,
           initialValue: _reason,
           decoration: const InputDecoration(labelText: 'Reason'),
           items: [

@@ -22,19 +22,14 @@ extension RiderDeliveryControllerLoading on RiderDeliveryController {
     _errorMessage = null;
     _notify();
     final generation = ++_requestGeneration;
+    _activeRequestLoads++;
     try {
       final page = canLoadNearby
           ? await _repository.fetchNearbyRequests(_buildQuery())
           : null;
-      final assigned = page != null && page.items.isEmpty
-          ? (await _repository.fetchRequests(
-              riderId: riderId,
-              search: _search,
-            )).where(
-              (request) =>
-                  request.isAssignedTo(riderId) && !request.stage.isTerminal,
-            )
-          : const <DeliveryRequest>[];
+      // Assigned deliveries travel beside (not inside) the nearby page so the
+      // controller can reconcile both sets without a second backend query.
+      final assigned = page?.assignedItems ?? const <DeliveryRequest>[];
       final fetched = page == null
           ? removeReadyPickupRequests(
               await _repository.fetchRequests(
@@ -52,9 +47,30 @@ extension RiderDeliveryControllerLoading on RiderDeliveryController {
       if (generation != _requestGeneration) return;
       _loadState = RiderRequestLoadState.error;
       _errorMessage = 'Delivery requests could not be loaded.';
+    } finally {
+      _activeRequestLoads--;
+      _schedulePendingRealtimeRefresh();
     }
     _notify();
     await _persistState();
+  }
+
+  void _schedulePendingRealtimeRefresh() {
+    if (_activeRequestLoads != 0 || !_realtimeRefreshPending || _isDisposed) {
+      return;
+    }
+    _realtimeRefreshPending = false;
+    final riderId = _riderId;
+    if (riderId == null) return;
+    _realtimeDebounce?.cancel();
+    _realtimeDebounce = Timer(Duration.zero, () {
+      if (_isDisposed ||
+          (!canReceiveAdditionalDelivery &&
+              !_status.availability.isHandlingDelivery)) {
+        return;
+      }
+      unawaited(load(riderId: riderId));
+    });
   }
 
   Future<void> updateNearbySearch(RiderDeliverySearch search) async {

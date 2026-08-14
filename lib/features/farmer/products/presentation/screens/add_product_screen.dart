@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 import 'package:agresell_app/features/farmer/products/domain/farmer_dashboard_product.dart';

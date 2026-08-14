@@ -5,6 +5,22 @@ abstract interface class OrderRepository {
 
   Future<void> save(String accountId, Iterable<PlacedOrder> orders);
 
+  Future<void> submitFeedback({
+    required String accountId,
+    required String orderId,
+    required String productId,
+    int? productRating,
+    required String productComment,
+    int? riderRating,
+    String riderComment = '',
+  });
+
+  Future<void> createOrders({
+    required String accountId,
+    required Iterable<PlacedOrder> newOrders,
+    required Iterable<PlacedOrder> currentOrders,
+  });
+
   Future<void> markReadyForPickup({
     required String accountId,
     required String orderId,
@@ -26,6 +42,14 @@ abstract interface class OrderRepository {
     required String accountId,
     required String orderId,
     required String reference,
+  });
+}
+
+abstract interface class FarmerOrderCancellationRepository {
+  Future<void> cancelFarmerOrder({
+    required String accountId,
+    required String orderId,
+    required String reason,
   });
 }
 

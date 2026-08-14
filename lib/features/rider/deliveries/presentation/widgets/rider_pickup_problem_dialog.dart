@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/pickup_confirmation.dart';
 
 class PickupProblemDraft {
@@ -34,6 +35,10 @@ class _RiderPickupProblemDialogState extends State<RiderPickupProblemDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           DropdownButtonFormField<PickupProblemKind>(
+            dropdownColor: AppDropdownStyle.menuColor,
+            borderRadius: AppDropdownStyle.menuBorderRadius,
+            style: AppDropdownStyle.textStyle,
+            iconEnabledColor: AppDropdownStyle.iconColor,
             initialValue: _kind,
             items: [
               for (final kind in PickupProblemKind.values)

@@ -71,9 +71,16 @@ class RiderBatchDeliverySummary extends StatelessWidget {
                   value:
                       '${currentPlan.remainingCapacityKg.toStringAsFixed(1)} kg',
                 ),
+                _Metric(
+                  label: 'COD total',
+                  value:
+                      'PHP ${_codTotal(deliveries).toStringAsFixed(2)}',
+                ),
               ],
             ),
             const SizedBox(height: 10),
+            _StopSequence(title: 'Route order', stops: currentPlan.stops),
+            const SizedBox(height: 8),
             _StopSequence(
               title: 'Pickup sequence',
               stops: currentPlan.pickupSequence,
@@ -155,3 +162,9 @@ String _deadline(DeliveryRequest delivery) {
   final minute = value.minute.toString().padLeft(2, '0');
   return 'deadline $hour:$minute';
 }
+
+double _codTotal(Iterable<DeliveryRequest> deliveries) => deliveries.fold(
+  0,
+  (total, delivery) =>
+      total + (delivery.cashOnDelivery?.amountToCollect ?? 0),
+);

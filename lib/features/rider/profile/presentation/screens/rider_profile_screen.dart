@@ -8,6 +8,7 @@ import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/presentation/account_session_navigation.dart';
 import 'package:agresell_app/features/rider/profile/data/rider_registration_service.dart';
+import 'package:agresell_app/features/rider/profile/domain/rider_account_exit_policy.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
 import 'package:agresell_app/features/rider/safety/domain/rider_safety_action.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/controllers/rider_analytics_controller.dart';

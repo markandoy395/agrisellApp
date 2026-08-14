@@ -6,8 +6,10 @@ import 'package:agresell_app/features/auth/presentation/screens/account_switcher
 import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
 
 abstract final class AccountSessionNavigation {
-  static Future<void> openSwitcher(BuildContext context) {
-    return Navigator.of(context).push(
+  static Future<void> openSwitcher(BuildContext context) async {
+    await AuthSessionService.instance.preserveCurrentAccountForSwitch();
+    if (!context.mounted) return;
+    await Navigator.of(context).push(
       agrisellPageRoute<void>(builder: (_) => const AccountSwitcherScreen()),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:agresell_app/features/rider/chat/data/rider_message_repository.dart';
@@ -7,6 +8,7 @@ import 'package:agresell_app/features/rider/chat/domain/rider_conversation_acces
 import 'package:agresell_app/features/rider/chat/domain/rider_notification.dart';
 import 'package:agresell_app/features/rider/chat/presentation/controllers/rider_messages_controller.dart';
 import 'package:agresell_app/features/rider/chat/presentation/controllers/rider_notifications_controller.dart';
+import 'package:agresell_app/features/rider/chat/presentation/widgets/rider_chat_actions.dart';
 import 'package:agresell_app/features/rider/deliveries/data/rider_offline_action_queue.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/offline_delivery_action.dart';
 
@@ -20,6 +22,28 @@ void main() {
     historyDeliveryIds: {'delivery-2'},
     supportAuthorized: true,
   );
+
+  testWidgets('conversation actions only show implemented attachments', (
+    tester,
+  ) async {
+    RiderCommunicationActionType? selected;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: RiderConversationActionRow(
+            enabled: true,
+            onAction: (value) => selected = value,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Call'), findsNothing);
+    expect(find.text('Location'), findsOneWidget);
+    expect(find.text('Photo'), findsOneWidget);
+    await tester.tap(find.text('Photo'));
+    expect(selected, RiderCommunicationActionType.attachPhoto);
+  });
 
   test(
     'conversation access is limited to active, history, and support',
@@ -139,6 +163,22 @@ void main() {
       );
     },
   );
+
+  test('account switch can dispose messages while loading', () async {
+    final offlineQueue = RiderOfflineActionQueue(
+      repository: MemoryOfflineQueueRepository(),
+    );
+    final controller = RiderMessagesController(
+      repository: _repository(access),
+      offlineQueue: offlineQueue,
+    );
+
+    final loading = controller.load(riderId: 'rider-1', access: access);
+    controller.dispose();
+
+    await expectLater(loading, completes);
+    offlineQueue.dispose();
+  });
 
   _registerRetryTest(access);
 

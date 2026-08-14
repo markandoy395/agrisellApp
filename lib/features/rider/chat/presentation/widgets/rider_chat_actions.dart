@@ -54,12 +54,6 @@ class RiderConversationActionRow extends StatelessWidget {
     child: Row(
       children: [
         _ActionButton(
-          icon: Icons.call_outlined,
-          label: 'Call',
-          enabled: enabled,
-          onTap: () => onAction(RiderCommunicationActionType.call),
-        ),
-        _ActionButton(
           icon: Icons.share_location_outlined,
           label: 'Location',
           enabled: enabled,

@@ -69,14 +69,17 @@ class LocalAuthRegistrationStore {
   }) async {
     final email = data.email.trim().toLowerCase();
     final phoneNumber = _normalizePhone(data.phoneNumber);
-    if (_accounts.any(
-      (account) =>
-          account.email == email ||
-          (phoneNumber != null &&
-              _normalizePhone(account.phoneNumber) == phoneNumber),
-    )) {
+    if (_accounts.any((account) => account.email == email)) {
       throw const AuthRegistrationException(
         'An account with this email already exists.',
+      );
+    }
+    if (phoneNumber != null &&
+        _accounts.any(
+          (account) => _normalizePhone(account.phoneNumber) == phoneNumber,
+        )) {
+      throw const AuthRegistrationException(
+        'An account with this phone number already exists.',
       );
     }
     final hashedPassword = _passwordHasher.hash(data.password);

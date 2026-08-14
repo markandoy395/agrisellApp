@@ -76,6 +76,13 @@ class _OrderDetailsSheet extends StatelessWidget {
                 label: 'GCash reference',
                 value: order.payment.transactionReference,
               ),
+            if (order.payment.hasReceiptImage)
+              _DetailsLine(
+                label: 'Receipt image',
+                value: order.payment.receiptImageName.isEmpty
+                    ? 'Uploaded'
+                    : order.payment.receiptImageName,
+              ),
             if (order.payment.refundReference.isNotEmpty)
               _DetailsLine(
                 label: 'Refund reference',

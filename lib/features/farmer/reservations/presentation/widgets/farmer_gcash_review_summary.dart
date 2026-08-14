@@ -40,6 +40,35 @@ class FarmerGcashReviewSummary extends StatelessWidget {
         const SizedBox(height: 10),
         Row(
           children: [
+            Icon(
+              order.payment.hasReceiptImage
+                  ? Icons.image_outlined
+                  : Icons.warning_amber_rounded,
+              size: 17,
+              color: order.payment.hasReceiptImage
+                  ? AgrisellColors.statusGreenText
+                  : AgrisellColors.statusOrangeText,
+            ),
+            const SizedBox(width: 7),
+            Expanded(
+              child: Text(
+                order.payment.hasReceiptImage
+                    ? 'Receipt image uploaded'
+                    : 'No receipt image attached',
+                style: TextStyle(
+                  color: order.payment.hasReceiptImage
+                      ? AgrisellColors.statusGreenText
+                      : AgrisellColors.statusOrangeText,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
             const Expanded(
               child: Text(
                 'Expected amount',

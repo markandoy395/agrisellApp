@@ -26,9 +26,7 @@ class AuthCard extends StatelessWidget {
     final keyboardGap = isKeyboardVisible ? 12.0 : 0.0;
     final keyboardCompaction = isKeyboardVisible ? 8.0 : 0.0;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 220),
-      curve: Curves.easeOutCubic,
+    return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(
         lerpDouble(30, 42, scale),

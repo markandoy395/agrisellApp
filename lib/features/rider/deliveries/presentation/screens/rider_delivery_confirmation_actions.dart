@@ -48,11 +48,16 @@ extension _RiderDeliveryConfirmationActions
 
   Future<void> _capturePhoto() async {
     try {
-      final reference = await _storage.capturePhoto(
+      final evidence = await _storage.captureEvidence(
         deliveryId: widget.request.id,
       );
-      if (reference != null && mounted) {
-        _update(() => _photoReference = reference);
+      if (evidence != null && mounted) {
+        _update(() {
+          _photoReference = evidence.secureReference;
+          _photoPreviewBytes = evidence.previewBytes;
+          _photoCapturedAt = evidence.capturedAt;
+          _photoLocation = widget.controller.currentRiderLocation;
+        });
         _saveRecovery();
       }
     } on DeliveryProofStorageException catch (error) {
@@ -61,6 +66,11 @@ extension _RiderDeliveryConfirmationActions
   }
 
   Future<void> _submit() async {
+    if (_submitting) return;
+    if (_photoReference?.trim().isEmpty ?? true) {
+      _message('Capture delivery evidence before completing delivery.');
+      return;
+    }
     final configuration = _configuration;
     final location = widget.controller.currentRiderLocation;
     if (configuration == null || location == null) {
@@ -77,9 +87,11 @@ extension _RiderDeliveryConfirmationActions
           idempotencyKey: _idempotencyKey,
           finalLocation: location,
           proofReferences: proofs,
+          evidenceCapturedAt: _photoCapturedAt,
+          evidenceLocation: _photoLocation,
           confirmationCode: _code.text,
           qrPayload: _qr.text,
-          recipientName: _recipient.text,
+          recipientName: widget.request.buyerName,
           deliveryNotes: _notes.text,
           cashCollection: _cashSubmission(),
         ),
@@ -110,7 +122,7 @@ extension _RiderDeliveryConfirmationActions
       final attested = switch (method) {
         DeliveryConfirmationMethod.buyerConfirmation => _buyerConfirmed,
         DeliveryConfirmationMethod.recipientName =>
-          _recipient.text.trim().isNotEmpty,
+          widget.request.buyerName.trim().isNotEmpty,
         DeliveryConfirmationMethod.deliveryNotes =>
           _notes.text.trim().isNotEmpty,
         DeliveryConfirmationMethod.gpsLocation ||

@@ -97,7 +97,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final saved = await BuyerShippingAddressSaver.save(_profile, address);
     if (!mounted) return;
     setState(() => _profile = saved);
-    _showMessage('Shipping address saved.');
   }
 
   Future<void> _pickAvatarImage() async {

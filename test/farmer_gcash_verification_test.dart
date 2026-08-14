@@ -22,14 +22,23 @@ void main() {
       items: [BasketCartItem.fromProduct(testHomeProducts.first)],
       deliveryAddress: 'Test address',
       phoneNumber: '09171234567',
-      payment: OrderPayment.gcash('1234567890123'),
+      payment: OrderPayment.gcash(
+        '1234567890123',
+        receiptImageReference: 'local-secure://gcash-receipts/test',
+        receiptImageName: 'gcash-receipt.png',
+      ),
     );
 
     await tester.pumpWidget(
       const MaterialApp(home: Scaffold(body: FarmerReserveScreen())),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Verification pending'), findsOneWidget);
+    await tester.tap(
+      find.byKey(ValueKey('farmer-order-card-${controller.orders.single.id}')),
+    );
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Verification pending').first);
+    expect(find.text('Verification pending'), findsWidgets);
     expect(find.text('Review'), findsOneWidget);
     expect(find.text('Accept order'), findsNothing);
 
@@ -37,6 +46,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Review GCash reference'), findsOneWidget);
     expect(find.text('1234567890123'), findsOneWidget);
+    expect(find.text('Receipt image uploaded'), findsOneWidget);
     await tester.tap(find.text('Verify'));
     await tester.pumpAndSettle();
 
@@ -44,6 +54,9 @@ void main() {
       controller.orders.single.payment.status,
       OrderPaymentStatus.verified,
     );
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Accept order').first);
     expect(find.text('Accept order'), findsOneWidget);
     await tester.tap(find.text('Accept order'));
     await tester.pumpAndSettle();
@@ -71,7 +84,12 @@ void main() {
       const MaterialApp(home: Scaffold(body: FarmerReserveScreen())),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Refund required'), findsOneWidget);
+    await tester.tap(
+      find.byKey(ValueKey('farmer-order-card-${controller.orders.single.id}')),
+    );
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Refund required').first);
+    expect(find.text('Refund required'), findsWidgets);
     expect(find.text('Refund'), findsOneWidget);
 
     await tester.tap(find.text('Refund'));

@@ -1,35 +1,54 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
-import 'package:agresell_app/features/auth/presentation/auth_dashboard_router.dart';
+import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_scaffold.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/otp_verification_screen.dart';
+import 'package:agresell_app/features/farmer/registration/domain/farmer_signup_data.dart';
 import 'package:agresell_app/features/farmer/registration/domain/farmer_signup_validator.dart';
+import 'package:agresell_app/features/farmer/registration/presentation/screens/farmer_registration_submitted_screen.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/controllers/farmer_signup_controllers.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_account_step.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_farm_step.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_personal_step.dart';
-import 'package:agresell_app/features/shared/location/domain/confirmed_location.dart';
-import 'package:agresell_app/features/shared/location/presentation/location_selector.dart';
+import 'package:agresell_app/features/shared/location/data/gps_location_gateway.dart';
 
 part 'farmer_sign_up_actions.dart';
 part 'farmer_sign_up_validation.dart';
 
 class FarmerSignUpScreen extends StatefulWidget {
-  const FarmerSignUpScreen({super.key});
+  const FarmerSignUpScreen({this.gpsGateway, super.key});
+
+  final GpsLocationGateway? gpsGateway;
+
   @override
   State<FarmerSignUpScreen> createState() => _FarmerSignUpScreenState();
 }
 
 class _FarmerSignUpScreenState extends State<FarmerSignUpScreen> {
   final _controllers = FarmerSignupControllers();
+  late final GpsLocationGateway _gpsGateway;
   final _errors = <String, String?>{};
+  Future<void>? _captureFarmLocationRequest;
   var _step = 0;
   var _showAllErrors = false;
   var _isSubmitting = false;
+  var _isCapturingLocation = false;
+  var _requestedFarmLocation = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _gpsGateway = widget.gpsGateway ?? GeolocatorGpsLocationGateway();
+  }
+
   @override
   void dispose() {
     _controllers.dispose();
@@ -96,7 +115,6 @@ class _FarmerSignUpScreenState extends State<FarmerSignUpScreen> {
       controllers: _controllers,
       errors: _errors,
       onChanged: _onChanged,
-      onPickLocation: _pickLocation,
       onPickImage: () => _pickImage(profile: false),
     ),
   };
@@ -129,7 +147,11 @@ class _FarmerSignUpScreenState extends State<FarmerSignUpScreen> {
   void _onChanged() => setState(() => _validateCurrent(showEmpty: false));
   void _refresh(VoidCallback update) => setState(update);
 
-  void _next() {
+  Future<void> _next() async {
+    if (_step == 2 && !_hasFarmCoordinates) {
+      await _captureFarmLocation();
+      if (!mounted) return;
+    }
     setState(() {
       _showAllErrors = true;
       _validateCurrent(showEmpty: true);
@@ -137,11 +159,17 @@ class _FarmerSignUpScreenState extends State<FarmerSignUpScreen> {
     if (_errors.values.any((error) => error != null)) return;
     if (_step < 2) {
       FocusManager.instance.primaryFocus?.unfocus();
+      late final bool enteredFarmStep;
       setState(() {
         _step += 1;
+        enteredFarmStep = _step == 2 && !_requestedFarmLocation;
         _showAllErrors = false;
         _errors.clear();
       });
+      if (enteredFarmStep) {
+        _requestedFarmLocation = true;
+        unawaited(_captureFarmLocation());
+      }
       return;
     }
     _submit();

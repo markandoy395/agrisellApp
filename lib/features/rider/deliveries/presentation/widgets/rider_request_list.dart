@@ -6,6 +6,7 @@ import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_location_controller.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/screens/rider_delivery_details_screen.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_request_card.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_request_list_states.dart';
@@ -17,19 +18,23 @@ class RiderRequestList extends StatelessWidget {
   const RiderRequestList({
     required this.controller,
     required this.riderId,
+    this.locationController,
     this.onRetryLocation,
     this.onOpenLocationSettings,
     this.onOpenAppSettings,
     this.onOpenProfile,
+    this.onOpenConversation,
     super.key,
   });
 
   final RiderDeliveryController controller;
   final String? riderId;
+  final RiderLocationController? locationController;
   final VoidCallback? onRetryLocation;
   final VoidCallback? onOpenLocationSettings;
   final VoidCallback? onOpenAppSettings;
   final VoidCallback? onOpenProfile;
+  final Future<bool> Function(String deliveryId)? onOpenConversation;
 
   @override
   Widget build(BuildContext context) {
@@ -134,6 +139,8 @@ class RiderRequestList extends StatelessWidget {
                     request: request,
                     controller: controller,
                     riderId: riderId!,
+                    locationController: locationController,
+                    onOpenConversation: onOpenConversation,
                   ),
                 ),
               ),

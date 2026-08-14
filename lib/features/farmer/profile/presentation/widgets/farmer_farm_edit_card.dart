@@ -104,6 +104,7 @@ class _FarmerFarmEditCardState extends State<FarmerFarmEditCard> {
       if (!mounted) return;
       setState(() => _farm = farm);
       _message('Farm details saved.');
+      widget.onCancel();
     } on FarmerFarmException catch (error) {
       if (mounted) _message(error.message);
     } finally {

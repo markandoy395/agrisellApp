@@ -77,6 +77,24 @@ class _RecordingOrderRepository implements OrderRepository {
   var saveCalls = 0;
 
   @override
+  Future<void> submitFeedback({
+    required String accountId,
+    required String orderId,
+    required String productId,
+    int? productRating,
+    required String productComment,
+    int? riderRating,
+    String riderComment = '',
+  }) async {}
+
+  @override
+  Future<void> createOrders({
+    required String accountId,
+    required Iterable<PlacedOrder> newOrders,
+    required Iterable<PlacedOrder> currentOrders,
+  }) async {}
+
+  @override
   Future<List<PlacedOrder>> load(String accountId) async => [
     PlacedOrder(
       id: 'ORD-1',

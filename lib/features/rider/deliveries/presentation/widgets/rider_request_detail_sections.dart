@@ -102,6 +102,11 @@ class RiderRequestDetailSections extends StatelessWidget {
       ]),
       const SizedBox(height: 10),
       _section('Other information', [
+        if (request.isFarmerSelectedRequest)
+          _line(
+            Icons.person_search_outlined,
+            'Selected by the farmer — accept or decline before expiry',
+          ),
         if (request.paymentMethod.isNotEmpty)
           _line(Icons.account_balance_wallet_outlined, request.paymentMethod),
         if (request.cashOnDelivery case final cash?) ...[

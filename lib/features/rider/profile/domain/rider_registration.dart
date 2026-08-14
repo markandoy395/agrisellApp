@@ -10,6 +10,11 @@ class RiderRegistration {
     required this.gpsLatitude,
     required this.gpsLongitude,
     this.locationLabel = '',
+    this.addressLine = '',
+    this.barangay = '',
+    this.cityMunicipality = '',
+    this.province = '',
+    this.postalCode = '',
     this.locationNotes = '',
     this.gpsAccuracyMeters,
     this.locationCapturedAt,
@@ -35,6 +40,11 @@ class RiderRegistration {
   final double? gpsLatitude;
   final double? gpsLongitude;
   final String locationLabel;
+  final String addressLine;
+  final String barangay;
+  final String cityMunicipality;
+  final String province;
+  final String postalCode;
   final String locationNotes;
   final double? gpsAccuracyMeters;
   final DateTime? locationCapturedAt;
@@ -56,7 +66,16 @@ class RiderRegistration {
   ].where((part) => part.trim().isNotEmpty).join(' ');
 }
 
-enum RiderVehicleType { motorcycle, bicycle, eBike, tricycle, car, van, other }
+enum RiderVehicleType {
+  motorcycle,
+  bicycle,
+  eBike,
+  tricycle,
+  car,
+  van,
+  truck,
+  other,
+}
 
 extension RiderVehicleTypeDetails on RiderVehicleType {
   String get label => switch (this) {
@@ -66,6 +85,7 @@ extension RiderVehicleTypeDetails on RiderVehicleType {
     RiderVehicleType.tricycle => 'Tricycle',
     RiderVehicleType.car => 'Car',
     RiderVehicleType.van => 'Van',
+    RiderVehicleType.truck => 'Truck',
     RiderVehicleType.other => 'Other delivery vehicle',
   };
 

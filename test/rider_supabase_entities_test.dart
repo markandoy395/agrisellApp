@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:agresell_app/features/rider/dashboard/domain/rider_availability.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_location.dart';
 import 'package:agresell_app/features/rider/profile/data/rider_remote_data_source.dart';
 import 'package:agresell_app/features/rider/profile/data/rider_repository_impl.dart';
@@ -20,7 +21,14 @@ void main() {
       'contact_number': '09171234567',
       'gps_lat': 8.48,
       'gps_long': 124.65,
+      'location_label': 'Cagayan de Oro City, Misamis Oriental',
+      'address_line': '12 Rizal Street',
+      'barangay': 'Cogon',
+      'city_municipality': 'Cagayan de Oro City',
+      'province': 'Misamis Oriental',
+      'postal_code': '9000',
       'total_deliveries': 4,
+      'maximum_active_deliveries': 5,
       'employment_status': 'inactive',
       'availability_status': 'offline',
     });
@@ -28,8 +36,18 @@ void main() {
     expect(rider.fullName, 'Ana Maria Reyes');
     expect(rider.licenseNumber, 'N01-23-456789');
     expect(rider.gpsLatitude, 8.48);
+    expect(rider.locationLabel, 'Cagayan de Oro City, Misamis Oriental');
+    expect(rider.addressLine, '12 Rizal Street');
+    expect(rider.toJson()['barangay'], 'Cogon');
     expect(rider.employmentStatus.name, 'inactive');
+    expect(rider.maximumActiveDeliveries, 5);
+    expect(rider.toJson()['maximum_active_deliveries'], 5);
+    expect(rider.verificationStatus, RiderVerificationStatus.pending);
     expect(rider.toJson()['vehicle_plate_number'], 'ABC 1234');
+    expect(
+      rider.toJson()['location_label'],
+      'Cagayan de Oro City, Misamis Oriental',
+    );
     expect(rider.toJson(), isNot(contains('service_radius_km')));
   });
 
@@ -64,14 +82,25 @@ void main() {
       'last_name': 'Santos',
       'email': 'ana@example.com',
       'contact_number': '09171234567',
+      'location_label': 'Lapasan, Cagayan de Oro City',
+      'address_line': '18 Corrales Avenue',
+      'barangay': 'Lapasan',
+      'city_municipality': 'Cagayan de Oro City',
+      'province': 'Misamis Oriental',
     });
 
     await repository.updateRider(rider);
 
     expect(remote.riderUpdate, isNot(contains('logistics_company_id')));
     expect(remote.riderUpdate, isNot(contains('email')));
+    expect(remote.riderUpdate, isNot(contains('maximum_active_deliveries')));
     expect(remote.riderUpdate?['full_name'], 'Ana Santos');
     expect(remote.riderUpdate?['license_number'], 'N01-23-456789');
+    expect(
+      remote.riderUpdate?['location_label'],
+      'Lapasan, Cagayan de Oro City',
+    );
+    expect(remote.riderUpdate?['barangay'], 'Lapasan');
   });
 }
 

@@ -125,7 +125,12 @@ class RiderRequestQuery {
 }
 
 class RiderRequestPage {
-  const RiderRequestPage({required this.items, this.nextCursor});
+  const RiderRequestPage({
+    required this.items,
+    this.assignedItems = const <DeliveryRequest>[],
+    this.nextCursor,
+  });
   final List<DeliveryRequest> items;
+  final List<DeliveryRequest> assignedItems;
   final String? nextCursor;
 }

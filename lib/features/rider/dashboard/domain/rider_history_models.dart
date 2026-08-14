@@ -42,6 +42,7 @@ class RiderDeliveryHistoryEntry {
     this.earningStatus = DeliveryEarningStatus.pending,
     this.earning,
     this.cashCollection,
+    this.deliveryEvidence,
   }) : assert(id != ''),
        assert(orderNumber != ''),
        assert(deliveryFee >= 0),
@@ -69,33 +70,44 @@ class RiderDeliveryHistoryEntry {
   final DeliveryEarningStatus earningStatus;
   final DeliveryEarningBreakdown? earning;
   final CashCollectionRecord? cashCollection;
+  final DeliveryProof? deliveryEvidence;
 
   bool get hasProof => proofTypes.isNotEmpty;
   bool get isEditable => false;
 
   factory RiderDeliveryHistoryEntry.fromCompletion(
     DeliveryCompletionRecord record,
-  ) => RiderDeliveryHistoryEntry(
-    id: record.request.id,
-    orderNumber: record.request.orderNumber,
-    completedAt: record.completedAt,
-    pickupAddress: record.request.pickupLocation.address,
-    deliveryAddress: record.request.deliveryLocation.address,
-    productName: record.request.productName,
-    quantityDescription: record.request.quantityDescription,
-    deliveryFee: record.earning?.netEarning ?? record.request.deliveryFee,
-    status: RiderHistoryStatus.completed,
-    sellerName: record.request.sellerName,
-    buyerName: record.request.buyerName,
-    paymentStatus: RiderHistoryPaymentStatus.pending,
-    proofTypes: [for (final proof in record.request.proofs) proof.type],
-    timeline: record.events,
-    deliveryNotes: record.deliveryNotes,
-    recipientName: record.recipientName,
-    earningStatus: record.earningStatus,
-    earning: record.earning,
-    cashCollection: record.cashCollection,
-  );
+  ) {
+    DeliveryProof? evidence;
+    for (final proof in record.request.proofs) {
+      if (proof.type == DeliveryProofType.deliveryPhoto) {
+        evidence = proof;
+        break;
+      }
+    }
+    return RiderDeliveryHistoryEntry(
+      id: record.request.id,
+      orderNumber: record.request.orderNumber,
+      completedAt: record.completedAt,
+      pickupAddress: record.request.pickupLocation.address,
+      deliveryAddress: record.request.deliveryLocation.address,
+      productName: record.request.productName,
+      quantityDescription: record.request.quantityDescription,
+      deliveryFee: record.earning?.netEarning ?? record.request.deliveryFee,
+      status: RiderHistoryStatus.completed,
+      sellerName: record.request.sellerName,
+      buyerName: record.request.buyerName,
+      paymentStatus: RiderHistoryPaymentStatus.pending,
+      proofTypes: [for (final proof in record.request.proofs) proof.type],
+      timeline: record.events,
+      deliveryNotes: record.deliveryNotes,
+      recipientName: record.recipientName,
+      earningStatus: record.earningStatus,
+      earning: record.earning,
+      cashCollection: record.cashCollection,
+      deliveryEvidence: evidence,
+    );
+  }
 
   bool matchesSearch(String query) {
     final value = query.trim().toLowerCase();

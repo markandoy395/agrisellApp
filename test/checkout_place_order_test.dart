@@ -6,6 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:agresell_app/core/constants/agrisell_routes.dart';
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
+import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
+import 'package:agresell_app/features/auth/data/auth_session_service.dart';
+import 'package:agresell_app/features/auth/domain/buyer_shipping_address.dart';
+import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_controller.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/screens/basket_screen.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/screens/checkout_screen.dart';
@@ -35,6 +39,8 @@ void main() {
   tearDown(() {
     basket.clear();
     orders.clear();
+    AuthSessionService.instance.clearMemoryForTesting();
+    AuthRegistrationService.instance.clearForTesting();
   });
 
   testWidgets('place order moves checkout items to To Ship', (tester) async {
@@ -89,5 +95,58 @@ void main() {
     expect(find.text('Order Details'), findsOneWidget);
     expect(find.text('Delivery Address'), findsOneWidget);
     semantics.dispose();
+  });
+
+  testWidgets('checkout accepts saved buyer shipping coordinates', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    AuthRegistrationService.instance.clearForTesting();
+    AuthSessionService.instance.clearMemoryForTesting();
+    var account = await AuthRegistrationService.instance.register(
+      const SignUpAccountData(
+        firstName: 'Buyer',
+        lastName: 'One',
+        email: 'buyer-location@example.com',
+        password: 'Password1!',
+        shippingAddress:
+            'Purok 5, Barangay Hubang, San Francisco, Agusan del Sur, Philippines',
+      ),
+      AuthRole.buyer,
+    );
+    account = await AuthRegistrationService.instance.saveBuyerShippingAddress(
+      account,
+      const BuyerShippingAddress(
+        address:
+            'Purok 5, Barangay Hubang, San Francisco, Agusan del Sur, Philippines',
+        latitude: 8.4822,
+        longitude: 124.6472,
+      ),
+    );
+    await AuthSessionService.instance.start(account, rememberMe: false);
+
+    basket.addProduct(testHomeProducts[0], quantity: 1);
+    await tester.pumpWidget(
+      MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: AgrisellTheme.light,
+        routes: {
+          AgrisellRoutes.basket: (_) => const BasketScreen(),
+          AgrisellRoutes.checkout: (_) => const CheckoutScreen(),
+        },
+        home: const CheckoutScreen(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Place Order'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Confirm your exact delivery map location first.'),
+      findsNothing,
+    );
+    expect(orders.toShipOrders, hasLength(1));
+    expect(orders.toShipOrders.single.deliveryLatitude, 8.4822);
+    expect(orders.toShipOrders.single.deliveryLongitude, 124.6472);
   });
 }

@@ -8,11 +8,13 @@ void main() {
       'farm_id': 7,
       'category_id': 12,
       'commodity_name': 'Tomato',
+      'available_quantity': 50,
     };
 
     final update = FarmerCommodityWriteValues.forUpdate(source);
 
     expect(update, {'category_id': 12, 'commodity_name': 'Tomato'});
     expect(source['farm_id'], 7);
+    expect(source['available_quantity'], 50);
   });
 }

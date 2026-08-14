@@ -32,6 +32,10 @@ class _RouteMetrics extends StatelessWidget {
           if (controller.routes.length > 1)
             DropdownButtonHideUnderline(
               child: DropdownButton<int>(
+                dropdownColor: AppDropdownStyle.menuColor,
+                borderRadius: AppDropdownStyle.menuBorderRadius,
+                style: AppDropdownStyle.textStyle.copyWith(fontSize: 12),
+                iconEnabledColor: AppDropdownStyle.iconColor,
                 isDense: true,
                 value: controller.routes.indexOf(route),
                 items: [

@@ -5,6 +5,7 @@ import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.d
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_location_controller.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/screens/rider_delivery_details_screen.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_progress_timeline.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
@@ -16,15 +17,19 @@ class RiderActiveDeliveryList extends StatelessWidget {
   const RiderActiveDeliveryList({
     required this.controller,
     required this.riderId,
+    this.locationController,
+    this.onOpenConversation,
     super.key,
   });
 
   final RiderDeliveryController controller;
   final String? riderId;
+  final RiderLocationController? locationController;
+  final Future<bool> Function(String deliveryId)? onOpenConversation;
 
   @override
   Widget build(BuildContext context) {
-    final active = controller.requests
+    final active = controller.routeOrderedRequests
         .where(
           (item) =>
               item.stage != DeliveryStage.readyForPickup &&
@@ -54,6 +59,8 @@ class RiderActiveDeliveryList extends StatelessWidget {
           request: active[deliveryIndex],
           controller: controller,
           riderId: riderId,
+          locationController: locationController,
+          onOpenConversation: onOpenConversation,
         );
       },
     );
@@ -65,11 +72,15 @@ class _ActiveDeliveryCard extends StatelessWidget {
     required this.request,
     required this.controller,
     required this.riderId,
+    this.locationController,
+    this.onOpenConversation,
   });
 
   final DeliveryRequest request;
   final RiderDeliveryController controller;
   final String? riderId;
+  final RiderLocationController? locationController;
+  final Future<bool> Function(String deliveryId)? onOpenConversation;
 
   @override
   Widget build(BuildContext context) {
@@ -111,6 +122,8 @@ class _ActiveDeliveryCard extends StatelessWidget {
                           request: request,
                           controller: controller,
                           riderId: riderId!,
+                          locationController: locationController,
+                          onOpenConversation: onOpenConversation,
                         ),
                       ),
                     );

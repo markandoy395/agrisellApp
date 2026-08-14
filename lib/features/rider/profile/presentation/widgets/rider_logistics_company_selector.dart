@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/profile/data/logistics_company_repository.dart';
 import 'package:agresell_app/features/rider/profile/domain/logistics_company.dart';
@@ -61,6 +62,10 @@ class _RiderLogisticsCompanySelectorState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           DropdownButtonFormField<String>(
+            dropdownColor: AppDropdownStyle.menuColor,
+            borderRadius: AppDropdownStyle.menuBorderRadius,
+            style: AppDropdownStyle.textStyle,
+            iconEnabledColor: AppDropdownStyle.iconColor,
             key: ValueKey(value),
             initialValue: value,
             isExpanded: true,

@@ -1,14 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_action_result.dart';
 import 'package:agresell_app/features/rider/deliveries/data/delivery_proof_storage.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
+import 'package:agresell_app/features/rider/deliveries/domain/google_maps_route.dart';
+import 'package:agresell_app/features/rider/deliveries/domain/delivery_proof.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_status.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_location_controller.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_acceptance_dialog.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_detail_utilities.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_action_panel.dart';
@@ -27,6 +31,7 @@ import 'package:agresell_app/features/rider/safety/presentation/widgets/rider_sa
 import 'package:agresell_app/features/rider/safety/presentation/controllers/rider_safety_report_controller.dart';
 import 'package:agresell_app/features/rider/safety/domain/rider_safety_report.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_request_overview.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_evidence_view.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_request_detail_sections.dart';
 
 part 'rider_delivery_details_acceptance.dart';
@@ -39,12 +44,18 @@ class RiderDeliveryDetailsScreen extends StatefulWidget {
     required this.request,
     required this.controller,
     required this.riderId,
+    this.locationController,
+    this.routeLauncher,
+    this.onOpenConversation,
     super.key,
   });
 
   final DeliveryRequest request;
   final RiderDeliveryController controller;
   final String riderId;
+  final RiderLocationController? locationController;
+  final Future<bool> Function(Uri uri)? routeLauncher;
+  final Future<bool> Function(String deliveryId)? onOpenConversation;
 
   @override
   State<RiderDeliveryDetailsScreen> createState() =>
@@ -143,6 +154,10 @@ class _RiderDeliveryDetailsScreenState
       context,
     ).showAppSnackBar(SnackBar(content: Text(message)));
   }
+
+  Future<bool> _launchRoute(Uri uri) =>
+      widget.routeLauncher?.call(uri) ??
+      launchUrl(uri, mode: LaunchMode.externalApplication);
 
   void _applyAcceptanceState({required bool isOpen, DeliveryRequest? request}) {
     setState(() {

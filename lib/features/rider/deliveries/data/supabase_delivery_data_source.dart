@@ -14,6 +14,7 @@ import '../domain/delivery_requirement.dart';
 import '../domain/delivery_status.dart';
 import '../domain/delivery_status_history.dart';
 import '../domain/delivery_status_update.dart';
+import '../domain/pickup_confirmation.dart';
 
 part 'supabase_delivery_mutations.dart';
 part 'supabase_delivery_proofs.dart';

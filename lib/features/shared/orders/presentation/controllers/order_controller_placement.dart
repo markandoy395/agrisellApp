@@ -71,7 +71,7 @@ extension OrderControllerPlacement on OrderController {
     }
     _commitChange(persist: false);
     try {
-      await _persistOrders();
+      await _persistNewOrders(newOrders);
     } on Object {
       _orders.removeWhere(newOrders.contains);
       final addedNotificationCount =
@@ -83,6 +83,28 @@ extension OrderControllerPlacement on OrderController {
       rethrow;
     }
     return List<PlacedOrder>.unmodifiable(newOrders);
+  }
+
+  Future<void> _persistNewOrders(Iterable<PlacedOrder> newOrders) {
+    final accountId = _accountId;
+    if (accountId == null) return Future<void>.value();
+    final previousWrite = _pendingPersistence;
+    final additions = List<PlacedOrder>.of(newOrders);
+    final snapshot = List<PlacedOrder>.of(_orders);
+    final write = () async {
+      try {
+        await previousWrite;
+      } on Object {
+        // A new checkout must not be blocked by an older stale snapshot.
+      }
+      await _repository.createOrders(
+        accountId: accountId,
+        newOrders: additions,
+        currentOrders: snapshot,
+      );
+    }();
+    _pendingPersistence = write;
+    return write;
   }
 
   String _sellerKey(BasketCartItem item) {

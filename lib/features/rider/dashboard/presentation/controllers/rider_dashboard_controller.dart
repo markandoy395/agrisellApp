@@ -141,8 +141,7 @@ class RiderDashboardController extends ChangeNotifier {
 }
 
 RiderDashboardRepository _defaultDashboardRepository() {
-  if (AgrisellSupabase.isInitialized &&
-      AgrisellSupabase.client.auth.currentUser != null) {
+  if (AgrisellSupabase.isInitialized) {
     return SupabaseRiderDashboardRepository();
   }
   return const TemporaryLocalRiderDashboardRepository();

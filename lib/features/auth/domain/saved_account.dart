@@ -7,6 +7,7 @@ class SavedAccount {
     required this.lastName,
     required this.email,
     required this.role,
+    this.profileImageUrl,
   });
 
   factory SavedAccount.fromAccount(RegisteredAccount account) {
@@ -16,6 +17,7 @@ class SavedAccount {
       lastName: account.lastName,
       email: account.email,
       role: account.role,
+      profileImageUrl: account.profileImageUrl,
     );
   }
 
@@ -26,6 +28,7 @@ class SavedAccount {
       lastName: _text(json['lastName']),
       email: _requiredText(json['email']),
       role: _requiredText(json['role']),
+      profileImageUrl: _nullableText(json['profileImageUrl']),
     );
   }
 
@@ -34,6 +37,7 @@ class SavedAccount {
   final String lastName;
   final String email;
   final String role;
+  final String? profileImageUrl;
 
   String get displayName {
     final name = [
@@ -51,10 +55,16 @@ class SavedAccount {
     'lastName': lastName,
     'email': email,
     'role': role,
+    if (profileImageUrl != null) 'profileImageUrl': profileImageUrl!,
   };
 }
 
 String _text(Object? value) => value?.toString().trim() ?? '';
+
+String? _nullableText(Object? value) {
+  final text = _text(value);
+  return text.isEmpty ? null : text;
+}
 
 String _requiredText(Object? value) {
   final text = _text(value);

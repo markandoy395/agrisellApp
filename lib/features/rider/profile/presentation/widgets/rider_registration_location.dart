@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/utils/written_address.dart';
 import 'package:agresell_app/features/shared/location/domain/confirmed_location.dart';
 
 class RiderRegistrationLocation {
@@ -18,6 +19,7 @@ class RiderRegistrationLocation {
   final String? notes;
 
   String get label =>
+      WrittenAddress.valueOrNull(address) ??
       '${latitude.toStringAsFixed(5)}, ${longitude.toStringAsFixed(5)}';
 
   factory RiderRegistrationLocation.fromConfirmed(ConfirmedLocation value) =>

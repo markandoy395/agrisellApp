@@ -19,6 +19,8 @@ class OrderJsonCodec {
 
   static Map<String, Object?> encodeOrder(PlacedOrder order) => {
     'id': order.id,
+    if (order.buyerId.isNotEmpty) 'buyerId': order.buyerId,
+    if (order.buyerName.isNotEmpty) 'buyerName': order.buyerName,
     'status': order.status.name,
     'placedAt': order.placedAt.toIso8601String(),
     'deliveryAddress': order.deliveryAddress,
@@ -32,11 +34,20 @@ class OrderJsonCodec {
       'acceptanceExpiredAt': order.acceptanceExpiredAt!.toIso8601String(),
     'phoneNumber': order.phoneNumber,
     'isRated': order.isRated,
+    if (order.deliveryId != null) 'deliveryId': order.deliveryId,
+    'riderRated': order.riderRated,
+    if (order.cancellationReason case final reason?)
+      'cancellationReason': reason,
+    if (order.cancelledBy case final actor?) 'cancelledBy': actor,
+    if (order.cancelledAt case final cancelledAt?)
+      'cancelledAt': cancelledAt.toIso8601String(),
     'payment': {
       'method': order.payment.method.databaseValue,
       'status': order.payment.status.databaseValue,
       'transactionReference': order.payment.transactionReference,
       'refundReference': order.payment.refundReference,
+      'receiptImageReference': order.payment.receiptImageReference,
+      'receiptImageName': order.payment.receiptImageName,
     },
     if (order.feedback case final feedback?)
       'feedback': {
@@ -50,10 +61,17 @@ class OrderJsonCodec {
             'productId': item.productId,
             'productName': item.productName,
             'image': item.image,
+            if (item.imageUrl case final imageUrl?) 'imageUrl': imageUrl,
             'sellerName': item.sellerName,
             'pricePerKg': item.pricePerKg,
             'unit': item.unit,
             'quantity': item.quantity,
+            if (item.feedback case final feedback?)
+              'feedback': {
+                'rating': feedback.rating,
+                'comment': feedback.comment,
+                'submittedAt': feedback.submittedAt.toIso8601String(),
+              },
           },
         )
         .toList(growable: false),
@@ -74,6 +92,8 @@ class OrderJsonCodec {
     final feedback = _decodeFeedback(json['feedback']);
     return PlacedOrder(
       id: json['id'] as String? ?? '',
+      buyerId: json['buyerId']?.toString() ?? '',
+      buyerName: json['buyerName']?.toString() ?? '',
       status: status,
       placedAt: placedAt,
       deliveryAddress: json['deliveryAddress'] as String? ?? '',
@@ -85,6 +105,11 @@ class OrderJsonCodec {
       items: items,
       isRated: json['isRated'] as bool? ?? feedback != null,
       feedback: feedback,
+      deliveryId: _optionalText(json['deliveryId']),
+      riderRated: json['riderRated'] as bool? ?? false,
+      cancellationReason: _optionalText(json['cancellationReason']),
+      cancelledBy: _optionalText(json['cancelledBy']),
+      cancelledAt: _date(json['cancelledAt']),
       payment: payment,
     );
   }
@@ -97,6 +122,8 @@ class OrderJsonCodec {
       status: OrderPaymentStatusDetails.fromValue(json['status']),
       transactionReference: json['transactionReference'] as String? ?? '',
       refundReference: json['refundReference'] as String? ?? '',
+      receiptImageReference: json['receiptImageReference'] as String? ?? '',
+      receiptImageName: json['receiptImageName'] as String? ?? '',
     );
   }
 
@@ -119,10 +146,12 @@ class OrderJsonCodec {
       productId: json['productId'] as String? ?? '',
       productName: json['productName'] as String? ?? '',
       image: json['image'] as String? ?? '',
+      imageUrl: _optionalText(json['imageUrl']),
       sellerName: json['sellerName'] as String? ?? '',
       pricePerKg: (json['pricePerKg'] as num?)?.toDouble() ?? 0,
       unit: json['unit'] as String? ?? '',
       quantity: (json['quantity'] as num?)?.toInt() ?? 0,
+      feedback: _decodeFeedback(json['feedback']),
     );
   }
 
@@ -136,5 +165,10 @@ class OrderJsonCodec {
   static DateTime? _date(Object? value) {
     final parsed = DateTime.tryParse(value?.toString() ?? '');
     return parsed?.toLocal();
+  }
+
+  static String? _optionalText(Object? value) {
+    final text = value?.toString().trim();
+    return text == null || text.isEmpty ? null : text;
   }
 }

@@ -51,6 +51,7 @@ class CheckoutItemTile extends StatelessWidget {
               children: [
                 ProductThumbnail.square(
                   asset: item.image,
+                  imageUrl: item.imageUrl,
                   size: 82,
                   borderRadius: 10,
                   semanticLabel: '${item.productName} product photo',

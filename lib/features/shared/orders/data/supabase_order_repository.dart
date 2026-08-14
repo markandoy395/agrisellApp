@@ -5,7 +5,8 @@ import 'package:agresell_app/features/shared/orders/data/order_repository.dart';
 import 'package:agresell_app/features/shared/orders/data/order_snapshot_merger.dart';
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
 
-class SupabaseOrderRepository implements OrderRepository {
+class SupabaseOrderRepository
+    implements OrderRepository, FarmerOrderCancellationRepository {
   const SupabaseOrderRepository(this.client);
 
   final SupabaseClient client;
@@ -22,18 +23,83 @@ class SupabaseOrderRepository implements OrderRepository {
     final expirations = await client.rpc<Object?>(
       'current_account_expiration_snapshots',
     );
+    final cancellations = await client.rpc<Object?>(
+      'current_account_cancellation_snapshots',
+    );
     return OrderJsonCodec.decodeOrders(
       OrderSnapshotMerger.merge(
         orders,
         payments: payments,
         reviews: reviews,
         expirations: expirations,
+        cancellations: cancellations,
       ),
     );
   }
 
   @override
+  Future<void> cancelFarmerOrder({
+    required String accountId,
+    required String orderId,
+    required String reason,
+  }) async {
+    try {
+      await client.rpc<Object?>(
+        'cancel_current_farmer_order',
+        params: {
+          'p_seller_order_id': orderId,
+          'p_cancellation_reason': reason.trim(),
+        },
+      );
+    } on PostgrestException catch (error) {
+      throw OrderPlacementException(error.message);
+    }
+  }
+
+  @override
   Future<void> save(String accountId, Iterable<PlacedOrder> orders) async {
+    await _syncOrders(orders);
+  }
+
+  @override
+  Future<void> submitFeedback({
+    required String accountId,
+    required String orderId,
+    required String productId,
+    int? productRating,
+    required String productComment,
+    int? riderRating,
+    String riderComment = '',
+  }) async {
+    final commodityId = int.tryParse(productId);
+    if (commodityId == null) {
+      throw const OrderPlacementException('The purchased product is invalid.');
+    }
+    try {
+      await client.rpc<Object?>(
+        'submit_current_buyer_feedback',
+        params: {
+          'p_client_order_id': orderId,
+          'p_commodity_id': commodityId,
+          'p_product_rating': productRating,
+          'p_product_comment': productComment.trim(),
+          'p_rider_rating': riderRating,
+          'p_rider_comment': riderComment.trim(),
+        },
+      );
+    } on PostgrestException catch (error) {
+      throw OrderPlacementException(error.message);
+    }
+  }
+
+  @override
+  Future<void> createOrders({
+    required String accountId,
+    required Iterable<PlacedOrder> newOrders,
+    required Iterable<PlacedOrder> currentOrders,
+  }) => _syncOrders(newOrders);
+
+  Future<void> _syncOrders(Iterable<PlacedOrder> orders) async {
     final payload = OrderJsonCodec.encodeOrders(orders);
     final orderPayload = payload
         .map((order) => {...order, 'isRated': false})
@@ -51,10 +117,6 @@ class SupabaseOrderRepository implements OrderRepository {
             : 'The order could not be saved. Please try again.',
       );
     }
-    await client.rpc<void>(
-      'sync_current_buyer_review_snapshots',
-      params: {'order_payload': payload},
-    );
   }
 
   @override

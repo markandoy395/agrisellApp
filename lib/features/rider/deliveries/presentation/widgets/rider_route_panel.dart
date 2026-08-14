@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_route_plan.dart';
@@ -51,6 +52,10 @@ class RiderRoutePanel extends StatelessWidget {
               Expanded(
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
+                    dropdownColor: AppDropdownStyle.menuColor,
+                    borderRadius: AppDropdownStyle.menuBorderRadius,
+                    style: AppDropdownStyle.textStyle.copyWith(fontSize: 12),
+                    iconEnabledColor: AppDropdownStyle.iconColor,
                     isDense: true,
                     isExpanded: true,
                     value: selected?.id,

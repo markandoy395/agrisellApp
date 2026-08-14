@@ -8,12 +8,28 @@ import 'package:agresell_app/features/shared/widgets/navigation/custom_bottom_na
 import 'package:agresell_app/features/rider/profile/presentation/screens/rider_sign_up_screen.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/screens/rider_home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'support/auth_role_selection_helpers.dart';
 
+const _connectivityMethodChannel = MethodChannel(
+  'dev.fluttercommunity.plus/connectivity',
+);
+const _connectivityEventChannel = EventChannel(
+  'dev.fluttercommunity.plus/connectivity_status',
+);
+const _connectivityEventMethodChannel = MethodChannel(
+  'dev.fluttercommunity.plus/connectivity_status',
+);
+
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUpAll(_installConnectivityPlusMock);
+  tearDownAll(_clearConnectivityPlusMock);
+
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     AuthRegistrationService.instance.clearForTesting();
@@ -70,6 +86,10 @@ void main() {
     expect(account.shippingAddress, 'Purok 5, Lianga, Surigao del Sur');
     expect(account.role, 'buyer');
     expect(find.byType(CustomBottomNavBar), findsOneWidget);
+    expect(
+      find.text('Your Buyer account was created successfully.'),
+      findsWidgets,
+    );
     expect(find.text('Search in AgriSell'), findsOneWidget);
     expect(find.text('Categories'), findsOneWidget);
     expect(find.text('Add new products'), findsNothing);
@@ -150,6 +170,44 @@ void main() {
 
     expect(find.byType(RiderHomeScreen), findsOneWidget);
   });
+}
+
+void _installConnectivityPlusMock() {
+  final messenger =
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+
+  messenger.setMockMethodCallHandler(_connectivityMethodChannel, (
+    MethodCall methodCall,
+  ) async {
+    if (methodCall.method == 'check') return <String>['wifi'];
+    return null;
+  });
+
+  messenger.setMockMethodCallHandler(_connectivityEventMethodChannel, (
+    MethodCall methodCall,
+  ) async {
+    switch (methodCall.method) {
+      case 'listen':
+        await messenger.handlePlatformMessage(
+          _connectivityEventChannel.name,
+          _connectivityEventChannel.codec.encodeSuccessEnvelope(<String>[
+            'wifi',
+          ]),
+          (_) {},
+        );
+        return null;
+      case 'cancel':
+        return null;
+    }
+    return null;
+  });
+}
+
+void _clearConnectivityPlusMock() {
+  final messenger =
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+  messenger.setMockMethodCallHandler(_connectivityMethodChannel, null);
+  messenger.setMockMethodCallHandler(_connectivityEventMethodChannel, null);
 }
 
 Future<void> _pumpUntilFound(

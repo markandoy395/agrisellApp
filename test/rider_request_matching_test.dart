@@ -55,13 +55,28 @@ void main() {
     },
   );
 
-  test('service area, radius, vehicle, and capacity rules are enforced', () {
+  test('current GPS can match requests without registered service area text', () {
     expect(
-      riderRequestRejection(_request(now, serviceArea: 'Iligan'), _rider()),
+      riderRequestRejection(_request(now), _rider(serviceArea: '')),
+      isNull,
+    );
+  });
+
+  test('fallback service area, radius, vehicle, and capacity rules are enforced', () {
+    expect(
+      riderRequestRejection(
+        _request(now, serviceArea: 'Iligan'),
+        _rider(current: null, fallback: true),
+        requireCurrentGps: false,
+      ),
       RiderRequestRejection.outsideServiceArea,
     );
     expect(
-      riderRequestRejection(_request(now, pickupDistance: 20), _rider()),
+      riderRequestRejection(
+        _request(now, pickupDistance: 20),
+        _rider(current: null, fallback: true),
+        requireCurrentGps: false,
+      ),
       RiderRequestRejection.outsideServiceRadius,
     );
     expect(
@@ -128,18 +143,25 @@ RiderMatchingContext _rider({
   double accuracy = 5,
   int activeCount = 0,
   double? capacity = 150,
+  String serviceArea = 'Cagayan de Oro',
+  RiderDeliverySearch? current = const RiderDeliverySearch(
+    latitude: 8.48,
+    longitude: 124.65,
+  ),
+  bool fallback = false,
   Set<String> capabilities = const {},
 }) => RiderMatchingContext(
   riderId: 'rider-a',
   availability: availability,
   vehicleType: RiderVehicleType.motorcycle,
   capacityKg: capacity,
-  serviceArea: 'Cagayan de Oro',
+  serviceArea: serviceArea,
   serviceRadiusKm: 15,
   registeredLatitude: 8.48,
   registeredLongitude: 124.65,
-  location: const RiderDeliverySearch(latitude: 8.48, longitude: 124.65),
-  gpsAccuracyMeters: accuracy,
+  location: current,
+  gpsAccuracyMeters: current == null ? null : accuracy,
+  allowRegisteredLocationEstimate: fallback,
   activeDeliveryCount: activeCount,
   handlingCapabilityKeys: capabilities,
 );

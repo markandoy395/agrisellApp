@@ -8,7 +8,8 @@ begin;
 -- );
 -- select vault.create_secret('<long-random-value>', 'push_function_secret');
 
-create extension if not exists pg_net;
+create schema if not exists extensions;
+create extension if not exists pg_net with schema extensions;
 
 create or replace function private.dispatch_notification_push()
 returns trigger

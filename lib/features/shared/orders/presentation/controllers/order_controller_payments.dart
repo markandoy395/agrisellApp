@@ -35,9 +35,9 @@ extension OrderControllerPayments on OrderController {
     required String orderId,
     required String reference,
   }) async {
-    final normalized = reference.trim();
-    if (!RegExp(r'^[A-Za-z0-9 _-]{6,40}$').hasMatch(normalized)) {
-      throw ArgumentError('Enter a valid GCash reference number.');
+    final normalized = OrderPayment.normalizeGcashReference(reference);
+    if (!OrderPayment.isValidGcashReference(normalized)) {
+      throw ArgumentError('Enter the 13-digit GCash reference number.');
     }
     final index = _orders.indexWhere((order) => order.id == orderId);
     if (index == -1 ||

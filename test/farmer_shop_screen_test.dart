@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/farmer/dashboard/presentation/screens/farmer_dashboard_screen.dart';
+import 'package:agresell_app/features/farmer/dashboard/presentation/widgets/farmer_quick_menu.dart';
 import 'package:agresell_app/features/shared/products/domain/product_availability_date_rules.dart';
 import 'package:agresell_app/features/shared/products/domain/product_production_stage.dart';
 import 'package:agresell_app/features/shared/products/domain/product_sale_status.dart';
@@ -15,7 +16,7 @@ void main() {
     await _pumpDashboard(tester);
 
     expect(find.bySemanticsLabel('AgriSell'), findsOneWidget);
-    expect(find.text('Search in AgriSell'), findsOneWidget);
+    expect(find.text('Search products'), findsOneWidget);
     expect(find.text('Add new products'), findsOneWidget);
     expect(
       find.text('Products from the backend will appear here.'),
@@ -32,6 +33,20 @@ void main() {
     expect(find.text('Fruit Trees'), findsOneWidget);
     expect(find.text('Spices'), findsOneWidget);
     expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
+  });
+
+  testWidgets('farmer menu exposes working dashboard destinations', (
+    tester,
+  ) async {
+    FarmerQuickDestination? destination;
+    await _pumpDashboard(tester, onNavigate: (value) => destination = value);
+
+    await tester.tap(find.bySemanticsLabel('Menu'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Messages'));
+    await tester.pumpAndSettle();
+
+    expect(destination, FarmerQuickDestination.messages);
   });
 
   testWidgets('add product opens edit screen and saves to farmer grid', (
@@ -122,7 +137,10 @@ void main() {
   });
 }
 
-Future<void> _pumpDashboard(WidgetTester tester) async {
+Future<void> _pumpDashboard(
+  WidgetTester tester, {
+  ValueChanged<FarmerQuickDestination>? onNavigate,
+}) async {
   await tester.binding.setSurfaceSize(const Size(430, 932));
   addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -133,6 +151,7 @@ Future<void> _pumpDashboard(WidgetTester tester) async {
       home: Scaffold(
         body: FarmerDashboardScreen(
           pickProductImageBytes: () async => _transparentPng,
+          onNavigate: onNavigate,
         ),
       ),
     ),

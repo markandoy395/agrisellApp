@@ -19,6 +19,8 @@ class SupabaseRiderDashboardRepository
   Future<RiderDashboardData> fetchDashboard({required String riderId}) async {
     final value = await _client.rpc<Object?>('current_rider_dashboard');
     final row = _map(value);
+    final unavailableSections =
+        (row['unavailable_sections'] as List? ?? const []).cast<String>();
     return RiderDashboardData(
       metrics: RiderDashboardMetrics(
         todayCompletedDeliveries:
@@ -39,8 +41,7 @@ class SupabaseRiderDashboardRepository
       ),
       fetchedAt: DateTime.tryParse('${row['fetched_at']}') ?? DateTime.now(),
       dataOrigin: dataOrigin,
-      unavailableSections: (row['unavailable_sections'] as List? ?? const [])
-          .cast<String>(),
+      unavailableSections: unavailableSections,
     );
   }
 }

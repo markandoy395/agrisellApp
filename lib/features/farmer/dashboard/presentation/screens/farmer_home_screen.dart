@@ -12,6 +12,7 @@ import 'package:agresell_app/features/shared/chat/data/marketplace_messaging_rep
 import 'package:agresell_app/features/shared/chat/data/marketplace_messaging_repository_factory.dart';
 import 'package:agresell_app/features/shared/widgets/navigation/custom_bottom_nav_bar.dart';
 import 'package:agresell_app/features/farmer/dashboard/presentation/screens/farmer_dashboard_screen.dart';
+import 'package:agresell_app/features/farmer/dashboard/presentation/widgets/farmer_quick_menu.dart';
 import 'package:agresell_app/features/farmer/profile/presentation/screens/farmer_profile_screen.dart';
 import 'package:agresell_app/features/farmer/chat/presentation/screens/farmer_message_screen.dart';
 import 'package:agresell_app/features/farmer/reservations/presentation/screens/farmer_reserve_screen.dart';
@@ -47,9 +48,7 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
   late final PageController _navigationController;
   late final Map<int, int> _badgeCounts;
   late int _activeNavIndex;
-  int? _tabAnimationTarget;
   StreamSubscription<PushNotificationAction>? _pushSubscription;
-  var _notificationVersion = 0;
 
   void _updateUi(VoidCallback update) => setState(update);
 
@@ -92,36 +91,29 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
   Future<void> _selectTab(int index) async {
     if (index == _activeNavIndex) return;
 
-    if (index == FarmerHomeScreen.productNavIndex) {
-      await AuthRegistrationService.instance.loadCurrentAccount();
-    }
-    if (index == FarmerHomeScreen.reserveNavIndex) {
-      await OrderController.instance.reload();
-    }
-    if (!mounted) return;
-
     setState(() {
       _activeNavIndex = index;
-      if (index == FarmerHomeScreen.notificationNavIndex) {
-        _notificationVersion++;
-      }
     });
+    _navigationController.jumpToPage(index);
+    unawaited(_refreshSelectedTab(index));
+  }
 
-    final disableAnimations =
-        MediaQuery.maybeOf(context)?.disableAnimations ?? false;
-    if (disableAnimations) {
-      _navigationController.jumpToPage(index);
-    } else {
-      _tabAnimationTarget = index;
-      await _navigationController.animateToPage(
-        index,
-        duration: const Duration(milliseconds: 280),
-        curve: Curves.easeOutCubic,
-      );
-      if (mounted && _tabAnimationTarget == index) {
-        _tabAnimationTarget = null;
-      }
+  Future<void> _refreshSelectedTab(int index) async {
+    if (index == FarmerHomeScreen.productNavIndex) {
+      await AuthRegistrationService.instance.loadCurrentAccount();
+    } else if (index == FarmerHomeScreen.reserveNavIndex) {
+      await OrderController.instance.reload();
     }
+  }
+
+  void _openQuickDestination(FarmerQuickDestination destination) {
+    final index = switch (destination) {
+      FarmerQuickDestination.products => FarmerHomeScreen.productNavIndex,
+      FarmerQuickDestination.messages => FarmerHomeScreen.messageNavIndex,
+      FarmerQuickDestination.reservations => FarmerHomeScreen.reserveNavIndex,
+      FarmerQuickDestination.account => FarmerHomeScreen.profileNavIndex,
+    };
+    unawaited(_selectTab(index));
   }
 
   @override
@@ -141,33 +133,44 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
         shadowColor: AgrisellColors.brandBlack.withValues(alpha: 0.16),
         onItemSelected: _selectTab,
       ),
-      body: PageView(
+      body: PageView.builder(
         controller: _navigationController,
         onPageChanged: _handlePageChanged,
         physics: const ClampingScrollPhysics(),
-        children: [
-          const _FarmerKeepAliveTab(child: FarmerDashboardScreen()),
-          _FarmerKeepAliveTab(
-            child: FarmerMessageScreen(
-              isActive: _activeNavIndex == FarmerHomeScreen.messageNavIndex,
-              repository: widget.messagingRepository,
-              onUnreadCountChanged: _setMessageUnreadCount,
-            ),
-          ),
-          const _FarmerKeepAliveTab(child: FarmerReserveScreen()),
-          _FarmerKeepAliveTab(
-            child: NotificationScreen(
-              key: ValueKey('farmer-notifications-$_notificationVersion'),
-              role: AuthRole.farmer,
-              userId: AuthSessionService.instance.currentAccount?.id,
-              onNotificationSelected: _openNotification,
-              onUnreadCountChanged: _setNotificationUnreadCount,
-            ),
-          ),
-          const _FarmerKeepAliveTab(child: FarmerProfileScreen()),
-        ],
+        itemCount: farmerBottomNavItems.length,
+        itemBuilder: _buildTab,
       ),
     );
+  }
+
+  Widget _buildTab(BuildContext context, int index) {
+    return switch (index) {
+      FarmerHomeScreen.productNavIndex => _FarmerKeepAliveTab(
+        child: FarmerDashboardScreen(onNavigate: _openQuickDestination),
+      ),
+      FarmerHomeScreen.messageNavIndex => _FarmerKeepAliveTab(
+        child: FarmerMessageScreen(
+          isActive: _activeNavIndex == FarmerHomeScreen.messageNavIndex,
+          repository: widget.messagingRepository,
+          onUnreadCountChanged: _setMessageUnreadCount,
+        ),
+      ),
+      FarmerHomeScreen.reserveNavIndex => _FarmerKeepAliveTab(
+        child: FarmerReserveScreen(onNavigate: _openQuickDestination),
+      ),
+      FarmerHomeScreen.notificationNavIndex => _FarmerKeepAliveTab(
+        child: NotificationScreen(
+          role: AuthRole.farmer,
+          userId: AuthSessionService.instance.currentAccount?.id,
+          onNotificationSelected: _openNotification,
+          onUnreadCountChanged: _setNotificationUnreadCount,
+        ),
+      ),
+      FarmerHomeScreen.profileNavIndex => const _FarmerKeepAliveTab(
+        child: FarmerProfileScreen(),
+      ),
+      _ => const SizedBox.shrink(),
+    };
   }
 }
 

@@ -18,6 +18,11 @@ class RiderRegistrationPayload {
           ?.toUtc()
           .toIso8601String(),
       'location_label': registration.locationLabel.trim(),
+      'address_line': registration.addressLine.trim(),
+      'barangay': registration.barangay.trim(),
+      'city_municipality': registration.cityMunicipality.trim(),
+      'province': registration.province.trim(),
+      'postal_code': registration.postalCode.trim(),
       'location_notes': registration.locationNotes.trim(),
       'vehicle_type': registration.vehicleType?.name,
       'vehicle_plate_number': registration.vehiclePlateNumber

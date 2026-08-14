@@ -91,6 +91,10 @@ class FakeRiderLocationController extends RiderLocationController {
   RiderDeviceLocation? fakeLocation;
   int refreshCalls = 0;
   int permissionRequestCalls = 0;
+  int publishCalls = 0;
+  bool publishSucceeds = true;
+  int startTrackingCalls = 0;
+  int stopTrackingCalls = 0;
 
   @override
   RiderLocationState get state => fakeState;
@@ -103,5 +107,21 @@ class FakeRiderLocationController extends RiderLocationController {
     refreshCalls++;
     if (requestPermission) permissionRequestCalls++;
     notifyListeners();
+  }
+
+  @override
+  Future<bool> publishCurrentLocation() async {
+    publishCalls++;
+    return publishSucceeds;
+  }
+
+  @override
+  Future<void> startTracking() async {
+    startTrackingCalls++;
+  }
+
+  @override
+  Future<void> stopTracking() async {
+    stopTrackingCalls++;
   }
 }

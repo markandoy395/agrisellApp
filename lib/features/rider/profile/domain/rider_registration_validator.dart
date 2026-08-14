@@ -1,5 +1,7 @@
-import 'package:agresell_app/features/rider/profile/domain/rider_registration.dart';
 import 'package:agresell_app/core/utils/password_policy.dart';
+import 'package:agresell_app/core/utils/written_address.dart';
+import 'package:agresell_app/features/rider/profile/domain/rider_registration.dart';
+import 'package:agresell_app/features/rider/profile/domain/rider_address.dart';
 
 abstract final class RiderRegistrationValidator {
   static final _email = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
@@ -26,6 +28,17 @@ abstract final class RiderRegistrationValidator {
         item.gpsLongitude! < -180 ||
         item.gpsLongitude! > 180) {
       return 'Use a valid current location.';
+    }
+    if (!WrittenAddress.isValid(item.locationLabel)) {
+      return 'Enter your written address.';
+    }
+    if (!RiderAddress.isComplete(
+      addressLine: item.addressLine,
+      barangay: item.barangay,
+      cityMunicipality: item.cityMunicipality,
+      province: item.province,
+    )) {
+      return 'Complete your street address, barangay, city or municipality, and province.';
     }
     final vehicle = item.vehicleType;
     if (vehicle == null) return 'Select a vehicle type.';

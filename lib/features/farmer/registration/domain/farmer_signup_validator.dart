@@ -48,7 +48,7 @@ abstract final class FarmerSignupValidator {
 
   static String? farmCoordinates(String latitude, String longitude) {
     if (latitude.trim().isEmpty || longitude.trim().isEmpty) {
-      return 'Choose your farm location.';
+      return 'Allow location access so we can capture your farm location.';
     }
     final parsedLatitude = double.tryParse(latitude);
     final parsedLongitude = double.tryParse(longitude);

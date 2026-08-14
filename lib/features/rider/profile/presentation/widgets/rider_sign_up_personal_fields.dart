@@ -67,11 +67,7 @@ class _BirthDateField extends StatelessWidget {
           color: AgrisellColors.mutedText,
           fontSize: 13,
         ),
-        floatingLabelStyle: const TextStyle(
-          color: AgrisellColors.authGreen,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
+        floatingLabelStyle: AgrisellTheme.floatingInputLabelStyle,
         filled: true,
         fillColor: AgrisellColors.fieldFill,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),

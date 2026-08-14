@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_draft.dart';
 
 export 'package:agresell_app/features/rider/profile/presentation/widgets/rider_sign_up_availability_note.dart';
@@ -92,11 +93,7 @@ class RiderSignUpTextField extends StatelessWidget {
           color: AgrisellColors.mutedText,
           fontSize: 13,
         ),
-        floatingLabelStyle: const TextStyle(
-          color: AgrisellColors.authGreen,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
+        floatingLabelStyle: AgrisellTheme.floatingInputLabelStyle,
         contentPadding: riderSignUpFieldContentPadding,
         helperText: helper,
         errorText: error,

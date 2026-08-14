@@ -35,6 +35,16 @@ class DeliveryStatusLocation {
       longitude <= 180 &&
       accuracyMeters >= 0 &&
       !isMocked;
+
+  bool isUsableForPickup({
+    DateTime? now,
+    Duration maxAge = const Duration(seconds: 45),
+  }) {
+    final capturedAt = timestamp;
+    if (!isValid || isApproximate || capturedAt == null) return false;
+    final age = (now ?? DateTime.now()).difference(capturedAt);
+    return age >= const Duration(seconds: -10) && age <= maxAge;
+  }
 }
 
 class DeliveryStatusUpdateCommand {

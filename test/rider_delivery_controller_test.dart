@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:agresell_app/features/rider/deliveries/data/rider_delivery_repository.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_acceptance.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_proof.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dart';
+import 'package:agresell_app/features/rider/deliveries/domain/delivery_status.dart';
+import 'package:agresell_app/features/rider/deliveries/domain/delivery_status_update.dart';
+import 'package:agresell_app/features/rider/deliveries/domain/pickup_confirmation.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_delivery_search.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_request_query.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_acceptance_state.dart';
@@ -19,6 +24,37 @@ void main() {
       expect(requests, isEmpty);
     },
   );
+  test('requests load without a current GPS fix', () async {
+    final request = DeliveryRequest(
+      id: 'delivery-without-gps',
+      orderNumber: 'ORD-NO-GPS',
+      productName: 'Fresh vegetables',
+      sellerName: 'Farmer',
+      buyerName: 'Buyer',
+      pickupLocation: const DeliveryLocation(address: 'Farm pickup'),
+      deliveryLocation: const DeliveryLocation(address: 'Buyer address'),
+      pickupDeadline: DateTime.now().add(const Duration(hours: 2)),
+      assignmentRequestId: 'farmer-request-1',
+    );
+    final controller = RiderDeliveryController(
+      repository: InMemoryRiderDeliveryRepository(requests: [request]),
+    );
+    addTearDown(controller.dispose);
+    controller.updateProfile(_profile(RiderVerificationStatus.verified));
+    controller.setOnline(true);
+
+    // Establish the rider identity before the environment check. The initial
+    // unauthenticated state must transition to preview access even without GPS.
+    await controller.load(riderId: 'rider-a');
+    controller.updateRequestEnvironment(
+      state: RiderRequestAccessState.locationUnavailable,
+    );
+    await Future<void>.delayed(Duration.zero);
+
+    expect(controller.requests, contains(request));
+    expect(controller.usesRegisteredLocationEstimate, isTrue);
+    expect(controller.requestAccessState.canAcceptRequests, isFalse);
+  });
   test('unverified riders cannot accept delivery requests', () async {
     final controller = RiderDeliveryController(
       repository: InMemoryRiderDeliveryRepository(requests: [_request()]),
@@ -156,6 +192,98 @@ void main() {
       expect(repository.fetchCalls, 2);
     },
   );
+  test('repeated pickup taps share one confirmation request', () async {
+    final repository = _DelayedPickupRepository(requests: [_pickupRequest()]);
+    final transitionLocation = DeliveryStatusLocation(
+      latitude: 8.48,
+      longitude: 124.65,
+      accuracyMeters: 5,
+      timestamp: DateTime.now(),
+    );
+    await repository.updateDeliveryStatus(
+      DeliveryStatusUpdateCommand(
+        deliveryId: 'delivery-1',
+        riderId: 'rider-a',
+        previousStatus: DeliveryStatus.arrivedAtPickup,
+        newStatus: DeliveryStatus.waitingForProduct,
+        idempotencyKey: 'waiting',
+        location: transitionLocation,
+      ),
+    );
+    await repository.updateDeliveryStatus(
+      DeliveryStatusUpdateCommand(
+        deliveryId: 'delivery-1',
+        riderId: 'rider-a',
+        previousStatus: DeliveryStatus.waitingForProduct,
+        newStatus: DeliveryStatus.pickupConfirmationRequired,
+        idempotencyKey: 'confirmation-required',
+        location: transitionLocation,
+      ),
+    );
+    final controller = RiderDeliveryController(repository: repository);
+    addTearDown(controller.dispose);
+    controller.updateProfile(_profile(RiderVerificationStatus.verified));
+    await controller.applyAuthoritativeAvailability(
+      RiderAvailability.deliveryReserved,
+      loadRequests: false,
+    );
+    await controller.load(riderId: 'rider-a');
+    final command = PickupCompletionCommand(
+      deliveryId: 'delivery-1',
+      riderId: 'rider-a',
+      idempotencyKey: 'one-pickup-request',
+      location: DeliveryStatusLocation(
+        latitude: 8.48,
+        longitude: 124.65,
+        accuracyMeters: 5,
+        timestamp: DateTime.now(),
+      ),
+      checklist: const PickupConditionChecklist(
+        correctProduct: true,
+        correctQuantity: true,
+        correctWeight: true,
+        securePackaging: true,
+        notVisiblyDamaged: true,
+        matchesRequest: true,
+        fitsVehicle: true,
+        handlingInstructionsReceived: true,
+        confirmedQuantity: 2,
+        confirmedWeightKg: 0,
+      ),
+      proofReferences: const {
+        PickupConfirmationMethod.productPhoto: 'protected://product-photo',
+        PickupConfirmationMethod.farmerConfirmation:
+            'protected://farmer-confirmation',
+      },
+    );
+
+    final first = controller.completePickup(command);
+    final repeated = controller.completePickup(command);
+    expect(identical(first, repeated), isTrue);
+    expect(repository.completionCalls, 1);
+
+    repository.release();
+    expect((await first).isSuccess, isTrue);
+    expect((await repeated).isSuccess, isTrue);
+    expect(repository.completionCalls, 1);
+  });
+}
+
+class _DelayedPickupRepository extends InMemoryRiderDeliveryRepository {
+  _DelayedPickupRepository({required super.requests});
+  final _gate = Completer<void>();
+  var completionCalls = 0;
+
+  void release() => _gate.complete();
+
+  @override
+  Future<PickupCompletionResult> completePickup(
+    PickupCompletionCommand command,
+  ) async {
+    completionCalls++;
+    await _gate.future;
+    return super.completePickup(command);
+  }
 }
 
 class _CountingRepository extends InMemoryRiderDeliveryRepository {
@@ -205,6 +333,18 @@ DeliveryRequest _activeRequest() => DeliveryRequest(
   deliveryLocation: const DeliveryLocation(address: 'Delivery'),
   pickupDeadline: DateTime(2030),
   stage: DeliveryStage.accepted,
+  assignedRiderId: 'rider-a',
+);
+DeliveryRequest _pickupRequest() => DeliveryRequest(
+  id: 'delivery-1',
+  orderNumber: 'ORD-1',
+  productName: 'Produce',
+  sellerName: 'Seller',
+  buyerName: 'Buyer',
+  pickupLocation: const DeliveryLocation(address: 'Pickup'),
+  deliveryLocation: const DeliveryLocation(address: 'Delivery'),
+  pickupDeadline: DateTime(2030),
+  stage: DeliveryStage.arrivedAtPickup,
   assignedRiderId: 'rider-a',
 );
 RiderProfile _profile(RiderVerificationStatus status) => RiderProfile(

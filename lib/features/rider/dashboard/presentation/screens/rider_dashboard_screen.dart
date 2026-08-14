@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/controllers/rider_availability_controller.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/controllers/rider_dashboard_controller.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_active_delivery_summary.dart';
+import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_active_batch_summary.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_availability_card.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_dashboard_delivery_summary.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_dashboard_header.dart';
@@ -75,10 +77,10 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
     final riderId = widget.riderId;
     await Future.wait([
       widget.dashboardController.refresh(),
-      widget.availabilityController.refreshEnvironment(refreshLocation: true),
-      if (riderId != null &&
-          widget.deliveryController.canReceiveAdditionalDelivery)
-        widget.deliveryController.load(riderId: riderId),
+      widget.availabilityController.refreshEnvironment(),
+      // Active deliveries must refresh even when the Rider cannot receive an
+      // additional request (for example while a delivery is in progress).
+      if (riderId != null) widget.deliveryController.load(riderId: riderId),
     ]);
   }
 
@@ -107,15 +109,28 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                 availability.locationController,
                 widget.deliveryController,
               ]),
-              builder: (context, _) => RefreshIndicator(
-                onRefresh: _refresh,
-                child: ListView(
-                  physics: const AlwaysScrollableScrollPhysics(
-                    parent: ClampingScrollPhysics(),
-                  ),
-                  padding: const EdgeInsets.fromLTRB(14, 14, 14, 156),
-                  children: _content(),
-                ),
+              builder: (context, _) => LayoutBuilder(
+                builder: (context, constraints) {
+                  final sidePadding = constraints.maxWidth > 760
+                      ? (constraints.maxWidth - 760) / 2 + 18
+                      : 16.0;
+                  return RefreshIndicator(
+                    onRefresh: _refresh,
+                    child: ListView(
+                      physics: const AlwaysScrollableScrollPhysics(
+                        parent: ClampingScrollPhysics(),
+                      ),
+                      scrollCacheExtent: const ScrollCacheExtent.pixels(10000),
+                      padding: EdgeInsets.fromLTRB(
+                        sidePadding,
+                        16,
+                        sidePadding,
+                        156,
+                      ),
+                      children: _content(),
+                    ),
+                  );
+                },
               ),
             ),
           ),

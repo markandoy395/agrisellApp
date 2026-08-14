@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 
 import 'package:agresell_app/features/rider/dashboard/domain/rider_availability.dart';
 import 'package:agresell_app/features/rider/deliveries/data/rider_delivery_foundation_repositories.dart';
@@ -34,6 +35,7 @@ import 'package:agresell_app/features/rider/deliveries/data/supabase_delivery_da
 import 'package:agresell_app/features/rider/deliveries/data/supabase_rider_evidence_uploader.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_registration.dart';
 import 'package:agresell_app/features/rider/safety/data/supabase_rider_incident_store.dart';
+import 'package:agresell_app/features/shared/orders/domain/rider_assignment_request_status.dart';
 
 part 'in_memory_rider_acceptance.dart';
 part 'in_memory_rider_delivery_repository.dart';

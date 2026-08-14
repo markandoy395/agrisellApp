@@ -14,6 +14,7 @@ extension _InMemoryRiderPickupConfirmation on InMemoryRiderDeliveryRepository {
     return _pickupConfigurations[deliveryId] ??
         const PickupConfiguration(
           requiredMethods: {
+            PickupConfirmationMethod.productPhoto,
             PickupConfirmationMethod.farmerConfirmation,
             PickupConfirmationMethod.quantityConfirmation,
             PickupConfirmationMethod.weightConfirmation,
@@ -27,6 +28,13 @@ extension _InMemoryRiderPickupConfirmation on InMemoryRiderDeliveryRepository {
     final key = '${command.riderId}|${command.idempotencyKey}';
     final replay = _pickupCompletions[key];
     if (replay != null) return replay;
+    final validation = validatePickupCompletion(command, now: _clock());
+    if (!validation.isValid) {
+      throw DeliveryTransitionException(
+        validation.message,
+        code: DeliveryErrorCode.invalidProof,
+      );
+    }
     final request = _requestFor(command.deliveryId);
     final current = _snapshotFor(request);
     if (!request.isAssignedTo(command.riderId)) {

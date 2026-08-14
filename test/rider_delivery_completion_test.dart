@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_availability.dart';
 import 'package:agresell_app/features/rider/deliveries/data/rider_delivery_repository.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_errors.dart';
+import 'package:agresell_app/features/rider/deliveries/domain/delivery_proof.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_status.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_status_update.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_live_location_policy.dart';
@@ -63,6 +64,12 @@ void main() {
       expect(result.record.buyerNotified, isTrue);
       expect(result.record.farmerNotified, isTrue);
       expect(result.record.request.proofs, isNotEmpty);
+      final evidence = result.record.request.proofs.singleWhere(
+        (proof) => proof.type == DeliveryProofType.deliveryPhoto,
+      );
+      expect(evidence.capturedAt, isNotNull);
+      expect(evidence.latitude, closeTo(8.49, 0.001));
+      expect(evidence.longitude, closeTo(124.66, 0.001));
       expect(replay.record.events.length, result.record.events.length);
       expect(await repository.fetchActiveDeliveryStatus('rider-a'), isNull);
       expect(

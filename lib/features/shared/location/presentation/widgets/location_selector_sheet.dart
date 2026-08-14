@@ -157,8 +157,7 @@ class _LocationSelectorSheetState extends State<LocationSelectorSheet> {
     _userAdjusted = true;
   });
 
-  bool get _requiresWrittenAddress =>
-      widget.showAddressFields && widget.role != LocationOwnerRole.rider;
+  bool get _requiresWrittenAddress => widget.showAddressFields;
 
   void _onAddressChanged() {
     if (mounted) setState(() {});

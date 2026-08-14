@@ -188,6 +188,8 @@ PickupCompletionCommand _command({
             'protected://pickup/delivery-1/code',
         PickupConfirmationMethod.farmerConfirmation:
             'protected://pickup/delivery-1/farmer',
+        PickupConfirmationMethod.productPhoto:
+            'protected://pickup/delivery-1/product-photo',
       },
 );
 PickupConditionChecklist _condition({bool fitsVehicle = true}) =>

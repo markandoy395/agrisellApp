@@ -81,6 +81,7 @@ extension RiderDeliveryControllerBatch on RiderDeliveryController {
               _status.availability.isHandlingDelivery),
       maximumActiveDeliveries: profile?.maximumActiveDeliveries ?? 1,
       capacityKg: profile?.capacityKg,
+      vehicleType: profile?.vehicleType,
       currentLocation: location == null
           ? _search
           : RiderDeliverySearch(

@@ -5,6 +5,7 @@ import 'package:agresell_app/features/rider/dashboard/domain/rider_history_model
 import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_analytics_formatters.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_status.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_progress_timeline.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_evidence_view.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
 
 class RiderHistoryDetailsScreen extends StatelessWidget {
@@ -56,6 +57,10 @@ class RiderHistoryDetailsScreen extends StatelessWidget {
                     ? entry.proofTypes.map((type) => type.name).join(', ')
                     : 'No proof attached',
               ),
+              if (entry.deliveryEvidence case final evidence?) ...[
+                const SizedBox(height: 10),
+                RiderDeliveryEvidenceView(proof: evidence),
+              ],
               if (entry.recipientName?.trim().isNotEmpty ?? false) ...[
                 const SizedBox(height: 10),
                 _section('Recipient', entry.recipientName!),

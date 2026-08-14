@@ -26,6 +26,7 @@ extension _RiderDeliveryDetailsStatus on _RiderDeliveryDetailsScreenState {
           request: _request,
           riderId: widget.riderId,
           controller: widget.controller,
+          locationController: widget.locationController,
         ),
       ),
     );

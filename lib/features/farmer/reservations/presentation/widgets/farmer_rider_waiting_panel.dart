@@ -9,8 +9,7 @@ class FarmerRiderWaitingPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       container: true,
-      label:
-          'Waiting for an assigned rider. Shipping starts after verified pickup.',
+      label: 'Waiting for an assigned rider. Choose an available local rider.',
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: AgrisellColors.statusGreenBackground,
@@ -40,7 +39,7 @@ class FarmerRiderWaitingPanel extends StatelessWidget {
                     ),
                     SizedBox(height: 3),
                     Text(
-                      'The delivery request is live. Shipping starts automatically after the rider verifies pickup.',
+                      'Choose an eligible rider below. The order is assigned only after the rider accepts your request.',
                       style: TextStyle(
                         color: AgrisellColors.brandBlack,
                         fontSize: 12,

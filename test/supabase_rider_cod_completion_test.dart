@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:agresell_app/features/rider/deliveries/data/rider_delivery_repository.dart';
 import 'package:agresell_app/features/rider/deliveries/data/supabase_delivery_data_source.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_completion.dart';
+import 'package:agresell_app/features/rider/deliveries/domain/delivery_errors.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_payment.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_status_update.dart';
 
@@ -43,6 +44,42 @@ void main() {
           },
         ]);
       }
+      if (request.url.path.endsWith('/rpc/save_current_rider_delivery_proof')) {
+        return _response(request, {
+          'proof_id': 'evidence-1',
+          'delivery_id': 7,
+          'proof_stage': 'delivery',
+          'proof_type': 'photo',
+          'file_path': 'rider-1/7/delivery/evidence.jpg',
+          'latitude': 8.48,
+          'longitude': 124.64,
+          'confirmed_at': _created,
+          'created_at': _created,
+          'updated_at': _created,
+        });
+      }
+      if (request.url.path.endsWith('/rest/v1/delivery_proofs')) {
+        return _response(request, [
+          {
+            'proof_id': 'evidence-1',
+            'delivery_id': 7,
+            'proof_stage': 'delivery',
+            'proof_type': 'photo',
+            'file_path': 'rider-1/7/delivery/evidence.jpg',
+            'confirmed_at': _created,
+            'created_at': _created,
+            'updated_at': _created,
+          },
+        ]);
+      }
+      if (request.url.path.contains('/storage/v1/object/sign/')) {
+        return http.Response(
+          jsonEncode({'message': 'Signed URL is temporarily unavailable'}),
+          500,
+          headers: {'content-type': 'application/json'},
+          request: request,
+        );
+      }
       return _response(request, {});
     });
     final client = SupabaseClient(
@@ -57,7 +94,7 @@ void main() {
     );
 
     final result = await repository.completeDelivery(
-      const DeliveryCompletionCommand(
+      DeliveryCompletionCommand(
         deliveryId: '7',
         riderId: 'rider-1',
         idempotencyKey: 'complete-key',
@@ -66,7 +103,16 @@ void main() {
           longitude: 124.64,
           accuracyMeters: 5,
         ),
-        proofReferences: {},
+        proofReferences: {
+          DeliveryConfirmationMethod.handoverPhoto:
+              'rider-1/7/delivery/evidence.jpg',
+        },
+        evidenceCapturedAt: DateTime.parse(_created),
+        evidenceLocation: DeliveryStatusLocation(
+          latitude: 8.48,
+          longitude: 124.64,
+          accuracyMeters: 5,
+        ),
         cashCollection: CashCollectionSubmission(
           amountReceived: 450,
           collectionConfirmed: true,
@@ -81,6 +127,85 @@ void main() {
     expect(
       result.record.cashCollection?.status,
       CashCollectionStatus.collected,
+    );
+  });
+
+  test('Supabase completion exposes server validation errors', () async {
+    final httpClient = MockClient((request) async {
+      if (request.url.path.endsWith('/rpc/complete_delivery')) {
+        return http.Response(
+          jsonEncode({
+            'code': '22023',
+            'message':
+                'Confirm the exact cash amount before completing delivery',
+          }),
+          400,
+          headers: {'content-type': 'application/json'},
+          request: request,
+        );
+      }
+      if (request.url.path.endsWith('/rpc/current_rider_deliveries')) {
+        return _response(request, [_delivery]);
+      }
+      if (request.url.path.endsWith('/rpc/save_current_rider_delivery_proof')) {
+        return _response(request, {
+          'proof_id': 'evidence-1',
+          'delivery_id': 7,
+          'proof_stage': 'delivery',
+          'proof_type': 'photo',
+          'file_path': 'rider-1/7/delivery/evidence.jpg',
+          'confirmed_at': _created,
+          'created_at': _created,
+          'updated_at': _created,
+        });
+      }
+      return _response(request, {});
+    });
+    final client = SupabaseClient(
+      'https://example.supabase.co',
+      'test-publishable-key',
+      httpClient: httpClient,
+      accessToken: () async => 'test-access-token',
+    );
+    addTearDown(client.dispose);
+    final repository = SupabaseRiderDeliveryRepository(
+      SupabaseDeliveryDataSource(client),
+    );
+
+    expect(
+      () => repository.completeDelivery(
+        DeliveryCompletionCommand(
+          deliveryId: '7',
+          riderId: 'rider-1',
+          idempotencyKey: 'complete-key',
+          finalLocation: DeliveryStatusLocation(
+            latitude: 8.48,
+            longitude: 124.64,
+            accuracyMeters: 5,
+          ),
+          proofReferences: const {
+            DeliveryConfirmationMethod.handoverPhoto:
+                'rider-1/7/delivery/evidence.jpg',
+          },
+          cashCollection: const CashCollectionSubmission(
+            amountReceived: 400,
+            collectionConfirmed: true,
+          ),
+        ),
+      ),
+      throwsA(
+        isA<DeliveryDomainException>()
+            .having(
+              (error) => error.code,
+              'code',
+              DeliveryErrorCode.invalidPayment,
+            )
+            .having(
+              (error) => error.message,
+              'message',
+              'Confirm the exact cash amount before completing delivery',
+            ),
+      ),
     );
   });
 }

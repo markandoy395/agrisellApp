@@ -52,10 +52,7 @@ void main() {
   test('email-confirmation response explains the next step', () {
     const error = AuthEmailConfirmationRequired();
 
-    expect(
-      error.message,
-      'We sent an OTP to your email. Verify it, then log in to finish signing up.',
-    );
+    expect(error.message, 'We sent a 6-digit OTP to your email.');
   });
 
   test('Farm validation requires a pinned location and whole years', () {

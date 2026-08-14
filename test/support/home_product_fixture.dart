@@ -48,6 +48,7 @@ HomeProduct _product({
   required String price,
   String category = 'Vegetable',
   bool isAvailable = true,
+  String? imageUrl,
 }) => HomeProduct(
   id: id,
   name: name,
@@ -60,4 +61,5 @@ HomeProduct _product({
   sellerLocation: 'Cagayan de Oro',
   category: category,
   isAvailable: isAvailable,
+  imageUrl: imageUrl,
 );

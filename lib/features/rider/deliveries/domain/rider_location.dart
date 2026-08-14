@@ -69,8 +69,13 @@ class RiderLocation {
     'latitude': latitude,
     'longitude': longitude,
     'accuracy_meters': accuracyMeters,
-    'heading': headingDegrees,
-    'speed_kph': speedMetersPerSecond * 3.6,
+    'heading':
+        headingDegrees.isFinite && headingDegrees >= 0 && headingDegrees <= 360
+        ? headingDegrees
+        : 0.0,
+    'speed_kph': speedMetersPerSecond.isFinite && speedMetersPerSecond >= 0
+        ? speedMetersPerSecond * 3.6
+        : 0.0,
     'location_updated_at': timestamp.toUtc().toIso8601String(),
   };
 

@@ -8,7 +8,7 @@ import 'package:agresell_app/core/theme/agrisell_colors.dart';
 class AuthBackground extends StatelessWidget {
   const AuthBackground({this.onLoaded, super.key});
 
-  static const _maxDecodedLongEdge = 2400;
+  static const _maxDecodedHeight = 1989;
 
   final VoidCallback? onLoaded;
 
@@ -24,23 +24,12 @@ class AuthBackground extends StatelessWidget {
   }
 
   static ImageProvider providerForSize(Size size, double devicePixelRatio) {
-    final rawWidth = math.max(1, (size.width * devicePixelRatio).round());
     final rawHeight = math.max(1, (size.height * devicePixelRatio).round());
-    final longestSide = math.max(rawWidth, rawHeight);
-
-    if (longestSide <= _maxDecodedLongEdge) {
-      return ResizeImage(
-        const AssetImage(AgrisellAssets.loginBackground),
-        width: rawWidth,
-        height: rawHeight,
-      );
-    }
-
-    final decodeScale = _maxDecodedLongEdge / longestSide;
     return ResizeImage(
-      const AssetImage(AgrisellAssets.loginBackground),
-      width: math.max(1, (rawWidth * decodeScale).round()),
-      height: math.max(1, (rawHeight * decodeScale).round()),
+      const AssetImage(AgrisellAssets.authBackground),
+      // A height-only decode preserves the source aspect ratio before
+      // BoxFit.cover crops it to the portrait viewport.
+      height: math.min(rawHeight, _maxDecodedHeight),
     );
   }
 

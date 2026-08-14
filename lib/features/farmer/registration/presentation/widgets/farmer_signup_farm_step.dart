@@ -6,14 +6,12 @@ import 'package:agresell_app/features/farmer/registration/presentation/widgets/f
 import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_field.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_options_field.dart';
 import 'package:agresell_app/features/shared/location/presentation/widgets/psgc_address_fields.dart';
-import 'package:agresell_app/features/shared/location/presentation/widgets/location_map_preview.dart';
 
 class FarmerSignupFarmStep extends StatelessWidget {
   const FarmerSignupFarmStep({
     required this.controllers,
     required this.errors,
     required this.onChanged,
-    required this.onPickLocation,
     required this.onPickImage,
     super.key,
   });
@@ -21,7 +19,6 @@ class FarmerSignupFarmStep extends StatelessWidget {
   final FarmerSignupControllers controllers;
   final Map<String, String?> errors;
   final VoidCallback onChanged;
-  final VoidCallback onPickLocation;
   final VoidCallback onPickImage;
 
   @override
@@ -50,14 +47,6 @@ class FarmerSignupFarmStep extends StatelessWidget {
         error: errors['farmAddress'],
         onChanged: (_) => onChanged(),
       ),
-      LocationMapPreview(
-        latitude: double.tryParse(controllers.latitude.text),
-        longitude: double.tryParse(controllers.longitude.text),
-        onTap: onPickLocation,
-        emptyLabel: 'Tap to select the exact farm location *',
-        selectedLabel: 'Tap to adjust the farm location pin',
-      ),
-      const SizedBox(height: 8),
       if (errors['farmLocation'] != null)
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 8),

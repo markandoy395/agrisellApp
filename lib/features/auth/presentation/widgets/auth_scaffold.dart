@@ -31,10 +31,13 @@ class AuthScaffold extends StatelessWidget {
     final compactCardHeight = lerpDouble(430, 480, layoutScale);
 
     return Scaffold(
+      // Keep the full-screen image at a stable layout size while the keyboard
+      // animates. AuthCard consumes viewInsets inside its scrollable content.
+      resizeToAvoidBottomInset: false,
       body: Stack(
         fit: StackFit.expand,
         children: [
-          const AuthBackground(),
+          const RepaintBoundary(child: AuthBackground()),
           SafeArea(
             bottom: false,
             child: Column(

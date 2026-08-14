@@ -1,8 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 import '../../../deliveries/domain/delivery_completion.dart';
 import '../../../deliveries/domain/delivery_status_update.dart';
 import '../../../../rider/presentation/widgets/rider_page_widgets.dart';
+import 'rider_delivery_evidence_capture.dart';
 
 class RiderDeliveryConfirmationForm extends StatelessWidget {
   const RiderDeliveryConfirmationForm({
@@ -10,11 +13,14 @@ class RiderDeliveryConfirmationForm extends StatelessWidget {
     required this.location,
     required this.codeController,
     required this.qrController,
-    required this.recipientController,
+    required this.recipientName,
     required this.notesController,
     required this.buyerConfirmed,
     required this.signatureCaptured,
     required this.photoCaptured,
+    required this.photoPreviewBytes,
+    required this.photoCapturedAt,
+    required this.photoLocation,
     required this.isSubmitting,
     required this.onBuyerConfirmed,
     required this.onCaptureSignature,
@@ -28,11 +34,14 @@ class RiderDeliveryConfirmationForm extends StatelessWidget {
   final DeliveryStatusLocation? location;
   final TextEditingController codeController;
   final TextEditingController qrController;
-  final TextEditingController recipientController;
+  final String recipientName;
   final TextEditingController notesController;
   final bool buyerConfirmed;
   final bool signatureCaptured;
   final bool photoCaptured;
+  final Uint8List? photoPreviewBytes;
+  final DateTime? photoCapturedAt;
+  final DeliveryStatusLocation? photoLocation;
   final bool isSubmitting;
   final ValueChanged<bool> onBuyerConfirmed;
   final VoidCallback onCaptureSignature;
@@ -64,6 +73,16 @@ class RiderDeliveryConfirmationForm extends StatelessWidget {
                   style: const TextStyle(fontSize: 12),
                 ),
               ),
+            if (!configuration.requiredMethods.contains(
+              DeliveryConfirmationMethod.handoverPhoto,
+            ))
+              const Padding(
+                padding: EdgeInsets.only(top: 3),
+                child: Text(
+                  'â€¢ Delivery evidence photo',
+                  style: TextStyle(fontSize: 12),
+                ),
+              ),
           ],
         ),
       ),
@@ -89,10 +108,35 @@ class RiderDeliveryConfirmationForm extends StatelessWidget {
         const SizedBox(height: 10),
       ],
       if (_requires(DeliveryConfirmationMethod.recipientName)) ...[
-        TextField(
-          controller: recipientController,
-          textCapitalization: TextCapitalization.words,
-          decoration: const InputDecoration(labelText: 'Recipient name'),
+        RiderSurfaceCard(
+          child: Row(
+            children: [
+              const Icon(Icons.person_outline, size: 20),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Recipient name',
+                      style: TextStyle(fontSize: 11),
+                    ),
+                    Text(
+                      recipientName,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const Text(
+                      'From the buyer information',
+                      style: TextStyle(fontSize: 11),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 10),
       ],
@@ -125,17 +169,15 @@ class RiderDeliveryConfirmationForm extends StatelessWidget {
           complete: signatureCaptured,
           onPressed: isSubmitting ? null : onCaptureSignature,
         ),
-      if (_requires(DeliveryConfirmationMethod.handoverPhoto)) ...[
-        const SizedBox(height: 8),
-        _ProofButton(
-          label: photoCaptured
-              ? 'Handover photo captured'
-              : 'Capture handover photo',
-          icon: Icons.camera_alt_outlined,
-          complete: photoCaptured,
-          onPressed: isSubmitting ? null : onCapturePhoto,
-        ),
-      ],
+      const SizedBox(height: 8),
+      RiderDeliveryEvidenceCapture(
+        captured: photoCaptured,
+        previewBytes: photoPreviewBytes,
+        capturedAt: photoCapturedAt,
+        location: photoLocation,
+        enabled: !isSubmitting,
+        onCapture: onCapturePhoto,
+      ),
       const SizedBox(height: 12),
       if (cashCollectionSection case final section?) ...[
         section,

@@ -170,6 +170,25 @@ class BasketController extends ChangeNotifier {
     }
   }
 
+  bool reconcileAvailableQuantities(Map<String, int> quantities) {
+    if (quantities.isEmpty) return false;
+    var changed = false;
+    for (var index = _items.length - 1; index >= 0; index--) {
+      final item = _items[index];
+      final available = quantities[item.productId];
+      if (available == null) continue;
+      if (available <= 0) {
+        _items.removeAt(index);
+        changed = true;
+      } else if (item.quantity > available) {
+        _items[index] = item.copyWith(quantity: available);
+        changed = true;
+      }
+    }
+    if (changed) _commitChange();
+    return changed;
+  }
+
   void _commitChange({bool synchronize = true}) {
     final selected = <BasketCartItem>[];
     var totalQuantity = 0;

@@ -30,7 +30,18 @@ extension _RiderRegistrationServiceRemote on RiderRegistrationService {
           registration,
         ),
       );
-      _currentRider = entities.rider;
+      _currentRider = await _repository.updateRider(
+        entities.rider.copyWith(
+          locationLabel: registration.locationLabel,
+          addressLine: registration.addressLine,
+          barangay: registration.barangay,
+          cityMunicipality: registration.cityMunicipality,
+          province: registration.province,
+          postalCode: registration.postalCode,
+          gpsLatitude: registration.gpsLatitude,
+          gpsLongitude: registration.gpsLongitude,
+        ),
+      );
       _currentVehicle = entities.vehicle;
       _currentLocation = entities.location;
       await _uploadRegistrationFiles(
@@ -72,24 +83,38 @@ extension _RiderRegistrationServiceRemote on RiderRegistrationService {
     try {
       final rider = await _repository.getCurrentRider();
       if (rider == null) return null;
-      final results = await Future.wait<Object?>([
-        _repository.getRiderVehicles(rider.riderId),
-        _repository.getRiderDocuments(rider.riderId),
-        _repository.getCurrentRiderLocation(rider.riderId),
-      ]);
-      final vehicles = results[0]! as List<RiderVehicle>;
+      final vehicles = await _repository.getRiderVehicles(rider.riderId);
       if (vehicles.isEmpty) {
         throw const RiderRegistrationException(
           'The Rider vehicle record is unavailable.',
         );
       }
+      List<RiderDocument> documents;
+      RiderLocation? location;
+      try {
+        documents = await _repository.getRiderDocuments(rider.riderId);
+      } on RiderRepositoryException {
+        documents = const [];
+      }
+      try {
+        location = await _repository.getCurrentRiderLocation(rider.riderId);
+      } on RiderRepositoryException {
+        location = null;
+      }
       _currentRider = rider;
       _currentVehicle = vehicles.first;
-      _currentDocuments = results[1]! as List<RiderDocument>;
-      _currentLocation = results[2] as RiderLocation?;
-      final photoUrl = rider.profilePhotoPath == null
-          ? null
-          : await _repository.createDocumentSignedUrl(rider.profilePhotoPath!);
+      _currentDocuments = documents;
+      _currentLocation = location;
+      String? photoUrl;
+      if (rider.profilePhotoPath != null) {
+        try {
+          photoUrl = await _repository.createDocumentSignedUrl(
+            rider.profilePhotoPath!,
+          );
+        } on RiderRepositoryException {
+          photoUrl = null;
+        }
+      }
       final profile = _profileFromEntities(
         rider,
         vehicles.first,
@@ -126,6 +151,12 @@ extension _RiderRegistrationServiceRemote on RiderRegistrationService {
     contactNumber: value.contactNumber.trim(),
     gpsLatitude: value.gpsLatitude,
     gpsLongitude: value.gpsLongitude,
+    locationLabel: value.locationLabel,
+    addressLine: value.addressLine,
+    barangay: value.barangay,
+    cityMunicipality: value.cityMunicipality,
+    province: value.province,
+    postalCode: value.postalCode,
   );
 
   RiderVehicle _vehicleFromRegistration(

@@ -135,6 +135,7 @@ Map<String, Object?> _riderUpdate(Rider rider) {
     'employment_status',
     'rating',
     'total_deliveries',
+    'maximum_active_deliveries',
   };
   for (final key in protected) {
     values.remove(key);

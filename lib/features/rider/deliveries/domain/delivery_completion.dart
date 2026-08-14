@@ -64,6 +64,8 @@ class DeliveryCompletionCommand {
     required this.idempotencyKey,
     required this.finalLocation,
     required this.proofReferences,
+    this.evidenceCapturedAt,
+    this.evidenceLocation,
     this.confirmationCode,
     this.qrPayload,
     this.recipientName,
@@ -76,6 +78,8 @@ class DeliveryCompletionCommand {
   final String idempotencyKey;
   final DeliveryStatusLocation finalLocation;
   final Map<DeliveryConfirmationMethod, String> proofReferences;
+  final DateTime? evidenceCapturedAt;
+  final DeliveryStatusLocation? evidenceLocation;
   final String? confirmationCode;
   final String? qrPayload;
   final String? recipientName;

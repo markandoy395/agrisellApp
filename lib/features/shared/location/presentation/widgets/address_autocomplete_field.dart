@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/shared/location/data/psgc_address_service.dart';
 
 class AddressAutocompleteField extends StatefulWidget {
@@ -70,6 +71,7 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
         isDense: true,
         filled: true,
         fillColor: AgrisellColors.fieldFill,
+        floatingLabelStyle: AgrisellTheme.floatingInputLabelStyle,
         constraints: const BoxConstraints.tightFor(height: 56),
         contentPadding: const EdgeInsets.symmetric(horizontal: 14),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),

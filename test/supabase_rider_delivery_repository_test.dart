@@ -41,6 +41,11 @@ void main() {
     expect(values.single.deliveryFee, 0);
     expect(values.single.isCashOnDelivery, isTrue);
     expect(values.single.cashOnDelivery?.amountToCollect, 450);
+    expect(values.single.reservedRiderId, 'auth-rider-1');
+    expect(
+      values.single.reservedUntil,
+      DateTime.parse('2026-07-16T02:00:00Z').toLocal(),
+    );
     expect(
       requests.any((uri) => uri.path.endsWith('/rpc/current_rider_deliveries')),
       isTrue,
@@ -64,4 +69,7 @@ const _availableDelivery = <String, Object?>{
   'payment_status': 'pending_collection',
   'amount_to_collect': 450,
   'assigned_to_current_rider': false,
+  'assignment_request_id': 'request-1',
+  'assignment_request_status': 'pending',
+  'assignment_request_expires_at': '2026-07-16T02:00:00Z',
 };

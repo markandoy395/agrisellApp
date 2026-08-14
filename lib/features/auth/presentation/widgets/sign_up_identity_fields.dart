@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:agresell_app/core/utils/philippine_phone_number.dart';
 import 'package:agresell_app/features/shared/widgets/profile/phone_number_sync_control.dart';
@@ -95,6 +96,10 @@ class _SignUpIdentityFieldsState extends State<SignUpIdentityFields> {
         ),
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
+          dropdownColor: AppDropdownStyle.menuColor,
+          borderRadius: AppDropdownStyle.menuBorderRadius,
+          style: AppDropdownStyle.textStyle,
+          iconEnabledColor: AppDropdownStyle.iconColor,
           initialValue: widget.genderController.text.isEmpty
               ? null
               : widget.genderController.text,

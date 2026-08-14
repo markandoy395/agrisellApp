@@ -1,5 +1,6 @@
 import 'support/home_product_fixture.dart';
 import 'package:agresell_app/features/shared/orders/data/order_local_repository.dart';
+import 'package:agresell_app/features/shared/orders/data/order_repository.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_status.dart';
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
 import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
@@ -178,6 +179,99 @@ void main() {
       testHomeProducts.first.name,
     );
   });
+
+  test('new checkout persists only its new orders remotely', () async {
+    final staleOrder = PlacedOrder(
+      id: 'ORD-STALE',
+      status: PlacedOrderStatus.cancelled,
+      placedAt: DateTime(2026),
+      deliveryAddress: 'Old address',
+      phoneNumber: '09123456789',
+      items: const [],
+    );
+    final repository = _PlacementRepository(staleOrder);
+    final controller = OrderController(repository: repository);
+    await controller.loadForAccount('buyer-1');
+
+    final order = await controller.placeToShipOrder(
+      items: [BasketCartItem.fromProduct(testHomeProducts.first)],
+      deliveryAddress: 'New address',
+      phoneNumber: '09987654321',
+    );
+
+    expect(order, isNotNull);
+    expect(repository.saveCalls, 0);
+    expect(repository.createdOrders, hasLength(1));
+    expect(repository.createdOrders.single.id, order!.id);
+    expect(repository.currentOrders, hasLength(2));
+    expect(repository.currentOrders.first.id, order.id);
+    expect(repository.currentOrders.last.id, staleOrder.id);
+  });
+}
+
+class _PlacementRepository implements OrderRepository {
+  _PlacementRepository(this.staleOrder);
+
+  final PlacedOrder staleOrder;
+  var saveCalls = 0;
+  List<PlacedOrder> createdOrders = const [];
+  List<PlacedOrder> currentOrders = const [];
+
+  @override
+  Future<void> submitFeedback({
+    required String accountId,
+    required String orderId,
+    required String productId,
+    int? productRating,
+    required String productComment,
+    int? riderRating,
+    String riderComment = '',
+  }) async {}
+
+  @override
+  Future<List<PlacedOrder>> load(String accountId) async => [staleOrder];
+
+  @override
+  Future<void> createOrders({
+    required String accountId,
+    required Iterable<PlacedOrder> newOrders,
+    required Iterable<PlacedOrder> currentOrders,
+  }) async {
+    createdOrders = List<PlacedOrder>.of(newOrders);
+    this.currentOrders = List<PlacedOrder>.of(currentOrders);
+  }
+
+  @override
+  Future<void> save(String accountId, Iterable<PlacedOrder> orders) async {
+    saveCalls++;
+  }
+
+  @override
+  Future<void> markReadyForPickup({
+    required String accountId,
+    required String orderId,
+  }) async {}
+
+  @override
+  Future<void> recordGcashRefund({
+    required String accountId,
+    required String orderId,
+    required String reference,
+  }) async {}
+
+  @override
+  Future<void> resubmitGcashReference({
+    required String accountId,
+    required String orderId,
+    required String reference,
+  }) async {}
+
+  @override
+  Future<void> reviewGcashPayment({
+    required String accountId,
+    required String orderId,
+    required bool approved,
+  }) async {}
 }
 
 BasketCartItem _withSeller(
@@ -188,6 +282,7 @@ BasketCartItem _withSeller(
   productId: item.productId,
   productName: item.productName,
   image: item.image,
+  imageUrl: item.imageUrl,
   sellerName: sellerName,
   sellerLocation: item.sellerLocation,
   harvestDate: item.harvestDate,

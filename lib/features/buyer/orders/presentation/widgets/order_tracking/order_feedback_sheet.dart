@@ -9,7 +9,13 @@ class _OrderFeedbackSheet extends StatefulWidget {
 
   final PlacedOrder order;
   final PlacedOrderItem item;
-  final Future<void> Function(int rating, String comment) onSubmit;
+  final Future<void> Function(
+    int rating,
+    String comment,
+    int? riderRating,
+    String riderComment,
+  )
+  onSubmit;
 
   @override
   State<_OrderFeedbackSheet> createState() => _OrderFeedbackSheetState();
@@ -17,19 +23,25 @@ class _OrderFeedbackSheet extends StatefulWidget {
 
 class _OrderFeedbackSheetState extends State<_OrderFeedbackSheet> {
   final _commentController = TextEditingController();
+  final _riderCommentController = TextEditingController();
   var _rating = 5;
+  var _riderRating = 5;
   var _submitting = false;
   String? _error;
 
   @override
   void dispose() {
     _commentController.dispose();
+    _riderCommentController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+    final canRateProduct = widget.order.canReviewProduct(widget.item.productId);
+    final canRateRider =
+        widget.order.deliveryId != null && !widget.order.riderRated;
     return SafeArea(
       top: false,
       child: SingleChildScrollView(
@@ -51,8 +63,10 @@ class _OrderFeedbackSheetState extends State<_OrderFeedbackSheet> {
             const SizedBox(height: 14),
             _FeedbackProductHeader(item: widget.item),
             const SizedBox(height: 15),
-            const Text(
-              'How was your order?',
+            Text(
+              canRateProduct
+                  ? 'How was this product?'
+                  : 'How was your delivery?',
               style: TextStyle(
                 color: AgrisellColors.brandBlack,
                 fontSize: 14,
@@ -65,47 +79,101 @@ class _OrderFeedbackSheetState extends State<_OrderFeedbackSheet> {
               style: TextStyle(color: AgrisellColors.mutedText, fontSize: 12),
             ),
             const SizedBox(height: 7),
-            Semantics(
-              label: 'Selected rating: $_rating out of 5 stars',
-              child: Row(
-                children: [
-                  for (var value = 1; value <= 5; value++)
-                    IconButton(
-                      visualDensity: VisualDensity.compact,
-                      tooltip: '$value star rating',
-                      onPressed: _submitting
-                          ? null
-                          : () => setState(() => _rating = value),
-                      icon: Icon(
-                        value <= _rating
-                            ? Icons.star_rounded
-                            : Icons.star_border_rounded,
-                        color: AgrisellColors.accentOrange,
-                        size: 28,
+            if (canRateProduct) ...[
+              Semantics(
+                label: 'Selected rating: $_rating out of 5 stars',
+                child: Row(
+                  children: [
+                    for (var value = 1; value <= 5; value++)
+                      IconButton(
+                        visualDensity: VisualDensity.compact,
+                        tooltip: '$value star rating',
+                        onPressed: _submitting
+                            ? null
+                            : () => setState(() => _rating = value),
+                        icon: Icon(
+                          value <= _rating
+                              ? Icons.star_rounded
+                              : Icons.star_border_rounded,
+                          color: AgrisellColors.accentOrange,
+                          size: 28,
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              key: const ValueKey('order-feedback-comment'),
-              controller: _commentController,
-              enabled: !_submitting,
-              minLines: 3,
-              maxLines: 4,
-              maxLength: 500,
-              style: const TextStyle(fontSize: 13),
-              decoration: InputDecoration(
-                labelText: 'Comment (optional)',
-                hintText: 'Freshness, packaging, and seller service',
-                filled: true,
-                fillColor: AgrisellColors.searchBackground,
-                border: _feedbackBorder(AgrisellColors.borderLine),
-                enabledBorder: _feedbackBorder(AgrisellColors.borderLine),
-                focusedBorder: _feedbackBorder(AgrisellColors.authGreen),
+              const SizedBox(height: 8),
+              TextField(
+                key: const ValueKey('order-feedback-comment'),
+                controller: _commentController,
+                enabled: !_submitting,
+                minLines: 3,
+                maxLines: 4,
+                maxLength: 500,
+                style: const TextStyle(fontSize: 13),
+                decoration: InputDecoration(
+                  labelText: 'Comment (optional)',
+                  hintText: 'Freshness, packaging, and seller service',
+                  filled: true,
+                  fillColor: AgrisellColors.searchBackground,
+                  border: _feedbackBorder(AgrisellColors.borderLine),
+                  enabledBorder: _feedbackBorder(AgrisellColors.borderLine),
+                  focusedBorder: _feedbackBorder(AgrisellColors.authGreen),
+                ),
               ),
-            ),
+            ],
+            if (canRateRider) ...[
+              const SizedBox(height: 10),
+              const Divider(color: AgrisellColors.borderLine),
+              const Text(
+                'Rate your rider',
+                style: TextStyle(
+                  color: AgrisellColors.brandBlack,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              Semantics(
+                label: 'Selected rider rating: $_riderRating out of 5 stars',
+                child: Row(
+                  children: [
+                    for (var value = 1; value <= 5; value++)
+                      IconButton(
+                        visualDensity: VisualDensity.compact,
+                        tooltip: '$value star rider rating',
+                        onPressed: _submitting
+                            ? null
+                            : () => setState(() => _riderRating = value),
+                        icon: Icon(
+                          value <= _riderRating
+                              ? Icons.star_rounded
+                              : Icons.star_border_rounded,
+                          color: AgrisellColors.accentOrange,
+                          size: 28,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              TextField(
+                key: const ValueKey('rider-feedback-comment'),
+                controller: _riderCommentController,
+                enabled: !_submitting,
+                minLines: 2,
+                maxLines: 3,
+                maxLength: 500,
+                style: const TextStyle(fontSize: 13),
+                decoration: InputDecoration(
+                  labelText: 'Rider comment (optional)',
+                  hintText: 'Delivery care, communication, and service',
+                  filled: true,
+                  fillColor: AgrisellColors.searchBackground,
+                  border: _feedbackBorder(AgrisellColors.borderLine),
+                  enabledBorder: _feedbackBorder(AgrisellColors.borderLine),
+                  focusedBorder: _feedbackBorder(AgrisellColors.authGreen),
+                ),
+              ),
+            ],
             if (_error case final message?) ...[
               const SizedBox(height: 4),
               Text(
@@ -166,17 +234,27 @@ class _OrderFeedbackSheetState extends State<_OrderFeedbackSheet> {
       _error = null;
     });
     try {
-      await widget.onSubmit(_rating, _commentController.text);
+      await widget.onSubmit(
+        _rating,
+        _commentController.text,
+        widget.order.deliveryId != null && !widget.order.riderRated
+            ? _riderRating
+            : null,
+        _riderCommentController.text,
+      );
       if (!mounted) return;
       Navigator.of(context).pop();
       messenger.showAppSnackBar(
         const SnackBar(content: Text('Feedback saved. Thank you!')),
       );
-    } on Object {
+    } on Object catch (error) {
       if (!mounted) return;
       setState(() {
         _submitting = false;
-        _error = 'Feedback could not be saved. Please try again.';
+        final detail = error.toString().replaceFirst('Exception: ', '').trim();
+        _error = detail.isEmpty
+            ? 'Feedback could not be saved. Please try again.'
+            : detail;
       });
     }
   }

@@ -10,6 +10,7 @@ class _FeedbackProductHeader extends StatelessWidget {
     children: [
       ProductThumbnail.square(
         asset: item.image,
+        imageUrl: item.imageUrl,
         size: 48,
         borderRadius: 9,
         semanticLabel: '${item.productName} product photo',

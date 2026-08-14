@@ -15,10 +15,7 @@ extension _PickupConfirmationSections on _RiderPickupConfirmationScreenState {
             'Pickup: ${widget.request.pickupLocation.address}',
             style: const TextStyle(fontSize: 12),
           ),
-          Text(
-            'GPS accuracy: ${widget.controller.currentRiderLocation?.accuracyMeters.toStringAsFixed(0) ?? 'Unavailable'} m',
-            style: const TextStyle(fontSize: 12),
-          ),
+          _locationStatus(),
           if (widget.controller.pickupWaitingStartedAt case final startedAt?)
             Text(
               'Pickup waiting time: ${_waitingLabel(_now.difference(startedAt))}',
@@ -41,6 +38,66 @@ extension _PickupConfirmationSections on _RiderPickupConfirmationScreenState {
       ),
     ),
   );
+
+  Widget _locationStatus() {
+    final location = widget.controller.currentRiderLocation;
+    final usable = location?.isUsableForPickup() ?? false;
+    final state = widget.locationController?.state;
+    final status = switch (state) {
+      RiderLocationState.serviceDisabled => 'Location services are disabled.',
+      RiderLocationState.permissionDenied => 'Location permission is required.',
+      RiderLocationState.permissionDeniedForever =>
+        'Location permission is disabled in app settings.',
+      RiderLocationState.approximateLocation => 'Precise Location is disabled.',
+      RiderLocationState.timedOut => 'GPS fix timed out. Please retry.',
+      RiderLocationState.loading => 'Finding current GPS location…',
+      _ when usable =>
+        'GPS ready (±${location!.accuracyMeters.toStringAsFixed(0)} m)',
+      _ => 'GPS accuracy: Unavailable',
+    };
+    final needsLocationSettings = state == RiderLocationState.serviceDisabled;
+    final needsAppSettings =
+        state == RiderLocationState.permissionDeniedForever ||
+        state == RiderLocationState.approximateLocation;
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            status,
+            style: TextStyle(
+              fontSize: 12,
+              color: usable
+                  ? AgrisellColors.authGreen
+                  : AgrisellColors.statusRedText,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        TextButton(
+          onPressed: _refreshingLocation || _submitting
+              ? null
+              : () {
+                  if (needsLocationSettings) {
+                    unawaited(
+                      widget.locationController?.openLocationSettings(),
+                    );
+                  } else if (needsAppSettings) {
+                    unawaited(widget.locationController?.openAppSettings());
+                  } else {
+                    unawaited(_refreshPickupLocation(requestPermission: true));
+                  }
+                },
+          child: Text(
+            _refreshingLocation
+                ? 'Locating…'
+                : needsLocationSettings || needsAppSettings
+                ? 'Open settings'
+                : 'Retry GPS',
+          ),
+        ),
+      ],
+    );
+  }
 
   Widget _methods(PickupConfiguration config) => Card(
     child: Padding(
@@ -97,7 +154,11 @@ extension _PickupConfirmationSections on _RiderPickupConfirmationScreenState {
                 ),
               ],
             ),
-          for (final method in config.requiredMethods.where(_requiresProof))
+          for (final method
+              in {
+                ...config.requiredMethods,
+                PickupConfirmationMethod.productPhoto,
+              }.where(_requiresProof))
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: OutlinedButton.icon(
@@ -141,11 +202,31 @@ extension _PickupConfirmationSections on _RiderPickupConfirmationScreenState {
   Widget _action(PickupConfiguration config) => Column(
     children: [
       if (_error != null)
-        Text(
-          _error!,
-          style: const TextStyle(
-            color: AgrisellColors.statusRedText,
-            fontSize: 12,
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                _error!,
+                style: const TextStyle(
+                  color: AgrisellColors.statusRedText,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              for (final issue in _validationIssues)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
+                    '• ${issue.message}',
+                    style: const TextStyle(
+                      color: AgrisellColors.statusRedText,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       SizedBox(

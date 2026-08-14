@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -11,6 +9,7 @@ import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_l
 import 'package:agresell_app/features/rider/presentation/rider_availability_presentation.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_status_pills.dart';
+import 'package:agresell_app/features/shared/widgets/profile/safe_circle_avatar.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_follow_stats.dart';
 
 class RiderProfileOverview extends StatelessWidget {
@@ -56,10 +55,10 @@ class RiderProfileOverview extends StatelessWidget {
         RiderSurfaceCard(
           child: Row(
             children: [
-              CircleAvatar(
+              SafeCircleAvatar(
                 radius: 32,
-                foregroundImage: _photoImage(profile.profilePhotoUrl),
-                child: const Icon(Icons.person_rounded, size: 30),
+                imageUrl: profile.profilePhotoUrl,
+                fallback: const Icon(Icons.person_rounded, size: 30),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -111,6 +110,7 @@ class RiderProfileOverview extends StatelessWidget {
           rows: [
             RiderProfileInfoRow(Icons.phone_outlined, profile.contactNumber),
             RiderProfileInfoRow(Icons.email_outlined, profile.email),
+            RiderProfileInfoRow(Icons.home_outlined, profile.addressLabel),
           ],
         ),
         const SizedBox(height: 12),
@@ -134,7 +134,12 @@ class RiderProfileOverview extends StatelessWidget {
         RiderProfileInformationCard(
           title: 'Rider status',
           rows: [
-            RiderProfileInfoRow(Icons.location_on_outlined, profile.gpsLabel),
+            RiderProfileInfoRow(
+              Icons.location_on_outlined,
+              profile.hasRegisteredServiceCoordinates
+                  ? 'Exact GPS location captured'
+                  : 'GPS location unavailable',
+            ),
             RiderProfileInfoRow(
               Icons.toggle_on_outlined,
               profile.availabilityStatus.displayLabel,
@@ -169,10 +174,4 @@ class RiderProfileOverview extends StatelessWidget {
       ],
     );
   }
-}
-
-ImageProvider<Object>? _photoImage(String? value) {
-  if (value == null || value.isEmpty) return null;
-  if (Uri.tryParse(value)?.hasScheme ?? false) return NetworkImage(value);
-  return FileImage(File(value));
 }

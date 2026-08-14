@@ -18,6 +18,8 @@ void main() {
         status: OrderPaymentStatus.verified,
         transactionReference: '1234567890123',
         refundReference: 'REFUND-987654',
+        receiptImageReference: 'local-secure://gcash-receipts/test',
+        receiptImageName: 'gcash-receipt.png',
       ),
       feedback: OrderFeedback(
         rating: 4,
@@ -34,8 +36,11 @@ void main() {
     expect(restored.payment.status, OrderPaymentStatus.verified);
     expect(restored.payment.transactionReference, '1234567890123');
     expect(restored.payment.refundReference, 'REFUND-987654');
+    expect(restored.payment.receiptImageReference, contains('gcash-receipts'));
+    expect(restored.payment.receiptImageName, 'gcash-receipt.png');
     expect(restored.feedback?.rating, 4);
     expect(restored.feedback?.comment, 'Fresh and carefully packed.');
+    expect(restored.items.single.imageUrl, 'https://example.com/tomato.jpg');
   });
 
   test('feedback is saved with its rating and comment', () async {
@@ -58,7 +63,50 @@ void main() {
     expect(stored.isRated, isTrue);
     expect(stored.feedback?.rating, 5);
     expect(stored.feedback?.comment, 'Excellent harvest.');
+    expect(stored.items.single.feedback?.rating, 5);
   });
+
+  test(
+    'feedback is blocked before delivery and cannot be duplicated',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      final preferences = await SharedPreferences.getInstance();
+      final repository = OrderLocalRepository(preferences: preferences);
+      await repository.save('buyer-1', [_order()]);
+      final controller = OrderController(repository: repository);
+      await controller.loadForAccount('buyer-1');
+
+      await expectLater(
+        controller.submitFeedback(
+          orderId: 'ORD-1',
+          productId: '1',
+          rating: 5,
+          comment: '',
+        ),
+        throwsStateError,
+      );
+
+      await repository.save('buyer-1', [
+        _order(status: PlacedOrderStatus.delivered),
+      ]);
+      await controller.loadForAccount('buyer-1');
+      await controller.submitFeedback(
+        orderId: 'ORD-1',
+        productId: '1',
+        rating: 5,
+        comment: '',
+      );
+      await expectLater(
+        controller.submitFeedback(
+          orderId: 'ORD-1',
+          productId: '1',
+          rating: 4,
+          comment: '',
+        ),
+        throwsStateError,
+      );
+    },
+  );
 
   test(
     'unverified GCash blocks acceptance and rejected references recover',
@@ -166,6 +214,7 @@ PlacedOrder _order({
       productId: '1',
       productName: 'Tomato',
       image: 'assets/images/vege.jpeg',
+      imageUrl: 'https://example.com/tomato.jpg',
       sellerName: 'Test Farmer',
       pricePerKg: 50,
       unit: 'kg',

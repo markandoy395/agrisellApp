@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/core/services/push_notification_service.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
@@ -27,6 +28,7 @@ part 'home_screen_messaging.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
     this.initialNavIndex = homeNavIndex,
+    this.initialMessage,
     this.messagingRepository,
     this.productRepository = const HomeProductRepository(),
     super.key,
@@ -39,6 +41,7 @@ class HomeScreen extends StatefulWidget {
   static const profileNavIndex = 4;
 
   final int initialNavIndex;
+  final String? initialMessage;
   final MarketplaceMessagingRepository? messagingRepository;
   final HomeProductRepository productRepository;
 
@@ -52,7 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
   late final Map<int, int> _badgeCounts;
   late int _activeNavIndex;
   StreamSubscription<PushNotificationAction>? _pushSubscription;
-  int? _tabAnimationTarget;
 
   void _updateUi(VoidCallback update) => setState(update);
 
@@ -74,6 +76,15 @@ class _HomeScreenState extends State<HomeScreen> {
     unawaited(_productCatalogController.load());
     unawaited(_loadMessageUnreadCount());
     unawaited(_loadNotificationUnreadCount());
+    final initialMessage = widget.initialMessage;
+    if (initialMessage != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showAppSnackBar(SnackBar(content: Text(initialMessage)));
+      });
+    }
   }
 
   @override
@@ -90,22 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _activeNavIndex = index;
     });
-
-    final disableAnimations =
-        MediaQuery.maybeOf(context)?.disableAnimations ?? false;
-    if (disableAnimations) {
-      _navigationController.jumpToPage(index);
-    } else {
-      _tabAnimationTarget = index;
-      await _navigationController.animateToPage(
-        index,
-        duration: const Duration(milliseconds: 280),
-        curve: Curves.easeOutCubic,
-      );
-      if (mounted && _tabAnimationTarget == index) {
-        _tabAnimationTarget = null;
-      }
-    }
+    _navigationController.jumpToPage(index);
   }
 
   void _handlePageChanged(int index) {
@@ -133,38 +129,44 @@ class _HomeScreenState extends State<HomeScreen> {
           shadowColor: AgrisellColors.brandBlack.withValues(alpha: 0.16),
           onItemSelected: _selectTab,
         ),
-        body: PageView(
+        body: PageView.builder(
           controller: _navigationController,
           onPageChanged: _handlePageChanged,
           physics: const ClampingScrollPhysics(),
-          children: [
-            _KeepAliveTab(
-              child: HomeDashboardContent(
-                catalogController: _productCatalogController,
-                onProductTap: _openProduct,
-              ),
-            ),
-            _KeepAliveTab(
-              child: BuyerMessageScreen(
-                isActive: _activeNavIndex == HomeScreen.messageNavIndex,
-                repository: widget.messagingRepository,
-                onUnreadCountChanged: _setMessageUnreadCount,
-              ),
-            ),
-            const _KeepAliveTab(child: FarmerScreen()),
-            _KeepAliveTab(
-              child: NotificationScreen(
-                role: AuthRole.buyer,
-                userId: AuthSessionService.instance.currentAccount?.id,
-                onNotificationSelected: _openNotification,
-                onUnreadCountChanged: _setNotificationUnreadCount,
-              ),
-            ),
-            const _KeepAliveTab(child: ProfileScreen()),
-          ],
+          itemCount: homeBottomNavItems.length,
+          itemBuilder: _buildTab,
         ),
       ),
     );
+  }
+
+  Widget _buildTab(BuildContext context, int index) {
+    return switch (index) {
+      HomeScreen.homeNavIndex => _KeepAliveTab(
+        child: HomeDashboardContent(
+          catalogController: _productCatalogController,
+          onProductTap: _openProduct,
+        ),
+      ),
+      HomeScreen.messageNavIndex => _KeepAliveTab(
+        child: BuyerMessageScreen(
+          isActive: _activeNavIndex == HomeScreen.messageNavIndex,
+          repository: widget.messagingRepository,
+          onUnreadCountChanged: _setMessageUnreadCount,
+        ),
+      ),
+      HomeScreen.farmerNavIndex => const _KeepAliveTab(child: FarmerScreen()),
+      HomeScreen.notificationNavIndex => _KeepAliveTab(
+        child: NotificationScreen(
+          role: AuthRole.buyer,
+          userId: AuthSessionService.instance.currentAccount?.id,
+          onNotificationSelected: _openNotification,
+          onUnreadCountChanged: _setNotificationUnreadCount,
+        ),
+      ),
+      HomeScreen.profileNavIndex => const _KeepAliveTab(child: ProfileScreen()),
+      _ => const SizedBox.shrink(),
+    };
   }
 
   void _openNotification(HomeNotification notification) {

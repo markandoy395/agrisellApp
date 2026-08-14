@@ -41,6 +41,10 @@ void main() {
     AuthSessionService.instance.clearMemoryForTesting();
 
     expect((await AuthSessionService.instance.restore()).account, isNull);
+    expect(
+      await AuthSessionService.instance.loadRememberedIdentifier(),
+      account.email,
+    );
   });
 
   test(
@@ -57,6 +61,10 @@ void main() {
 
       expect(restored.account, isNull);
       expect(restored.wasExpired, isFalse);
+      expect(
+        await AuthSessionService.instance.loadRememberedIdentifier(),
+        isNull,
+      );
     },
   );
 

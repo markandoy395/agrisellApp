@@ -11,6 +11,7 @@ import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_s
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_sign_up_security_step.dart';
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_sign_up_vehicle_step.dart';
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_sign_up_widgets.dart';
+import 'package:agresell_app/features/shared/location/data/gps_location_gateway.dart';
 
 class RiderRegistrationForm extends StatefulWidget {
   const RiderRegistrationForm({
@@ -18,11 +19,13 @@ class RiderRegistrationForm extends StatefulWidget {
     required this.onExit,
     required this.onEmailOtpRequired,
     this.controller,
+    this.gpsGateway,
     super.key,
   });
   final ValueChanged<RiderProfile> onSubmitted;
   final Future<void> Function() onExit;
   final RiderSignUpController? controller;
+  final GpsLocationGateway? gpsGateway;
   final Future<bool> Function(String email) onEmailOtpRequired;
   @override
   State<RiderRegistrationForm> createState() => RiderRegistrationFormState();
@@ -37,7 +40,9 @@ class RiderRegistrationFormState extends State<RiderRegistrationForm>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _ownsController = widget.controller == null;
-    _controller = widget.controller ?? RiderSignUpController();
+    _controller =
+        widget.controller ??
+        RiderSignUpController(gpsGateway: widget.gpsGateway);
     unawaited(_controller.initialize());
   }
 
@@ -165,7 +170,9 @@ class RiderRegistrationFormState extends State<RiderRegistrationForm>
                   isFirst: step == RiderSignUpStep.personal,
                   isLast: step == RiderSignUpStep.review,
                   enabled: _controller.canContinue,
-                  loading: _controller.isSubmitting,
+                  loading:
+                      _controller.isSubmitting ||
+                      _controller.isCapturingLocation,
                   onPrevious: () => unawaited(_controller.previousStep()),
                   onContinue: _continue,
                 ),

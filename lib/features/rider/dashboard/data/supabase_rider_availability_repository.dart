@@ -1,3 +1,6 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_availability.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_data_source.dart';
 import 'package:agresell_app/features/rider/deliveries/data/rider_delivery_foundation_repositories.dart';
@@ -7,10 +10,15 @@ import 'package:agresell_app/features/rider/profile/domain/rider.dart';
 
 class SupabaseRiderAvailabilityRepository
     implements RiderAvailabilityRepository, RiderDataSourceMetadata {
-  SupabaseRiderAvailabilityRepository({RiderRepository? repository})
-    : _repository = repository ?? RiderRepositoryImpl();
+  SupabaseRiderAvailabilityRepository({
+    RiderRepository? repository,
+    SupabaseClient? client,
+  }) : _repository = repository ?? RiderRepositoryImpl(),
+       _client =
+           client ?? (repository == null ? AgrisellSupabase.client : null);
 
   final RiderRepository _repository;
+  final SupabaseClient? _client;
 
   @override
   RiderDataOrigin get dataOrigin => RiderDataOrigin.backend;
@@ -51,11 +59,34 @@ class SupabaseRiderAvailabilityRepository
       throw StateError('The authenticated Rider profile is unavailable.');
     }
     final status = _databaseStatus(availability, current.deliveryStatus);
-    await _repository.updateRiderOperationalStatus(
+    final updated = await _saveOperationalStatus(
       riderId,
       availability: status.$1,
       delivery: status.$2,
     );
+    if (updated.riderId != riderId || updated.availabilityStatus != status.$1) {
+      throw StateError('The Rider availability update was not persisted.');
+    }
+  }
+
+  Future<Rider> _saveOperationalStatus(
+    String riderId, {
+    required RiderDatabaseAvailability availability,
+    required RiderDeliveryProgress delivery,
+  }) async {
+    final client = _client;
+    if (client == null) {
+      return _repository.updateRiderOperationalStatus(
+        riderId,
+        availability: availability,
+        delivery: delivery,
+      );
+    }
+    final row = await client.rpc<Object?>(
+      'update_current_rider_availability',
+      params: {'p_availability_status': availability.name},
+    );
+    return Rider.fromJson(_map(row));
   }
 
   (RiderDatabaseAvailability, RiderDeliveryProgress) _databaseStatus(
@@ -105,3 +136,7 @@ class SupabaseRiderAvailabilityRepository
     ),
   };
 }
+
+Map<String, Object?> _map(Object? value) => value is Map
+    ? {for (final entry in value.entries) '${entry.key}': entry.value}
+    : const {};

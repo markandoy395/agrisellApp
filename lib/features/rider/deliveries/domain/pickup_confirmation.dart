@@ -91,7 +91,7 @@ class PickupConditionChecklist {
   final int confirmedQuantity;
   final double confirmedWeightKg;
 
-  bool get passes =>
+  bool get allItemsChecked =>
       correctProduct &&
       correctQuantity &&
       correctWeight &&
@@ -99,9 +99,64 @@ class PickupConditionChecklist {
       notVisiblyDamaged &&
       matchesRequest &&
       fitsVehicle &&
-      handlingInstructionsReceived &&
-      confirmedQuantity > 0 &&
-      confirmedWeightKg >= 0;
+      handlingInstructionsReceived;
+
+  bool get hasValidQuantity => confirmedQuantity > 0;
+  bool get hasValidWeight =>
+      confirmedWeightKg.isFinite && confirmedWeightKg >= 0;
+  bool get passes => allItemsChecked && hasValidQuantity && hasValidWeight;
+}
+
+enum PickupValidationIssue {
+  location,
+  checklist,
+  quantity,
+  weight,
+  productPhoto,
+}
+
+extension PickupValidationIssueDetails on PickupValidationIssue {
+  String get message => switch (this) {
+    PickupValidationIssue.location =>
+      'Pickup location is unavailable. Please enable Precise Location and try again.',
+    PickupValidationIssue.checklist =>
+      'Complete all 8 product condition checklist items.',
+    PickupValidationIssue.quantity => 'Enter a quantity greater than 0.',
+    PickupValidationIssue.weight => 'Enter a valid weight of 0 kg or greater.',
+    PickupValidationIssue.productPhoto => 'Upload the required product photo.',
+  };
+}
+
+class PickupCompletionValidation {
+  const PickupCompletionValidation(this.issues);
+
+  static const heading =
+      'Pickup cannot be confirmed because one or more required requirements are incomplete.';
+
+  final List<PickupValidationIssue> issues;
+  bool get isValid => issues.isEmpty;
+
+  String get message =>
+      [heading, ...issues.map((item) => item.message)].join('\n');
+}
+
+PickupCompletionValidation validatePickupCompletion(
+  PickupCompletionCommand command, {
+  DateTime? now,
+}) {
+  final checklist = command.checklist;
+  return PickupCompletionValidation([
+    if (!command.location.isUsableForPickup(now: now))
+      PickupValidationIssue.location,
+    if (!checklist.allItemsChecked) PickupValidationIssue.checklist,
+    if (!checklist.hasValidQuantity) PickupValidationIssue.quantity,
+    if (!checklist.hasValidWeight) PickupValidationIssue.weight,
+    if ((command.proofReferences[PickupConfirmationMethod.productPhoto]
+            ?.trim()
+            .isEmpty ??
+        true))
+      PickupValidationIssue.productPhoto,
+  ]);
 }
 
 class PickupCompletionCommand {

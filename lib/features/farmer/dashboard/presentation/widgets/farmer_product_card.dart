@@ -1,10 +1,17 @@
 part of 'package:agresell_app/features/farmer/dashboard/presentation/screens/farmer_dashboard_screen.dart';
 
 class _FarmerProductCard extends StatelessWidget {
-  const _FarmerProductCard({required this.product, required this.onEdit});
+  const _FarmerProductCard({
+    required this.product,
+    required this.onEdit,
+    required this.onRestock,
+    required this.isRestocking,
+  });
 
   final FarmerDashboardProduct product;
   final VoidCallback onEdit;
+  final VoidCallback onRestock;
+  final bool isRestocking;
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +69,13 @@ class _FarmerProductCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Expanded(child: _FarmerProductDetails(product: product)),
+                Expanded(
+                  child: _FarmerProductDetails(
+                    product: product,
+                    onRestock: onRestock,
+                    isRestocking: isRestocking,
+                  ),
+                ),
               ],
             ),
           ),

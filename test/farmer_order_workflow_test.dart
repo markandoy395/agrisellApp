@@ -37,12 +37,22 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Accept order'), findsOneWidget);
-    await tester.tap(find.text('Accept order'));
+    await tester.tap(
+      find.byKey(
+        ValueKey('farmer-order-card-${orderController.orders.single.id}'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Accept order').first);
+    expect(find.text('Accept order'), findsWidgets);
+    await tester.tap(find.text('Accept order').first);
     await tester.pumpAndSettle();
 
-    expect(find.text('Mark ready for pickup'), findsOneWidget);
-    await tester.tap(find.text('Mark ready for pickup'));
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Mark ready for pickup').first);
+    expect(find.text('Mark ready for pickup'), findsWidgets);
+    await tester.tap(find.text('Mark ready for pickup').first);
     await tester.pumpAndSettle();
 
     expect(find.text('Waiting for an assigned rider'), findsOneWidget);

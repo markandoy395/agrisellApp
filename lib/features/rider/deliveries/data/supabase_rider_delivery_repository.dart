@@ -4,6 +4,7 @@ class SupabaseRiderDeliveryRepository implements RiderDeliveryRepository {
   SupabaseRiderDeliveryRepository(this._dataSource);
 
   final SupabaseDeliveryDataSource _dataSource;
+  final Map<String, String> _pendingPickupRemoteReferences = {};
 
   @override
   Future<List<DeliveryRequest>> fetchRequests({
@@ -16,11 +17,32 @@ class SupabaseRiderDeliveryRepository implements RiderDeliveryRepository {
       _fetchNearbyRequests(query);
 
   @override
-  Stream<void> watchRequestChanges({required String riderId}) => _dataSource
-      .client
-      .from('deliveries')
-      .stream(primaryKey: ['delivery_id'])
-      .map((_) {});
+  Stream<void> watchRequestChanges({required String riderId}) {
+    late final StreamController<void> controller;
+    StreamSubscription<Object?>? deliverySubscription;
+    StreamSubscription<Object?>? requestSubscription;
+    controller = StreamController<void>(
+      onListen: () {
+        deliverySubscription = _dataSource.client
+            .from('deliveries')
+            .stream(primaryKey: ['delivery_id'])
+            // The first stream value is the initial table snapshot, not a
+            // change. The controller is already performing its initial load.
+            .skip(1)
+            .listen((_) => controller.add(null), onError: controller.addError);
+        requestSubscription = _dataSource.client
+            .from('rider_assignment_requests')
+            .stream(primaryKey: ['request_id'])
+            .skip(1)
+            .listen((_) => controller.add(null), onError: controller.addError);
+      },
+      onCancel: () async {
+        await deliverySubscription?.cancel();
+        await requestSubscription?.cancel();
+      },
+    );
+    return controller.stream;
+  }
 
   @override
   Future<DeliveryAcceptanceReceipt> acceptDelivery(

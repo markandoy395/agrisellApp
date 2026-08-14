@@ -7,6 +7,7 @@ import 'package:agresell_app/features/rider/dashboard/data/temporary_local_rider
 import 'package:agresell_app/features/rider/dashboard/domain/rider_availability.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_availability_state.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/controllers/rider_availability_controller.dart';
+import 'package:agresell_app/features/rider/deliveries/data/rider_delivery_repository.dart';
 import 'package:agresell_app/features/rider/deliveries/data/shared_preferences_rider_delivery_state_store.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
 import 'support/rider_availability_fakes.dart';
@@ -22,12 +23,38 @@ void main() {
     final result = await harness.availability.setOnline(true);
 
     expect(result.isSuccess, isTrue);
+    expect(harness.location.publishCalls, 1);
     expect(harness.repository.saveCalls, 1);
     expect(harness.repository.serverStatus, RiderAvailability.onlineAvailable);
     expect(
       harness.delivery.status.availability,
       RiderAvailability.onlineAvailable,
     );
+  });
+
+  test(
+    'startup checks dashboard connectivity without requesting GPS',
+    () async {
+      final harness = await _Harness.create();
+      addTearDown(harness.dispose);
+
+      expect(harness.connectivity.checkCalls, greaterThan(0));
+      expect(harness.location.refreshCalls, 0);
+      expect(harness.location.permissionRequestCalls, 0);
+    },
+  );
+
+  test('Rider stays Offline when current GPS cannot synchronize', () async {
+    final harness = await _Harness.create();
+    addTearDown(harness.dispose);
+    harness.location.publishSucceeds = false;
+
+    final result = await harness.availability.setOnline(true);
+
+    expect(result.isSuccess, isFalse);
+    expect(result.warning, RiderAvailabilityWarning.synchronizationFailed);
+    expect(harness.repository.saveCalls, 0);
+    expect(harness.delivery.status.availability, RiderAvailability.offline);
   });
 
   test('online Rider synchronizes Offline', () async {
@@ -132,6 +159,34 @@ void main() {
       restoredAvailability.availability,
       RiderAvailability.onlineAvailable,
     );
+  });
+
+  test('startup restores an assigned backend delivery while offline', () async {
+    final delivery = RiderDeliveryController(
+      repository: InMemoryRiderDeliveryRepository(
+        requests: [assignedDeliveryRequest()],
+      ),
+    )..updateProfile(verifiedRiderProfile());
+    addTearDown(delivery.dispose);
+    await delivery.restore(riderId: 'rider-a');
+    final repository = FakeRiderAvailabilityRepository();
+    final connectivity = FakeRiderConnectivityService();
+    final location = FakeRiderLocationController();
+    final availability = RiderAvailabilityController(
+      deliveryController: delivery,
+      locationController: location,
+      repository: repository,
+      connectivityService: connectivity,
+    );
+    addTearDown(availability.dispose);
+    addTearDown(connectivity.dispose);
+    addTearDown(location.dispose);
+
+    await availability.initialize(riderId: 'rider-a');
+
+    expect(delivery.hasActiveDelivery, isTrue);
+    expect(delivery.status.availability, RiderAvailability.deliveryReserved);
+    expect(repository.serverStatus, RiderAvailability.deliveryReserved);
   });
 }
 

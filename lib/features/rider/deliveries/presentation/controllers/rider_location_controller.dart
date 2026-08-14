@@ -153,9 +153,16 @@ class RiderLocationController extends ChangeNotifier {
       } on Exception {
         _isApproximate = false;
       }
-      _setPosition(
-        await _gateway.currentPosition(settings: _currentLocationSettings),
+      final position = await _gateway.currentPosition(
+        settings: _currentLocationSettings,
       );
+      if (!_isUsablePositionSample(position)) {
+        _setError(
+          'A current GPS fix could not be retrieved. Please try again.',
+        );
+        return;
+      }
+      _setPosition(position);
     } on TimeoutException {
       _setError(
         'Location took too long. Check your signal and try again.',
@@ -169,6 +176,13 @@ class RiderLocationController extends ChangeNotifier {
   Future<bool> openLocationSettings() => _gateway.openLocationSettings();
   Future<bool> openAppSettings() => _gateway.openAppSettings();
 
+  Future<bool> publishCurrentLocation() async {
+    final location = _location;
+    if (_currentRiderId == null || location == null) return false;
+    await _publishIfMeaningful(location);
+    return _outbox.sync();
+  }
+
   bool get _needsLocationRefresh {
     final location = _location;
     return location == null ||
@@ -177,6 +191,11 @@ class RiderLocationController extends ChangeNotifier {
 
   void _setUnavailableState(RiderLocationState state) {
     _state = state;
+    if (state == RiderLocationState.serviceDisabled ||
+        state == RiderLocationState.permissionDenied ||
+        state == RiderLocationState.permissionDeniedForever) {
+      _location = null;
+    }
     notifyListeners();
   }
 

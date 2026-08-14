@@ -57,6 +57,11 @@ class HomeNotificationMapper {
       'payment_update' => HomeNotificationType.paymentUpdate,
       'new_message' => HomeNotificationType.newMessage,
       'delivery_request' => HomeNotificationType.deliveryRequest,
+      'rider_assignment_accepted' => HomeNotificationType.riderAccepted,
+      'rider_assignment_declined' ||
+      'rider_assignment_cancelled' ||
+      'rider_assignment_failed' => HomeNotificationType.deliveryCancelled,
+      'rider_assignment_expired' => HomeNotificationType.warning,
       _ => HomeNotificationType.values.firstWhere(
         (item) => _typeName(item) == name,
         orElse: () => HomeNotificationType.verificationUpdate,
@@ -76,6 +81,7 @@ class HomeNotificationMapper {
       HomeNotificationType.paymentUpdate => 'payment_update',
       HomeNotificationType.newMessage => 'new_message',
       HomeNotificationType.deliveryRequest => 'delivery_request',
+      HomeNotificationType.riderAccepted => 'rider_assignment_accepted',
       _ =>
         value.name
             .replaceAllMapped(

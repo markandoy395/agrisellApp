@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/auth/domain/saved_account.dart';
+import 'package:agresell_app/features/shared/widgets/profile/safe_circle_avatar.dart';
 
 class AccountSwitcherContent extends StatelessWidget {
   const AccountSwitcherContent({
@@ -91,11 +92,13 @@ class SavedAccountTile extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        leading: CircleAvatar(
+        leading: SafeCircleAvatar(
+          radius: 20,
+          imageUrl: account.profileImageUrl,
           backgroundColor: AgrisellColors.forestSoft,
           foregroundColor: AgrisellColors.authGreen,
-          child: Text(
-            account.displayName.characters.first.toUpperCase(),
+          fallback: Text(
+            _initials(account),
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
           ),
         ),
@@ -129,5 +132,16 @@ class SavedAccountTile extends StatelessWidget {
               ),
       ),
     );
+  }
+
+  String _initials(SavedAccount account) {
+    final first = account.firstName.trim();
+    final last = account.lastName.trim();
+    final initials = [
+      if (first.isNotEmpty) first.characters.first,
+      if (last.isNotEmpty) last.characters.first,
+    ].join();
+    if (initials.isNotEmpty) return initials.toUpperCase();
+    return account.displayName.characters.first.toUpperCase();
   }
 }

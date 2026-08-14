@@ -29,13 +29,16 @@ class FarmerFarmService {
     }
     try {
       final owner = await _owner();
-      final values = draft.toDatabase(owner.farmerId);
+      final values = draft.toDatabase(
+        ownerId: farmId == null ? owner.farmerId : null,
+      );
       final query = AgrisellSupabase.client.from('farms');
       final row = farmId == null
           ? await query.insert(values).select(_farmFields).single()
           : await query
                 .update(values)
                 .eq('farm_id', farmId)
+                .eq('farmer_user_id', owner.farmerId)
                 .select(_farmFields)
                 .single();
       return FarmModel.fromJson(row);
@@ -105,8 +108,8 @@ class FarmEditDraft {
   final String? irrigationType;
   final List<String> mainCrops;
 
-  Map<String, Object?> toDatabase(int farmerId) => {
-    'farmer_user_id': farmerId,
+  Map<String, Object?> toDatabase({int? ownerId}) => {
+    if (ownerId != null) 'farmer_user_id': ownerId,
     'farm_name': name.trim(),
     'farm_location': location,
     'barangay': barangay,
@@ -140,6 +143,7 @@ const _farmFields =
 
 String _message(PostgrestException error) => switch (error.code) {
   '42501' => 'You are not authorized to edit this farm.',
+  'PGRST116' => 'Farm not found or you are not authorized to edit it.',
   _ when error.message.trim().isNotEmpty => error.message.trim(),
   _ => 'Farm details could not be saved. Please try again.',
 };

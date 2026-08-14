@@ -56,11 +56,15 @@ class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
   }
 
   List<PsgcAddressOption> get _filteredLocalities {
-    final province = widget.provinceController.text.trim().toLowerCase();
-    if (province.isEmpty) return _localities;
-    return _localities
-        .where((option) => option.province.toLowerCase() == province)
+    final selected = _exact(_provinces, widget.provinceController.text);
+    if (selected == null) return _localities;
+    final matches = _localities
+        .where((option) => _belongsToProvince(option, selected))
         .toList(growable: false);
+    // Some PSGC responses omit the province name. Keep the city selector
+    // usable instead of rendering an empty menu while preserving the selected
+    // province when the farmer chooses a municipality.
+    return matches.isEmpty ? _localities : matches;
   }
 
   void _provinceChanged(String value) {
@@ -82,9 +86,8 @@ class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
     bool clearBarangay = true,
   }) async {
     final selectedProvince = widget.provinceController.text.trim();
-    if (selectedProvince.isNotEmpty &&
-        option.province.isNotEmpty &&
-        selectedProvince.toLowerCase() != option.province.toLowerCase()) {
+    final province = _exact(_provinces, selectedProvince);
+    if (province != null && !_belongsToProvince(option, province)) {
       widget.cityController.clear();
       widget.barangayController.clear();
       widget.onChanged();
@@ -93,6 +96,7 @@ class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
     if (selectedProvince.isEmpty && option.province.isNotEmpty) {
       widget.provinceController.text = option.province;
     }
+    widget.cityController.text = option.name;
     if (clearBarangay) widget.barangayController.clear();
     setState(() => _region = option.region);
     widget.onChanged();
@@ -114,6 +118,7 @@ class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
         options: _provinces,
         onChanged: _provinceChanged,
         onSelected: (option) {
+          widget.provinceController.text = option.name;
           widget.cityController.clear();
           widget.barangayController.clear();
           setState(() {
@@ -124,6 +129,9 @@ class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
         },
       ),
       AddressAutocompleteField(
+        key: ValueKey(
+          'city:${widget.provinceController.text.trim().toLowerCase()}',
+        ),
         label: 'City or municipality',
         controller: widget.cityController,
         options: _filteredLocalities,
@@ -131,11 +139,15 @@ class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
         onSelected: _selectLocality,
       ),
       AddressAutocompleteField(
+        key: ValueKey('barangay:${_loadedLocalityCode ?? ''}'),
         label: 'Barangay',
         controller: widget.barangayController,
         options: _barangays,
         onChanged: (_) => widget.onChanged(),
-        onSelected: (_) => widget.onChanged(),
+        onSelected: (option) {
+          widget.barangayController.text = option.name;
+          widget.onChanged();
+        },
       ),
       if (_region.isNotEmpty)
         Padding(
@@ -158,4 +170,20 @@ PsgcAddressOption? _exact(List<PsgcAddressOption> values, String text) {
     if (option.name.toLowerCase() == query) return option;
   }
   return null;
+}
+
+bool _belongsToProvince(
+  PsgcAddressOption locality,
+  PsgcAddressOption province,
+) {
+  if (locality.province.toLowerCase() == province.name.toLowerCase()) {
+    return true;
+  }
+  if (locality.provinceCode.isNotEmpty &&
+      locality.provinceCode == province.code) {
+    return true;
+  }
+  return locality.code.length >= 4 &&
+      province.code.length >= 4 &&
+      locality.code.substring(0, 4) == province.code.substring(0, 4);
 }

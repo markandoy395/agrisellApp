@@ -88,9 +88,11 @@ extension _SupabaseRiderDeliveryCompletion on SupabaseRiderDeliveryRepository {
   Future<PickupCompletionResult> _completePickup(
     PickupCompletionCommand command,
   ) async {
-    if (!command.location.isValid || !command.checklist.passes) {
-      throw const DeliveryTransitionException(
-        'Pickup location and checklist validation are required.',
+    final validation = validatePickupCompletion(command);
+    if (!validation.isValid) {
+      throw DeliveryTransitionException(
+        validation.message,
+        code: DeliveryErrorCode.invalidProof,
       );
     }
     for (final entry in command.proofReferences.entries.where(
@@ -110,15 +112,16 @@ extension _SupabaseRiderDeliveryCompletion on SupabaseRiderDeliveryRepository {
       );
     }
     final bundle = await _requiredBundle(command.deliveryId);
-    await _dataSource.updateDeliveryStatus(
+    await _dataSource.completePickupStatus(
       deliveryId: command.deliveryId,
       previousStatus: bundle.delivery.deliveryStatus,
-      newStatus: DeliveryStatus.productPickedUp,
       idempotencyKey: command.idempotencyKey,
-      remarks: 'Pickup proof accepted.',
-      latitude: command.location.latitude,
-      longitude: command.location.longitude,
+      command: command,
     );
+    for (final reference in command.proofReferences.values) {
+      await _removeLocalProof(reference);
+      _pendingPickupRemoteReferences.remove(reference);
+    }
     final snapshot = _snapshot(
       await _requiredBundle(command.deliveryId),
       command.riderId,
@@ -138,12 +141,15 @@ extension _SupabaseRiderDeliveryCompletion on SupabaseRiderDeliveryRepository {
     final type = method == PickupConfirmationMethod.farmerSignature
         ? DeliveryProofType.riderSignature
         : DeliveryProofType.productPhoto;
-    final remoteReference = await _remoteProofReference(
-      reference: reference,
-      deliveryId: command.deliveryId,
-      stage: DeliveryProofStage.pickup,
-      type: type,
-    );
+    final remoteReference =
+        _pendingPickupRemoteReferences[reference] ??
+        await _remoteProofReference(
+          reference: reference,
+          deliveryId: command.deliveryId,
+          stage: DeliveryProofStage.pickup,
+          type: type,
+        );
+    _pendingPickupRemoteReferences[reference] = remoteReference;
     await _dataSource.saveDeliveryProof(
       DeliveryProof(
         id: 'pending-${command.idempotencyKey}-${method.name}',
@@ -152,12 +158,12 @@ extension _SupabaseRiderDeliveryCompletion on SupabaseRiderDeliveryRepository {
         type: type,
         secureReference: remoteReference,
         filePath: remoteReference,
+        remarks: 'pickup_method:${method.name}',
         capturedAt: DateTime.now(),
         latitude: command.location.latitude,
         longitude: command.location.longitude,
         confirmedAt: DateTime.now(),
       ),
     );
-    await _removeLocalProof(reference);
   }
 }

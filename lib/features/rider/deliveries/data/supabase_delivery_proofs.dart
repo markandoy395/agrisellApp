@@ -53,6 +53,7 @@ extension SupabaseDeliveryProofs on SupabaseDeliveryDataSource {
             'p_remarks': proof.remarks,
             'p_latitude': proof.latitude,
             'p_longitude': proof.longitude,
+            'p_captured_at': proof.capturedAt.toUtc().toIso8601String(),
           },
         );
         return DeliveryProof.fromJson(_map(value));

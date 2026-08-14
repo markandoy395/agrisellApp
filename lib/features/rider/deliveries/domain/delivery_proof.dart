@@ -160,12 +160,16 @@ class DeliveryProof {
     'confirmed_at': confirmedAt?.toUtc().toIso8601String(),
   };
 
-  DeliveryProof copyWith({String? filePath, String? remarks}) => DeliveryProof(
+  DeliveryProof copyWith({
+    String? secureReference,
+    String? filePath,
+    String? remarks,
+  }) => DeliveryProof(
     id: id,
     deliveryId: deliveryId,
     stage: stage,
     type: type,
-    secureReference: filePath ?? secureReference,
+    secureReference: secureReference ?? filePath ?? this.secureReference,
     filePath: filePath ?? this.filePath,
     confirmationCodeHash: confirmationCodeHash,
     remarks: remarks ?? this.remarks,

@@ -28,17 +28,20 @@ extension _RiderProfileLogout on _RiderProfileScreenState {
   }
 
   Future<void> _logout() async {
-    if (!await _canLeaveAccount()) return;
+    if (!await _canLeaveAccount(RiderAccountExitAction.logout)) return;
     if (mounted) await AccountSessionNavigation.logout(context);
   }
 
   Future<void> _switchAccount() async {
-    if (!await _canLeaveAccount()) return;
+    if (!await _canLeaveAccount(RiderAccountExitAction.switchAccount)) return;
     if (mounted) await AccountSessionNavigation.openSwitcher(context);
   }
 
-  Future<bool> _canLeaveAccount() async {
-    final synchronized = await widget.prepareForLogout?.call() ?? true;
+  Future<bool> _canLeaveAccount(RiderAccountExitAction action) async {
+    final synchronized = await RiderAccountExitPolicy.prepare(
+      action,
+      prepareForLogout: widget.prepareForLogout,
+    );
     if (!synchronized && mounted) {
       _message(
         'Availability could not be synchronized. Reconnect before continuing.',

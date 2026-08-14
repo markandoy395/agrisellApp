@@ -8,6 +8,7 @@ import 'package:agresell_app/features/rider/deliveries/domain/delivery_route.dar
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request_metadata.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_registration.dart';
+import 'package:agresell_app/features/shared/orders/domain/rider_assignment_request_status.dart';
 
 export 'package:agresell_app/features/rider/deliveries/domain/delivery_location.dart';
 export 'package:agresell_app/features/rider/deliveries/domain/delivery_priority.dart';
@@ -54,6 +55,8 @@ class DeliveryRequest {
     this.route,
     this.stage = DeliveryStage.readyForPickup,
     this.assignedRiderId,
+    this.assignmentRequestId,
+    this.assignmentRequestStatus,
     this.reservedRiderId,
     this.reservedUntil,
     this.outcome,
@@ -109,6 +112,8 @@ class DeliveryRequest {
   final DeliveryRouteInfo? route;
   final DeliveryStage stage;
   final String? assignedRiderId;
+  final String? assignmentRequestId;
+  final RiderAssignmentRequestStatus? assignmentRequestStatus;
   final String? reservedRiderId;
   final DateTime? reservedUntil;
   final DeliveryOutcome? outcome;
@@ -117,6 +122,7 @@ class DeliveryRequest {
   final Set<String> declinedRiderIds;
 
   bool isAssignedTo(String riderId) => assignedRiderId == riderId;
+  bool get isFarmerSelectedRequest => assignmentRequestId != null;
   bool get isCashOnDelivery =>
       cashOnDelivery != null ||
       RiderPaymentMethodDetails.fromBackendValue(paymentMethod) ==
@@ -127,6 +133,8 @@ class DeliveryRequest {
     final now = at ?? DateTime.now();
     return stage == DeliveryStage.readyForPickup &&
         assignedRiderId == null &&
+        (assignmentRequestStatus == null ||
+            assignmentRequestStatus == RiderAssignmentRequestStatus.pending) &&
         (expiresAt == null || expiresAt!.isAfter(now)) &&
         (reservedRiderId == null ||
             reservedRiderId == riderId ||

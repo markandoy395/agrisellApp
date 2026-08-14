@@ -51,55 +51,64 @@ class HomeHeader extends StatelessWidget {
       builder: (sheetContext) {
         return SafeArea(
           top: false,
-          child: Container(
-            margin: const EdgeInsets.all(12),
-            padding: const EdgeInsets.fromLTRB(10, 10, 10, 14),
-            decoration: BoxDecoration(
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Material(
               color: AgrisellColors.surface,
               borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 38,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AgrisellColors.mutedText.withValues(alpha: 0.35),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text(
-                      'Quick access',
-                      style: TextStyle(
-                        color: AgrisellColors.headingGreen,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
+              clipBehavior: Clip.antiAlias,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 14),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 38,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AgrisellColors.mutedText.withValues(alpha: 0.35),
+                        borderRadius: BorderRadius.circular(4),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 10),
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(
+                          'Quick access',
+                          style: TextStyle(
+                            color: AgrisellColors.headingGreen,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    _QuickActionTile(
+                      icon: Icons.shopping_basket_outlined,
+                      title: 'My basket',
+                      subtitle: 'Review produce ready for checkout',
+                      onTap: () => _openRoute(
+                        context,
+                        sheetContext,
+                        AgrisellRoutes.basket,
+                      ),
+                    ),
+                    _QuickActionTile(
+                      icon: Icons.local_shipping_outlined,
+                      title: 'My orders',
+                      subtitle: 'Track shipping and delivery updates',
+                      onTap: () => _openRoute(
+                        context,
+                        sheetContext,
+                        AgrisellRoutes.buyerOrders,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 6),
-                _QuickActionTile(
-                  icon: Icons.shopping_basket_outlined,
-                  title: 'My basket',
-                  subtitle: 'Review produce ready for checkout',
-                  onTap: () =>
-                      _openRoute(context, sheetContext, AgrisellRoutes.basket),
-                ),
-                _QuickActionTile(
-                  icon: Icons.local_shipping_outlined,
-                  title: 'My orders',
-                  subtitle: 'Track shipping and delivery updates',
-                  onTap: () =>
-                      _openRoute(context, sheetContext, AgrisellRoutes.toShip),
-                ),
-              ],
+              ),
             ),
           ),
         );

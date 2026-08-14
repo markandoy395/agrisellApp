@@ -114,6 +114,7 @@ PickupCompletionCommand _command({
     PickupConfirmationMethod.confirmationCode: 'protected://code',
     PickupConfirmationMethod.farmerConfirmation: 'protected://farmer',
     PickupConfirmationMethod.qrCode: 'protected://qr',
+    PickupConfirmationMethod.productPhoto: 'protected://product-photo',
   },
 );
 

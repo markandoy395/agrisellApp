@@ -78,6 +78,56 @@ class FarmerCommodityRepository {
     }
   }
 
+  Future<FarmerDashboardProduct> restock({
+    required FarmerDashboardProduct product,
+    required double quantity,
+    String? reason,
+  }) async {
+    final commodityId = product.commodityId;
+    if (commodityId == null || commodityId <= 0) {
+      throw const FarmerCommodityException(
+        'Save this product before adding stock.',
+      );
+    }
+    if (quantity <= 0 || quantity > 1000000) {
+      throw const FarmerCommodityException(
+        'Restock quantity must be between 0 and 1,000,000.',
+      );
+    }
+
+    if (!isAvailable) {
+      final updatedQuantity = product.availableQuantity + quantity;
+      return product.copyWith(
+        availableWeight:
+            '${FarmerCommodityFormat.displayNumber(updatedQuantity)} ${product.unitType}',
+      );
+    }
+
+    try {
+      final result = await AgrisellSupabase.client.rpc<Object?>(
+        'restock_current_farmer_commodity',
+        params: {
+          'p_commodity_id': commodityId,
+          'p_quantity': quantity,
+          'p_reason': reason?.trim(),
+        },
+      );
+      final row = result is Map
+          ? Map<String, dynamic>.from(result)
+          : const <String, dynamic>{};
+      final newQuantity = FarmerCommodityFormat.displayNumber(
+        row['new_quantity'],
+      );
+      return product.copyWith(
+        availableWeight: '$newQuantity ${product.unitType}',
+      );
+    } on PostgrestException catch (error) {
+      throw FarmerCommodityException(
+        FarmerCommodityFormat.databaseMessage(error.code, error.message),
+      );
+    }
+  }
+
   Future<void> createFarm(String name) async {
     if (!isAvailable) return;
     try {

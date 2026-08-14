@@ -23,6 +23,7 @@ InMemoryRiderDeliveryRepository codRepository({
     'delivery-1': const DeliveryCompletionConfiguration(
       requiredMethods: {
         DeliveryConfirmationMethod.buyerConfirmation,
+        DeliveryConfirmationMethod.handoverPhoto,
         DeliveryConfirmationMethod.gpsLocation,
         DeliveryConfirmationMethod.timestamp,
       },
@@ -102,9 +103,13 @@ DeliveryCompletionCommand codCommand({
   finalLocation: completionLocation(),
   proofReferences: const {
     DeliveryConfirmationMethod.buyerConfirmation: 'protected://buyer',
+    DeliveryConfirmationMethod.handoverPhoto:
+        'local-secure://delivery/delivery-1/handoverPhoto/evidence.jpg',
     DeliveryConfirmationMethod.gpsLocation: 'protected://gps',
     DeliveryConfirmationMethod.timestamp: 'protected://time',
   },
+  evidenceCapturedAt: DateTime.now(),
+  evidenceLocation: completionLocation(),
   cashCollection: CashCollectionSubmission(
     amountReceived: amount,
     collectionConfirmed: issue == null,

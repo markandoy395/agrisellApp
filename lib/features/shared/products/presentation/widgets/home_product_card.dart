@@ -82,7 +82,6 @@ class HomeProductCard extends StatelessWidget {
                               semanticLabel: '${product.name} product photo',
                               filterQuality: FilterQuality.medium,
                               gaplessPlayback: true,
-                              decodeWidth: 1200,
                             ),
                           ),
                         ),

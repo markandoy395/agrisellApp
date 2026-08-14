@@ -1,5 +1,6 @@
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_delivery_search.dart';
+import 'package:agresell_app/features/rider/profile/domain/rider_registration.dart';
 
 enum RiderBatchRejection {
   riderIneligible,
@@ -10,6 +11,9 @@ enum RiderBatchRejection {
   productConflict,
   temperatureConflict,
   fragileProtectionRequired,
+  vehicleIncompatible,
+  handlingCapabilityRequired,
+  codResponsibilityUnavailable,
   routeIncompatible,
   deadlineConflict,
 }
@@ -32,6 +36,12 @@ extension RiderBatchRejectionDetails on RiderBatchRejection {
       'The products require conflicting transport temperatures.',
     RiderBatchRejection.fragileProtectionRequired =>
       'The vehicle has no verified protection for a fragile batch.',
+    RiderBatchRejection.vehicleIncompatible =>
+      'The vehicle type is not compatible with every delivery in the batch.',
+    RiderBatchRejection.handlingCapabilityRequired =>
+      'The Rider lacks a required product-handling capability.',
+    RiderBatchRejection.codResponsibilityUnavailable =>
+      'Cash collection responsibility could not be verified.',
     RiderBatchRejection.routeIncompatible =>
       'The combined route would create an unreasonable delay.',
     RiderBatchRejection.deadlineConflict =>
@@ -112,6 +122,7 @@ class RiderBatchContext {
     required this.capacityKg,
     required this.now,
     this.currentLocation,
+    this.vehicleType,
     this.handlingCapabilityKeys = const <String>{},
     this.trafficMultiplier = 1,
     this.maximumBatchDistanceKm = 100,
@@ -123,6 +134,7 @@ class RiderBatchContext {
   final double? capacityKg;
   final DateTime now;
   final RiderDeliverySearch? currentLocation;
+  final RiderVehicleType? vehicleType;
   final Set<String> handlingCapabilityKeys;
   final double trafficMultiplier;
   final double maximumBatchDistanceKm;

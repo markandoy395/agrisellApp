@@ -50,6 +50,12 @@ class FarmerDashboardProduct {
   ProductSaleStatus get saleStatus => _saleStatus ?? ProductSaleStatus.readyNow;
   ProductProductionStage get productionStage =>
       productProductionStageFromDatabase(productionStatus);
+  double get availableQuantity =>
+      double.tryParse(
+        RegExp(r'[\d.]+').firstMatch(availableWeight)?.group(0) ?? '',
+      ) ??
+      0;
+  bool get isOutOfStock => !isSold && availableQuantity <= 0;
 
   FarmerDashboardProduct copyWith({
     String? name,

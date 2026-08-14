@@ -20,14 +20,61 @@ class RiderActiveDeliverySummary extends StatelessWidget {
   Widget build(BuildContext context) {
     final active = delivery;
     if (active == null) {
-      return const RiderSurfaceCard(
-        child: _SummaryLine(
-          icon: Icons.route_outlined,
-          text: 'No active delivery. Your current delivery will appear here.',
+      return RiderSurfaceCard(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const _IconBadge(
+                  icon: Icons.route_outlined,
+                  backgroundColor: AgrisellColors.statusBlueBackground,
+                  foregroundColor: AgrisellColors.statusBlueText,
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'No active delivery',
+                        style: TextStyle(
+                          color: AgrisellColors.headingGreen,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Accepted jobs and route progress will appear here.',
+                        style: TextStyle(
+                          color: AgrisellColors.mutedText,
+                          fontSize: 12,
+                          height: 1.3,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: onContinue,
+                icon: const Icon(Icons.local_shipping_outlined, size: 18),
+                label: const Text('Browse delivery requests'),
+              ),
+            ),
+          ],
         ),
       );
     }
     return RiderSurfaceCard(
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -40,63 +87,111 @@ class RiderActiveDeliverySummary extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      active.productName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AgrisellColors.headingGreen,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            active.productName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: AgrisellColors.headingGreen,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          active.orderNumber,
+                          style: const TextStyle(
+                            color: AgrisellColors.mutedText,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 5),
-                    RiderStatusPill(
-                      label: active.stage.label,
-                      icon: Icons.route_outlined,
-                      backgroundColor: AgrisellColors.statusGreenBackground,
-                      foregroundColor: AgrisellColors.statusGreenText,
+                    const SizedBox(height: 7),
+                    Wrap(
+                      spacing: 7,
+                      runSpacing: 7,
+                      children: [
+                        RiderStatusPill(
+                          label: active.stage.label,
+                          icon: Icons.route_outlined,
+                          backgroundColor: AgrisellColors.statusGreenBackground,
+                          foregroundColor: AgrisellColors.statusGreenText,
+                        ),
+                        if (active.deliveryFee > 0)
+                          RiderStatusPill(
+                            label:
+                                'PHP ${active.deliveryFee.toStringAsFixed(2)}',
+                            icon: Icons.payments_outlined,
+                            backgroundColor:
+                                AgrisellColors.statusBlueBackground,
+                            foregroundColor: AgrisellColors.statusBlueText,
+                          ),
+                      ],
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          _SummaryLine(
+          const SizedBox(height: 14),
+          _RouteStop(
             icon: Icons.storefront_outlined,
-            text: active.pickupLocation.address,
-          ),
-          const SizedBox(height: 6),
-          _SummaryLine(
-            icon: Icons.location_on_outlined,
-            text: active.deliveryLocation.address,
+            label: 'Pickup',
+            value: active.pickupLocation.address,
           ),
           const SizedBox(height: 8),
-          Text(
-            'Next: ${_nextAction(active.stage)}',
-            style: const TextStyle(
-              color: AgrisellColors.headingGreen,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 3),
-          Text(
-            'Pickup deadline: ${_deadline(active.pickupDeadline)}',
-            style: const TextStyle(
-              color: AgrisellColors.mutedText,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
+          _RouteStop(
+            icon: Icons.location_on_outlined,
+            label: 'Drop-off',
+            value: active.deliveryLocation.address,
           ),
           const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AgrisellColors.pageBackground,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AgrisellColors.borderLine),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Next: ${_nextAction(active.stage)}',
+                  style: const TextStyle(
+                    color: AgrisellColors.headingGreen,
+                    fontSize: 12,
+                    height: 1.25,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Pickup deadline: ${_deadline(active.pickupDeadline)}',
+                  style: const TextStyle(
+                    color: AgrisellColors.mutedText,
+                    fontSize: 12,
+                    height: 1.25,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
           Row(
             children: [
               Expanded(
                 child: FilledButton.icon(
                   onPressed: onContinue,
-                  icon: const Icon(Icons.arrow_forward_rounded, size: 17),
+                  icon: const Icon(Icons.arrow_forward_rounded, size: 18),
                   label: const Text('Continue delivery'),
                 ),
               ),
@@ -104,7 +199,7 @@ class RiderActiveDeliverySummary extends StatelessWidget {
                 const SizedBox(width: 8),
                 OutlinedButton.icon(
                   onPressed: onOpenMap,
-                  icon: const Icon(Icons.map_outlined, size: 17),
+                  icon: const Icon(Icons.map_outlined, size: 18),
                   label: const Text('Map'),
                 ),
               ],
@@ -116,30 +211,85 @@ class RiderActiveDeliverySummary extends StatelessWidget {
   }
 }
 
-class _SummaryLine extends StatelessWidget {
-  const _SummaryLine({required this.icon, required this.text});
+class _RouteStop extends StatelessWidget {
+  const _RouteStop({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
 
   final IconData icon;
-  final String text;
+  final String label;
+  final String value;
 
   @override
   Widget build(BuildContext context) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Icon(icon, size: 18, color: AgrisellColors.mutedText),
-      const SizedBox(width: 8),
+      Container(
+        width: 30,
+        height: 30,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: AgrisellColors.forestSoft,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(icon, size: 17, color: AgrisellColors.authGreen),
+      ),
+      const SizedBox(width: 10),
       Expanded(
-        child: Text(
-          text,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: AgrisellColors.mutedText,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                color: AgrisellColors.mutedText,
+                fontSize: 11,
+                height: 1.1,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              value,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AgrisellColors.headingGreen,
+                fontSize: 12,
+                height: 1.25,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
         ),
       ),
     ],
+  );
+}
+
+class _IconBadge extends StatelessWidget {
+  const _IconBadge({
+    required this.icon,
+    required this.backgroundColor,
+    required this.foregroundColor,
+  });
+
+  final IconData icon;
+  final Color backgroundColor;
+  final Color foregroundColor;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: 48,
+    height: 48,
+    alignment: Alignment.center,
+    decoration: BoxDecoration(
+      color: backgroundColor,
+      borderRadius: BorderRadius.circular(14),
+    ),
+    child: Icon(icon, color: foregroundColor, size: 24),
   );
 }
 
@@ -157,9 +307,9 @@ class _ProductImage extends StatelessWidget {
         ? Image.network(value, fit: BoxFit.cover, errorBuilder: _errorBuilder)
         : Image.asset(value, fit: BoxFit.cover, errorBuilder: _errorBuilder);
     return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(14),
       child: SizedBox.square(
-        dimension: 56,
+        dimension: 62,
         child: image ?? _errorBuilder(context, Object(), null),
       ),
     );

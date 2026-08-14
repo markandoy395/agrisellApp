@@ -67,6 +67,7 @@ class _TrackingOrderCard extends StatelessWidget {
               children: [
                 ProductThumbnail.square(
                   asset: item.image,
+                  imageUrl: item.imageUrl,
                   size: imageSize,
                   borderRadius: 12,
                   semanticLabel: '${item.productName} product photo',
@@ -87,7 +88,11 @@ class _TrackingOrderCard extends StatelessWidget {
             const SizedBox(height: 14),
             _OrderCardActions(
               status: order.status,
-              canLeaveFeedback: order.canLeaveFeedback,
+              canLeaveFeedback:
+                  order.canReviewProduct(item.productId) ||
+                  (order.status.canLeaveFeedback &&
+                      order.deliveryId != null &&
+                      !order.riderRated),
               canRetryPayment:
                   order.payment.method == OrderPaymentMethod.gcash &&
                   order.payment.status == OrderPaymentStatus.rejected,
@@ -166,11 +171,16 @@ class _TrackingOrderCard extends StatelessWidget {
       builder: (context) => _OrderFeedbackSheet(
         order: order,
         item: item,
-        onSubmit: (rating, comment) => onSubmitFeedback(
-          orderId: order.id,
-          rating: rating,
-          comment: comment,
-        ),
+        onSubmit: (rating, comment, riderRating, riderComment) =>
+            onSubmitFeedback(
+              orderId: order.id,
+              productId: item.productId,
+              rating: rating,
+              comment: comment,
+              riderRating: riderRating,
+              riderComment: riderComment,
+              reviewProduct: order.canReviewProduct(item.productId),
+            ),
       ),
     );
   }

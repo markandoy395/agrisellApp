@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import 'package:agresell_app/features/rider/safety/domain/rider_safety_report.dart';
 
 class RiderSafetyReportDraft {
@@ -37,6 +38,10 @@ Future<RiderSafetyReportDraft?> showRiderSafetyReportDialog(
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<RiderSafetyCategory>(
+                dropdownColor: AppDropdownStyle.menuColor,
+                borderRadius: AppDropdownStyle.menuBorderRadius,
+                style: AppDropdownStyle.textStyle,
+                iconEnabledColor: AppDropdownStyle.iconColor,
                 initialValue: category,
                 items: [
                   for (final item in RiderSafetyCategory.values)

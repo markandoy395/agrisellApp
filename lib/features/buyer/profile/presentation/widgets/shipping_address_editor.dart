@@ -1,12 +1,10 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:agresell_app/core/utils/map_coordinates.dart';
+import 'package:geolocator/geolocator.dart';
+
 import 'package:agresell_app/core/utils/written_address.dart';
 import 'package:agresell_app/features/auth/domain/buyer_shipping_address.dart';
-import 'package:agresell_app/features/buyer/profile/presentation/screens/shipping_address_map_editor_screen.dart';
 import 'package:agresell_app/features/buyer/profile/presentation/widgets/shipping_address_editor_content.dart';
-import 'package:agresell_app/features/shared/location/data/nominatim_geocoding_service.dart';
+import 'package:agresell_app/features/shared/location/data/gps_location_gateway.dart';
 
 class ShippingAddressEditor extends StatefulWidget {
   const ShippingAddressEditor({
@@ -16,6 +14,7 @@ class ShippingAddressEditor extends StatefulWidget {
     this.phoneNumber = '',
     this.latitude,
     this.longitude,
+    this.gpsGateway,
     super.key,
   });
 
@@ -25,6 +24,7 @@ class ShippingAddressEditor extends StatefulWidget {
   final String phoneNumber;
   final double? latitude;
   final double? longitude;
+  final GpsLocationGateway? gpsGateway;
   @override
   State<ShippingAddressEditor> createState() => _ShippingAddressEditorState();
 }
@@ -35,29 +35,23 @@ class _ShippingAddressEditorState extends State<ShippingAddressEditor> {
   final _cityController = TextEditingController();
   final _barangayController = TextEditingController();
   final _postalCodeController = TextEditingController();
-  final _geocoder = NominatimGeocodingService();
-  Timer? _geocodeTimer;
-  LatLng? _point;
+  late final GpsLocationGateway _gpsGateway;
+  double? _latitude;
+  double? _longitude;
   String? _error;
   var _isSaving = false;
-  var _isGeocoding = false;
+  var _isCapturingLocation = false;
   @override
   void initState() {
     super.initState();
+    _gpsGateway = widget.gpsGateway ?? GeolocatorGpsLocationGateway();
     _streetController.text = widget.initialAddress;
-    if (MapCoordinates.isValid(
-      latitude: widget.latitude,
-      longitude: widget.longitude,
-    )) {
-      _point = LatLng(widget.latitude!, widget.longitude!);
-    }
-    _streetController.addListener(_scheduleGeocode);
-    _postalCodeController.addListener(_scheduleGeocode);
+    _latitude = widget.latitude;
+    _longitude = widget.longitude;
   }
 
   @override
   void dispose() {
-    _geocodeTimer?.cancel();
     _streetController.dispose();
     _provinceController.dispose();
     _cityController.dispose();
@@ -89,66 +83,6 @@ class _ShippingAddressEditorState extends State<ShippingAddressEditor> {
       _cityController.text.trim().isNotEmpty &&
       _barangayController.text.trim().isNotEmpty;
 
-  void _scheduleGeocode() {
-    _geocodeTimer?.cancel();
-    _geocodeTimer = Timer(const Duration(milliseconds: 900), _geocodeAddress);
-  }
-
-  Future<void> _geocodeAddress() async {
-    if (!_isComplete || _isGeocoding) return;
-    setState(() {
-      _isGeocoding = true;
-      _error = null;
-    });
-    try {
-      final point = await _geocoder.geocode(_address);
-      if (!mounted) return;
-      if (point == null) {
-        setState(
-          () => _error =
-              'We could not locate this address. Adjust it or place the pin manually.',
-        );
-      } else {
-        setState(() => _point = point);
-      }
-    } catch (_) {
-      if (mounted) {
-        setState(
-          () =>
-              _error = 'Address lookup is unavailable. Place the pin manually.',
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isGeocoding = false);
-    }
-  }
-
-  Future<void> _openMap() async {
-    final selected = await Navigator.of(context).push<BuyerShippingAddress>(
-      MaterialPageRoute(
-        builder: (_) => ShippingAddressMapEditorScreen(
-          initialAddress: _address,
-          latitude: _point?.latitude,
-          longitude: _point?.longitude,
-        ),
-      ),
-    );
-    if (selected == null || !mounted) return;
-    if (!MapCoordinates.isValid(
-      latitude: selected.latitude,
-      longitude: selected.longitude,
-    )) {
-      setState(
-        () => _error = 'The selected map location is invalid. Try again.',
-      );
-      return;
-    }
-    setState(() {
-      _point = LatLng(selected.latitude!, selected.longitude!);
-      _error = null;
-    });
-  }
-
   Future<void> _save() async {
     if (!_isComplete || !WrittenAddress.isValid(_address)) {
       setState(
@@ -156,26 +90,69 @@ class _ShippingAddressEditorState extends State<ShippingAddressEditor> {
       );
       return;
     }
-    if (_point == null) {
-      setState(
-        () => _error = 'Select your delivery pin on the map before saving.',
-      );
-      return;
-    }
     setState(() => _isSaving = true);
     try {
+      await _captureCurrentLocation();
+      if (!mounted) return;
       await widget.onSave(
         BuyerShippingAddress(
           address: _address,
-          latitude: _point!.latitude,
-          longitude: _point!.longitude,
+          latitude: _latitude,
+          longitude: _longitude,
         ),
       );
-      if (mounted) Navigator.of(context).pop();
+      if (mounted) Navigator.of(context).pop(true);
     } catch (error) {
-      if (mounted) setState(() => _error = error.toString());
+      if (mounted) {
+        setState(
+          () => _error = error.toString().replaceFirst('Exception: ', ''),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  Future<void> _captureCurrentLocation() async {
+    setState(() {
+      _isCapturingLocation = true;
+      _error = null;
+    });
+    try {
+      if (!await _gpsGateway.isServiceEnabled()) {
+        await _gpsGateway.openLocationSettings();
+        throw Exception('Turn on location services, then try saving again.');
+      }
+      var permission = await _gpsGateway.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await _gpsGateway.requestPermission();
+      }
+      if (permission == LocationPermission.denied) {
+        throw Exception(
+          'Allow location access so we can capture your delivery location.',
+        );
+      }
+      if (permission == LocationPermission.deniedForever) {
+        await _gpsGateway.openAppSettings();
+        throw Exception(
+          'Allow location permission in app settings, then try saving again.',
+        );
+      }
+      if (await _gpsGateway.getAccuracyStatus() ==
+          LocationAccuracyStatus.reduced) {
+        await _gpsGateway.openAppSettings();
+        throw Exception('Enable precise location, then try saving again.');
+      }
+      final position = await _gpsGateway.currentPosition(
+        settings: const LocationSettings(
+          accuracy: LocationAccuracy.bestForNavigation,
+          timeLimit: Duration(seconds: 15),
+        ),
+      );
+      _latitude = position.latitude;
+      _longitude = position.longitude;
+    } finally {
+      if (mounted) setState(() => _isCapturingLocation = false);
     }
   }
 
@@ -188,15 +165,10 @@ class _ShippingAddressEditorState extends State<ShippingAddressEditor> {
     cityController: _cityController,
     barangayController: _barangayController,
     postalCodeController: _postalCodeController,
-    latitude: _point?.latitude,
-    longitude: _point?.longitude,
-    isGeocoding: _isGeocoding,
-    isSaving: _isSaving,
+    isSaving: _isSaving || _isCapturingLocation,
     error: _error,
-    onMapTap: _openMap,
     onAddressChanged: () {
       setState(() => _error = null);
-      _scheduleGeocode();
     },
     onSave: _save,
   );

@@ -1,9 +1,15 @@
 part of 'package:agresell_app/features/farmer/dashboard/presentation/screens/farmer_dashboard_screen.dart';
 
 class _FarmerProductDetails extends StatelessWidget {
-  const _FarmerProductDetails({required this.product});
+  const _FarmerProductDetails({
+    required this.product,
+    required this.onRestock,
+    required this.isRestocking,
+  });
 
   final FarmerDashboardProduct product;
+  final VoidCallback onRestock;
+  final bool isRestocking;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
@@ -71,28 +77,71 @@ class _FarmerProductDetails extends StatelessWidget {
                 ),
               ),
             ],
+            const SizedBox(height: 4),
+            Text(
+              product.harvestDate,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AgrisellColors.mutedText,
+                fontSize: 10,
+                height: 1,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
             const Spacer(),
             Container(height: 1, color: AgrisellColors.borderLine),
             const SizedBox(height: 7),
             Row(
               children: [
                 Icon(
-                  Icons.calendar_today_outlined,
+                  product.isOutOfStock
+                      ? Icons.inventory_2_outlined
+                      : Icons.inventory_outlined,
                   color: valueColor,
                   size: 14,
                 ),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    product.harvestDate,
+                    product.isOutOfStock
+                        ? 'OUT OF STOCK'
+                        : 'Stock: ${product.availableWeight}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AgrisellColors.mutedText,
-                      fontSize: 12,
+                    style: TextStyle(
+                      color: product.isOutOfStock
+                          ? AgrisellColors.statusRedText
+                          : AgrisellColors.mutedText,
+                      fontSize: 11,
                       height: 1,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                     ),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                SizedBox(
+                  height: 28,
+                  child: TextButton(
+                    onPressed: isRestocking ? null : onRestock,
+                    style: TextButton.styleFrom(
+                      foregroundColor: AgrisellColors.authGreen,
+                      padding: const EdgeInsets.symmetric(horizontal: 7),
+                      minimumSize: const Size(0, 28),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: isRestocking
+                        ? const SizedBox.square(
+                            dimension: 14,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text(
+                            product.isOutOfStock ? 'Restock' : 'Add stock',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
                   ),
                 ),
               ],

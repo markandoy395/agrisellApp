@@ -53,6 +53,31 @@ class RiderBatchOptimizer {
     List<DeliveryRequest> deliveries,
     RiderBatchContext context,
   ) {
+    final vehicleType = context.vehicleType;
+    if (deliveries.any(
+      (item) =>
+          item.requiredVehicleTypes.isNotEmpty &&
+          (vehicleType == null ||
+              !item.requiredVehicleTypes.contains(vehicleType)),
+    )) {
+      return RiderBatchRejection.vehicleIncompatible;
+    }
+    if (deliveries.any(
+      (item) => item.handlingRequirements.any(
+        (rule) =>
+            rule.type.needsProvenVehicleCapability &&
+            !context.handlingCapabilityKeys.contains(rule.type.name),
+      ),
+    )) {
+      return RiderBatchRejection.handlingCapabilityRequired;
+    }
+    if (deliveries.any(
+      (item) =>
+          item.cashOnDelivery != null &&
+          item.cashOnDelivery!.riderCashResponsibility.trim().isEmpty,
+    )) {
+      return RiderBatchRejection.codResponsibilityUnavailable;
+    }
     if (deliveries.length < 2) return null;
     if (deliveries.any((item) => item.requiresExclusiveTransport)) {
       return RiderBatchRejection.exclusiveTransport;

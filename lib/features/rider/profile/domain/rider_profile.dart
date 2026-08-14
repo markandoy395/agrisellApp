@@ -1,5 +1,7 @@
+import 'package:agresell_app/core/utils/written_address.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_availability.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_registration.dart';
+import 'package:agresell_app/features/rider/profile/domain/rider_address.dart';
 
 export 'package:agresell_app/features/rider/dashboard/domain/rider_availability.dart';
 export 'package:agresell_app/features/rider/profile/domain/rider_registration.dart';
@@ -23,6 +25,12 @@ class RiderProfile {
     required this.totalDeliveries,
     required this.employmentStatus,
     required this.profilePhotoUrl,
+    this.address = '',
+    this.addressLine = '',
+    this.barangay = '',
+    this.cityMunicipality = '',
+    this.province = '',
+    this.postalCode = '',
     this.serviceArea = '',
     this.serviceRadiusKm,
     this.capacityKg,
@@ -53,6 +61,12 @@ class RiderProfile {
       email: registration.email.trim().toLowerCase(),
       gpsLatitude: registration.gpsLatitude,
       gpsLongitude: registration.gpsLongitude,
+      address: registration.locationLabel,
+      addressLine: registration.addressLine,
+      barangay: registration.barangay,
+      cityMunicipality: registration.cityMunicipality,
+      province: registration.province,
+      postalCode: registration.postalCode,
       totalDeliveries: 0,
       employmentStatus: RiderEmploymentStatus.pending,
       profilePhotoUrl: _blankToNull(registration.profilePhotoPath ?? ''),
@@ -73,6 +87,12 @@ class RiderProfile {
   final String email;
   final double? gpsLatitude;
   final double? gpsLongitude;
+  final String address;
+  final String addressLine;
+  final String barangay;
+  final String cityMunicipality;
+  final String province;
+  final String postalCode;
   final int totalDeliveries;
   final RiderEmploymentStatus employmentStatus;
   final String? profilePhotoUrl;
@@ -85,7 +105,7 @@ class RiderProfile {
   RiderVerificationStatus get verificationStatus => switch (employmentStatus) {
     RiderEmploymentStatus.pending => RiderVerificationStatus.pending,
     RiderEmploymentStatus.active => RiderVerificationStatus.verified,
-    RiderEmploymentStatus.inactive => RiderVerificationStatus.rejected,
+    RiderEmploymentStatus.inactive => RiderVerificationStatus.pending,
     RiderEmploymentStatus.suspended => RiderVerificationStatus.suspended,
   };
 
@@ -99,6 +119,21 @@ class RiderProfile {
       return 'GPS location unavailable';
     }
     return '${latitude.toStringAsFixed(5)}, ${longitude.toStringAsFixed(5)}';
+  }
+
+  String get addressLabel {
+    final legacyAddress = WrittenAddress.valueOrNull(address);
+    if (legacyAddress != null) return legacyAddress;
+    final structuredAddress = RiderAddress.format(
+      addressLine: addressLine,
+      barangay: barangay,
+      cityMunicipality: cityMunicipality,
+      province: province,
+      postalCode: postalCode,
+    );
+    return structuredAddress.isEmpty
+        ? 'Address unavailable'
+        : structuredAddress;
   }
 
   bool get hasRegisteredServiceCoordinates =>
@@ -137,6 +172,14 @@ class RiderProfile {
     String? profilePhotoUrl,
     RiderAvailability? availabilityStatus,
     RiderEmploymentStatus? employmentStatus,
+    String? address,
+    String? addressLine,
+    String? barangay,
+    String? cityMunicipality,
+    String? province,
+    String? postalCode,
+    double? gpsLatitude,
+    double? gpsLongitude,
   }) {
     final names = _splitName(fullName ?? this.fullName);
     return RiderProfile(
@@ -154,8 +197,14 @@ class RiderProfile {
       rating: rating,
       contactNumber: contactNumber ?? this.contactNumber,
       email: email,
-      gpsLatitude: gpsLatitude,
-      gpsLongitude: gpsLongitude,
+      gpsLatitude: gpsLatitude ?? this.gpsLatitude,
+      gpsLongitude: gpsLongitude ?? this.gpsLongitude,
+      address: address ?? this.address,
+      addressLine: addressLine ?? this.addressLine,
+      barangay: barangay ?? this.barangay,
+      cityMunicipality: cityMunicipality ?? this.cityMunicipality,
+      province: province ?? this.province,
+      postalCode: postalCode ?? this.postalCode,
       totalDeliveries: totalDeliveries,
       employmentStatus: employmentStatus ?? this.employmentStatus,
       profilePhotoUrl: _blankToNull(

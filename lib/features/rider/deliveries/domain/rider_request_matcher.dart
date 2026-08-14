@@ -29,6 +29,7 @@ RiderRequestRejection? riderRequestRejection(
   RiderMatchingContext rider, {
   DateTime? at,
   bool requireCurrentGps = true,
+  bool allowReservedOffline = false,
 }) {
   final now = at ?? DateTime.now();
   if (rider.riderId.trim().isEmpty) {
@@ -38,23 +39,35 @@ RiderRequestRejection? riderRequestRejection(
       rider.availability.isHandlingDelivery &&
       rider.activeDeliveryCount > 0 &&
       rider.activeDeliveryCount < rider.maximumActiveDeliveries;
-  if (!rider.availability.canReceiveRequests && !continuingBatch) {
+  final isReservedOfflineRider =
+      allowReservedOffline &&
+      rider.availability == RiderAvailability.offline &&
+      request.reservedRiderId == rider.riderId &&
+      request.reservedUntil != null &&
+      request.reservedUntil!.isAfter(now);
+  if (!rider.availability.canReceiveRequests &&
+      !continuingBatch &&
+      !isReservedOfflineRider) {
     return RiderRequestRejection.riderUnavailable;
   }
   final serviceArea = rider.registeredServiceArea;
-  if (!serviceArea.hasName) return RiderRequestRejection.serviceAreaMissing;
-  if (!serviceArea.hasCoordinates) {
-    return RiderRequestRejection.registeredLocationMissing;
-  }
-  if (!serviceArea.hasValidRadius) {
-    return RiderRequestRejection.invalidServiceRadius;
-  }
+  final usesCurrentGps = rider.hasUsableCurrentGps;
+  final usesRegisteredEstimate = rider.usesRegisteredLocationEstimate;
   if (rider.location == null &&
-      (requireCurrentGps || !rider.usesRegisteredLocationEstimate)) {
+      (requireCurrentGps || !usesRegisteredEstimate)) {
     return RiderRequestRejection.locationUnavailable;
   }
   if (rider.location != null && !rider.hasUsableCurrentGps) {
     return RiderRequestRejection.poorGpsAccuracy;
+  }
+  if (!usesCurrentGps && usesRegisteredEstimate) {
+    if (!serviceArea.hasName) return RiderRequestRejection.serviceAreaMissing;
+    if (!serviceArea.hasCoordinates) {
+      return RiderRequestRejection.registeredLocationMissing;
+    }
+    if (!serviceArea.hasValidRadius) {
+      return RiderRequestRejection.invalidServiceRadius;
+    }
   }
   if (rider.activeDeliveryCount >= rider.maximumActiveDeliveries) {
     return RiderRequestRejection.activeDeliveryLimit;
@@ -62,10 +75,15 @@ RiderRequestRejection? riderRequestRejection(
   if (!request.isAvailableTo(rider.riderId, at: now)) {
     return RiderRequestRejection.globallyUnavailable;
   }
-  if (!serviceArea.matchesArea(request.serviceArea)) {
-    return RiderRequestRejection.outsideServiceArea;
-  }
-  if (!serviceArea.containsPickup(request.pickupLocation)) {
+  if (usesRegisteredEstimate) {
+    if (!serviceArea.matchesArea(request.serviceArea)) {
+      return RiderRequestRejection.outsideServiceArea;
+    }
+    if (!serviceArea.containsPickup(request.pickupLocation)) {
+      return RiderRequestRejection.outsideServiceRadius;
+    }
+  } else if (usesCurrentGps &&
+      !rider.containsPickupFromCurrentLocation(request.pickupLocation)) {
     return RiderRequestRejection.outsideServiceRadius;
   }
   if (request.requiredVehicleTypes.isNotEmpty &&

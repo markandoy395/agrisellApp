@@ -119,13 +119,15 @@ class RiderDeliveryController extends ChangeNotifier {
   DateTime? _lastSynchronizationTime;
   RiderProfile? _profile;
   RiderRequestAccessState _requestAccess =
-      RiderRequestAccessState.locationUnavailable;
+      RiderRequestAccessState.unauthenticated;
   RiderRequestSort _requestSort = RiderRequestSort.recommended;
   RiderRequestFilters _requestFilters = const RiderRequestFilters();
   String _searchText = '';
   String? _nextCursor;
   bool _isLoadingMore = false;
   bool _isRefreshing = false;
+  int _activeRequestLoads = 0;
+  bool _realtimeRefreshPending = false;
   Timer? _searchDebounce;
   int _requestGeneration = 0;
   StreamSubscription<void>? _requestUpdates;

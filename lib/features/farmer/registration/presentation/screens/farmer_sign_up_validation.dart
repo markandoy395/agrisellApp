@@ -1,6 +1,15 @@
 part of 'farmer_sign_up_screen.dart';
 
 extension _FarmerSignUpValidation on _FarmerSignUpScreenState {
+  bool get _hasFarmCoordinates =>
+      _controllers.latitude.text.trim().isNotEmpty &&
+      _controllers.longitude.text.trim().isNotEmpty &&
+      FarmerSignupValidator.farmCoordinates(
+            _controllers.latitude.text,
+            _controllers.longitude.text,
+          ) ==
+          null;
+
   void _validateCurrent({required bool showEmpty}) {
     _errors.clear();
     final show = showEmpty || _showAllErrors;

@@ -77,25 +77,45 @@ class OrderPayment {
     required this.status,
     this.transactionReference = '',
     this.refundReference = '',
+    this.receiptImageReference = '',
+    this.receiptImageName = '',
   });
 
   const OrderPayment.cashOnDelivery()
     : method = OrderPaymentMethod.cashOnDelivery,
       status = OrderPaymentStatus.pendingCollection,
       transactionReference = '',
-      refundReference = '';
+      refundReference = '',
+      receiptImageReference = '',
+      receiptImageName = '';
 
-  factory OrderPayment.gcash(String reference) => OrderPayment(
+  factory OrderPayment.gcash(
+    String reference, {
+    String receiptImageReference = '',
+    String receiptImageName = '',
+  }) => OrderPayment(
     method: OrderPaymentMethod.gcash,
     status: OrderPaymentStatus.submittedForVerification,
-    transactionReference: reference.trim(),
+    transactionReference: normalizeGcashReference(reference),
     refundReference: '',
+    receiptImageReference: receiptImageReference.trim(),
+    receiptImageName: receiptImageName.trim(),
   );
 
   final OrderPaymentMethod method;
   final OrderPaymentStatus status;
   final String transactionReference;
   final String refundReference;
+  final String receiptImageReference;
+  final String receiptImageName;
+
+  static final _gcashReferenceSeparators = RegExp(r'[\s_-]+');
+
+  static String normalizeGcashReference(String reference) =>
+      reference.trim().replaceAll(_gcashReferenceSeparators, '');
+
+  static bool isValidGcashReference(String reference) =>
+      RegExp(r'^\d{13}$').hasMatch(normalizeGcashReference(reference));
 
   bool get allowsOrderAcceptance =>
       method == OrderPaymentMethod.cashOnDelivery ||
@@ -105,15 +125,20 @@ class OrderPayment {
       method == OrderPaymentMethod.gcash &&
       (status == OrderPaymentStatus.submittedForVerification ||
           status == OrderPaymentStatus.paymentReviewRequired);
+  bool get hasReceiptImage => receiptImageReference.trim().isNotEmpty;
 
   OrderPayment copyWith({
     OrderPaymentStatus? status,
     String? transactionReference,
     String? refundReference,
+    String? receiptImageReference,
+    String? receiptImageName,
   }) => OrderPayment(
     method: method,
     status: status ?? this.status,
     transactionReference: transactionReference ?? this.transactionReference,
     refundReference: refundReference ?? this.refundReference,
+    receiptImageReference: receiptImageReference ?? this.receiptImageReference,
+    receiptImageName: receiptImageName ?? this.receiptImageName,
   );
 }

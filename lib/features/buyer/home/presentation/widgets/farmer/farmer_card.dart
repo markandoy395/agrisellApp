@@ -80,7 +80,6 @@ class _FarmerInfoSection extends StatelessWidget {
     final availableProducts = farmer.products
         .where((product) => product.isAvailable)
         .length;
-    final previewProducts = farmer.products.take(3).toList(growable: false);
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -99,19 +98,6 @@ class _FarmerInfoSection extends StatelessWidget {
               Expanded(child: FarmerIdentity(farmer: farmer)),
               const SizedBox(width: 8),
               FarmerAvailabilityBadge(availableProducts: availableProducts),
-            ],
-          ),
-          const SizedBox(height: 13),
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: [
-              for (final product in previewProducts)
-                FarmerProductChip(product: product),
-              if (farmer.products.length > previewProducts.length)
-                FarmerMoreProductsChip(
-                  count: farmer.products.length - previewProducts.length,
-                ),
             ],
           ),
           const SizedBox(height: 14),

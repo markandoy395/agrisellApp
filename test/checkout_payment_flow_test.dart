@@ -48,6 +48,7 @@ void main() {
         home: CheckoutScreen(
           initialDeliveryAddress: 'Test delivery address',
           paymentRepository: _FakeCheckoutPaymentRepository(),
+          gcashReceiptImagePicker: _pickReceiptImage,
         ),
       ),
     );
@@ -65,6 +66,9 @@ void main() {
       '1234567890123',
     );
     await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('gcash-receipt-upload-button')));
+    await tester.pumpAndSettle();
+    expect(find.text('gcash-receipt.png'), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('use-gcash-button')));
     await tester.pumpAndSettle();
     expect(find.text('Reference 1234567890123'), findsOneWidget);
@@ -78,11 +82,22 @@ void main() {
       OrderPaymentStatus.submittedForVerification,
     );
     expect(orders.orders.single.payment.transactionReference, '1234567890123');
+    expect(orders.orders.single.payment.hasReceiptImage, isTrue);
+    expect(orders.orders.single.payment.receiptImageName, 'gcash-receipt.png');
     expect(orders.orders.single.deliveryLatitude, 8.1575);
     expect(orders.orders.single.deliveryLongitude, 125.1277);
     expect(tester.takeException(), isNull);
   });
 }
+
+Future<GcashReceiptImage> _pickReceiptImage() async => GcashReceiptImage(
+  fileName: 'gcash-receipt.png',
+  bytes: base64Decode(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADElEQVR42mP8z8AARQAFAgHh'
+    'AJn6AAAAAElFTkSuQmCC',
+  ),
+  proofReference: 'local-secure://gcash-receipts/test',
+);
 
 const _product = HomeProduct(
   id: '1',

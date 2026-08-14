@@ -1,7 +1,9 @@
 part of 'package:agresell_app/features/buyer/cart/presentation/screens/checkout_screen.dart';
 
 class _CheckoutHeader extends StatelessWidget {
-  const _CheckoutHeader();
+  const _CheckoutHeader({required this.onMessagesTap});
+
+  final VoidCallback onMessagesTap;
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +56,7 @@ class _CheckoutHeader extends StatelessWidget {
               ),
             ),
           ),
-          _HeaderChatButton(onTap: () {}),
+          _HeaderChatButton(onTap: onMessagesTap),
         ],
       ),
     );

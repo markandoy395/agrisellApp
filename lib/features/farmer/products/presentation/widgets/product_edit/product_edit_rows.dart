@@ -50,15 +50,14 @@ class ProductEditWeightRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ProductEditInputRow(
-    label: 'Available weight:',
+    label: 'Current stock:',
     expandChild: false,
     child: SizedBox(
       width: 132,
       child: ProductEditRoundedTextField(
         controller: controller,
-        keyboardType: TextInputType.number,
-        textInputAction: TextInputAction.next,
-        suffixText: 'Kg',
+        readOnly: true,
+        suffixText: 'kg',
       ),
     ),
   );

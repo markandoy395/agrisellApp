@@ -17,6 +17,7 @@ import 'package:agresell_app/features/auth/presentation/widgets/auth_scaffold.da
 import 'package:agresell_app/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/sign_up_identity_fields.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/social_sign_in_button.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/otp_verification_screen.dart';
 import 'package:agresell_app/features/rider/profile/presentation/screens/rider_sign_up_screen.dart';
 import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
 
@@ -100,7 +101,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
             onChanged: (value) => setState(() => _agreesToPolicy = value),
           ),
           const SizedBox(height: 20),
-          AuthPrimaryButton(label: 'Sign up', onPressed: _signUp),
+          AuthPrimaryButton(
+            label: 'Sign up',
+            isLoading: _isSubmitting,
+            onPressed: _isSubmitting ? null : _signUp,
+          ),
           const SizedBox(height: 20),
           const AuthDivider(text: 'Or Sign up with'),
           const SizedBox(height: 16),
@@ -174,15 +179,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
         signUpData,
         widget.role,
       );
-      await AuthSessionService.instance.start(account, rememberMe: false);
-      if (!mounted) {
-        return;
-      }
-      Navigator.of(context).pushReplacement(
-        agrisellPageRoute<void>(
-          builder: (_) => AuthDashboardRouter.destinationFor(account),
-        ),
-      );
+      await _finishSignUp(account);
+    } on AuthEmailConfirmationRequired {
+      final account = await _verifySignupEmail(signUpData.email);
+      if (account != null) await _finishSignUp(account);
     } on AuthRegistrationException catch (error) {
       _showMessage(error.message);
     } catch (_) {
@@ -192,6 +192,43 @@ class _SignUpScreenState extends State<SignUpScreen> {
         setState(() => _isSubmitting = false);
       }
     }
+  }
+
+  Future<RegisteredAccount?> _verifySignupEmail(String email) async {
+    RegisteredAccount? account;
+    final verified = await Navigator.of(context).push<bool>(
+      agrisellPageRoute<bool>(
+        builder: (_) => OtpVerificationScreen(
+          destination: email.trim().toLowerCase(),
+          title: 'Verify your email',
+          changeDestinationLabel: 'Change email',
+          onVerify: (otp) async {
+            account = await AuthRegistrationService.instance.verifyEmailOtp(
+              email: email,
+              otp: otp,
+            );
+          },
+          onResend: () =>
+              AuthRegistrationService.instance.resendSignupEmailOtp(email),
+        ),
+      ),
+    );
+    return verified == true ? account : null;
+  }
+
+  Future<void> _finishSignUp(RegisteredAccount account) async {
+    await AuthSessionService.instance.start(account, rememberMe: false);
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      agrisellPageRoute<void>(
+        builder: (_) => AuthDashboardRouter.destinationFor(
+          account,
+          initialMessage:
+              'Your ${widget.role.label} account was created successfully.',
+        ),
+      ),
+      (route) => false,
+    );
   }
 
   void _showMessage(String message) {

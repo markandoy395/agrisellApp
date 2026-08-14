@@ -79,6 +79,14 @@ class RiderRegistrationService extends ChangeNotifier {
           lastName: profile.lastName,
           contactNumber: profile.contactNumber,
           licenseNumber: profile.licenseNumber,
+          locationLabel: profile.address,
+          addressLine: profile.addressLine,
+          barangay: profile.barangay,
+          cityMunicipality: profile.cityMunicipality,
+          province: profile.province,
+          postalCode: profile.postalCode,
+          gpsLatitude: profile.gpsLatitude,
+          gpsLongitude: profile.gpsLongitude,
         ),
       );
       _currentVehicle = await _repository.updateVehicle(

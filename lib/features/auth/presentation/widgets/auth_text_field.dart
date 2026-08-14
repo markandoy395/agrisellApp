@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/core/utils/responsive.dart';
 
 class AuthTextField extends StatefulWidget {
@@ -43,6 +44,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
   @override
   void initState() {
     super.initState();
+    _hasText = widget.controller?.text.isNotEmpty ?? false;
     widget.controller?.addListener(_handleControllerChanged);
   }
 
@@ -51,6 +53,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller == widget.controller) return;
     oldWidget.controller?.removeListener(_handleControllerChanged);
+    _hasText = widget.controller?.text.isNotEmpty ?? false;
     widget.controller?.addListener(_handleControllerChanged);
   }
 
@@ -66,8 +69,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
     final textScaler = MediaQuery.textScalerOf(context);
     final isPassword = widget.showPasswordToggle;
     final textSize = lerpDouble(12, 14, scale);
-    final isFloating =
-        _isFocused || (widget.controller?.text.isNotEmpty ?? _hasText);
+    final isFloating = _isFocused || _hasText;
     final fieldHeight =
         _fieldHeight +
         (textScaler.scale(textSize) - textSize).clamp(0.0, double.infinity) *
@@ -165,12 +167,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Text(
                       widget.hintText,
-                      style: const TextStyle(
-                        color: AgrisellColors.authGreen,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        height: 1.2,
-                      ),
+                      style: AgrisellTheme.floatingInputLabelStyle,
                     ),
                   ),
                 ),
@@ -190,7 +187,10 @@ class _AuthTextFieldState extends State<AuthTextField> {
   }
 
   void _handleControllerChanged() {
-    if (mounted) setState(() {});
+    final hasText = widget.controller?.text.isNotEmpty ?? false;
+    if (mounted && _hasText != hasText) {
+      setState(() => _hasText = hasText);
+    }
   }
 
   void _handleFocusChanged(bool hasFocus) {

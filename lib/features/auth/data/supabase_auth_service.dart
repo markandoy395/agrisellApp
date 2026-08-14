@@ -72,6 +72,11 @@ class SupabaseAuthService {
     if (response.user == null) {
       throw const AuthRegistrationException('Account creation failed.');
     }
+    if (response.user!.identities?.isEmpty == true) {
+      throw const AuthRegistrationException(
+        'This email is already registered. Log in or use another email.',
+      );
+    }
     if (response.session == null) {
       throw const AuthEmailConfirmationRequired();
     }
@@ -97,7 +102,7 @@ class SupabaseAuthService {
         .from('farmers')
         .select(
           'first_name,last_name,suffix,phone_number,date_of_birth,'
-          'account_status,verification_status',
+          'account_status,verification_status,profile_image_url',
         )
         .eq('auth_user_id', authUser.id)
         .maybeSingle();
@@ -115,6 +120,7 @@ class SupabaseAuthService {
         phoneNumber: _nullableText(farmer['phone_number']),
         dateOfBirth: _nullableText(farmer['date_of_birth']),
         verificationStatus: _nullableText(farmer['verification_status']),
+        profileImageUrl: _nullableText(farmer['profile_image_url']),
       );
     }
     final databaseRole = await _roleFor();
@@ -122,10 +128,13 @@ class SupabaseAuthService {
     if (role == AuthRole.rider.value) {
       final rider = await _client
           .from('riders')
-          .select('first_name,last_name,email,contact_number,employment_status')
+          .select(
+            'first_name,last_name,email,contact_number,employment_status,'
+            'profile_photo_url',
+          )
           .maybeSingle();
       if (rider != null) {
-        return _riderAccount(authUser, role, rider);
+        return _withRiderProfileImage(_riderAccount(authUser, role, rider));
       }
       final pendingApplication = authUser.userMetadata?['rider_application'];
       if (pendingApplication is Map) {
@@ -139,7 +148,7 @@ class SupabaseAuthService {
           },
         );
         if (rider is Map) {
-          return _riderAccount(authUser, role, rider);
+          return _withRiderProfileImage(_riderAccount(authUser, role, rider));
         }
       }
       return RegisteredAccount(
@@ -161,7 +170,7 @@ class SupabaseAuthService {
         .from('users')
         .select(
           'first_name,last_name,extension_name,email,contact_number,'
-          'date_of_birth,account_status',
+          'date_of_birth,account_status,profile_photo_url',
         )
         .single();
     return RegisteredAccount(
@@ -179,6 +188,7 @@ class SupabaseAuthService {
       shippingAddress: shipping?.address,
       shippingLatitude: shipping?.latitude,
       shippingLongitude: shipping?.longitude,
+      profileImageUrl: _nullableText(row['profile_photo_url']),
     );
   }
 
@@ -208,27 +218,20 @@ class SupabaseAuthService {
   }) async {
     final normalizedEmail = email.trim().toLowerCase();
     final normalizedOtp = otp.trim();
-    late final AuthResponse response;
-    try {
-      response = await _client.auth.verifyOTP(
-        email: normalizedEmail,
-        token: normalizedOtp,
-        type: OtpType.signup,
-      );
-    } on AuthException catch (error) {
-      // Newer Supabase Auth projects may issue confirmation tokens as `email`
-      // instead of the legacy `signup` type. Retry only its opaque server
-      // failure; invalid and expired codes should keep their original error.
-      if (!error.message.toLowerCase().contains('unexpected')) rethrow;
-      response = await _client.auth.verifyOTP(
-        email: normalizedEmail,
-        token: normalizedOtp,
-        type: OtpType.email,
+    if (!RegExp(r'^\d{6}$').hasMatch(normalizedOtp)) {
+      throw const AuthOtpException(
+        'That OTP is invalid. Enter the 6 digits from your email.',
+        reason: AuthOtpFailureReason.invalid,
       );
     }
-    if (response.session == null) {
+    final response = await _client.auth.verifyOTP(
+      email: normalizedEmail,
+      token: normalizedOtp,
+      type: OtpType.email,
+    );
+    if (response.session == null || response.user?.emailConfirmedAt == null) {
       throw const AuthRegistrationException(
-        'The email OTP is invalid or expired.',
+        'The email could not be confirmed. Request a new OTP and try again.',
       );
     }
     final account = await loadCurrentAccount();
@@ -315,6 +318,22 @@ class SupabaseAuthService {
           : employmentStatus == 'suspended'
           ? 'suspended'
           : 'pending',
+      profileImageUrl: _nullableText(rider['profile_photo_url']),
     );
+  }
+
+  Future<RegisteredAccount> _withRiderProfileImage(
+    RegisteredAccount account,
+  ) async {
+    final path = account.profileImageUrl;
+    if (path == null || Uri.tryParse(path)?.hasScheme == true) return account;
+    try {
+      final signedUrl = await _client.storage
+          .from('rider-documents')
+          .createSignedUrl(path, 3600);
+      return account.copyWith(profileImageUrl: signedUrl);
+    } on Object {
+      return account.copyWith(profileImageUrl: null);
+    }
   }
 }

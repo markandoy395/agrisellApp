@@ -79,6 +79,7 @@ class RegisteredAccount {
     this.shippingAddress,
     this.shippingLatitude,
     this.shippingLongitude,
+    this.profileImageUrl,
   });
 
   final String id;
@@ -96,6 +97,7 @@ class RegisteredAccount {
   final String? shippingAddress;
   final double? shippingLatitude;
   final double? shippingLongitude;
+  final String? profileImageUrl;
 
   AuthRole? get assignedRole => AuthRole.fromValue(role);
 
@@ -127,6 +129,7 @@ class RegisteredAccount {
     String? shippingAddress,
     double? shippingLatitude,
     double? shippingLongitude,
+    String? profileImageUrl,
   }) {
     return RegisteredAccount(
       id: id,
@@ -143,6 +146,7 @@ class RegisteredAccount {
       shippingAddress: shippingAddress ?? this.shippingAddress,
       shippingLatitude: shippingLatitude ?? this.shippingLatitude,
       shippingLongitude: shippingLongitude ?? this.shippingLongitude,
+      profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       verificationStatus: verificationStatus ?? this.verificationStatus,
     );
   }

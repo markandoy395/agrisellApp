@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('farm coordinates stay hidden after a location is pinned', (
+  testWidgets('farm coordinates stay hidden in the farm step UI', (
     tester,
   ) async {
     final controllers = FarmerSignupControllers();
@@ -20,7 +20,6 @@ void main() {
               controllers: controllers,
               errors: const {},
               onChanged: () {},
-              onPickLocation: () {},
               onPickImage: () {},
             ),
           ),
@@ -30,17 +29,19 @@ void main() {
 
     expect(find.widgetWithText(TextField, 'Latitude'), findsNothing);
     expect(find.widgetWithText(TextField, 'Longitude'), findsNothing);
-    expect(find.text('Tap to adjust the farm location pin'), findsOneWidget);
+    expect(find.text('Farm GPS location'), findsNothing);
+    expect(find.text('Refresh location'), findsNothing);
+    expect(find.textContaining('Latitude'), findsNothing);
+    expect(find.textContaining('longitude'), findsNothing);
     expect(controllers.latitude.text, '14.5995');
     expect(controllers.longitude.text, '120.9842');
   });
 
-  testWidgets('empty farm location shows a tappable map preview', (
+  testWidgets('empty farm location does not show GPS capture controls', (
     tester,
   ) async {
     final controllers = FarmerSignupControllers();
     addTearDown(controllers.dispose);
-    var tapped = false;
 
     await tester.pumpWidget(
       MaterialApp(
@@ -50,7 +51,6 @@ void main() {
               controllers: controllers,
               errors: const {},
               onChanged: () {},
-              onPickLocation: () => tapped = true,
               onPickImage: () {},
             ),
           ),
@@ -58,10 +58,11 @@ void main() {
       ),
     );
 
-    final label = find.text('Tap to select the exact farm location *');
-    expect(label, findsOneWidget);
-    await tester.tap(label);
-    expect(tapped, isTrue);
+    expect(
+      find.widgetWithText(OutlinedButton, 'Use current location'),
+      findsNothing,
+    );
+    expect(find.byIcon(Icons.my_location_rounded), findsNothing);
   });
 
   testWidgets('same address copies farmer area details into the farm', (
@@ -81,7 +82,6 @@ void main() {
               controllers: controllers,
               errors: const {},
               onChanged: () {},
-              onPickLocation: () {},
               onPickImage: () {},
             ),
           ),
@@ -117,7 +117,6 @@ void main() {
               controllers: controllers,
               errors: const {},
               onChanged: () {},
-              onPickLocation: () {},
               onPickImage: () {},
             ),
           ),
@@ -149,11 +148,11 @@ void main() {
             child: FarmerSignupFarmStep(
               controllers: controllers,
               errors: const {
-                'farmLocation': 'Choose your farm location.',
+                'farmLocation':
+                    'Allow location access so we can capture your farm location.',
                 'yearsOfExperience': 'Enter your years of farming experience.',
               },
               onChanged: () {},
-              onPickLocation: () {},
               onPickImage: () {},
             ),
           ),
@@ -161,7 +160,10 @@ void main() {
       ),
     );
 
-    expect(find.text('Choose your farm location.'), findsOneWidget);
+    expect(
+      find.text('Allow location access so we can capture your farm location.'),
+      findsOneWidget,
+    );
     expect(
       find.widgetWithText(TextField, 'Years of farming experience'),
       findsOneWidget,

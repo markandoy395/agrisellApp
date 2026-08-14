@@ -79,6 +79,7 @@ class BasketItem extends StatelessWidget {
               children: [
                 ProductThumbnail(
                   asset: item.image,
+                  imageUrl: item.imageUrl,
                   width: 88,
                   height: 96,
                   borderRadius: 13,

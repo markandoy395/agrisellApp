@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import '../../domain/rider_delivery_problem.dart';
 
 class RiderDeliveryProblemDraft {
@@ -31,6 +32,10 @@ Future<RiderDeliveryProblemDraft?> showRiderDeliveryProblemDialog(
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<RiderDeliveryProblemKind>(
+                dropdownColor: AppDropdownStyle.menuColor,
+                borderRadius: AppDropdownStyle.menuBorderRadius,
+                style: AppDropdownStyle.textStyle,
+                iconEnabledColor: AppDropdownStyle.iconColor,
                 initialValue: kind,
                 isExpanded: true,
                 items: [

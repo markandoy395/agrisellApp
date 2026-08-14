@@ -18,6 +18,11 @@ void main() {
       gpsAccuracyMeters: 12.5,
       locationCapturedAt: DateTime.utc(2026, 7, 15, 8, 30),
       locationLabel: 'Cagayan de Oro City',
+      addressLine: '12 Rizal Street',
+      barangay: 'Cogon',
+      cityMunicipality: 'Cagayan de Oro City',
+      province: 'Misamis Oriental',
+      postalCode: '9000',
       locationNotes: 'Meet at the public market.',
       vehicleType: RiderVehicleType.motorcycle,
       vehiclePlateNumber: 'abc 1234',
@@ -37,6 +42,11 @@ void main() {
     expect(payload['gps_long'], 124.65);
     expect(payload['gps_accuracy_meters'], 12.5);
     expect(payload['location_label'], 'Cagayan de Oro City');
+    expect(payload['address_line'], '12 Rizal Street');
+    expect(payload['barangay'], 'Cogon');
+    expect(payload['city_municipality'], 'Cagayan de Oro City');
+    expect(payload['province'], 'Misamis Oriental');
+    expect(payload['postal_code'], '9000');
     expect(payload['location_notes'], 'Meet at the public market.');
     expect(payload['location_captured_at'], '2026-07-15T08:30:00.000Z');
     expect(payload['vehicle_type'], 'motorcycle');
@@ -56,6 +66,11 @@ void main() {
       'gps_accuracy_meters',
       'location_captured_at',
       'location_label',
+      'address_line',
+      'barangay',
+      'city_municipality',
+      'province',
+      'postal_code',
       'location_notes',
       'vehicle_type',
       'vehicle_plate_number',

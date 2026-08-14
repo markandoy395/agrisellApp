@@ -25,10 +25,16 @@ void main() {
     },
   );
 
-  test('pickup outside registered radius is not eligible', () {
+  test('pickup outside current GPS search radius is not eligible', () {
     final rejection = riderRequestRejection(
       _request(id: 'outside', latitude: 8.54),
-      _rider(),
+      _rider(
+        current: const RiderDeliverySearch(
+          latitude: 8.49,
+          longitude: 124.65,
+          radiusKm: 3,
+        ),
+      ),
     );
 
     expect(rejection, RiderRequestRejection.outsideServiceRadius);
@@ -74,7 +80,7 @@ void main() {
   );
 
   test(
-    'server-side acceptance rejects a pickup outside registered coverage',
+    'server-side acceptance rejects pickup outside current GPS radius',
     () async {
       final repository = InMemoryRiderDeliveryRepository(
         requests: [_request(id: 'server-outside', latitude: 8.54)],
@@ -136,7 +142,11 @@ RiderAcceptanceState _acceptanceRider() => RiderAcceptanceState(
   serviceRadiusKm: 3,
   registeredLatitude: 8.48,
   registeredLongitude: 124.65,
-  location: const RiderDeliverySearch(latitude: 8.49, longitude: 124.65),
+  location: const RiderDeliverySearch(
+    latitude: 8.49,
+    longitude: 124.65,
+    radiusKm: 3,
+  ),
   gpsAccuracyMeters: 5,
 );
 

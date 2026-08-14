@@ -14,6 +14,8 @@ Future<RiderRegistrationLocation?> showRiderSignUpLocationPicker(
     context,
     role: LocationOwnerRole.rider,
     initialAddress: address,
+    initialLatitude: latitude,
+    initialLongitude: longitude,
   );
   return selected == null
       ? null

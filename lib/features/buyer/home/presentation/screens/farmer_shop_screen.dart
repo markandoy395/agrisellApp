@@ -66,6 +66,7 @@ class _FarmerShopScreenState extends State<FarmerShopScreen> {
   Map<String, int> get _categoryCounts {
     final counts = <String, int>{};
     for (final product in _products) {
+      if (!product.canOrder) continue;
       counts.update(product.category, (count) => count + 1, ifAbsent: () => 1);
     }
     return counts;
@@ -76,7 +77,10 @@ class _FarmerShopScreenState extends State<FarmerShopScreen> {
 
     return [
       for (final product in _products)
-        if (_matchesCategory(product) && _matchesQuery(product, query)) product,
+        if (product.canOrder &&
+            _matchesCategory(product) &&
+            _matchesQuery(product, query))
+          product,
     ];
   }
 
@@ -137,6 +141,7 @@ class _FarmerShopScreenState extends State<FarmerShopScreen> {
                   setState(() => _searchQuery = value);
                 },
                 onBack: () => Navigator.of(context).maybePop(),
+                onMenuSelected: _handleMenuAction,
               ),
             ),
             Positioned(
@@ -195,5 +200,19 @@ class _FarmerShopScreenState extends State<FarmerShopScreen> {
         ),
       ),
     );
+  }
+
+  void _handleMenuAction(FarmerShopMenuAction action) {
+    switch (action) {
+      case FarmerShopMenuAction.viewAllProducts:
+        setState(() {
+          _activeTab = FarmerShopTab.products;
+          _selectedCategory = null;
+          _searchQuery = '';
+          _searchController.clear();
+        });
+      case FarmerShopMenuAction.messageFarmer:
+        _openChat();
+    }
   }
 }

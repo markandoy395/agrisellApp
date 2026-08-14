@@ -13,7 +13,10 @@ import 'package:agresell_app/features/rider/profile/presentation/screens/rider_a
 class AuthDashboardRouter {
   const AuthDashboardRouter._();
 
-  static Widget destinationFor(RegisteredAccount account) {
+  static Widget destinationFor(
+    RegisteredAccount account, {
+    String? initialMessage,
+  }) {
     final resolution = AuthRouteGuard.resolve(account);
     if (resolution.destination == AuthRouteDestination.riderDashboard) {
       RiderRegistrationService.instance.selectProfile(account.email);
@@ -26,10 +29,13 @@ class AuthDashboardRouter {
           initialNavIndex: FarmerHomeScreen.productNavIndex,
         ),
       ),
-      AuthRouteDestination.buyerDashboard => const AuthRoleGate(
+      AuthRouteDestination.buyerDashboard => AuthRoleGate(
         requiredRole: AuthRole.buyer,
         redirectFor: AuthDashboardRouter.destinationFor,
-        child: HomeScreen(initialNavIndex: HomeScreen.homeNavIndex),
+        child: HomeScreen(
+          initialNavIndex: HomeScreen.homeNavIndex,
+          initialMessage: initialMessage,
+        ),
       ),
       AuthRouteDestination.riderDashboard => const AuthRoleGate(
         requiredRole: AuthRole.rider,

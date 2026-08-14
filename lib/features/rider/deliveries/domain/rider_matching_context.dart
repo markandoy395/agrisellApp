@@ -87,4 +87,14 @@ class RiderMatchingContext {
   bool get isCurrentLocationInsideRegisteredServiceArea =>
       location != null &&
       registeredServiceArea.containsCurrentLocation(location!);
+
+  bool containsPickupFromCurrentLocation(DeliveryLocation pickup) {
+    final currentLocation = location;
+    if (currentLocation == null || !pickup.hasCoordinates) return true;
+    return currentLocation.distanceTo(
+          latitude: pickup.latitude!,
+          longitude: pickup.longitude!,
+        ) <=
+        currentLocation.radiusKm;
+  }
 }

@@ -110,6 +110,13 @@ extension RiderAvailabilityControllerSynchronization
     _syncState = RiderAvailabilitySyncState.synchronizing;
     _notify();
     try {
+      try {
+        await deliveryController.refreshActiveDelivery();
+      } on Exception {
+        // Preserve a locally restored delivery when backend reconciliation
+        // fails; availability can still be restored independently.
+      }
+      if (_isDisposed) return;
       final pendingWorkStatus = _pendingWorkStatus;
       if (pendingWorkStatus != null) {
         await _repository.saveAvailability(riderId, pendingWorkStatus);

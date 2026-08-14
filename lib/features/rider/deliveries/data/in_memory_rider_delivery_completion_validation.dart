@@ -87,6 +87,15 @@ extension _InMemoryRiderDeliveryCompletionValidation
     DeliveryCompletionConfiguration configuration,
   ) {
     final required = configuration.requiredMethods;
+    if (command.proofReferences[DeliveryConfirmationMethod.handoverPhoto]
+            ?.trim()
+            .isEmpty ??
+        true) {
+      throw const DeliveryTransitionException(
+        'Delivery evidence photo is required before completion.',
+        code: DeliveryErrorCode.invalidProof,
+      );
+    }
     if (required.contains(DeliveryConfirmationMethod.confirmationCode)) {
       _validateDeliveryCode(command, configuration);
     }
@@ -184,14 +193,28 @@ extension _InMemoryRiderDeliveryCompletionValidation
     DeliveryCompletionConfiguration configuration,
     DateTime now,
   ) => [
-    for (final method in configuration.requiredMethods)
+    for (final method in {
+      ...configuration.requiredMethods,
+      DeliveryConfirmationMethod.handoverPhoto,
+    })
       DeliveryProof(
         id: '${command.deliveryId}-${method.name}',
         type: _deliveryProofType(method),
         secureReference:
             command.proofReferences[method] ??
             'protected://delivery/${command.deliveryId}/${method.name}',
-        capturedAt: now,
+        capturedAt: method == DeliveryConfirmationMethod.handoverPhoto
+            ? command.evidenceCapturedAt ?? now
+            : now,
+        latitude: method == DeliveryConfirmationMethod.handoverPhoto
+            ? command.evidenceLocation?.latitude
+            : null,
+        longitude: method == DeliveryConfirmationMethod.handoverPhoto
+            ? command.evidenceLocation?.longitude
+            : null,
+        confirmedAt: method == DeliveryConfirmationMethod.handoverPhoto
+            ? command.evidenceCapturedAt ?? now
+            : now,
       ),
   ];
   void _markDeliverySecretsUsed(

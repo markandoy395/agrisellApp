@@ -19,7 +19,7 @@ class SupabaseRiderEvidenceUploader {
     if (!reference.startsWith('local-secure://')) return reference;
     final fileName = _fileName(reference);
     final root = await getApplicationDocumentsDirectory();
-    final file = File('${root.path}/$fileName');
+    final file = File('${root.path}/delivery_proofs/$fileName');
     if (!await file.exists()) {
       throw const DeliveryDataException(
         DeliveryDataFailureType.storage,
@@ -56,7 +56,7 @@ class SupabaseRiderEvidenceUploader {
     if (!reference.startsWith('local-secure://')) return;
     final fileName = _fileName(reference);
     final root = await getApplicationDocumentsDirectory();
-    final file = File('${root.path}/$fileName');
+    final file = File('${root.path}/delivery_proofs/$fileName');
     if (await file.exists()) await file.delete();
   }
 

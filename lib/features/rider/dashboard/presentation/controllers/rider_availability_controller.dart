@@ -87,7 +87,10 @@ class RiderAvailabilityController extends ChangeNotifier {
     _connectivitySubscription = _connectivity.connectivityChanges.listen(
       _onConnectivityChanged,
     );
-    await refreshEnvironment(refreshLocation: true);
+    // Connectivity and work status are enough to load dashboard data and
+    // preview requests. Location is requested by actions that actually need
+    // it (for example going online, accepting, or opening the map).
+    await refreshEnvironment();
   }
 
   Future<void> refreshEnvironment({bool refreshLocation = false}) async {
@@ -133,6 +136,9 @@ class RiderAvailabilityController extends ChangeNotifier {
     _syncState = RiderAvailabilitySyncState.updating;
     _notify();
     try {
+      if (value && !await locationController.publishCurrentLocation()) {
+        return _fail(RiderAvailabilityWarning.synchronizationFailed);
+      }
       await _repository.saveAvailability(_riderId!, target);
       _lastObservedAvailability = target;
       await deliveryController.applyAuthoritativeAvailability(target);

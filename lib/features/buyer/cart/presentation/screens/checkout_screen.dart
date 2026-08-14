@@ -1,16 +1,22 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
+import 'package:agresell_app/core/utils/map_coordinates.dart';
 import 'package:agresell_app/core/utils/written_address.dart';
 import 'package:agresell_app/features/buyer/cart/data/checkout_payment_repository.dart';
+import 'package:agresell_app/features/buyer/cart/data/checkout_inventory_repository.dart';
 import 'package:agresell_app/features/shared/payments/domain/farmer_gcash_details.dart';
 import 'package:agresell_app/features/shared/profile/data/user_profile_data.dart';
 import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_controller.dart';
+import 'package:agresell_app/features/buyer/chat/presentation/buyer_conversation_launcher.dart';
+import 'package:agresell_app/features/shared/chat/data/marketplace_messaging_repository.dart';
 import 'package:agresell_app/features/shared/orders/data/order_repository.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/order_controller.dart';
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
@@ -40,13 +46,19 @@ class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({
     this.initialDeliveryAddress,
     this.paymentRepository = const SupabaseCheckoutPaymentRepository(),
+    this.inventoryRepository = const SupabaseCheckoutInventoryRepository(),
     this.locationRepository,
+    this.gcashReceiptImagePicker,
+    this.messagingRepository,
     super.key,
   });
 
   final String? initialDeliveryAddress;
   final CheckoutPaymentRepository paymentRepository;
+  final CheckoutInventoryRepository inventoryRepository;
   final ConfirmedLocationRepository? locationRepository;
+  final GcashReceiptImagePicker? gcashReceiptImagePicker;
+  final MarketplaceMessagingRepository? messagingRepository;
 
   @override
   State<CheckoutScreen> createState() => _CheckoutScreenState();

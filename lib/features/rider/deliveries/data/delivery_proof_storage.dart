@@ -15,6 +15,18 @@ class DeliveryProofStorageException implements Exception {
   final String message;
 }
 
+class CapturedDeliveryEvidence {
+  const CapturedDeliveryEvidence({
+    required this.secureReference,
+    required this.previewBytes,
+    required this.capturedAt,
+  });
+
+  final String secureReference;
+  final Uint8List previewBytes;
+  final DateTime capturedAt;
+}
+
 class DeliveryProofStorage {
   DeliveryProofStorage({ImagePicker? picker, this.failUploads = false})
     : _picker = picker ?? ImagePicker();
@@ -24,7 +36,9 @@ class DeliveryProofStorage {
   final bool failUploads;
   final Random _random = Random.secure();
 
-  Future<String?> capturePhoto({required String deliveryId}) async {
+  Future<CapturedDeliveryEvidence?> captureEvidence({
+    required String deliveryId,
+  }) async {
     final image = await _picker.pickImage(
       source: ImageSource.camera,
       imageQuality: 88,
@@ -36,13 +50,22 @@ class DeliveryProofStorage {
         'Use a JPG, PNG, or WEBP delivery photo.',
       );
     }
-    return saveBytes(
+    final bytes = await image.readAsBytes();
+    final reference = await saveBytes(
       deliveryId: deliveryId,
       method: DeliveryConfirmationMethod.handoverPhoto,
-      bytes: await image.readAsBytes(),
+      bytes: bytes,
       extension: extension,
     );
+    return CapturedDeliveryEvidence(
+      secureReference: reference,
+      previewBytes: bytes,
+      capturedAt: DateTime.now(),
+    );
   }
+
+  Future<String?> capturePhoto({required String deliveryId}) async =>
+      (await captureEvidence(deliveryId: deliveryId))?.secureReference;
 
   Future<String> saveBytes({
     required String deliveryId,
@@ -103,6 +126,21 @@ class DeliveryProofStorage {
       );
     }
     return 'protected://delivery/$deliveryId/${method.name}/${_opaqueId()}';
+  }
+
+  Future<Uint8List?> readLocalEvidence(String reference) async {
+    if (!reference.startsWith('local-secure://')) return null;
+    final fileName = Uri.tryParse(reference)?.pathSegments.lastOrNull ?? '';
+    if (fileName.isEmpty ||
+        fileName.contains('..') ||
+        !RegExp(r'^[A-Za-z0-9_.-]+$').hasMatch(fileName)) {
+      throw const DeliveryProofStorageException(
+        'The saved delivery evidence reference is invalid.',
+      );
+    }
+    final root = await getApplicationDocumentsDirectory();
+    final file = File('${root.path}/delivery_proofs/$fileName');
+    return await file.exists() ? file.readAsBytes() : null;
   }
 
   String _opaqueId() => List<int>.generate(

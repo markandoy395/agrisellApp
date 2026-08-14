@@ -46,6 +46,7 @@ extension _InMemoryRiderBatch on InMemoryRiderDeliveryRepository {
         riderEligible: rider.isAllowedToDeliver,
         maximumActiveDeliveries: rider.maximumActiveDeliveries,
         capacityKg: rider.capacityKg,
+        vehicleType: rider.vehicleType,
         currentLocation: rider.location,
         handlingCapabilityKeys: rider.handlingCapabilityKeys,
         now: _clock(),

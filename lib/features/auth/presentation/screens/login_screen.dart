@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
@@ -6,12 +9,11 @@ import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/domain/auth_route_guard.dart';
 import 'package:agresell_app/features/auth/domain/login_validator.dart';
+import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/auth/presentation/auth_dashboard_router.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/auth_bottom_link.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/auth_button.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/auth_checkbox.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_scaffold.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/auth_text_field.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/login_form.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/otp_verification_screen.dart';
 import 'package:agresell_app/features/auth/presentation/screens/role_selection_screen.dart';
 import 'package:agresell_app/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_controller.dart';
@@ -45,6 +47,9 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     _identifier = TextEditingController(text: widget.initialIdentifier);
     _rememberMe = widget.rememberMeInitially;
+    if (widget.initialIdentifier == null) {
+      unawaited(_loadRememberedIdentifier());
+    }
     final initialMessage = widget.initialMessage;
     if (initialMessage == null) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -65,59 +70,21 @@ class _LoginScreenState extends State<LoginScreen> {
       title: widget.title,
       largeTitle: true,
       compactCard: true,
-      child: Column(
-        children: [
-          AuthTextField(
-            hintText: 'Email or phone number',
-            controller: _identifier,
-            keyboardType: TextInputType.emailAddress,
-            autofillHints: const [AutofillHints.username],
-          ),
-          const SizedBox(height: 14),
-          AuthTextField(
-            hintText: 'Password',
-            controller: _password,
-            showPasswordToggle: true,
-            autofillHints: const [AutofillHints.password],
-          ),
-          const SizedBox(height: 10),
-          AuthCheckbox(
-            label: 'Remember me',
-            value: _rememberMe,
-            onChanged: (value) => setState(() => _rememberMe = value),
-          ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: _showForgotPasswordMessage,
-              style: TextButton.styleFrom(
-                minimumSize: const Size(0, 36),
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-              ),
-              child: const Text('Forgot password?'),
+      child: LoginForm(
+        identifierController: _identifier,
+        passwordController: _password,
+        rememberMe: _rememberMe,
+        isLoggingIn: _isLoggingIn,
+        onRememberChanged: (value) => setState(() => _rememberMe = value),
+        onLogIn: _isLoggingIn ? null : _logIn,
+        onForgotPassword: _showForgotPasswordMessage,
+        onCreateAccount: () {
+          Navigator.of(context).pushReplacement(
+            agrisellPageRoute<void>(
+              builder: (_) => const RoleSelectionScreen.signUp(),
             ),
-          ),
-          const SizedBox(height: 14),
-          AuthPrimaryButton(
-            label: 'Log In',
-            onPressed: _isLoggingIn ? null : _logIn,
-            isLoading: _isLoggingIn,
-          ),
-          const SizedBox(height: 24),
-          const Spacer(),
-          AuthBottomLink(
-            label: "Don't have an account?",
-            action: 'Create account',
-            onTap: () {
-              Navigator.of(context).pushReplacement(
-                agrisellPageRoute<void>(
-                  builder: (_) => const RoleSelectionScreen.signUp(),
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 8),
-        ],
+          );
+        },
       ),
     );
   }
@@ -150,20 +117,11 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
-      final resolution = AuthRouteGuard.resolve(account);
-      if (account.assignedRole == null) {
-        await AuthSessionService.instance.clear(forgetAccount: false);
-        if (!mounted) return;
-        setState(() => _isLoggingIn = false);
-        _showMessage(
-          resolution.message ??
-              'Your account role is invalid. Please contact support.',
-        );
-        return;
-      }
-      await AuthSessionService.instance.start(account, rememberMe: _rememberMe);
+      await _finishLogin(account);
+    } on AuthEmailNotVerified {
       if (!mounted) return;
-      _navigateTo(AuthDashboardRouter.destinationFor(account));
+      setState(() => _isLoggingIn = false);
+      await _resumeUnverifiedSignup();
     } on AuthRegistrationException catch (error) {
       if (!mounted) return;
       setState(() => _isLoggingIn = false);
@@ -175,6 +133,62 @@ class _LoginScreenState extends State<LoginScreen> {
         'We could not load your account information. Please try again.',
       );
     }
+  }
+
+  Future<void> _resumeUnverifiedSignup() async {
+    final email = _identifier.text.trim().toLowerCase();
+    RegisteredAccount? account;
+    final verified = await Navigator.of(context).push<bool>(
+      agrisellPageRoute<bool>(
+        builder: (_) => OtpVerificationScreen(
+          destination: email,
+          title: 'Finish verifying your email',
+          onVerify: (otp) async {
+            account = await AuthRegistrationService.instance.verifyEmailOtp(
+              email: email,
+              otp: otp,
+            );
+          },
+          onResend: () =>
+              AuthRegistrationService.instance.resendSignupEmailOtp(email),
+        ),
+      ),
+    );
+    if (verified != true || account == null || !mounted) return;
+    try {
+      setState(() => _isLoggingIn = true);
+      await _finishLogin(account!);
+    } on AuthRegistrationException catch (error) {
+      if (!mounted) return;
+      setState(() => _isLoggingIn = false);
+      _showMessage(error.message);
+    }
+  }
+
+  Future<void> _finishLogin(RegisteredAccount account) async {
+    final resolution = AuthRouteGuard.resolve(account);
+    if (account.assignedRole == null) {
+      await AuthSessionService.instance.clear(forgetAccount: false);
+      if (!mounted) return;
+      setState(() => _isLoggingIn = false);
+      _showMessage(
+        resolution.message ??
+            'Your account role is invalid. Please contact support.',
+      );
+      return;
+    }
+    await AuthSessionService.instance.start(account, rememberMe: _rememberMe);
+    if (!mounted) return;
+    TextInput.finishAutofillContext(shouldSave: true);
+    _navigateTo(AuthDashboardRouter.destinationFor(account));
+  }
+
+  Future<void> _loadRememberedIdentifier() async {
+    final identifier = await AuthSessionService.instance
+        .loadRememberedIdentifier();
+    if (!mounted || identifier == null || _identifier.text.isNotEmpty) return;
+    _identifier.text = identifier;
+    setState(() => _rememberMe = true);
   }
 
   void _navigateTo(Widget destination) {

@@ -21,36 +21,67 @@ extension _PickupConfirmationActions on _RiderPickupConfirmationScreenState {
   }
 
   Future<void> _submit(PickupConfiguration config) async {
-    final location = widget.controller.currentRiderLocation;
-    if (location == null) {
-      _setError('Current pickup location is required.');
+    if (_submitting) return;
+    _setSubmitting(true);
+    await _refreshPickupLocation(requestPermission: true);
+    final locationState = widget.locationController?.state;
+    final currentLocation =
+        widget.locationController == null ||
+            locationState == RiderLocationState.ready
+        ? widget.controller.currentRiderLocation
+        : null;
+    final location =
+        currentLocation ??
+        const DeliveryStatusLocation(
+          latitude: 0,
+          longitude: 0,
+          accuracyMeters: -1,
+        );
+    final proofs = Map<PickupConfirmationMethod, String>.from(_proofs);
+    var command = PickupCompletionCommand(
+      deliveryId: widget.request.id,
+      riderId: widget.riderId,
+      idempotencyKey: _idempotencyKey,
+      location: location,
+      checklist: _condition(),
+      proofReferences: proofs,
+      confirmationCode: _code.text,
+      qrPayload: _qr.text,
+    );
+    final validation = validatePickupCompletion(command);
+    if (!validation.isValid) {
+      _setValidation(validation);
+      _setSubmitting(false);
       return;
     }
-    _setSubmitting(true);
-    _setError(null);
-    final proofs = Map<PickupConfirmationMethod, String>.from(_proofs);
+    _setValidation(const PickupCompletionValidation([]));
     for (final method in config.requiredMethods.where(
       (item) =>
           item == PickupConfirmationMethod.confirmationCode ||
           item == PickupConfirmationMethod.qrCode,
     )) {
-      proofs[method] = await _storage.saveAttestation(
-        deliveryId: widget.request.id,
-        method: method,
-      );
+      try {
+        proofs[method] = await _storage.saveAttestation(
+          deliveryId: widget.request.id,
+          method: method,
+        );
+      } on PickupProofStorageException catch (error) {
+        _setError(error.message);
+        _setSubmitting(false);
+        return;
+      }
     }
-    final result = await widget.controller.completePickup(
-      PickupCompletionCommand(
-        deliveryId: widget.request.id,
-        riderId: widget.riderId,
-        idempotencyKey: Random.secure().nextInt(1 << 32).toString(),
-        location: location,
-        checklist: _condition(),
-        proofReferences: proofs,
-        confirmationCode: _code.text,
-        qrPayload: _qr.text,
-      ),
+    command = PickupCompletionCommand(
+      deliveryId: command.deliveryId,
+      riderId: command.riderId,
+      idempotencyKey: command.idempotencyKey,
+      location: command.location,
+      checklist: command.checklist,
+      proofReferences: proofs,
+      confirmationCode: command.confirmationCode,
+      qrPayload: command.qrPayload,
     );
+    final result = await widget.controller.completePickup(command);
     _setSubmitting(false);
     if (!mounted) return;
     if (result.isSuccess) {

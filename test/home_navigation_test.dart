@@ -1,10 +1,33 @@
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
+import 'package:agresell_app/core/constants/agrisell_routes.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/home_screen.dart';
+import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_header.dart';
 import 'package:agresell_app/features/shared/widgets/navigation/custom_bottom_nav_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  testWidgets('buyer quick menu opens buyer order tracking', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AgrisellTheme.light,
+        routes: {
+          AgrisellRoutes.basket: (_) => const Scaffold(body: Text('Basket')),
+          AgrisellRoutes.buyerOrders: (_) =>
+              const Scaffold(body: Text('Buyer order tracking')),
+        },
+        home: const Scaffold(body: HomeHeader()),
+      ),
+    );
+
+    await tester.tap(find.bySemanticsLabel('Menu'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('My orders'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Buyer order tracking'), findsOneWidget);
+  });
+
   testWidgets('buyer navigation opens the searchable messages destination', (
     tester,
   ) async {

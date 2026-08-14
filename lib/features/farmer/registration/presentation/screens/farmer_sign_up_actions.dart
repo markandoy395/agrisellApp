@@ -19,28 +19,74 @@ extension _FarmerSignUpActions on _FarmerSignUpScreenState {
     });
   }
 
-  Future<void> _pickLocation() async {
-    final selected = await showLocationSelector(
-      context,
-      role: LocationOwnerRole.farmer,
-      initialAddress: _controllers.farmAddress.text,
-      initialLatitude: double.tryParse(_controllers.latitude.text),
-      initialLongitude: double.tryParse(_controllers.longitude.text),
-      showAddressFields: false,
-    );
-    if (selected == null || !mounted) return;
-    _refresh(() {
-      _controllers.setFarmCoordinates(
-        latitudeValue: selected.latitude,
-        longitudeValue: selected.longitude,
+  Future<void> _captureFarmLocation() async {
+    return _captureFarmLocationRequest ??= _captureFarmLocationOnce()
+        .whenComplete(() => _captureFarmLocationRequest = null);
+  }
+
+  Future<void> _captureFarmLocationOnce() async {
+    if (_isCapturingLocation) return;
+    _refresh(() => _isCapturingLocation = true);
+    try {
+      if (!await _gpsGateway.isServiceEnabled()) {
+        await _gpsGateway.openLocationSettings();
+        _validateFarmLocationSilently();
+        return;
+      }
+
+      var permission = await _gpsGateway.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await _gpsGateway.requestPermission();
+      }
+      if (permission == LocationPermission.denied) {
+        _validateFarmLocationSilently();
+        return;
+      }
+      if (permission == LocationPermission.deniedForever) {
+        await _gpsGateway.openAppSettings();
+        _validateFarmLocationSilently();
+        return;
+      }
+      if (await _gpsGateway.getAccuracyStatus() ==
+          LocationAccuracyStatus.reduced) {
+        await _gpsGateway.openAppSettings();
+        _validateFarmLocationSilently();
+        return;
+      }
+
+      final position = await _gpsGateway.currentPosition(
+        settings: const LocationSettings(
+          accuracy: LocationAccuracy.bestForNavigation,
+          timeLimit: Duration(seconds: 15),
+        ),
       );
-      _validateCurrent(showEmpty: false);
-    });
+      if (!mounted) return;
+      _refresh(() {
+        _controllers.setFarmCoordinates(
+          latitudeValue: position.latitude,
+          longitudeValue: position.longitude,
+        );
+        _validateCurrent(showEmpty: false);
+      });
+    } on TimeoutException {
+      _validateFarmLocationSilently();
+    } catch (_) {
+      _validateFarmLocationSilently();
+    } finally {
+      if (mounted) _refresh(() => _isCapturingLocation = false);
+    }
+  }
+
+  void _validateFarmLocationSilently() {
+    if (!mounted) return;
+    _refresh(() => _validateCurrent(showEmpty: false));
   }
 
   Future<void> _pickImage({required bool profile}) async {
     final image = await ImagePicker().pickImage(
       source: ImageSource.gallery,
+      maxWidth: 1600,
+      maxHeight: 1600,
       imageQuality: 85,
     );
     if (image == null || !mounted) return;
@@ -57,25 +103,14 @@ extension _FarmerSignUpActions on _FarmerSignUpScreenState {
 
   Future<void> _submit() async {
     _refresh(() => _isSubmitting = true);
+    final data = _controllers.data();
     try {
       final account = await AuthRegistrationService.instance.registerFarmer(
-        _controllers.data(),
+        data,
       );
-      await AuthSessionService.instance.start(account, rememberMe: false);
-      if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        agrisellPageRoute<void>(
-          builder: (_) => AuthDashboardRouter.destinationFor(account),
-        ),
-      );
-    } on AuthEmailConfirmationRequired catch (error) {
-      if (!mounted) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        agrisellPageRoute<void>(
-          builder: (_) => LoginScreen(initialMessage: error.message),
-        ),
-        (route) => false,
-      );
+      await _finishRegistration(account);
+    } on AuthEmailConfirmationRequired {
+      await _verifyAndCompleteRegistration(data);
     } on AuthRegistrationException catch (error) {
       _showMessage(error.message);
     } catch (_) {
@@ -85,6 +120,49 @@ extension _FarmerSignUpActions on _FarmerSignUpScreenState {
     } finally {
       if (mounted) _refresh(() => _isSubmitting = false);
     }
+  }
+
+  Future<void> _verifyAndCompleteRegistration(FarmerSignupData data) async {
+    final email = data.email.trim().toLowerCase();
+    final verified = await Navigator.of(context).push<bool>(
+      agrisellPageRoute<bool>(
+        builder: (_) => OtpVerificationScreen(
+          destination: email,
+          title: 'Verify your Farmer email',
+          changeDestinationLabel: 'Change email',
+          onVerify: (otp) => AuthRegistrationService.instance.verifyEmailOtp(
+            email: email,
+            otp: otp,
+          ),
+          onResend: () =>
+              AuthRegistrationService.instance.resendSignupEmailOtp(email),
+        ),
+      ),
+    );
+    if (verified != true || !mounted) return;
+    try {
+      final account = await AuthRegistrationService.instance
+          .completeVerifiedFarmerRegistration(data);
+      await _finishRegistration(account);
+    } on AuthRegistrationException catch (error) {
+      _showMessage(error.message);
+    } catch (_) {
+      _showMessage(
+        'Your email was verified, but the Farmer registration could not be completed.',
+      );
+    }
+  }
+
+  Future<void> _finishRegistration(RegisteredAccount account) async {
+    await AuthSessionService.instance.start(account, rememberMe: false);
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      agrisellPageRoute<void>(
+        builder: (_) =>
+            FarmerRegistrationSubmittedScreen(reference: account.id),
+      ),
+      (route) => false,
+    );
   }
 
   Future<void> _confirmDiscard() async {

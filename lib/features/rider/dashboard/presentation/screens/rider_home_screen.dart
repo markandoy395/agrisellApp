@@ -30,7 +30,6 @@ import 'package:agresell_app/features/rider/deliveries/domain/delivery_completio
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_location_controller.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_delivery_search.dart';
-import 'package:agresell_app/features/rider/deliveries/domain/rider_registered_service_area.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_live_location_policy.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/screens/rider_deliveries_screen.dart';
@@ -98,6 +97,7 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
   var _activeIndex = RiderHomeScreen.homeNavIndex;
   StreamSubscription<PushNotificationAction>? _pushSubscription;
   DateTime? _backgroundedAt;
+  bool _isAppInForeground = true;
   RiderAvailability? _lastAvailability;
   bool? _lastTrackingRequested;
   int? _lastCompletedToday;
@@ -122,6 +122,11 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
       setState(() => _activeIndex = index);
       _syncLiveLocationSharing();
     }
+  }
+
+  void _handlePageChanged(int index) {
+    if (index == _activeIndex) return;
+    _setActiveIndex(index);
   }
 
   void _updateState(VoidCallback change) => setState(change);
@@ -177,11 +182,12 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
         shadowColor: AgrisellColors.brandBlack.withValues(alpha: 0.16),
         onItemSelected: _selectTab,
       ),
-      body: PageView(
+      body: PageView.builder(
         controller: _pageController,
-        onPageChanged: (index) => setState(() => _activeIndex = index),
+        onPageChanged: _handlePageChanged,
         physics: const ClampingScrollPhysics(),
-        children: _tabs(profile),
+        itemCount: riderBottomNavItems.length,
+        itemBuilder: (context, index) => _buildTab(index, profile),
       ),
     );
   }

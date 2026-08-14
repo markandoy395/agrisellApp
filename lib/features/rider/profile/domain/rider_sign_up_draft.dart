@@ -1,6 +1,6 @@
 enum RiderSignUpStep {
   personal('Personal information'),
-  address('GPS location'),
+  address('Address and exact location'),
   vehicle('Vehicle information'),
   documents('Driver information'),
   security('Account security'),

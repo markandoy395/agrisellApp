@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/farmer/products/presentation/widgets/product_edit/product_edit_form_fields.dart';
 import 'package:agresell_app/features/shared/products/domain/product_sale_status.dart';
@@ -24,6 +25,10 @@ class ProductEditSaleStatusRow extends StatelessWidget {
       child: SizedBox(
         height: 31,
         child: DropdownButtonFormField<ProductSaleStatus>(
+          dropdownColor: AppDropdownStyle.menuColor,
+          borderRadius: AppDropdownStyle.menuBorderRadius,
+          style: AppDropdownStyle.textStyle.copyWith(fontSize: 11),
+          iconEnabledColor: AppDropdownStyle.iconColor,
           initialValue: value,
           isExpanded: true,
           icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 17),
@@ -106,6 +111,10 @@ class ProductEditProductionStageRow extends StatelessWidget {
       child: SizedBox(
         height: 31,
         child: DropdownButtonFormField<ProductProductionStage>(
+          dropdownColor: AppDropdownStyle.menuColor,
+          borderRadius: AppDropdownStyle.menuBorderRadius,
+          style: AppDropdownStyle.textStyle.copyWith(fontSize: 11),
+          iconEnabledColor: AppDropdownStyle.iconColor,
           initialValue: value,
           isExpanded: true,
           icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 17),

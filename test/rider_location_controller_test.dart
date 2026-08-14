@@ -26,6 +26,17 @@ void main() {
     expect(controller.quality, RiderLocationQuality.accurate);
   });
 
+  test('unavailable Android speed and heading are normalized', () async {
+    final gateway = _Gateway(position: _position(speed: -1, heading: -1));
+    final controller = RiderLocationController(gateway: gateway);
+    addTearDown(controller.dispose);
+
+    await controller.refresh();
+
+    expect(controller.location?.speedMetersPerSecond, 0);
+    expect(controller.location?.headingDegrees, 0);
+  });
+
   test('denied permission is requested only after explicit action', () async {
     final gateway = _Gateway(
       permission: LocationPermission.denied,
@@ -90,6 +101,22 @@ void main() {
     expect(poor.quality, RiderLocationQuality.poor);
   });
 
+  test('stale GPS sample is rejected instead of becoming ready', () async {
+    final controller = RiderLocationController(
+      gateway: _Gateway(
+        position: _position(
+          timestamp: DateTime.now().subtract(const Duration(minutes: 2)),
+        ),
+      ),
+    );
+    addTearDown(controller.dispose);
+
+    await controller.refresh();
+
+    expect(controller.location, isNull);
+    expect(controller.state, RiderLocationState.error);
+  });
+
   test('repeated tracking start creates one position stream', () async {
     final gateway = _Gateway();
     final controller = RiderLocationController(gateway: gateway);
@@ -116,16 +143,21 @@ void main() {
   });
 }
 
-Position _position({double accuracy = 8}) => Position(
+Position _position({
+  double accuracy = 8,
+  double speed = 5,
+  double heading = 90,
+  DateTime? timestamp,
+}) => Position(
   longitude: 124.65,
   latitude: 8.48,
-  timestamp: DateTime.now(),
+  timestamp: timestamp ?? DateTime.now(),
   accuracy: accuracy,
   altitude: 42,
   altitudeAccuracy: 2,
-  heading: 90,
+  heading: heading,
   headingAccuracy: 3,
-  speed: 5,
+  speed: speed,
   speedAccuracy: 1,
   isMocked: false,
 );

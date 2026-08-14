@@ -47,6 +47,22 @@ void main() {
     expect(product.imageUrl, isNull);
   });
 
+  test(
+    'does not expose a non-active commodity even when stock is positive',
+    () {
+      final product = HomeProductRepository.productFromRow({
+        'commodity_id': 27,
+        'commodity_name': 'Archived squash',
+        'price_per_unit': 40,
+        'available_quantity': 12,
+        'commodity_status': 'out_of_stock',
+      });
+
+      expect(product.isAvailable, isFalse);
+      expect(product.canOrder, isFalse);
+    },
+  );
+
   test('maps a pre-order commodity with a harvest countdown', () {
     final harvestDate = DateTime.now().add(const Duration(days: 9));
     final product = HomeProductRepository.productFromRow({

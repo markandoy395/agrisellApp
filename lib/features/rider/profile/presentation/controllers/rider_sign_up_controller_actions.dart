@@ -1,6 +1,26 @@
 part of 'rider_sign_up_controller.dart';
 
 extension RiderSignUpControllerActions on RiderSignUpController {
+  bool validateForSubmission() {
+    for (final step in RiderSignUpStep.values) {
+      final error = RiderSignUpValidator.stepError(
+        draft: _draft,
+        step: step,
+        licenseNumber: _licenseNumber,
+        password: _password,
+        confirmPassword: _confirmPassword,
+        requirePassword: !emailVerified,
+      );
+      if (error == null) continue;
+      _error = error;
+      _draft = _draft.copyWith(step: step);
+      _showStepErrors = true;
+      _refresh();
+      return false;
+    }
+    return true;
+  }
+
   Future<void> addDocument(
     RiderDraftDocumentType type,
     ImageSource source,
@@ -29,22 +49,7 @@ extension RiderSignUpControllerActions on RiderSignUpController {
 
   Future<RiderProfile?> submit() async {
     if (_submitting) return null;
-    for (final step in RiderSignUpStep.values) {
-      final error = RiderSignUpValidator.stepError(
-        draft: _draft,
-        step: step,
-        licenseNumber: _licenseNumber,
-        password: _password,
-        confirmPassword: _confirmPassword,
-      );
-      if (error != null) {
-        _error = error;
-        _draft = _draft.copyWith(step: step);
-        _showStepErrors = true;
-        _refresh();
-        return null;
-      }
-    }
+    if (!validateForSubmission()) return null;
     _submitting = true;
     _error = null;
     _awaitingEmailOtp = false;
@@ -55,6 +60,7 @@ extension RiderSignUpControllerActions on RiderSignUpController {
         licenseNumber: _licenseNumber,
         password: _password,
         confirmPassword: _confirmPassword,
+        emailAlreadyVerified: emailVerified,
         onUploadProgress: (type, progress) {
           final document = _draft.documents[type];
           if (document == null) return;
@@ -105,5 +111,6 @@ extension RiderSignUpControllerActions on RiderSignUpController {
     _password = '';
     _confirmPassword = '';
     _licenseNumber = '';
+    _verifiedEmail = null;
   }
 }

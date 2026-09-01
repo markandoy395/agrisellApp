@@ -62,15 +62,6 @@ class RiderSignUpPersonalStep extends StatelessWidget {
         RiderSignUpAvailabilityNote(
           state: controller.availabilityFor(RiderSignUpFields.mobile),
         ),
-        _field(
-          RiderSignUpFields.email,
-          'Email address',
-          TextInputType.emailAddress,
-          autofillHints: const [AutofillHints.email],
-        ),
-        RiderSignUpAvailabilityNote(
-          state: controller.availabilityFor(RiderSignUpFields.email),
-        ),
       ],
     );
   }

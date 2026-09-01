@@ -14,16 +14,29 @@ extension _RiderMapScreenViewState on _RiderMapScreenState {
 
   void _applyRestoredView() {
     final view = _restoredView;
-    if (view == null) return;
+    final location = _locationController.location;
+    if (view == null ||
+        location == null ||
+        !RiderMapCameraPolicy.canMoveCamera(_mapController.camera)) {
+      return;
+    }
+    final zoom = RiderMapCameraPolicy.safeZoom(view.zoom);
+    final rotation = RiderMapCameraPolicy.safeRotation(view.rotation);
     _mapController.moveAndRotate(
-      LatLng(view.latitude, view.longitude),
-      view.zoom,
-      view.rotation,
+      LatLng(location.latitude, location.longitude),
+      zoom,
+      rotation,
     );
+    _mapZoom = zoom;
     _restoredView = null;
   }
 
   void _onPositionChanged(MapCamera camera, bool hasGesture) {
+    if (hasGesture) _followRider = false;
+    if (!RiderMapCameraPolicy.isCameraValid(camera)) return;
+    if ((camera.zoom - _mapZoom).abs() >= 0.25 && mounted) {
+      _updateMapZoom(camera.zoom);
+    }
     if (!_viewRestoreCompleted) return;
     _pendingView = RiderMapView(
       latitude: camera.center.latitude,

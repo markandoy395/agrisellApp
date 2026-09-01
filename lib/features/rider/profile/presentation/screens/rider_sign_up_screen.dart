@@ -8,6 +8,7 @@ import 'package:agresell_app/features/auth/presentation/screens/role_selection_s
 import 'package:agresell_app/features/auth/presentation/widgets/auth_background.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/logo_header.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
+import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/otp_verification_screen.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
 import 'package:agresell_app/features/rider/profile/presentation/screens/rider_application_submitted_screen.dart';
@@ -15,9 +16,14 @@ import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_r
 import 'package:agresell_app/features/shared/location/data/gps_location_gateway.dart';
 
 class RiderSignUpScreen extends StatefulWidget {
-  const RiderSignUpScreen({this.gpsGateway, super.key});
+  const RiderSignUpScreen({
+    this.gpsGateway,
+    this.initialVerifiedEmail,
+    super.key,
+  });
 
   final GpsLocationGateway? gpsGateway;
+  final String? initialVerifiedEmail;
 
   @override
   State<RiderSignUpScreen> createState() => _RiderSignUpScreenState();
@@ -70,6 +76,14 @@ class _RiderSignUpScreenState extends State<RiderSignUpScreen> {
                       onExit: _exitToRoleSelection,
                       onSubmitted: _showSubmitted,
                       onEmailOtpRequired: _verifyEmailOtp,
+                      onStartEmailVerification: (email, password) =>
+                          AuthRegistrationService.instance
+                              .startEmailVerification(
+                                email: email,
+                                password: password,
+                                role: AuthRole.rider,
+                              ),
+                      initialVerifiedEmail: widget.initialVerifiedEmail,
                       gpsGateway: widget.gpsGateway,
                     ),
                   ),
@@ -98,13 +112,17 @@ class _RiderSignUpScreenState extends State<RiderSignUpScreen> {
     );
   }
 
-  Future<bool> _verifyEmailOtp(String email) async {
+  Future<bool> _verifyEmailOtp(
+    String email,
+    VoidCallback onChangeDestination,
+  ) async {
     final verified = await Navigator.of(context).push<bool>(
       agrisellPageRoute<bool>(
         builder: (_) => OtpVerificationScreen(
           destination: email,
           title: 'We just sent an email',
           changeDestinationLabel: 'Change email',
+          onChangeDestination: onChangeDestination,
           onVerify: (otp) => AuthRegistrationService.instance.verifyEmailOtp(
             email: email,
             otp: otp,

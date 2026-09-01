@@ -15,8 +15,11 @@ import 'package:agresell_app/features/auth/presentation/widgets/auth_scaffold.da
 import 'package:agresell_app/features/auth/presentation/widgets/login_form.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/otp_verification_screen.dart';
 import 'package:agresell_app/features/auth/presentation/screens/role_selection_screen.dart';
+import 'package:agresell_app/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:agresell_app/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_controller.dart';
+import 'package:agresell_app/features/farmer/registration/presentation/screens/farmer_sign_up_screen.dart';
+import 'package:agresell_app/features/rider/profile/presentation/screens/rider_sign_up_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({
@@ -166,6 +169,23 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _finishLogin(RegisteredAccount account) async {
+    if (account.profilePending) {
+      setState(() => _isLoggingIn = false);
+      _navigateTo(switch (account.assignedRole) {
+        AuthRole.buyer => SignUpScreen(
+          role: AuthRole.buyer,
+          initialVerifiedEmail: account.email,
+        ),
+        AuthRole.farmer => FarmerSignUpScreen(
+          initialVerifiedEmail: account.email,
+        ),
+        AuthRole.rider => RiderSignUpScreen(
+          initialVerifiedEmail: account.email,
+        ),
+        _ => const RoleSelectionScreen.signUp(),
+      });
+      return;
+    }
     final resolution = AuthRouteGuard.resolve(account);
     if (account.assignedRole == null) {
       await AuthSessionService.instance.clear(forgetAccount: false);

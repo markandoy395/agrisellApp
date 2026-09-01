@@ -5,6 +5,7 @@ class _AdditionalCommodityFields extends StatelessWidget {
     required this.descriptionController,
     required this.pricingFields,
     required this.availabilityFields,
+    required this.inventoryLotFields,
     required this.gradeQuality,
     required this.isOrganic,
     required this.errors,
@@ -16,6 +17,7 @@ class _AdditionalCommodityFields extends StatelessWidget {
   final TextEditingController descriptionController;
   final Widget pricingFields;
   final Widget availabilityFields;
+  final Widget inventoryLotFields;
   final String? gradeQuality;
   final bool isOrganic;
   final Map<AddProductField, String> errors;
@@ -53,6 +55,13 @@ class _AdditionalCommodityFields extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         availabilityFields,
+        const SizedBox(height: 24),
+        const _FormSectionTitle(
+          icon: Icons.event_repeat_outlined,
+          title: 'Batch freshness',
+        ),
+        const SizedBox(height: 14),
+        inventoryLotFields,
         const SizedBox(height: 24),
         const _FormSectionTitle(
           icon: Icons.eco_outlined,

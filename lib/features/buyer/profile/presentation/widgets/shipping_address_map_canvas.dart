@@ -45,8 +45,8 @@ class ShippingAddressMapCanvas extends StatelessWidget {
             urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
             userAgentPackageName: 'com.agrisell.agresell_app',
           ),
-          const SimpleAttributionWidget(
-            source: Text('OpenStreetMap contributors'),
+          const RichAttributionWidget(
+            attributions: [TextSourceAttribution('OpenStreetMap contributors')],
           ),
         ],
       ),

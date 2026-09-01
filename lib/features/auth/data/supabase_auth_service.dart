@@ -95,6 +95,52 @@ class SupabaseAuthService {
     return account;
   }
 
+  Future<bool> startEmailVerification({
+    required String email,
+    required String password,
+    required AuthRole role,
+  }) async {
+    final normalizedEmail = email.trim().toLowerCase();
+    final currentUser = _client.auth.currentUser;
+    if (currentUser?.email?.trim().toLowerCase() == normalizedEmail &&
+        currentUser?.emailConfirmedAt != null) {
+      final requestedRole = _requestedRole(currentUser!);
+      if (requestedRole.isNotEmpty && requestedRole != role.value) {
+        throw const AuthRegistrationException(
+          'This verified email is already assigned to another account role.',
+        );
+      }
+      return false;
+    }
+
+    final response = await _client.auth.signUp(
+      email: normalizedEmail,
+      password: password,
+      data: <String, Object?>{
+        'requested_role': role.value,
+        'signup_stage': 'profile_pending',
+      },
+    );
+    final user = response.user;
+    if (user == null) {
+      throw const AuthRegistrationException('Account creation failed.');
+    }
+    if (user.identities?.isEmpty == true) {
+      throw const AuthRegistrationException(
+        'This email is already registered. Log in or use another email.',
+      );
+    }
+    if (response.session != null) {
+      await _client.auth.signOut();
+      throw const AuthRegistrationException(
+        'Email OTP verification is disabled for this AgriSell project. '
+        'Enable Confirm email in Supabase Authentication settings, then try '
+        'again with a new email.',
+      );
+    }
+    return true;
+  }
+
   Future<RegisteredAccount?> loadCurrentAccount() async {
     final authUser = _client.auth.currentUser;
     if (authUser == null) return null;
@@ -125,6 +171,34 @@ class SupabaseAuthService {
     }
     final databaseRole = await _roleFor();
     final role = databaseRole.isEmpty ? _requestedRole(authUser) : databaseRole;
+    if (databaseRole.isEmpty && role == AuthRole.buyer.value) {
+      return RegisteredAccount(
+        id: authUser.id,
+        firstName: '',
+        lastName: '',
+        email: (authUser.email ?? '').trim().toLowerCase(),
+        passwordHash: '',
+        passwordSalt: '',
+        role: role,
+        accountStatus: 'pending',
+        verificationStatus: 'pending',
+        profilePending: true,
+      );
+    }
+    if (databaseRole.isEmpty && role == AuthRole.farmer.value) {
+      return RegisteredAccount(
+        id: authUser.id,
+        firstName: '',
+        lastName: '',
+        email: (authUser.email ?? '').trim().toLowerCase(),
+        passwordHash: '',
+        passwordSalt: '',
+        role: role,
+        accountStatus: 'pending',
+        verificationStatus: 'pending',
+        profilePending: true,
+      );
+    }
     if (role == AuthRole.rider.value) {
       final rider = await _client
           .from('riders')
@@ -161,6 +235,7 @@ class SupabaseAuthService {
         role: role,
         accountStatus: 'pending',
         verificationStatus: 'pending',
+        profilePending: true,
       );
     }
     final shipping = role == AuthRole.buyer.value
@@ -211,6 +286,41 @@ class SupabaseAuthService {
   }
 
   Future<void> signOut() => _client.auth.signOut();
+
+  Future<RegisteredAccount> completeVerifiedBuyerRegistration(
+    SignUpAccountData data,
+  ) async {
+    final user = _client.auth.currentUser;
+    final email = data.email.trim().toLowerCase();
+    if (user == null || user.email?.trim().toLowerCase() != email) {
+      throw const AuthRegistrationException(
+        'Sign in with the Buyer account before completing registration.',
+      );
+    }
+    if (user.emailConfirmedAt == null) throw const AuthEmailNotVerified();
+
+    await _client.rpc<void>(
+      'complete_current_buyer_registration',
+      params: {
+        'buyer_payload': <String, Object?>{
+          'first_name': data.firstName.trim(),
+          'last_name': data.lastName.trim(),
+          'extension_name': data.extensionName?.trim(),
+          'phone_number': data.phoneNumber?.trim(),
+          'date_of_birth': data.dateOfBirth?.trim(),
+          'gender': data.gender?.trim(),
+          'shipping_address': data.shippingAddress?.trim(),
+        },
+      },
+    );
+    final account = await loadCurrentAccount();
+    if (account == null || account.assignedRole != AuthRole.buyer) {
+      throw const AuthRegistrationException(
+        'The Buyer account was created but its profile could not be loaded.',
+      );
+    }
+    return account;
+  }
 
   Future<RegisteredAccount> verifyEmailOtp({
     required String email,

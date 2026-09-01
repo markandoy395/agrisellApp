@@ -1,6 +1,64 @@
 part of 'farmer_sign_up_screen.dart';
 
 extension _FarmerSignUpActions on _FarmerSignUpScreenState {
+  Future<void> _verifyEmailBeforePersonalInfo() async {
+    final email = _controllers.email.text.trim().toLowerCase();
+    if (_verifiedEmail == email) {
+      _advanceStep();
+      return;
+    }
+
+    _refresh(() => _isSubmitting = true);
+    try {
+      if (_otpStartedFor != email) {
+        final requiresOtp = await AuthRegistrationService.instance
+            .startEmailVerification(
+              email: email,
+              password: _controllers.password.text,
+              role: AuthRole.farmer,
+            );
+        if (!mounted) return;
+        if (!requiresOtp) {
+          _refresh(() => _verifiedEmail = email);
+          _advanceStep();
+          return;
+        }
+        _refresh(() => _otpStartedFor = email);
+      }
+
+      final verified = await Navigator.of(context).push<bool>(
+        agrisellPageRoute<bool>(
+          builder: (_) => OtpVerificationScreen(
+            destination: email,
+            title: 'Verify your Farmer email',
+            changeDestinationLabel: 'Change email',
+            onChangeDestination: () {
+              if (mounted) _refresh(() => _otpStartedFor = null);
+            },
+            onVerify: (otp) => AuthRegistrationService.instance.verifyEmailOtp(
+              email: email,
+              otp: otp,
+            ),
+            onResend: () =>
+                AuthRegistrationService.instance.resendSignupEmailOtp(email),
+          ),
+        ),
+      );
+      if (verified != true || !mounted) return;
+      _refresh(() {
+        _verifiedEmail = email;
+        _otpStartedFor = null;
+      });
+      _advanceStep();
+    } on AuthRegistrationException catch (error) {
+      _showMessage(error.message);
+    } catch (_) {
+      _showMessage('We could not verify your email. Please try again.');
+    } finally {
+      if (mounted) _refresh(() => _isSubmitting = false);
+    }
+  }
+
   Future<void> _pickDate() async {
     final selected = await showDatePicker(
       context: context,
@@ -105,12 +163,11 @@ extension _FarmerSignUpActions on _FarmerSignUpScreenState {
     _refresh(() => _isSubmitting = true);
     final data = _controllers.data();
     try {
-      final account = await AuthRegistrationService.instance.registerFarmer(
-        data,
-      );
+      final service = AuthRegistrationService.instance;
+      final account = service.usesSupabase
+          ? await service.completeVerifiedFarmerRegistration(data)
+          : await service.registerFarmer(data);
       await _finishRegistration(account);
-    } on AuthEmailConfirmationRequired {
-      await _verifyAndCompleteRegistration(data);
     } on AuthRegistrationException catch (error) {
       _showMessage(error.message);
     } catch (_) {
@@ -119,37 +176,6 @@ extension _FarmerSignUpActions on _FarmerSignUpScreenState {
       );
     } finally {
       if (mounted) _refresh(() => _isSubmitting = false);
-    }
-  }
-
-  Future<void> _verifyAndCompleteRegistration(FarmerSignupData data) async {
-    final email = data.email.trim().toLowerCase();
-    final verified = await Navigator.of(context).push<bool>(
-      agrisellPageRoute<bool>(
-        builder: (_) => OtpVerificationScreen(
-          destination: email,
-          title: 'Verify your Farmer email',
-          changeDestinationLabel: 'Change email',
-          onVerify: (otp) => AuthRegistrationService.instance.verifyEmailOtp(
-            email: email,
-            otp: otp,
-          ),
-          onResend: () =>
-              AuthRegistrationService.instance.resendSignupEmailOtp(email),
-        ),
-      ),
-    );
-    if (verified != true || !mounted) return;
-    try {
-      final account = await AuthRegistrationService.instance
-          .completeVerifiedFarmerRegistration(data);
-      await _finishRegistration(account);
-    } on AuthRegistrationException catch (error) {
-      _showMessage(error.message);
-    } catch (_) {
-      _showMessage(
-        'Your email was verified, but the Farmer registration could not be completed.',
-      );
     }
   }
 

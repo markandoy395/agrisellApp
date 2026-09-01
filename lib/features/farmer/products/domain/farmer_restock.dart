@@ -1,7 +1,14 @@
+import 'package:agresell_app/features/shared/products/domain/product_inventory_lot.dart';
+
 class FarmerRestockRequest {
-  const FarmerRestockRequest({required this.quantity, this.reason});
+  const FarmerRestockRequest({
+    required this.quantity,
+    required this.inventoryLot,
+    this.reason,
+  });
 
   final double quantity;
+  final ProductInventoryLotDraft inventoryLot;
   final String? reason;
 }
 

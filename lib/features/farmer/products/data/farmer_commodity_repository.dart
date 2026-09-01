@@ -7,6 +7,9 @@ import 'package:agresell_app/features/farmer/products/data/farmer_commodity_mapp
 import 'package:agresell_app/features/farmer/products/data/farmer_commodity_write_values.dart';
 import 'package:agresell_app/features/farmer/products/domain/farmer_dashboard_product.dart';
 import 'package:agresell_app/features/shared/products/domain/product_sale_status.dart';
+import 'package:agresell_app/features/shared/products/domain/product_inventory_lot.dart';
+import 'package:agresell_app/features/shared/products/domain/product_availability_date_rules.dart';
+import 'package:agresell_app/features/shared/products/domain/product_production_stage.dart';
 
 class FarmerCommodityRepository {
   const FarmerCommodityRepository();
@@ -20,20 +23,32 @@ class FarmerCommodityRepository {
     try {
       final context = await FarmerCommodityContext.load();
       final categories = await context.loadCategories();
-      final rows = await AgrisellSupabase.client
+      final response = await AgrisellSupabase.client
           .from('commodities')
           .select()
           .eq('farm_id', context.farmId)
           .order('created_at', ascending: false);
-      return (rows as List)
-          .whereType<Map<String, dynamic>>()
-          .map(
-            (row) => FarmerCommodityMapper.productFromRow(
-              row,
+      final rows = (response as List).whereType<Map<String, dynamic>>().toList(
+        growable: false,
+      );
+      final summaries = await _loadInventorySummaries(rows);
+      return rows
+          .map((row) {
+            final commodityId = FarmerCommodityFormat.integer(
+              row['commodity_id'],
+            );
+            final summary = summaries[commodityId];
+            return FarmerCommodityMapper.productFromRow(
+              <String, dynamic>{
+                ...row,
+                if (summary != null) ...summary,
+                if (summary != null)
+                  'available_quantity': summary['marketable_quantity'],
+              },
               categories,
               context.farmId,
-            ),
-          )
+            );
+          })
           .toList(growable: false);
     } on PostgrestException catch (error) {
       throw FarmerCommodityException(
@@ -59,11 +74,20 @@ class FarmerCommodityRepository {
         categoryId,
         imageUrl,
       );
+      final isNewProduct = product.commodityId == null;
       final row = await _saveValues(product, context.farmId, values);
-      return product.copyWith(
+      final savedProduct = product.copyWith(
         commodityId: FarmerCommodityFormat.integer(row['commodity_id']),
         farmId: context.farmId,
         imageUrl: imageUrl,
+      );
+      if (!isNewProduct || product.availableQuantity <= 0) return savedProduct;
+      return restock(
+        product: savedProduct.copyWith(
+          availableWeight: '0 ${product.unitType}',
+        ),
+        quantity: product.availableQuantity,
+        inventoryLot: product.inventoryLot,
       );
     } on FarmerCommodityException {
       rethrow;
@@ -81,6 +105,7 @@ class FarmerCommodityRepository {
   Future<FarmerDashboardProduct> restock({
     required FarmerDashboardProduct product,
     required double quantity,
+    ProductInventoryLotDraft? inventoryLot,
     String? reason,
   }) async {
     final commodityId = product.commodityId;
@@ -95,20 +120,42 @@ class FarmerCommodityRepository {
       );
     }
 
+    final lot = inventoryLot ?? product.inventoryLot;
+    final lotErrors = lot.validationErrors(
+      today: ProductAvailabilityDateRules.philippineToday(),
+      allowFutureHarvest:
+          product.productionStage != ProductProductionStage.harvested,
+    );
+    if (lotErrors.isNotEmpty) {
+      throw FarmerCommodityException(lotErrors.values.first);
+    }
+
     if (!isAvailable) {
       final updatedQuantity = product.availableQuantity + quantity;
       return product.copyWith(
         availableWeight:
             '${FarmerCommodityFormat.displayNumber(updatedQuantity)} ${product.unitType}',
+        inventoryDateType: lot.dateType,
+        harvestedAt: lot.harvestedAt,
+        sellUntil: lot.sellUntil,
+        expiresAt: lot.expiresAt,
+        lotCode: lot.lotCode,
+        storageInstructions: lot.storageInstructions,
       );
     }
 
     try {
       final result = await AgrisellSupabase.client.rpc<Object?>(
-        'restock_current_farmer_commodity',
+        'restock_current_farmer_inventory_lot',
         params: {
           'p_commodity_id': commodityId,
           'p_quantity': quantity,
+          'p_date_type': lot.dateType.databaseValue,
+          'p_harvested_at': _databaseDate(lot.harvestedAt),
+          'p_sell_until': _databaseDate(lot.sellUntil),
+          'p_expires_at': _databaseDate(lot.expiresAt),
+          'p_lot_code': lot.lotCode?.trim(),
+          'p_storage_instructions': lot.storageInstructions?.trim(),
           'p_reason': reason?.trim(),
         },
       );
@@ -120,6 +167,12 @@ class FarmerCommodityRepository {
       );
       return product.copyWith(
         availableWeight: '$newQuantity ${product.unitType}',
+        inventoryDateType: lot.dateType,
+        harvestedAt: lot.harvestedAt,
+        sellUntil: lot.sellUntil,
+        expiresAt: lot.expiresAt,
+        lotCode: lot.lotCode,
+        storageInstructions: lot.storageInstructions,
       );
     } on PostgrestException catch (error) {
       throw FarmerCommodityException(
@@ -187,6 +240,7 @@ class FarmerCommodityRepository {
         ? null
         : FarmerCommodityFormat.number(product.minimumOrderQuantity),
     'grade_quality': product.gradeQuality,
+    'inventory_date_type': product.inventoryDateType.databaseValue,
   };
 
   Future<Map<String, dynamic>> _saveValues(
@@ -196,12 +250,39 @@ class FarmerCommodityRepository {
   ) {
     final commodities = AgrisellSupabase.client.from('commodities');
     return product.commodityId == null
-        ? commodities.insert(values).select().single()
+        ? commodities
+              .insert(<String, Object?>{...values, 'available_quantity': 0})
+              .select()
+              .single()
         : commodities
               .update(FarmerCommodityWriteValues.forUpdate(values))
               .eq('commodity_id', product.commodityId!)
               .eq('farm_id', farmId)
               .select()
               .single();
+  }
+
+  Future<Map<int, Map<String, dynamic>>> _loadInventorySummaries(
+    List<Map<String, dynamic>> rows,
+  ) async {
+    if (rows.isEmpty) return const {};
+    final ids = rows
+        .map((row) => FarmerCommodityFormat.integer(row['commodity_id']))
+        .toList(growable: false);
+    final response = await AgrisellSupabase.client.rpc<List<dynamic>>(
+      'marketplace_inventory_lot_summaries',
+      params: {'p_commodity_ids': ids},
+    );
+    return {
+      for (final row in response.whereType<Map<String, dynamic>>())
+        FarmerCommodityFormat.integer(row['commodity_id']): row,
+    };
+  }
+
+  static String? _databaseDate(DateTime? value) {
+    if (value == null) return null;
+    return '${value.year.toString().padLeft(4, '0')}-'
+        '${value.month.toString().padLeft(2, '0')}-'
+        '${value.day.toString().padLeft(2, '0')}';
   }
 }

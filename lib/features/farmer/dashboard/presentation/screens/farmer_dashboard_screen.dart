@@ -287,6 +287,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
       final updatedProduct = await widget.commodityRepository.restock(
         product: product,
         quantity: request.quantity,
+        inventoryLot: request.inventoryLot,
         reason: request.reason,
       );
       if (!mounted) return;

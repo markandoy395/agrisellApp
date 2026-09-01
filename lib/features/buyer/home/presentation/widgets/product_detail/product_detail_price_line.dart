@@ -14,9 +14,40 @@ class ProductDetailPriceLine extends StatelessWidget {
       spacing: 8,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
+        if (product.hasSale)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+            decoration: BoxDecoration(
+              color: AgrisellColors.authGreen,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: const Text(
+              'SALE',
+              style: TextStyle(
+                color: AgrisellColors.surface,
+                fontSize: 9,
+                height: 1,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.4,
+              ),
+            ),
+          ),
+        if (product.hasSale)
+          Text(
+            product.price,
+            style: const TextStyle(
+              color: Colors.red,
+              fontSize: 14,
+              decoration: TextDecoration.lineThrough,
+              decorationColor: Colors.red,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        if (product.hasSale)
+          const Text('→', style: TextStyle(color: AgrisellColors.mutedText)),
         Text.rich(
           TextSpan(
-            text: product.price,
+            text: product.activePrice,
             style: const TextStyle(
               color: AgrisellColors.authGreen,
               fontSize: 15,

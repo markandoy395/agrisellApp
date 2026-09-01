@@ -7,7 +7,10 @@ abstract final class RiderRegistrationValidator {
   static final _email = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
   static final _mobile = RegExp(r'^(?:\+63|0)9\d{9}$');
 
-  static String? validate(RiderRegistration item) {
+  static String? validate(
+    RiderRegistration item, {
+    bool requirePassword = true,
+  }) {
     if (item.firstName.trim().isEmpty) return 'First name is required.';
     if (item.lastName.trim().isEmpty) return 'Last name is required.';
     if (item.gender.trim().isEmpty) return 'Select a gender.';
@@ -48,8 +51,12 @@ abstract final class RiderRegistrationValidator {
     if (vehicle.requiresLicense && item.licenseNumber.trim().isEmpty) {
       return 'Enter your driver’s license number.';
     }
-    if (!isStrongPassword(item.password)) return 'Password is too weak.';
-    if (item.password != item.confirmPassword) return 'Passwords do not match.';
+    if (requirePassword && !isStrongPassword(item.password)) {
+      return 'Password is too weak.';
+    }
+    if (requirePassword && item.password != item.confirmPassword) {
+      return 'Passwords do not match.';
+    }
     if (!item.acceptsTerms || !item.acceptsPrivacy || !item.confirmsAccuracy) {
       return 'Accept the agreements and confirm your information.';
     }

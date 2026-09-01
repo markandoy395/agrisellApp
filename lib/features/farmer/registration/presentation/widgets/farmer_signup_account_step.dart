@@ -9,12 +9,16 @@ class FarmerSignupAccountStep extends StatelessWidget {
     required this.controllers,
     required this.errors,
     required this.onChanged,
+    this.readOnly = false,
+    this.emailVerified = false,
     super.key,
   });
 
   final FarmerSignupControllers controllers;
   final Map<String, String?> errors;
   final VoidCallback onChanged;
+  final bool readOnly;
+  final bool emailVerified;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -35,6 +39,7 @@ class FarmerSignupAccountStep extends StatelessWidget {
         controller: controllers.email,
         keyboardType: TextInputType.emailAddress,
         error: errors['email'],
+        readOnly: readOnly,
         onChanged: (_) => onChanged(),
       ),
       FarmerSignupField(
@@ -42,6 +47,7 @@ class FarmerSignupAccountStep extends StatelessWidget {
         controller: controllers.password,
         password: true,
         error: errors['password'],
+        readOnly: readOnly,
         onChanged: (_) => onChanged(),
       ),
       AuthPasswordRequirements(controller: controllers.password),
@@ -51,8 +57,16 @@ class FarmerSignupAccountStep extends StatelessWidget {
         controller: controllers.confirmPassword,
         password: true,
         error: errors['confirmPassword'],
+        readOnly: readOnly,
         onChanged: (_) => onChanged(),
       ),
+      if (readOnly)
+        Text(
+          emailVerified
+              ? 'Email verified. Your account credentials are locked for this registration.'
+              : 'OTP sent. Use Change email on the verification screen to edit these credentials.',
+          style: const TextStyle(fontSize: 12),
+        ),
     ],
   );
 }

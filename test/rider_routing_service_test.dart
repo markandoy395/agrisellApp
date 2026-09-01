@@ -41,6 +41,7 @@ void main() {
         routes.first.instructions.first.text,
         contains('National Highway'),
       );
+      expect(routes.first.instructions.first.maneuverType, 'depart');
     },
   );
 
@@ -94,6 +95,39 @@ void main() {
       throwsA(isA<RiderRoutingException>()),
     );
   });
+
+  test('OSRM nearest-road snap is parsed and cached', () async {
+    var calls = 0;
+    final service = OsrmRiderRoutingService(
+      client: MockClient((request) async {
+        calls++;
+        expect(request.url.path, contains('/nearest/v1/driving/'));
+        return http.Response(
+          jsonEncode({
+            'code': 'Ok',
+            'waypoints': [
+              {
+                'distance': 18.5,
+                'name': 'National Highway',
+                'location': [124.6502, 8.4802],
+              },
+            ],
+          }),
+          200,
+        );
+      }),
+    );
+    const source = DeliveryRoutePoint(latitude: 8.48, longitude: 124.65);
+
+    final first = await service.findNearestRoadAccess(source);
+    final second = await service.findNearestRoadAccess(source);
+
+    expect(calls, 1);
+    expect(first?.roadName, 'National Highway');
+    expect(first?.distanceMeters, 18.5);
+    expect(first?.point.latitude, 8.4802);
+    expect(second?.point.longitude, 124.6502);
+  });
 }
 
 const _response = <String, Object>{
@@ -127,7 +161,10 @@ const _response = <String, Object>{
               'distance': 1000.0,
               'duration': 100.0,
               'name': 'National Highway',
-              'maneuver': {'type': 'depart'},
+              'maneuver': {
+                'type': 'depart',
+                'location': [124.6501, 8.4801],
+              },
             },
           ],
         },
@@ -150,7 +187,11 @@ const _response = <String, Object>{
               'distance': 800.0,
               'duration': 120.0,
               'name': 'Market Road',
-              'maneuver': {'type': 'turn', 'modifier': 'left'},
+              'maneuver': {
+                'type': 'turn',
+                'modifier': 'left',
+                'location': [124.6501, 8.4801],
+              },
             },
           ],
         },

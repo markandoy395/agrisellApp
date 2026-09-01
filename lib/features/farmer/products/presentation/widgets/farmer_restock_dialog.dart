@@ -4,6 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/farmer/products/domain/farmer_dashboard_product.dart';
 import 'package:agresell_app/features/farmer/products/domain/farmer_restock.dart';
+import 'package:agresell_app/features/farmer/products/presentation/widgets/farmer_restock_lot_fields.dart';
+import 'package:agresell_app/features/shared/products/domain/product_availability_date_rules.dart';
+import 'package:agresell_app/features/shared/products/domain/product_inventory_lot.dart';
+import 'package:agresell_app/features/shared/products/domain/product_categories.dart';
 
 Future<FarmerRestockRequest?> showFarmerRestockDialog(
   BuildContext context, {
@@ -26,11 +30,26 @@ class _FarmerRestockDialogState extends State<FarmerRestockDialog> {
   final _formKey = GlobalKey<FormState>();
   final _quantityController = TextEditingController();
   final _reasonController = TextEditingController();
+  final _lotCodeController = TextEditingController();
+  final _storageController = TextEditingController();
+  late ProductInventoryDateType _dateType;
+  DateTime? _harvestedAt;
+  DateTime? _marketableUntil;
+  Map<String, String> _lotErrors = const {};
+
+  @override
+  void initState() {
+    super.initState();
+    _dateType = widget.product.inventoryDateType;
+    _harvestedAt = ProductAvailabilityDateRules.philippineToday();
+  }
 
   @override
   void dispose() {
     _quantityController.dispose();
     _reasonController.dispose();
+    _lotCodeController.dispose();
+    _storageController.dispose();
     super.dispose();
   }
 
@@ -151,6 +170,26 @@ class _FarmerRestockDialogState extends State<FarmerRestockDialog> {
                 ),
               ),
               const SizedBox(height: 13),
+              FarmerRestockLotFields(
+                dateType: _dateType,
+                allowedDateTypes: _allowedDateTypes,
+                harvestedAt: _harvestedAt,
+                marketableUntil: _marketableUntil,
+                lotCodeController: _lotCodeController,
+                storageController: _storageController,
+                errors: _lotErrors,
+                onDateTypeChanged: (value) {
+                  if (value == null) return;
+                  setState(() {
+                    _dateType = value;
+                    _marketableUntil = null;
+                    _lotErrors = const {};
+                  });
+                },
+                onSelectHarvestDate: _pickHarvestDate,
+                onSelectMarketableUntil: _pickMarketableUntil,
+              ),
+              const SizedBox(height: 13),
               TextField(
                 key: const Key('restock-reason-field'),
                 controller: _reasonController,
@@ -191,13 +230,98 @@ class _FarmerRestockDialogState extends State<FarmerRestockDialog> {
 
   void _submit() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
+    final lot = _inventoryLot;
+    final lotErrors = lot.validationErrors(
+      today: ProductAvailabilityDateRules.philippineToday(),
+    );
+    if (lotErrors.isNotEmpty) {
+      setState(() => _lotErrors = lotErrors);
+      return;
+    }
     final reason = _reasonController.text.trim();
     Navigator.of(context).pop(
       FarmerRestockRequest(
         quantity: FarmerRestockRules.parse(_quantityController.text),
+        inventoryLot: lot,
         reason: reason.isEmpty ? null : reason,
       ),
     );
+  }
+
+  ProductInventoryLotDraft get _inventoryLot => ProductInventoryLotDraft(
+    dateType: _dateType,
+    harvestedAt: _dateType == ProductInventoryDateType.nonPerishable
+        ? null
+        : _harvestedAt,
+    sellUntil: _dateType == ProductInventoryDateType.freshProduce
+        ? _marketableUntil
+        : null,
+    expiresAt: _dateType == ProductInventoryDateType.packagedFood
+        ? _marketableUntil
+        : null,
+    lotCode: _lotCodeController.text.trim().isEmpty
+        ? null
+        : _lotCodeController.text.trim(),
+    storageInstructions: _storageController.text.trim().isEmpty
+        ? null
+        : _storageController.text.trim(),
+  );
+
+  List<ProductInventoryDateType> get _allowedDateTypes {
+    if (widget.product.category == ProductCategories.fruitTrees) {
+      return const [ProductInventoryDateType.nonPerishable];
+    }
+    if (ProductCategories.values.contains(widget.product.category)) {
+      return const [
+        ProductInventoryDateType.freshProduce,
+        ProductInventoryDateType.packagedFood,
+      ];
+    }
+    return ProductInventoryDateType.values;
+  }
+
+  Future<void> _pickHarvestDate() async {
+    final today = ProductAvailabilityDateRules.philippineToday();
+    final selected = await showDatePicker(
+      context: context,
+      initialDate: _harvestedAt ?? today,
+      firstDate: DateTime(today.year - 2),
+      lastDate: today,
+      currentDate: today,
+      helpText: 'Harvest or production date',
+    );
+    if (!mounted || selected == null) return;
+    setState(() {
+      _harvestedAt = selected;
+      if (_marketableUntil != null && _marketableUntil!.isBefore(selected)) {
+        _marketableUntil = null;
+      }
+      _lotErrors = Map.of(_lotErrors)..remove('harvestedAt');
+    });
+  }
+
+  Future<void> _pickMarketableUntil() async {
+    final today = ProductAvailabilityDateRules.philippineToday();
+    final firstDate = _harvestedAt != null && _harvestedAt!.isAfter(today)
+        ? _harvestedAt!
+        : today;
+    final selected = await showDatePicker(
+      context: context,
+      initialDate: _marketableUntil ?? firstDate,
+      firstDate: firstDate,
+      lastDate: DateTime(firstDate.year + 10, firstDate.month, firstDate.day),
+      currentDate: today,
+      helpText: _dateType == ProductInventoryDateType.packagedFood
+          ? 'Printed expiration date'
+          : 'Final selling date',
+    );
+    if (!mounted || selected == null) return;
+    setState(() {
+      _marketableUntil = selected;
+      _lotErrors = Map.of(_lotErrors)
+        ..remove('sellUntil')
+        ..remove('expiresAt');
+    });
   }
 }
 

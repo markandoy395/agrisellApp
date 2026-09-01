@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_info_card.dart';
+import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_action_bar.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/farmer_shop/farmer_product_card.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/features/shared/products/domain/product_production_stage.dart';
@@ -24,7 +25,7 @@ void main() {
     estimatedHarvestDate: DateTime(2026, 8, 5),
   );
 
-  testWidgets('buyer product card uses accessible status icons', (
+  testWidgets('buyer product card keeps status icons off the image', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -38,16 +39,13 @@ void main() {
       ),
     );
 
-    expect(
-      find.bySemanticsLabel('Production: Harvesting soon'),
-      findsOneWidget,
-    );
+    expect(find.bySemanticsLabel('Production: Harvesting soon'), findsNothing);
     expect(
       find.bySemanticsLabel('Selling: Accepting pre-orders'),
-      findsOneWidget,
+      findsNothing,
     );
     expect(find.text('Production: Harvesting soon'), findsNothing);
-    expect(find.text('Available: 20 kg'), findsOneWidget);
+    expect(find.text('20 kg'), findsOneWidget);
   });
 
   testWidgets('farmer shop product card shows available quantity', (
@@ -88,5 +86,36 @@ void main() {
     expect(find.text('Production: Harvesting soon'), findsOneWidget);
     expect(find.text('Selling: Accepting pre-orders'), findsOneWidget);
     expect(find.text('Available: 20 kg'), findsOneWidget);
+  });
+
+  testWidgets('saved-product action is available in product details', (
+    tester,
+  ) async {
+    var isSaved = false;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: StatefulBuilder(
+            builder: (context, setState) => ProductDetailActionBar(
+              basketCount: 0,
+              basketPulse: 0,
+              productName: product.name,
+              isSaved: isSaved,
+              onSavedToggle: () => setState(() => isSaved = !isSaved),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final save = find.bySemanticsLabel('Save ${product.name}');
+    expect(save, findsOneWidget);
+    await tester.tap(save);
+    await tester.pump();
+    expect(
+      find.bySemanticsLabel('Remove ${product.name} from saved products'),
+      findsOneWidget,
+    );
   });
 }

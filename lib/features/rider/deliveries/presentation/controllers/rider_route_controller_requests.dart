@@ -27,6 +27,20 @@ extension _RiderRouteRequests on RiderRouteController {
       _notify();
       return;
     }
+    final mapDestination = _mapDestination;
+    if (mapDestination != null && _mapDestinationId != null) {
+      await _requestRoutes(
+        requestId: 'farm:${_mapDestinationId!}',
+        destinationKey: 'farm:${_mapDestinationId!}',
+        origin: DeliveryRoutePoint(
+          latitude: location.latitude,
+          longitude: location.longitude,
+        ),
+        destination: mapDestination,
+        force: true,
+      );
+      return;
+    }
     final request = selectRiderRouteTarget(requests, _selectedRequestId);
     if (request == null) return;
     final destination = riderRouteDestination(request);

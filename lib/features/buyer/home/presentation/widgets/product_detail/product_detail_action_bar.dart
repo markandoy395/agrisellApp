@@ -8,11 +8,17 @@ class ProductDetailActionBar extends StatelessWidget {
   const ProductDetailActionBar({
     required this.basketCount,
     required this.basketPulse,
+    required this.productName,
+    this.isSaved = false,
+    this.onSavedToggle,
     super.key,
   });
 
   final int basketCount;
   final int basketPulse;
+  final String productName;
+  final bool isSaved;
+  final VoidCallback? onSavedToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +33,8 @@ class ProductDetailActionBar extends StatelessWidget {
               icon: Icons.arrow_back_rounded,
               onTap: () => Navigator.of(context).maybePop(),
             ),
-            const Expanded(
-              child: Text(
+            Expanded(
+              child: const Text(
                 'Product Details',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -38,6 +44,21 @@ class ProductDetailActionBar extends StatelessWidget {
                 ),
               ),
             ),
+            if (onSavedToggle != null) ...[
+              _RoundActionButton(
+                semanticLabel: isSaved
+                    ? 'Remove $productName from saved products'
+                    : 'Save $productName',
+                icon: isSaved
+                    ? Icons.favorite_rounded
+                    : Icons.favorite_border_rounded,
+                onTap: onSavedToggle!,
+                foreground: isSaved
+                    ? AgrisellColors.statusRedText
+                    : AgrisellColors.authGreen,
+              ),
+              const SizedBox(width: 6),
+            ],
             BasketCountButton(
               count: basketCount,
               pulse: basketPulse,
@@ -56,18 +77,20 @@ class _RoundActionButton extends StatelessWidget {
     required this.semanticLabel,
     required this.icon,
     required this.onTap,
+    this.foreground = AgrisellColors.authGreen,
   });
 
   final String semanticLabel;
   final IconData icon;
   final VoidCallback onTap;
+  final Color foreground;
 
   @override
   Widget build(BuildContext context) {
     return _RoundActionSurface(
       semanticLabel: semanticLabel,
       onTap: onTap,
-      child: Icon(icon, color: AgrisellColors.authGreen, size: 21),
+      child: Icon(icon, color: foreground, size: 21),
     );
   }
 }

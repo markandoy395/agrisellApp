@@ -168,11 +168,14 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: AgrisellTheme.light,
-        home: const SignUpScreen(role: AuthRole.buyer),
+        home: const SignUpScreen(
+          role: AuthRole.buyer,
+          initialVerifiedEmail: 'buyer@example.com',
+        ),
       ),
     );
     final signUpFields = find.byType(AuthTextField);
-    for (var index = 0; index < 8; index++) {
+    for (var index = 0; index < 6; index++) {
       expect(tester.getSize(signUpFields.at(index)).height, inputSize.height);
       expect(
         tester.getSize(

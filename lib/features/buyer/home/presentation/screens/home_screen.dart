@@ -13,6 +13,7 @@ import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/features/shared/products/presentation/controllers/home_product_catalog_controller.dart';
 import 'package:agresell_app/features/buyer/home/data/home_bottom_nav_items.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/common/buyer_responsive_text.dart';
+import 'package:agresell_app/features/buyer/home/presentation/controllers/home_product_browse_controller.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_dashboard_content.dart';
 import 'package:agresell_app/features/shared/widgets/navigation/custom_bottom_nav_bar.dart';
 import 'package:agresell_app/features/buyer/chat/presentation/screens/buyer_message_screen.dart';
@@ -195,12 +196,17 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _openProduct(HomeProduct product) {
+  void _openProduct(
+    HomeProduct product,
+    HomeProductBrowseController browseController,
+  ) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => ProductDetailScreen(
           product: product,
           catalogController: _productCatalogController,
+          isSaved: browseController.isSaved,
+          onSavedToggle: browseController.toggleSaved,
         ),
       ),
     );

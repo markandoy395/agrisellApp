@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/features/auth/data/auth_registration_exception.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_draft.dart';
+import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_validator.dart';
 import 'package:agresell_app/features/rider/profile/presentation/controllers/rider_sign_up_controller.dart';
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_sign_up_address_step.dart';
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_sign_up_documents_step.dart';
@@ -18,6 +20,8 @@ class RiderRegistrationForm extends StatefulWidget {
     required this.onSubmitted,
     required this.onExit,
     required this.onEmailOtpRequired,
+    required this.onStartEmailVerification,
+    this.initialVerifiedEmail,
     this.controller,
     this.gpsGateway,
     super.key,
@@ -26,7 +30,11 @@ class RiderRegistrationForm extends StatefulWidget {
   final Future<void> Function() onExit;
   final RiderSignUpController? controller;
   final GpsLocationGateway? gpsGateway;
-  final Future<bool> Function(String email) onEmailOtpRequired;
+  final Future<bool> Function(String email, VoidCallback onChangeDestination)
+  onEmailOtpRequired;
+  final Future<bool> Function(String email, String password)
+  onStartEmailVerification;
+  final String? initialVerifiedEmail;
   @override
   State<RiderRegistrationForm> createState() => RiderRegistrationFormState();
 }
@@ -35,6 +43,8 @@ class RiderRegistrationFormState extends State<RiderRegistrationForm>
     with WidgetsBindingObserver {
   late final RiderSignUpController _controller;
   late final bool _ownsController;
+  String? _otpStartedFor;
+  var _isVerifyingEmail = false;
   @override
   void initState() {
     super.initState();
@@ -43,7 +53,15 @@ class RiderRegistrationFormState extends State<RiderRegistrationForm>
     _controller =
         widget.controller ??
         RiderSignUpController(gpsGateway: widget.gpsGateway);
-    unawaited(_controller.initialize());
+    unawaited(_initialize());
+  }
+
+  Future<void> _initialize() async {
+    await _controller.initialize();
+    final verifiedEmail = widget.initialVerifiedEmail;
+    if (verifiedEmail != null && verifiedEmail.trim().isNotEmpty) {
+      await _controller.resumeVerifiedEmail(verifiedEmail);
+    }
   }
 
   @override
@@ -167,12 +185,13 @@ class RiderRegistrationFormState extends State<RiderRegistrationForm>
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(18, 10, 18, 12),
                 child: RiderSignUpActions(
-                  isFirst: step == RiderSignUpStep.personal,
+                  isFirst: step == RiderSignUpStep.account,
                   isLast: step == RiderSignUpStep.review,
                   enabled: _controller.canContinue,
                   loading:
                       _controller.isSubmitting ||
-                      _controller.isCapturingLocation,
+                      _controller.isCapturingLocation ||
+                      _isVerifyingEmail,
                   onPrevious: () => unawaited(_controller.previousStep()),
                   onContinue: _continue,
                 ),
@@ -184,6 +203,10 @@ class RiderRegistrationFormState extends State<RiderRegistrationForm>
     },
   );
   Widget _stepBody(RiderSignUpStep step) => switch (step) {
+    RiderSignUpStep.account => RiderSignUpSecurityStep(
+      controller: _controller,
+      readOnly: _controller.emailVerified || _otpStartedFor != null,
+    ),
     RiderSignUpStep.personal => RiderSignUpPersonalStep(
       controller: _controller,
     ),
@@ -192,16 +215,18 @@ class RiderRegistrationFormState extends State<RiderRegistrationForm>
     RiderSignUpStep.documents => RiderSignUpDocumentsStep(
       controller: _controller,
     ),
-    RiderSignUpStep.security => RiderSignUpSecurityStep(
-      controller: _controller,
-    ),
     RiderSignUpStep.review => RiderSignUpReviewStep(controller: _controller),
   };
   Future<void> _continue() async {
+    if (_controller.draft.step == RiderSignUpStep.account) {
+      await _continueFromAccount();
+      return;
+    }
     if (_controller.draft.step != RiderSignUpStep.review) {
       await _controller.continueToNextStep();
       return;
     }
+    if (!_controller.validateForSubmission()) return;
     final profile = await _controller.submit();
     if (profile != null && mounted) {
       widget.onSubmitted(profile);
@@ -209,11 +234,59 @@ class RiderRegistrationFormState extends State<RiderRegistrationForm>
     }
     if (!_controller.awaitingEmailOtp || !mounted) return;
     final verified = await widget.onEmailOtpRequired(
-      _controller.draft.value('email'),
+      _controller.draft.value(RiderSignUpFields.email),
+      () {},
     );
     if (!verified || !mounted) return;
     final completed = await _controller.submit();
     if (completed != null && mounted) widget.onSubmitted(completed);
+  }
+
+  Future<void> _continueFromAccount() async {
+    final email = _controller.draft
+        .value(RiderSignUpFields.email)
+        .trim()
+        .toLowerCase();
+    if (_controller.emailVerified) {
+      await _controller.continueToNextStep();
+      return;
+    }
+    if (!_controller.canContinue) {
+      await _controller.continueToNextStep();
+      return;
+    }
+
+    setState(() => _isVerifyingEmail = true);
+    try {
+      if (_otpStartedFor != email) {
+        final requiresOtp = await widget.onStartEmailVerification(
+          email,
+          _controller.password,
+        );
+        if (!mounted) return;
+        if (!requiresOtp) {
+          _controller.markEmailVerified(email);
+          await _controller.continueToNextStep();
+          return;
+        }
+        setState(() => _otpStartedFor = email);
+      }
+      final verified = await widget.onEmailOtpRequired(email, () {
+        if (mounted) setState(() => _otpStartedFor = null);
+      });
+      if (!verified || !mounted) return;
+      setState(() => _otpStartedFor = null);
+      _controller.markEmailVerified(email);
+      await _controller.continueToNextStep();
+    } on AuthRegistrationException catch (error) {
+      _controller.showEmailVerificationError(error.message);
+    } catch (_) {
+      _controller.showEmailVerificationError(
+        'We could not verify your email. Please try again.',
+      );
+    } finally {
+      if (mounted) setState(() => _isVerifyingEmail = false);
+    }
   }
 }
 

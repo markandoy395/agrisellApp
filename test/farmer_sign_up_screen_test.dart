@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
+import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/screens/farmer_registration_submitted_screen.dart';
 import 'package:agresell_app/features/shared/location/data/gps_location_gateway.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/screens/farmer_sign_up_screen.dart';
@@ -11,6 +12,26 @@ import 'package:geolocator/geolocator.dart';
 
 void main() {
   const phoneChannel = MethodChannel('agrisell/device_phone_number');
+
+  setUp(AuthRegistrationService.instance.clearForTesting);
+  tearDown(AuthRegistrationService.instance.clearForTesting);
+
+  testWidgets('verified Farmer recovery resumes at personal information', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AgrisellTheme.light,
+        home: const FarmerSignUpScreen(
+          initialVerifiedEmail: 'farmer@example.com',
+        ),
+      ),
+    );
+
+    expect(find.text('Step 2 of 3'), findsOneWidget);
+    expect(find.text('Personal information'), findsOneWidget);
+    expect(find.widgetWithText(TextField, 'Email'), findsNothing);
+  });
 
   testWidgets(
     'Farmer signup validates account details and preserves them back',

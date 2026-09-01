@@ -27,15 +27,32 @@ class BasketItemDetails extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 7),
-        Text(
-          '${item.priceLabel} ${item.unit}',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: AgrisellColors.authGreen,
-            fontSize: 13,
-            fontWeight: FontWeight.w800,
-          ),
+        Wrap(
+          spacing: 6,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            if (item.hasSale)
+              Text(
+                item.originalPriceLabel!,
+                style: const TextStyle(
+                  color: Colors.red,
+                  fontSize: 12,
+                  decoration: TextDecoration.lineThrough,
+                  decorationColor: Colors.red,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            if (item.hasSale)
+              const Text('→', style: TextStyle(color: AgrisellColors.mutedText)),
+            Text(
+              '${item.priceLabel} ${item.unit}',
+              style: const TextStyle(
+                color: AgrisellColors.authGreen,
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 10),
         _InfoLine(

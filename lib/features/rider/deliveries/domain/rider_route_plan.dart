@@ -15,11 +15,17 @@ class RiderRouteInstruction {
     required this.text,
     required this.distanceMeters,
     required this.durationSeconds,
+    this.maneuverPoint,
+    this.maneuverType = 'continue',
+    this.maneuverModifier = '',
   });
 
   final String text;
   final double distanceMeters;
   final double durationSeconds;
+  final DeliveryRoutePoint? maneuverPoint;
+  final String maneuverType;
+  final String maneuverModifier;
 }
 
 class RiderRoutePlan {

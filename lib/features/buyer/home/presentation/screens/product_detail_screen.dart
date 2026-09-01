@@ -22,12 +22,16 @@ class ProductDetailScreen extends StatefulWidget {
     required this.product,
     this.catalogController,
     this.productRepository = const HomeProductRepository(),
+    this.isSaved,
+    this.onSavedToggle,
     super.key,
   });
 
   final HomeProduct product;
   final HomeProductCatalogController? catalogController;
   final HomeProductRepository productRepository;
+  final bool Function(String productId)? isSaved;
+  final ValueChanged<String>? onSavedToggle;
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -103,6 +107,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         builder: (_) => ProductDetailScreen(
           product: product,
           catalogController: _catalogController,
+          isSaved: widget.isSaved,
+          onSavedToggle: widget.onSavedToggle,
         ),
       ),
     );
@@ -148,6 +154,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     return ProductDetailActionBar(
                       basketCount: _basketController.totalQuantity,
                       basketPulse: _basketController.pulse,
+                      productName: widget.product.name,
+                      isSaved: widget.isSaved?.call(widget.product.id) ?? false,
+                      onSavedToggle: widget.onSavedToggle == null
+                          ? null
+                          : () {
+                              widget.onSavedToggle!(widget.product.id);
+                              setState(() {});
+                            },
                     );
                   },
                 ),

@@ -177,6 +177,12 @@ abstract final class ProductEditOptions {
       isSold: isSold,
       commodityId: baseProduct.commodityId,
       farmId: baseProduct.farmId,
+      inventoryDateType: baseProduct.inventoryDateType,
+      harvestedAt: baseProduct.harvestedAt,
+      sellUntil: baseProduct.sellUntil,
+      expiresAt: baseProduct.expiresAt,
+      lotCode: baseProduct.lotCode,
+      storageInstructions: baseProduct.storageInstructions,
     );
   }
 

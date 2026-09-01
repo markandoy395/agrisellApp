@@ -6,6 +6,7 @@ import 'package:agresell_app/features/rider/deliveries/data/rider_route_cache.da
 import 'package:agresell_app/features/rider/deliveries/data/rider_routing_service.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_route.dart';
+import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_route_geometry.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_route_plan.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_route_target.dart';
@@ -44,6 +45,9 @@ class RiderRouteController extends ChangeNotifier {
   String? _inFlightDestinationKey;
   int _latestGeneration = 0;
   bool _isOnline = true;
+  DeliveryRoutePoint? _mapDestination;
+  String? _mapDestinationId;
+  String? _mapDestinationLabel;
 
   RiderRouteState get state => _state;
   List<RiderRoutePlan> get routes => List.unmodifiable(_routes);
@@ -55,6 +59,7 @@ class RiderRouteController extends ChangeNotifier {
   bool get isOnline => _isOnline;
   bool get canRefresh => _isOnline && _requestInFlight == null;
   DateTime? get routeUpdatedAt => _routeUpdatedAt;
+  String? get navigationDestinationLabel => _mapDestinationLabel;
 
   double get progressFraction {
     final route = activeRoute;
@@ -82,6 +87,38 @@ class RiderRouteController extends ChangeNotifier {
   DateTime? get estimatedArrival => activeRoute == null
       ? null
       : DateTime.now().add(Duration(minutes: remainingTravelMinutes));
+
+  RiderRouteInstruction? get nextInstruction {
+    final route = activeRoute;
+    if (route == null || route.instructions.isEmpty) return null;
+    final location = _lastLocation;
+    if (location == null || route.points.length < 2) {
+      return route.instructions.first;
+    }
+    final progress = routeProgressFraction(location, route.points);
+    for (final instruction in route.instructions) {
+      final maneuverPoint = instruction.maneuverPoint;
+      if (maneuverPoint == null) continue;
+      final maneuverProgress = routeProgressFraction(
+        maneuverPoint,
+        route.points,
+      );
+      if (maneuverProgress > progress + 0.002) return instruction;
+    }
+    return route.instructions.last;
+  }
+
+  double get distanceToNextInstructionMeters {
+    final route = activeRoute;
+    final location = _lastLocation;
+    final maneuverPoint = nextInstruction?.maneuverPoint;
+    if (route == null || location == null || maneuverPoint == null) return 0;
+    final currentProgress = routeProgressFraction(location, route.points);
+    final maneuverProgress = routeProgressFraction(maneuverPoint, route.points);
+    return ((maneuverProgress - currentProgress) * route.distanceKm * 1000)
+        .clamp(0.0, double.infinity)
+        .toDouble();
+  }
 
   double get offRouteDistanceMeters {
     final route = activeRoute;
@@ -116,25 +153,46 @@ class RiderRouteController extends ChangeNotifier {
     required List<DeliveryRequest> requests,
     required bool navigationActive,
   }) async {
-    final request = selectRiderRouteTarget(requests, _selectedRequestId);
-    if (request == null) {
+    final priorityRequest = requests
+        .where(
+          (request) =>
+              request.stage != DeliveryStage.readyForPickup &&
+              !request.stage.isTerminal,
+        )
+        .firstOrNull;
+    if (priorityRequest != null) {
+      _mapDestination = null;
+      _mapDestinationId = null;
+      _mapDestinationLabel = null;
+    }
+    final request =
+        priorityRequest ??
+        (_mapDestination == null
+            ? selectRiderRouteTarget(requests, _selectedRequestId)
+            : null);
+    final mapDestination = _mapDestination;
+    if (request == null && mapDestination == null) {
       if (_selectedRequestId != null || _routes.isNotEmpty) clear();
       return;
     }
     if (!navigationActive) return;
-    _selectedRequestId = request.id;
-    final destination = riderRouteDestination(request);
+    _selectedRequestId = request?.id;
+    final destination = request == null
+        ? mapDestination
+        : riderRouteDestination(request);
     if (destination == null) return;
     final origin = DeliveryRoutePoint(
       latitude: location.latitude,
       longitude: location.longitude,
     );
     _lastLocation = origin;
-    final destinationKey =
-        '${request.id}:${riderRouteUsesDeliveryLocation(request) ? 'delivery' : 'pickup'}';
+    final targetId = request?.id ?? 'farm:${_mapDestinationId!}';
+    final destinationKey = request == null
+        ? targetId
+        : '$targetId:${riderRouteUsesDeliveryLocation(request) ? 'delivery' : 'pickup'}';
     final current = activeRoute;
     final destinationChanged = current?.destinationKey != destinationKey;
-    if (destinationChanged && current?.requestId != request.id) {
+    if (destinationChanged && current?.requestId != targetId) {
       _routes = const [];
       _selectedIndex = 0;
     }
@@ -169,7 +227,7 @@ class RiderRouteController extends ChangeNotifier {
         significantProgress ||
         (_state == RiderRouteState.stale && mayRetry)) {
       await _requestRoutes(
-        requestId: request.id,
+        requestId: targetId,
         destinationKey: destinationKey,
         origin: origin,
         destination: destination,

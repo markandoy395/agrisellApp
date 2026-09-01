@@ -68,15 +68,16 @@ abstract final class RiderSignUpValidator {
     required String password,
     required String confirmPassword,
     bool requireCoordinates = true,
+    bool requirePassword = true,
   }) {
     final fields = switch (step) {
+      RiderSignUpStep.account => [RiderSignUpFields.email],
       RiderSignUpStep.personal => [
         RiderSignUpFields.firstName,
         RiderSignUpFields.lastName,
         RiderSignUpFields.dateOfBirth,
         RiderSignUpFields.gender,
         RiderSignUpFields.mobile,
-        RiderSignUpFields.email,
       ],
       RiderSignUpStep.address => [
         RiderSignUpFields.addressLine,
@@ -88,9 +89,7 @@ abstract final class RiderSignUpValidator {
         RiderSignUpFields.vehicleType,
         RiderSignUpFields.plate,
       ],
-      RiderSignUpStep.documents ||
-      RiderSignUpStep.security ||
-      RiderSignUpStep.review => const <String>[],
+      RiderSignUpStep.documents || RiderSignUpStep.review => const <String>[],
     };
     for (final field in fields) {
       final error = fieldError(field, draft.value(field), draft);
@@ -121,7 +120,7 @@ abstract final class RiderSignUpValidator {
           .firstOrNull;
       if (missing != null) return 'Upload your ${missing.label}.';
     }
-    if (step == RiderSignUpStep.security) {
+    if (step == RiderSignUpStep.account && requirePassword) {
       if (!RiderRegistrationValidator.isStrongPassword(password)) {
         return 'Password is too weak.';
       }

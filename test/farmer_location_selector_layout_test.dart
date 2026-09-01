@@ -9,6 +9,8 @@ void main() {
   testWidgets(
     'simplified farm map hides address inputs and shows map controls',
     (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(326, 640);
       final gps = GpsSelectionController();
       final map = MapController();
       final address = TextEditingController();
@@ -18,6 +20,8 @@ void main() {
         map.dispose();
         address.dispose();
         notes.dispose();
+        tester.view.resetDevicePixelRatio();
+        tester.view.resetPhysicalSize();
       });
 
       await tester.pumpWidget(
@@ -57,6 +61,7 @@ void main() {
       expect(find.byIcon(Icons.remove), findsOneWidget);
       expect(find.byIcon(Icons.my_location), findsOneWidget);
       expect(find.text('Confirm Location'), findsOneWidget);
+      expect(tester.takeException(), isNull);
     },
   );
 }

@@ -15,6 +15,7 @@ import '../domain/delivery_status.dart';
 import '../domain/delivery_status_history.dart';
 import '../domain/delivery_status_update.dart';
 import '../domain/pickup_confirmation.dart';
+import '../domain/rider_delivery_search.dart';
 
 part 'supabase_delivery_mutations.dart';
 part 'supabase_delivery_proofs.dart';
@@ -68,6 +69,24 @@ class SupabaseDeliveryDataSource {
         .where((row) => row['assigned_to_current_rider'] != true)
         .map(DeliveryBundle.fromJson)
         .toList(growable: false);
+  });
+
+  Future<List<DeliveryBundle>> getNearbyDeliveries(
+    RiderDeliverySearch search, {
+    int limit = 50,
+  }) => _guard(() async {
+    final value = await client.rpc<Object?>(
+      'current_rider_nearby_deliveries',
+      params: {
+        'p_latitude': search.latitude,
+        'p_longitude': search.longitude,
+        'p_radius_km': search.radiusKm,
+        'p_limit': limit,
+      },
+    );
+    return _deliveryRows(
+      value,
+    ).map(DeliveryBundle.fromJson).toList(growable: false);
   });
 
   Future<List<DeliveryBundle>> getAssignedDeliveries() => _guard(() async {

@@ -72,7 +72,7 @@ class RiderSignUpReviewStep extends StatelessWidget {
             draft.value(RiderSignUpFields.email),
             'Password secured for submission',
           ],
-          onEdit: () => controller.editStep(RiderSignUpStep.security),
+          onEdit: () => controller.editStep(RiderSignUpStep.account),
         ),
         CheckboxListTile(
           contentPadding: EdgeInsets.zero,

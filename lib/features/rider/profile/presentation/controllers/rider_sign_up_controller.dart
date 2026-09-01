@@ -46,12 +46,16 @@ class RiderSignUpController extends ChangeNotifier {
   bool _capturingLocation = false;
   bool _showStepErrors = false;
   bool _awaitingEmailOtp = false;
+  String? _verifiedEmail;
   String? _error;
   RiderSignUpDraft get draft => _draft;
   bool get isLoading => _loading;
   bool get isSubmitting => _submitting;
   bool get isCapturingLocation => _capturingLocation;
   bool get awaitingEmailOtp => _awaitingEmailOtp;
+  bool get emailVerified =>
+      _verifiedEmail ==
+      _draft.value(RiderSignUpFields.email).trim().toLowerCase();
   String? get errorMessage => _error;
   String get password => _password;
   String get confirmPassword => _confirmPassword;
@@ -74,6 +78,10 @@ class RiderSignUpController extends ChangeNotifier {
   }
 
   void updateValue(String field, String value) {
+    if (field == RiderSignUpFields.email &&
+        value.trim().toLowerCase() != _verifiedEmail) {
+      _verifiedEmail = null;
+    }
     _draft = _draft.withValue(field, value);
     _touched.add(field);
     _showStepErrors = false;
@@ -92,6 +100,18 @@ class RiderSignUpController extends ChangeNotifier {
     if (password != null) _password = password;
     if (confirmPassword != null) _confirmPassword = confirmPassword;
     if (licenseNumber != null) _licenseNumber = licenseNumber;
+    notifyListeners();
+  }
+
+  void markEmailVerified(String email) {
+    _verifiedEmail = email.trim().toLowerCase();
+    _availability[RiderSignUpFields.email] = RiderFieldAvailability.available;
+    _error = null;
+    notifyListeners();
+  }
+
+  void showEmailVerificationError(String message) {
+    _error = message;
     notifyListeners();
   }
 
@@ -140,12 +160,18 @@ class RiderSignUpController extends ChangeNotifier {
       password: _password,
       confirmPassword: _confirmPassword,
       requireCoordinates: _draft.step != RiderSignUpStep.address,
+      requirePassword: !emailVerified,
     );
-    final checking =
-        _draft.step == RiderSignUpStep.personal &&
-        [RiderSignUpFields.mobile, RiderSignUpFields.email].any(
-          (field) => availabilityFor(field) != RiderFieldAvailability.available,
-        );
+    final checking = switch (_draft.step) {
+      RiderSignUpStep.account =>
+        !emailVerified &&
+            availabilityFor(RiderSignUpFields.email) !=
+                RiderFieldAvailability.available,
+      RiderSignUpStep.personal =>
+        availabilityFor(RiderSignUpFields.mobile) !=
+            RiderFieldAvailability.available,
+      _ => false,
+    };
     return error == null && !checking;
   }
 
@@ -236,7 +262,7 @@ class RiderSignUpController extends ChangeNotifier {
   );
 
   Future<void> previousStep() async {
-    if (_draft.step == RiderSignUpStep.personal) return;
+    if (_draft.step == RiderSignUpStep.account) return;
     _draft = _draft.copyWith(
       step: RiderSignUpStep.values[_draft.step.index - 1],
     );
@@ -250,6 +276,16 @@ class RiderSignUpController extends ChangeNotifier {
     _showStepErrors = false;
     await saveNow();
     notifyListeners();
+  }
+
+  Future<void> resumeVerifiedEmail(String email) async {
+    final normalizedEmail = email.trim().toLowerCase();
+    _draft = _draft.withValue(RiderSignUpFields.email, normalizedEmail);
+    if (_draft.step == RiderSignUpStep.account) {
+      _draft = _draft.copyWith(step: RiderSignUpStep.personal);
+    }
+    markEmailVerified(normalizedEmail);
+    await saveNow();
   }
 
   void _queueSave() {

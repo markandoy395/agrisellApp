@@ -10,7 +10,7 @@ class SupabaseRiderDeliveryRepository implements RiderDeliveryRepository {
   Future<List<DeliveryRequest>> fetchRequests({
     required String riderId,
     RiderDeliverySearch? search,
-  }) => _fetchRequests(riderId);
+  }) => _fetchRequests(riderId, search: search);
 
   @override
   Future<RiderRequestPage> fetchNearbyRequests(RiderRequestQuery query) =>
@@ -19,26 +19,36 @@ class SupabaseRiderDeliveryRepository implements RiderDeliveryRepository {
   @override
   Stream<void> watchRequestChanges({required String riderId}) {
     late final StreamController<void> controller;
-    StreamSubscription<Object?>? deliverySubscription;
-    StreamSubscription<Object?>? requestSubscription;
+    RealtimeChannel? channel;
+
+    void notifyChange(PostgresChangePayload _) {
+      if (!controller.isClosed) controller.add(null);
+    }
+
     controller = StreamController<void>(
       onListen: () {
-        deliverySubscription = _dataSource.client
-            .from('deliveries')
-            .stream(primaryKey: ['delivery_id'])
-            // The first stream value is the initial table snapshot, not a
-            // change. The controller is already performing its initial load.
-            .skip(1)
-            .listen((_) => controller.add(null), onError: controller.addError);
-        requestSubscription = _dataSource.client
-            .from('rider_assignment_requests')
-            .stream(primaryKey: ['request_id'])
-            .skip(1)
-            .listen((_) => controller.add(null), onError: controller.addError);
+        channel = _dataSource.client
+            .channel(
+              'rider-request-changes:$riderId:'
+              '${DateTime.now().microsecondsSinceEpoch}',
+            )
+            .onPostgresChanges(
+              event: PostgresChangeEvent.all,
+              schema: 'public',
+              table: 'deliveries',
+              callback: notifyChange,
+            )
+            .onPostgresChanges(
+              event: PostgresChangeEvent.all,
+              schema: 'public',
+              table: 'rider_assignment_requests',
+              callback: notifyChange,
+            )
+            .subscribe();
       },
       onCancel: () async {
-        await deliverySubscription?.cancel();
-        await requestSubscription?.cancel();
+        final active = channel;
+        if (active != null) await _dataSource.client.removeChannel(active);
       },
     );
     return controller.stream;

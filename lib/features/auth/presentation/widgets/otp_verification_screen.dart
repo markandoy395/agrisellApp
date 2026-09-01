@@ -19,6 +19,7 @@ class OtpVerificationScreen extends StatefulWidget {
     this.resendCooldown = const Duration(seconds: 60),
     this.accentColor = AgrisellColors.authGreen,
     this.changeDestinationLabel,
+    this.onChangeDestination,
     super.key,
   }) : assert(maxIncorrectAttempts > 0);
 
@@ -31,6 +32,7 @@ class OtpVerificationScreen extends StatefulWidget {
   final Duration resendCooldown;
   final Color accentColor;
   final String? changeDestinationLabel;
+  final VoidCallback? onChangeDestination;
 
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
@@ -241,7 +243,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     TextButton(
                       onPressed: _isVerifying || _isResending
                           ? null
-                          : () => Navigator.of(context).pop(false),
+                          : () {
+                              widget.onChangeDestination?.call();
+                              Navigator.of(context).pop(false);
+                            },
                       child: Text(widget.changeDestinationLabel!),
                     ),
                 ],

@@ -5,8 +5,9 @@ const _appSnackBarMargin = EdgeInsets.fromLTRB(16, 0, 16, 16);
 
 extension AppSnackBarMessenger on ScaffoldMessengerState {
   ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showAppSnackBar(
-    SnackBar snackBar,
-  ) {
+    SnackBar snackBar, {
+    Duration duration = _appSnackBarDuration,
+  }) {
     clearSnackBars();
     return showSnackBar(
       SnackBar(
@@ -23,7 +24,8 @@ extension AppSnackBarMessenger on ScaffoldMessengerState {
         actionOverflowThreshold: snackBar.actionOverflowThreshold,
         showCloseIcon: snackBar.showCloseIcon,
         closeIconColor: snackBar.closeIconColor,
-        duration: _appSnackBarDuration,
+        duration: duration,
+        persist: snackBar.persist,
         animation: snackBar.animation,
         onVisible: snackBar.onVisible,
         dismissDirection: snackBar.dismissDirection,

@@ -17,6 +17,48 @@ abstract final class SignUpValidator {
     required String confirmPassword,
     required bool agreesToPolicy,
   }) {
+    final profileError = validateBuyerProfile(
+      firstName: firstName,
+      lastName: lastName,
+      contactNumber: contactNumber,
+      dateOfBirth: dateOfBirth,
+      gender: gender,
+      shippingAddress: shippingAddress,
+      agreesToPolicy: agreesToPolicy,
+    );
+    if (profileError != null) return profileError;
+    return validateCredentials(
+      email: email,
+      password: password,
+      confirmPassword: confirmPassword,
+    );
+  }
+
+  static String? validateCredentials({
+    required String email,
+    required String password,
+    required String confirmPassword,
+  }) {
+    if (!_emailPattern.hasMatch(email)) {
+      return 'Enter a valid email address.';
+    }
+    if (password.isEmpty) return 'Enter your password.';
+    if (!PasswordPolicy.isStrong(password)) return 'Password is too weak.';
+    if (password != confirmPassword) {
+      return 'Password and confirm password must match.';
+    }
+    return null;
+  }
+
+  static String? validateBuyerProfile({
+    required String firstName,
+    required String lastName,
+    required String contactNumber,
+    required String dateOfBirth,
+    required String gender,
+    required String shippingAddress,
+    required bool agreesToPolicy,
+  }) {
     if (firstName.isEmpty) {
       return 'Enter your first name.';
     }
@@ -35,14 +77,6 @@ abstract final class SignUpValidator {
     if (gender.isEmpty) return 'Select your gender.';
     if (!WrittenAddress.isValid(shippingAddress)) {
       return 'Enter your shipping address.';
-    }
-    if (!_emailPattern.hasMatch(email)) {
-      return 'Enter a valid email address.';
-    }
-    if (password.isEmpty) return 'Enter your password.';
-    if (!PasswordPolicy.isStrong(password)) return 'Password is too weak.';
-    if (password != confirmPassword) {
-      return 'Password and confirm password must match.';
     }
     if (!agreesToPolicy) {
       return 'Agree to the privacy and policy before signing up.';

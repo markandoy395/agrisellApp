@@ -11,7 +11,6 @@ import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_scaffold.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/otp_verification_screen.dart';
-import 'package:agresell_app/features/farmer/registration/domain/farmer_signup_data.dart';
 import 'package:agresell_app/features/farmer/registration/domain/farmer_signup_validator.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/screens/farmer_registration_submitted_screen.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/controllers/farmer_signup_controllers.dart';
@@ -24,9 +23,14 @@ part 'farmer_sign_up_actions.dart';
 part 'farmer_sign_up_validation.dart';
 
 class FarmerSignUpScreen extends StatefulWidget {
-  const FarmerSignUpScreen({this.gpsGateway, super.key});
+  const FarmerSignUpScreen({
+    this.gpsGateway,
+    this.initialVerifiedEmail,
+    super.key,
+  });
 
   final GpsLocationGateway? gpsGateway;
+  final String? initialVerifiedEmail;
 
   @override
   State<FarmerSignUpScreen> createState() => _FarmerSignUpScreenState();
@@ -42,11 +46,19 @@ class _FarmerSignUpScreenState extends State<FarmerSignUpScreen> {
   var _isSubmitting = false;
   var _isCapturingLocation = false;
   var _requestedFarmLocation = false;
+  String? _otpStartedFor;
+  String? _verifiedEmail;
 
   @override
   void initState() {
     super.initState();
     _gpsGateway = widget.gpsGateway ?? GeolocatorGpsLocationGateway();
+    final initialEmail = widget.initialVerifiedEmail?.trim().toLowerCase();
+    if (initialEmail != null && initialEmail.isNotEmpty) {
+      _controllers.email.text = initialEmail;
+      _verifiedEmail = initialEmail;
+      _step = 1;
+    }
   }
 
   @override
@@ -103,6 +115,8 @@ class _FarmerSignUpScreenState extends State<FarmerSignUpScreen> {
       controllers: _controllers,
       errors: _errors,
       onChanged: _onChanged,
+      readOnly: _otpStartedFor != null || _verifiedEmail != null,
+      emailVerified: _verifiedEmail != null,
     ),
     1 => FarmerSignupPersonalStep(
       controllers: _controllers,
@@ -157,22 +171,30 @@ class _FarmerSignUpScreenState extends State<FarmerSignUpScreen> {
       _validateCurrent(showEmpty: true);
     });
     if (_errors.values.any((error) => error != null)) return;
+    if (_step == 0) {
+      await _verifyEmailBeforePersonalInfo();
+      return;
+    }
     if (_step < 2) {
-      FocusManager.instance.primaryFocus?.unfocus();
-      late final bool enteredFarmStep;
-      setState(() {
-        _step += 1;
-        enteredFarmStep = _step == 2 && !_requestedFarmLocation;
-        _showAllErrors = false;
-        _errors.clear();
-      });
-      if (enteredFarmStep) {
-        _requestedFarmLocation = true;
-        unawaited(_captureFarmLocation());
-      }
+      _advanceStep();
       return;
     }
     _submit();
+  }
+
+  void _advanceStep() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    late final bool enteredFarmStep;
+    setState(() {
+      _step += 1;
+      enteredFarmStep = _step == 2 && !_requestedFarmLocation;
+      _showAllErrors = false;
+      _errors.clear();
+    });
+    if (enteredFarmStep) {
+      _requestedFarmLocation = true;
+      unawaited(_captureFarmLocation());
+    }
   }
 
   void _previousStep() {

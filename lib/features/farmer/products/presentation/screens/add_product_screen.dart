@@ -12,6 +12,7 @@ import 'package:agresell_app/features/shared/products/domain/product_categories.
 import 'package:agresell_app/features/shared/products/domain/product_availability_date_rules.dart';
 import 'package:agresell_app/features/shared/products/domain/product_production_stage.dart';
 import 'package:agresell_app/features/shared/products/domain/product_sale_status.dart';
+import 'package:agresell_app/features/shared/products/domain/product_inventory_lot.dart';
 part 'package:agresell_app/features/farmer/products/presentation/widgets/add_product/add_product_options.dart';
 part 'package:agresell_app/features/farmer/products/presentation/widgets/add_product/add_product_media_widgets.dart';
 part 'package:agresell_app/features/farmer/products/presentation/widgets/add_product/add_product_form_panel.dart';
@@ -19,6 +20,7 @@ part 'package:agresell_app/features/farmer/products/presentation/widgets/add_pro
 part 'package:agresell_app/features/farmer/products/presentation/widgets/add_product/add_product_details_fields.dart';
 part 'package:agresell_app/features/farmer/products/presentation/widgets/add_product/add_product_pricing_fields.dart';
 part 'package:agresell_app/features/farmer/products/presentation/widgets/add_product/add_product_availability_fields.dart';
+part 'package:agresell_app/features/farmer/products/presentation/widgets/add_product/add_product_inventory_lot_fields.dart';
 part 'package:agresell_app/features/farmer/products/presentation/controllers/add_product_screen_actions.dart';
 
 class AddProductScreen extends StatefulWidget {
@@ -39,9 +41,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final _weightController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _minimumOrderController = TextEditingController();
+  final _lotCodeController = TextEditingController();
+  final _storageInstructionsController = TextEditingController();
   final _imagePicker = ImagePicker();
   Uint8List? _photoBytes;
   DateTime? _expectedDate;
+  DateTime? _lotHarvestedAt;
+  DateTime? _marketableUntil;
+  ProductInventoryDateType _inventoryDateType =
+      ProductInventoryDateType.freshProduce;
   String? _category;
   String _unitType = _unitTypes.first;
   ProductProductionStage _productionStage = ProductProductionStage.harvested;
@@ -53,6 +61,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   void initState() {
     super.initState();
     _photoBytes = widget.initialPhotoBytes;
+    _lotHarvestedAt = ProductAvailabilityDateRules.philippineToday();
   }
 
   @override
@@ -62,6 +71,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
     _weightController.dispose();
     _descriptionController.dispose();
     _minimumOrderController.dispose();
+    _lotCodeController.dispose();
+    _storageInstructionsController.dispose();
     super.dispose();
   }
 
@@ -132,6 +143,23 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     onProductionStageChanged: _changeProductionStage,
                     onSellingOptionChanged: _changeSellingOption,
                     onSelectExpectedDate: _pickExpectedDate,
+                  ),
+                  inventoryLotFields: _InventoryLotFields(
+                    dateType: _inventoryDateType,
+                    allowedDateTypes: _allowedInventoryDateTypes,
+                    harvestedAt: _lotHarvestedAt,
+                    marketableUntil: _marketableUntil,
+                    lotCodeController: _lotCodeController,
+                    storageInstructionsController:
+                        _storageInstructionsController,
+                    errors: _errors,
+                    onDateTypeChanged: _changeInventoryDateType,
+                    onSelectHarvestDate: _pickLotHarvestDate,
+                    onSelectMarketableUntil: _pickMarketableUntil,
+                    onLotCodeChanged: (_) =>
+                        _clearError(AddProductField.lotCode),
+                    onStorageChanged: (_) =>
+                        _clearError(AddProductField.storageInstructions),
                   ),
                   gradeQuality: _gradeQuality,
                   isOrganic: _isOrganic,

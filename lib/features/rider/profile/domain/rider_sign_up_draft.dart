@@ -1,9 +1,9 @@
 enum RiderSignUpStep {
+  account('Account credentials'),
   personal('Personal information'),
   address('Address and exact location'),
   vehicle('Vehicle information'),
   documents('Driver information'),
-  security('Account security'),
   review('Review and submit');
 
   const RiderSignUpStep(this.title);
@@ -79,7 +79,7 @@ class RiderDraftDocument {
 
 class RiderSignUpDraft {
   const RiderSignUpDraft({
-    this.step = RiderSignUpStep.personal,
+    this.step = RiderSignUpStep.account,
     this.values = const {},
     this.documents = const {},
     this.acceptsTerms = false,
@@ -129,7 +129,8 @@ class RiderSignUpDraft {
   );
 
   Map<String, Object> toJson() => {
-    'step': step.index,
+    'flowVersion': 2,
+    'step': step.name,
     'values': values,
     'documents': {
       for (final entry in documents.entries)
@@ -141,10 +142,18 @@ class RiderSignUpDraft {
   };
 
   factory RiderSignUpDraft.fromJson(Map<String, Object?> json) {
-    final stepIndex = (json['step'] as num?)?.toInt() ?? 0;
+    final rawStep = json['step'];
+    final restoredStep = rawStep is String
+        ? RiderSignUpStep.values.firstWhere(
+            (step) => step.name == rawStep,
+            orElse: () => RiderSignUpStep.account,
+          )
+        // Version 1 stored enum indexes from the old personal-first flow. A
+        // password was never persisted, so every legacy draft safely resumes
+        // at the new credentials step while retaining its non-sensitive data.
+        : RiderSignUpStep.account;
     return RiderSignUpDraft(
-      step: RiderSignUpStep
-          .values[stepIndex.clamp(0, RiderSignUpStep.values.length - 1)],
+      step: restoredStep,
       values: _stringMap(json['values']),
       documents: _documents(json['documents']),
       acceptsTerms: json['acceptsTerms'] as bool? ?? false,

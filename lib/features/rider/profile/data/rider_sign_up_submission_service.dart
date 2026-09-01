@@ -13,6 +13,7 @@ class RiderSignUpSubmissionService {
     required String licenseNumber,
     required String password,
     required String confirmPassword,
+    bool emailAlreadyVerified = false,
     RiderSignUpUploadProgress? onUploadProgress,
   }) async {
     final registration = _registration(
@@ -21,12 +22,16 @@ class RiderSignUpSubmissionService {
       password: password,
       confirmPassword: confirmPassword,
     );
-    final validation = RiderRegistrationValidator.validate(registration);
+    final validation = RiderRegistrationValidator.validate(
+      registration,
+      requirePassword: !emailAlreadyVerified,
+    );
     if (validation != null) throw RiderRegistrationException(validation);
     return RiderRegistrationService.instance.register(
       registration,
       documents: draft.documents,
       onUploadProgress: onUploadProgress,
+      emailAlreadyVerified: emailAlreadyVerified,
     );
   }
 

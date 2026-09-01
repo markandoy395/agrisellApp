@@ -7,16 +7,10 @@ class HomeProductGrid extends StatelessWidget {
   const HomeProductGrid({
     required this.onProductTap,
     required this.products,
-    this.isSaved,
-    this.onSavedToggle,
-    this.onAddToBasket,
     super.key,
   });
 
   final List<HomeProduct> products;
-  final bool Function(String productId)? isSaved;
-  final ValueChanged<HomeProduct>? onSavedToggle;
-  final ValueChanged<HomeProduct>? onAddToBasket;
   final ValueChanged<HomeProduct> onProductTap;
 
   @override
@@ -36,13 +30,6 @@ class HomeProductGrid extends StatelessWidget {
 
         return HomeProductCard(
           product: product,
-          isSaved: isSaved?.call(product.id) ?? false,
-          onSavedToggle: onSavedToggle == null
-              ? null
-              : () => onSavedToggle!(product),
-          onAddToBasket: onAddToBasket == null
-              ? null
-              : () => onAddToBasket!(product),
           onTap: () => onProductTap(product),
         );
       },

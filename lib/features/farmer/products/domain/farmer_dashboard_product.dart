@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:agresell_app/features/shared/products/domain/product_sale_status.dart';
 import 'package:agresell_app/features/shared/products/domain/product_production_stage.dart';
+import 'package:agresell_app/features/shared/products/domain/product_inventory_lot.dart';
 
 class FarmerDashboardProduct {
   const FarmerDashboardProduct({
@@ -24,7 +25,14 @@ class FarmerDashboardProduct {
     this.isSold = false,
     this.commodityId,
     this.farmId,
+    ProductInventoryDateType? inventoryDateType,
+    this.harvestedAt,
+    this.sellUntil,
+    this.expiresAt,
+    this.lotCode,
+    this.storageInstructions,
   }) : _saleStatus = saleStatus ?? ProductSaleStatus.readyNow,
+       _inventoryDateType = inventoryDateType,
        assert(imageAsset != null || imageBytes != null || imageUrl != null);
 
   final String name;
@@ -46,8 +54,16 @@ class FarmerDashboardProduct {
   final bool isSold;
   final int? commodityId;
   final int? farmId;
+  final ProductInventoryDateType? _inventoryDateType;
+  final DateTime? harvestedAt;
+  final DateTime? sellUntil;
+  final DateTime? expiresAt;
+  final String? lotCode;
+  final String? storageInstructions;
 
   ProductSaleStatus get saleStatus => _saleStatus ?? ProductSaleStatus.readyNow;
+  ProductInventoryDateType get inventoryDateType =>
+      _inventoryDateType ?? ProductInventoryDateType.nonPerishable;
   ProductProductionStage get productionStage =>
       productProductionStageFromDatabase(productionStatus);
   double get availableQuantity =>
@@ -56,6 +72,14 @@ class FarmerDashboardProduct {
       ) ??
       0;
   bool get isOutOfStock => !isSold && availableQuantity <= 0;
+  ProductInventoryLotDraft get inventoryLot => ProductInventoryLotDraft(
+    dateType: inventoryDateType,
+    harvestedAt: harvestedAt,
+    sellUntil: sellUntil,
+    expiresAt: expiresAt,
+    lotCode: lotCode,
+    storageInstructions: storageInstructions,
+  );
 
   FarmerDashboardProduct copyWith({
     String? name,
@@ -77,6 +101,12 @@ class FarmerDashboardProduct {
     bool? isSold,
     int? commodityId,
     int? farmId,
+    ProductInventoryDateType? inventoryDateType,
+    DateTime? harvestedAt,
+    DateTime? sellUntil,
+    DateTime? expiresAt,
+    String? lotCode,
+    String? storageInstructions,
     bool clearImageAsset = false,
     bool clearImageBytes = false,
     bool clearImageUrl = false,
@@ -101,6 +131,12 @@ class FarmerDashboardProduct {
       isSold: isSold ?? this.isSold,
       commodityId: commodityId ?? this.commodityId,
       farmId: farmId ?? this.farmId,
+      inventoryDateType: inventoryDateType ?? this.inventoryDateType,
+      harvestedAt: harvestedAt ?? this.harvestedAt,
+      sellUntil: sellUntil ?? this.sellUntil,
+      expiresAt: expiresAt ?? this.expiresAt,
+      lotCode: lotCode ?? this.lotCode,
+      storageInstructions: storageInstructions ?? this.storageInstructions,
     );
   }
 }

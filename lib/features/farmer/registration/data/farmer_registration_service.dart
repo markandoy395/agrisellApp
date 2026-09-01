@@ -58,6 +58,10 @@ class FarmerRegistrationService {
     }
 
     try {
+      await client.rpc<void>(
+        'complete_current_farmer_registration',
+        params: {'farmer_payload': data.toAuthMetadata()},
+      );
       await _uploadImages(client, user.id, data);
       final farmer = await client
           .from('farmers')

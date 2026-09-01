@@ -7,6 +7,7 @@ import 'package:agresell_app/features/farmer/dashboard/presentation/screens/farm
 import 'package:agresell_app/features/farmer/products/data/farmer_commodity_repository.dart';
 import 'package:agresell_app/features/farmer/products/domain/farmer_dashboard_product.dart';
 import 'package:agresell_app/features/farmer/products/domain/farmer_restock.dart';
+import 'package:agresell_app/features/shared/products/domain/product_inventory_lot.dart';
 
 void main() {
   group('restock validation', () {
@@ -119,6 +120,7 @@ class _FakeRestockRepository extends FarmerCommodityRepository {
   Future<FarmerDashboardProduct> restock({
     required FarmerDashboardProduct product,
     required double quantity,
+    ProductInventoryLotDraft? inventoryLot,
     String? reason,
   }) async {
     _calls++;

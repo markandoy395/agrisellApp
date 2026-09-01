@@ -38,4 +38,36 @@ void main() {
       expect(snackBar.margin, const EdgeInsets.fromLTRB(16, 0, 16, 16));
     },
   );
+
+  testWidgets('app SnackBar preserves non-persistent actions', (tester) async {
+    late BuildContext context;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (builderContext) {
+              context = builderContext;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      ),
+    );
+
+    ScaffoldMessenger.of(context).showAppSnackBar(
+      SnackBar(
+        content: const Text('Removed'),
+        persist: false,
+        action: SnackBarAction(label: 'Undo', onPressed: () {}),
+      ),
+      duration: const Duration(milliseconds: 1500),
+    );
+    await tester.pumpAndSettle();
+
+    final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+    expect(snackBar.persist, isFalse);
+    await tester.pump(const Duration(milliseconds: 1500));
+    await tester.pumpAndSettle();
+    expect(find.text('Removed'), findsNothing);
+  });
 }

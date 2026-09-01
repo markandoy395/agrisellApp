@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:agresell_app/features/shared/products/domain/product_availability_date_rules.dart';
 import 'package:agresell_app/features/shared/products/domain/product_production_stage.dart';
 import 'package:agresell_app/features/shared/products/domain/product_sale_status.dart';
+import 'package:agresell_app/features/shared/products/domain/product_inventory_lot.dart';
 
 enum AddProductField {
   photo,
@@ -13,6 +14,10 @@ enum AddProductField {
   quantity,
   minimumOrder,
   harvestDate,
+  lotHarvestDate,
+  marketableUntil,
+  lotCode,
+  storageInstructions,
 }
 
 abstract final class AddProductDraft {
@@ -27,6 +32,7 @@ abstract final class AddProductDraft {
     required ProductProductionStage productionStage,
     required ProductSaleStatus sellingOption,
     required DateTime? expectedDate,
+    ProductInventoryLotDraft? inventoryLot,
   }) {
     final errors = <AddProductField, String>{};
     if (photoBytes == null) {
@@ -69,6 +75,26 @@ abstract final class AddProductDraft {
     );
     if (dateWindow.validationMessage(expectedDate) case final message?) {
       errors[AddProductField.harvestDate] = message;
+    }
+    if (inventoryLot != null) {
+      final lotErrors = inventoryLot.validationErrors(
+        today: ProductAvailabilityDateRules.philippineToday(),
+        earliestMarketableDate: expectedDate,
+        allowFutureHarvest: productionStage != ProductProductionStage.harvested,
+      );
+      if (lotErrors['harvestedAt'] case final message?) {
+        errors[AddProductField.lotHarvestDate] = message;
+      }
+      if (lotErrors['sellUntil'] ?? lotErrors['expiresAt']
+          case final message?) {
+        errors[AddProductField.marketableUntil] = message;
+      }
+      if (lotErrors['lotCode'] case final message?) {
+        errors[AddProductField.lotCode] = message;
+      }
+      if (lotErrors['storageInstructions'] case final message?) {
+        errors[AddProductField.storageInstructions] = message;
+      }
     }
     return errors;
   }

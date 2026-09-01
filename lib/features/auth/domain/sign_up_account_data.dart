@@ -80,6 +80,7 @@ class RegisteredAccount {
     this.shippingLatitude,
     this.shippingLongitude,
     this.profileImageUrl,
+    this.profilePending = false,
   });
 
   final String id;
@@ -98,6 +99,7 @@ class RegisteredAccount {
   final double? shippingLatitude;
   final double? shippingLongitude;
   final String? profileImageUrl;
+  final bool profilePending;
 
   AuthRole? get assignedRole => AuthRole.fromValue(role);
 
@@ -130,6 +132,7 @@ class RegisteredAccount {
     double? shippingLatitude,
     double? shippingLongitude,
     String? profileImageUrl,
+    bool? profilePending,
   }) {
     return RegisteredAccount(
       id: id,
@@ -148,6 +151,7 @@ class RegisteredAccount {
       shippingLongitude: shippingLongitude ?? this.shippingLongitude,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       verificationStatus: verificationStatus ?? this.verificationStatus,
+      profilePending: profilePending ?? this.profilePending,
     );
   }
 
@@ -179,6 +183,7 @@ class RegisteredAccount {
         final value? => {'shippingAddress': value},
         null => const <String, Object>{},
       },
+      if (profilePending) 'profilePending': true,
     };
   }
 }

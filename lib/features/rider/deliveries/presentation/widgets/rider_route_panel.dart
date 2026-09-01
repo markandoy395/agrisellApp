@@ -21,6 +21,8 @@ class RiderRoutePanel extends StatelessWidget {
     required this.requests,
     required this.location,
     required this.locationController,
+    this.showRequestPicker = true,
+    this.onExitNavigation,
     super.key,
   });
 
@@ -28,6 +30,8 @@ class RiderRoutePanel extends StatelessWidget {
   final List<DeliveryRequest> requests;
   final RiderDeviceLocation location;
   final RiderLocationController locationController;
+  final bool showRequestPicker;
+  final VoidCallback? onExitNavigation;
 
   @override
   Widget build(BuildContext context) {
@@ -50,39 +54,54 @@ class RiderRoutePanel extends StatelessWidget {
               ),
               const SizedBox(width: 7),
               Expanded(
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    dropdownColor: AppDropdownStyle.menuColor,
-                    borderRadius: AppDropdownStyle.menuBorderRadius,
-                    style: AppDropdownStyle.textStyle.copyWith(fontSize: 12),
-                    iconEnabledColor: AppDropdownStyle.iconColor,
-                    isDense: true,
-                    isExpanded: true,
-                    value: selected?.id,
-                    hint: const Text('Select a pickup'),
-                    items: [
-                      for (final request in available)
-                        DropdownMenuItem(
-                          value: request.id,
-                          child: Text(
-                            request.productName,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 12),
+                child: showRequestPicker
+                    ? DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          dropdownColor: AppDropdownStyle.menuColor,
+                          borderRadius: AppDropdownStyle.menuBorderRadius,
+                          style: AppDropdownStyle.textStyle.copyWith(
+                            fontSize: 12,
                           ),
+                          iconEnabledColor: AppDropdownStyle.iconColor,
+                          isDense: true,
+                          isExpanded: true,
+                          value: selected?.id,
+                          hint: const Text('Select a pickup'),
+                          items: [
+                            for (final request in available)
+                              DropdownMenuItem(
+                                value: request.id,
+                                child: Text(
+                                  request.productName,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                              ),
+                          ],
+                          onChanged: (requestId) {
+                            if (requestId == null) return;
+                            unawaited(
+                              controller.selectRequest(
+                                requestId: requestId,
+                                location: location,
+                                requests: requests,
+                              ),
+                            );
+                          },
                         ),
-                    ],
-                    onChanged: (requestId) {
-                      if (requestId == null) return;
-                      unawaited(
-                        controller.selectRequest(
-                          requestId: requestId,
-                          location: location,
-                          requests: requests,
+                      )
+                    : Text(
+                        selected == null
+                            ? controller.navigationDestinationLabel ??
+                                  'Navigation'
+                            : 'Navigating to ${_routeDestination(selected, route?.destinationKey ?? '', selected.pickupLocation.address)}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
                         ),
-                      );
-                    },
-                  ),
-                ),
+                      ),
               ),
               if (route != null)
                 IconButton(
@@ -100,6 +119,14 @@ class RiderRoutePanel extends StatelessWidget {
                       : null,
                   icon: const Icon(Icons.refresh_rounded, size: 20),
                   color: AgrisellColors.authGreen,
+                ),
+              if (onExitNavigation != null)
+                IconButton(
+                  tooltip: 'Exit navigation',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: onExitNavigation,
+                  icon: const Icon(Icons.close_rounded, size: 21),
+                  color: AgrisellColors.statusRedText,
                 ),
               if (route != null)
                 IconButton(

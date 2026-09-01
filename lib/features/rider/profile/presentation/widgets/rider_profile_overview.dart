@@ -18,13 +18,6 @@ class RiderProfileOverview extends StatelessWidget {
     required this.onEarnings,
     required this.onHistory,
     required this.onRatings,
-    required this.onEdit,
-    required this.onVehicle,
-    required this.onDocuments,
-    required this.onChangePassword,
-    required this.onSafety,
-    required this.onSwitchAccount,
-    required this.onLogout,
     this.performance,
     super.key,
   });
@@ -33,13 +26,6 @@ class RiderProfileOverview extends StatelessWidget {
   final VoidCallback onEarnings;
   final VoidCallback onHistory;
   final VoidCallback onRatings;
-  final VoidCallback onEdit;
-  final VoidCallback onVehicle;
-  final VoidCallback onDocuments;
-  final VoidCallback onChangePassword;
-  final VoidCallback onSafety;
-  final VoidCallback onSwitchAccount;
-  final VoidCallback onLogout;
   final RiderRatingsSummary? performance;
 
   @override
@@ -163,13 +149,6 @@ class RiderProfileOverview extends StatelessWidget {
           onEarnings: onEarnings,
           onHistory: onHistory,
           onRatings: onRatings,
-          onEdit: onEdit,
-          onVehicle: onVehicle,
-          onDocuments: onDocuments,
-          onChangePassword: onChangePassword,
-          onSafety: onSafety,
-          onSwitchAccount: onSwitchAccount,
-          onLogout: onLogout,
         ),
       ],
     );

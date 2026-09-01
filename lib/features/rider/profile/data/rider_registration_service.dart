@@ -135,8 +135,12 @@ class RiderRegistrationService extends ChangeNotifier {
     RiderRegistration registration, {
     Map<RiderDraftDocumentType, RiderDraftDocument> documents = const {},
     RiderSignUpUploadProgress? onUploadProgress,
+    bool emailAlreadyVerified = false,
   }) async {
-    final validationMessage = RiderRegistrationValidator.validate(registration);
+    final validationMessage = RiderRegistrationValidator.validate(
+      registration,
+      requirePassword: !emailAlreadyVerified,
+    );
     if (validationMessage != null) {
       throw RiderRegistrationException(validationMessage);
     }

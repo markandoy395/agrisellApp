@@ -125,7 +125,15 @@ RiderRouteInstruction _instruction(Map<String, Object?> step) {
     text: road.isEmpty || type == 'arrive' ? action : '$action onto $road',
     distanceMeters: _number(step['distance']),
     durationSeconds: _number(step['duration']),
+    maneuverPoint: _optionalPoint(maneuver['location']),
+    maneuverType: type,
+    maneuverModifier: modifier,
   );
+}
+
+DeliveryRoutePoint? _optionalPoint(Object? value) {
+  if (value is! List || value.length < 2) return null;
+  return _point(List<Object?>.from(value));
 }
 
 DeliveryRoutePoint _point(List<Object?> value) {

@@ -5,33 +5,51 @@ import 'package:agresell_app/features/shared/products/data/home_product_format.d
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/features/shared/products/domain/product_sale_status.dart';
 import 'package:agresell_app/features/shared/products/domain/product_production_stage.dart';
+import 'package:agresell_app/features/shared/products/domain/product_inventory_lot.dart';
 
 class HomeProductRepository {
   const HomeProductRepository();
 
   static const _placeholderImage = 'assets/images/vege.jpeg';
-  static const _commoditySelect =
-      'commodity_id, commodity_name, description, price_per_unit, unit_type, '
-      'image_url, harvest_date, available_quantity, farm_id, '
-      'commodity_status, availability_status, production_status, rating, '
-      'categories(category_name)';
-
   bool get isAvailable => AgrisellSupabase.isInitialized;
 
   Future<List<HomeProduct>> loadProducts() async {
     if (!isAvailable) return const [];
 
     try {
-      final rows = await AgrisellSupabase.client
-          .from('commodities')
-          .select(_commoditySelect)
-          .eq('commodity_status', 'available')
-          .gt('available_quantity', 0)
-          .neq('availability_status', 'not_accepting_orders')
-          .order('created_at', ascending: false);
-      final commodities = (rows as List)
-          .whereType<Map<String, dynamic>>()
+      final rows = await AgrisellSupabase.client.rpc<List<dynamic>>(
+        'marketplace_products',
+      );
+      final commodities = await _withInventorySummaries(
+        rows.whereType<Map<String, dynamic>>().toList(growable: false),
+      );
+      final farmsById = await _loadFarms(commodities);
+      return commodities
+          .map(
+            (row) => productFromRow(
+              row,
+              farm: farmsById[HomeProductFormat.integer(row['farm_id'])],
+            ),
+          )
           .toList(growable: false);
+    } on PostgrestException catch (error) {
+      throw HomeProductException(error.message);
+    }
+  }
+
+  Future<List<HomeProduct>> loadSaleCampaignProducts({
+    required int saleId,
+  }) async {
+    if (!isAvailable || saleId <= 0) return const [];
+
+    try {
+      final rows = await AgrisellSupabase.client.rpc<List<dynamic>>(
+        'marketplace_sale_campaign_products',
+        params: {'p_sale_id': saleId},
+      );
+      final commodities = await _withInventorySummaries(
+        rows.whereType<Map<String, dynamic>>().toList(growable: false),
+      );
       final farmsById = await _loadFarms(commodities);
       return commodities
           .map(
@@ -54,20 +72,18 @@ class HomeProductRepository {
     if (!isAvailable || farmId <= 0) return const [];
 
     try {
-      final rows = await AgrisellSupabase.client
-          .from('commodities')
-          .select(_commoditySelect)
-          .eq('farm_id', farmId)
-          .eq('commodity_status', 'available')
-          .gt('available_quantity', 0)
-          .neq('availability_status', 'not_accepting_orders')
-          .order('created_at', ascending: false);
+      final rows = await AgrisellSupabase.client.rpc<List<dynamic>>(
+        'marketplace_products',
+        params: {'p_farm_id': farmId},
+      );
       final farm = <String, dynamic>{
         'farmer_name': sellerName,
         'farm_location': sellerLocation,
       };
-      return (rows as List)
-          .whereType<Map<String, dynamic>>()
+      final commodities = await _withInventorySummaries(
+        rows.whereType<Map<String, dynamic>>().toList(growable: false),
+      );
+      return commodities
           .map((row) => productFromRow(row, farm: farm))
           .toList(growable: false);
     } on PostgrestException catch (error) {
@@ -100,6 +116,34 @@ class HomeProductRepository {
     }
   }
 
+  Future<List<Map<String, dynamic>>> _withInventorySummaries(
+    List<Map<String, dynamic>> commodities,
+  ) async {
+    if (commodities.isEmpty) return commodities;
+    final ids = commodities
+        .map((row) => HomeProductFormat.integer(row['commodity_id']))
+        .whereType<int>()
+        .toList(growable: false);
+    final response = await AgrisellSupabase.client.rpc<List<dynamic>>(
+      'marketplace_inventory_lot_summaries',
+      params: {'p_commodity_ids': ids},
+    );
+    final summaries = <int, Map<String, dynamic>>{
+      for (final row in response.whereType<Map<String, dynamic>>())
+        if (HomeProductFormat.integer(row['commodity_id']) case final int id)
+          id: row,
+    };
+    return [
+      for (final commodity in commodities)
+        <String, dynamic>{
+          ...commodity,
+          if (summaries[HomeProductFormat.integer(commodity['commodity_id'])]
+              case final summary?)
+            ...summary,
+        },
+    ];
+  }
+
   static HomeProduct productFromRow(
     Map<String, dynamic> row, {
     Map<String, dynamic>? farm,
@@ -127,6 +171,7 @@ class HomeProductRepository {
         fallback: 'Unnamed commodity',
       ),
       price: '₱${HomeProductFormat.displayNumber(row['price_per_unit'])}',
+      salePrice: _salePrice(row),
       unit: 'per ${HomeProductFormat.text(row['unit_type'], fallback: 'kg')}',
       image: _placeholderImage,
       imageUrl: HomeProductFormat.optionalText(row['image_url']),
@@ -146,7 +191,7 @@ class HomeProductRepository {
       farmId: HomeProductFormat.integer(row['farm_id']),
       rating: HomeProductFormat.number(row['rating']),
       category: HomeProductFormat.text(
-        category['category_name'],
+        category['category_name'] ?? row['category_name'],
         fallback: 'Uncategorized',
       ),
       isAvailable:
@@ -156,7 +201,26 @@ class HomeProductRepository {
       saleStatus: saleStatus,
       productionStage: productionStage,
       estimatedHarvestDate: DateTime.tryParse(harvestDate),
+      inventoryDateType: productInventoryDateTypeFromDatabase(
+        HomeProductFormat.optionalText(row['inventory_date_type']),
+      ),
+      sellUntil: DateTime.tryParse(
+        HomeProductFormat.text(row['next_sell_until']),
+      ),
+      expiresAt: DateTime.tryParse(
+        HomeProductFormat.text(row['next_expires_at']),
+      ),
+      storageInstructions: HomeProductFormat.optionalText(
+        row['storage_instructions'],
+      ),
     );
+  }
+
+  static String? _salePrice(Map<String, dynamic> row) {
+    final original = HomeProductFormat.number(row['price_per_unit']);
+    final effective = HomeProductFormat.number(row['effective_price']);
+    if (effective <= 0 || effective >= original) return null;
+    return '₱${HomeProductFormat.displayNumber(row['effective_price'])}';
   }
 }
 

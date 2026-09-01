@@ -94,6 +94,31 @@ void main() {
     expect(near.longitude, closeTo(124.65, 0.00001));
     expect(far.longitude, closeTo(124.652, 0.00001));
   });
+
+  test('farm navigation reuses live route synchronization', () async {
+    final service = _RoutingService();
+    final controller = RiderRouteController(
+      service: service,
+      cache: _MemoryRouteCache(),
+    );
+    addTearDown(controller.dispose);
+
+    await controller.selectMapDestination(
+      destinationId: 'farm-17',
+      destinationLabel: 'Independent Farm',
+      destination: const DeliveryRoutePoint(latitude: 8.49, longitude: 124.65),
+      location: _location(8.48, 124.65),
+      requests: const [],
+    );
+    await controller.synchronize(
+      location: _location(8.481, 124.652),
+      requests: const [],
+      navigationActive: true,
+    );
+
+    expect(controller.navigationDestinationLabel, 'Independent Farm');
+    expect(service.calls, 2);
+  });
 }
 
 class _RoutingService implements RiderRoutingService {

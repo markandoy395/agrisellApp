@@ -15,6 +15,8 @@ import 'package:agresell_app/features/buyer/home/presentation/widgets/common/buy
 
 part 'basket_screen_states.dart';
 
+const _basketUndoDuration = Duration(milliseconds: 1500);
+
 class BasketScreen extends StatefulWidget {
   const BasketScreen({super.key});
 
@@ -68,15 +70,17 @@ class _BasketScreenState extends State<BasketScreen> {
   }) {
     final messenger = ScaffoldMessenger.of(context);
     messenger
-      ..hideCurrentSnackBar()
+      ..removeCurrentSnackBar()
       ..showAppSnackBar(
         SnackBar(
           content: Text(message),
+          persist: false,
           action: SnackBarAction(
             label: 'Undo',
             onPressed: () => _controller.restoreItems(items),
           ),
         ),
+        duration: _basketUndoDuration,
       );
   }
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
@@ -13,14 +15,52 @@ class SupabaseRiderMessageRepository implements RiderMessageRepository {
   @override
   Stream<List<RiderConversation>> watchConversations({
     required String riderId,
-  }) async* {
-    yield await _fetchConversations(riderId);
-    await for (final _
-        in _client
-            .from('rider_delivery_messages')
-            .stream(primaryKey: ['message_id'])) {
-      yield await _fetchConversations(riderId);
+  }) {
+    late final StreamController<List<RiderConversation>> controller;
+    RealtimeChannel? channel;
+    var refreshing = false;
+    var refreshAgain = false;
+
+    Future<void> refresh() async {
+      if (refreshing) {
+        refreshAgain = true;
+        return;
+      }
+      refreshing = true;
+      do {
+        refreshAgain = false;
+        try {
+          final conversations = await _fetchConversations(riderId);
+          if (!controller.isClosed) controller.add(conversations);
+        } catch (error, stackTrace) {
+          if (!controller.isClosed) controller.addError(error, stackTrace);
+        }
+      } while (refreshAgain && !controller.isClosed);
+      refreshing = false;
     }
+
+    controller = StreamController<List<RiderConversation>>(
+      onListen: () {
+        channel = _client
+            .channel(
+              'rider-conversations:$riderId:'
+              '${DateTime.now().microsecondsSinceEpoch}',
+            )
+            .onPostgresChanges(
+              event: PostgresChangeEvent.all,
+              schema: 'public',
+              table: 'rider_delivery_messages',
+              callback: (_) => unawaited(refresh()),
+            )
+            .subscribe();
+        unawaited(refresh());
+      },
+      onCancel: () async {
+        final active = channel;
+        if (active != null) await _client.removeChannel(active);
+      },
+    );
+    return controller.stream;
   }
 
   Future<List<RiderConversation>> _fetchConversations(String riderId) async {

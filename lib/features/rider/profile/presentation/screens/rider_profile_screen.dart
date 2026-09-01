@@ -18,6 +18,7 @@ import 'package:agresell_app/features/rider/presentation/widgets/rider_state_car
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_password_dialog.dart';
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_profile_edit_dialog.dart';
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_profile_overview.dart';
+import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_settings_panel.dart';
 import 'package:agresell_app/features/rider/profile/presentation/screens/rider_documents_screen.dart';
 import 'package:agresell_app/features/rider/profile/presentation/screens/rider_vehicle_screen.dart';
 import 'package:agresell_app/features/rider/safety/presentation/widgets/rider_safety_sheet.dart';
@@ -27,6 +28,8 @@ import 'package:agresell_app/features/rider/dashboard/presentation/screens/rider
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
 
 part 'rider_profile_logout.dart';
+
+enum _RiderProfileMode { overview, settings }
 
 class RiderProfileScreen extends StatefulWidget {
   const RiderProfileScreen({
@@ -54,6 +57,7 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
   late final bool _ownsAnalytics;
   late final bool _ownsSafety;
   late RiderProfile? _profile;
+  var _mode = _RiderProfileMode.overview;
 
   void _syncProfile() {
     final profile = RiderRegistrationService.instance.currentProfile;
@@ -96,9 +100,18 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
       color: AgrisellColors.homeBackground,
       child: Column(
         children: [
-          const RiderPageHeader(
+          RiderPageHeader(
             title: 'Rider profile',
             subtitle: 'Account, vehicle, documents, and safety',
+            action: IconButton(
+              tooltip: 'Settings',
+              constraints: const BoxConstraints.tightFor(width: 38, height: 38),
+              padding: EdgeInsets.zero,
+              color: AgrisellColors.surface,
+              iconSize: 24,
+              onPressed: () => _setMode(_RiderProfileMode.settings),
+              icon: const Icon(Icons.settings_rounded),
+            ),
           ),
           Expanded(
             child: profile == null
@@ -115,41 +128,55 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
                   )
                 : AnimatedBuilder(
                     animation: Listenable.merge([_analytics, _safety]),
-                    builder: (context, _) => RiderProfileOverview(
-                      profile: profile,
-                      performance: _analytics.ratings.summary,
-                      onEarnings: () => _open(
-                        RiderEarningsScreen(
-                          riderId: profile.id,
-                          controller: _analytics,
+                    builder: (context, _) {
+                      if (_mode == _RiderProfileMode.settings) {
+                        return RiderSettingsPanel(
+                          profile: profile,
+                          onEditProfile: _editProfile,
+                          onVehicle: () => _open(const RiderVehicleScreen()),
+                          onDocuments: () =>
+                              _open(const RiderDocumentsScreen()),
+                          onChangePassword: _changePassword,
+                          onSafety: _openSafety,
+                          onSwitchAccount: _switchAccount,
+                          onLogout: _logout,
+                          onBack: () => _setMode(_RiderProfileMode.overview),
+                        );
+                      }
+                      return RiderProfileOverview(
+                        profile: profile,
+                        performance: _analytics.ratings.summary,
+                        onEarnings: () => _open(
+                          RiderEarningsScreen(
+                            riderId: profile.id,
+                            controller: _analytics,
+                          ),
                         ),
-                      ),
-                      onHistory: () => _open(
-                        RiderHistoryScreen(
-                          riderId: profile.id,
-                          controller: _analytics,
-                          deliveryController: widget.deliveryController,
+                        onHistory: () => _open(
+                          RiderHistoryScreen(
+                            riderId: profile.id,
+                            controller: _analytics,
+                            deliveryController: widget.deliveryController,
+                          ),
                         ),
-                      ),
-                      onRatings: () => _open(
-                        RiderRatingsScreen(
-                          riderId: profile.id,
-                          controller: _analytics,
+                        onRatings: () => _open(
+                          RiderRatingsScreen(
+                            riderId: profile.id,
+                            controller: _analytics,
+                          ),
                         ),
-                      ),
-                      onEdit: _editProfile,
-                      onVehicle: () => _open(const RiderVehicleScreen()),
-                      onDocuments: () => _open(const RiderDocumentsScreen()),
-                      onChangePassword: _changePassword,
-                      onSafety: _openSafety,
-                      onSwitchAccount: _switchAccount,
-                      onLogout: _logout,
-                    ),
+                      );
+                    },
                   ),
           ),
         ],
       ),
     );
+  }
+
+  void _setMode(_RiderProfileMode mode) {
+    if (_mode == mode) return;
+    setState(() => _mode = mode);
   }
 
   Future<void> _editProfile() async {

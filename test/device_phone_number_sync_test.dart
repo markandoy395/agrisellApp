@@ -26,7 +26,10 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: AgrisellTheme.light,
-        home: const SignUpScreen(role: AuthRole.buyer),
+        home: const SignUpScreen(
+          role: AuthRole.buyer,
+          initialVerifiedEmail: 'buyer@example.com',
+        ),
       ),
     );
 

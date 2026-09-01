@@ -194,6 +194,11 @@ void main() {
     await tester.pumpAndSettle();
     expect(controller.items, isEmpty);
     expect(find.text('Undo'), findsOneWidget);
+    expect(
+      tester.widget<SnackBar>(find.byType(SnackBar)).duration,
+      const Duration(milliseconds: 1500),
+    );
+    expect(tester.widget<SnackBar>(find.byType(SnackBar)).persist, isFalse);
     await tester.tap(find.text('Undo'));
     await tester.pumpAndSettle();
     expect(controller.items, hasLength(1));

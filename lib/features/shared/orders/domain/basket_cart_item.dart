@@ -16,6 +16,7 @@ class BasketCartItem {
     required this.isSelected,
     this.imageUrl,
     this.farmId,
+    this.originalPriceLabel,
   });
 
   factory BasketCartItem.fromProduct(HomeProduct product, {int quantity = 1}) {
@@ -28,8 +29,9 @@ class BasketCartItem {
       sellerLocation: product.sellerLocation,
       harvestDate: product.harvestDate,
       availableWeight: product.availableWeight,
-      priceLabel: product.price,
-      pricePerKg: _priceFrom(product.price),
+      priceLabel: product.activePrice,
+      originalPriceLabel: product.hasSale ? product.price : null,
+      pricePerKg: _priceFrom(product.activePrice),
       unit: product.unit,
       quantity: quantity < 1 ? 1 : quantity,
       isSelected: true,
@@ -46,6 +48,7 @@ class BasketCartItem {
   final String harvestDate;
   final String availableWeight;
   final String priceLabel;
+  final String? originalPriceLabel;
   final double pricePerKg;
   final String unit;
   final int quantity;
@@ -65,6 +68,7 @@ class BasketCartItem {
       harvestDate: harvestDate,
       availableWeight: availableWeight,
       priceLabel: priceLabel,
+      originalPriceLabel: originalPriceLabel,
       pricePerKg: pricePerKg,
       unit: unit,
       quantity: quantity ?? this.quantity,
@@ -72,6 +76,8 @@ class BasketCartItem {
       farmId: farmId,
     );
   }
+
+  bool get hasSale => originalPriceLabel != null;
 
   static double _priceFrom(String price) {
     final normalized = price.replaceAll(',', '');

@@ -64,13 +64,12 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'Buyer'));
     await tester.pumpAndSettle();
     expect(find.text('Sign Up'), findsOneWidget);
-    expect(find.text('First Name'), findsOneWidget);
-    expect(find.text('Last Name'), findsOneWidget);
-    expect(find.text('Name Extension (Optional)'), findsOneWidget);
-    expect(find.text('Phone Number (09XXXXXXXXX)'), findsOneWidget);
-    expect(find.text('Date of Birth'), findsOneWidget);
-    expect(find.text('Gender'), findsOneWidget);
+    expect(find.text('Account credentials'), findsOneWidget);
     expect(find.text('Email'), findsOneWidget);
+    expect(find.text('Password'), findsOneWidget);
+    expect(find.text('Confirm Password'), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, 'Continue'), findsOneWidget);
+    expect(find.text('First Name'), findsNothing);
     await tester.scrollUntilVisible(
       find.text('Log in'),
       240,

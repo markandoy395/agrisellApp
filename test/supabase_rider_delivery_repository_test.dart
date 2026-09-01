@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:agresell_app/features/rider/deliveries/data/rider_delivery_repository.dart';
 import 'package:agresell_app/features/rider/deliveries/data/supabase_delivery_data_source.dart';
+import 'package:agresell_app/features/rider/deliveries/domain/rider_delivery_search.dart';
 
 void main() {
   test('Supabase Rider repository maps the final ERD delivery RPC', () async {
@@ -50,6 +51,46 @@ void main() {
       requests.any((uri) => uri.path.endsWith('/rpc/current_rider_deliveries')),
       isTrue,
     );
+  });
+
+  test('map discovery sends a bounded GPS query to Supabase', () async {
+    late http.Request captured;
+    final httpClient = MockClient((request) async {
+      captured = request;
+      return http.Response(
+        jsonEncode([_availableDelivery]),
+        200,
+        headers: {'content-type': 'application/json'},
+        request: request,
+      );
+    });
+    final client = SupabaseClient(
+      'https://example.supabase.co',
+      'test-publishable-key',
+      httpClient: httpClient,
+      accessToken: () async => 'test-access-token',
+    );
+    addTearDown(client.dispose);
+
+    final values = await SupabaseDeliveryDataSource(client)
+        .getNearbyDeliveries(
+          const RiderDeliverySearch(
+            latitude: 8.48,
+            longitude: 124.65,
+            radiusKm: 12,
+          ),
+        );
+
+    expect(values, hasLength(1));
+    expect(
+      captured.url.path,
+      endsWith('/rpc/current_rider_nearby_deliveries'),
+    );
+    final body = jsonDecode(captured.body) as Map<String, dynamic>;
+    expect(body['p_latitude'], 8.48);
+    expect(body['p_longitude'], 124.65);
+    expect(body['p_radius_km'], 12);
+    expect(body['p_limit'], 50);
   });
 }
 

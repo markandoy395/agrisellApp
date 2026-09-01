@@ -90,8 +90,8 @@ class LocationSelectorMap extends StatelessWidget {
                 ),
               ],
             ),
-          const SimpleAttributionWidget(
-            source: Text('OpenStreetMap contributors'),
+          const RichAttributionWidget(
+            attributions: [TextSourceAttribution('OpenStreetMap contributors')],
           ),
         ],
       ),

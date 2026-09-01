@@ -12,6 +12,9 @@ extension RiderRouteControllerActions on RiderRouteController {
     _routeUpdatedAt = null;
     _state = RiderRouteState.idle;
     _errorMessage = null;
+    _mapDestination = null;
+    _mapDestinationId = null;
+    _mapDestinationLabel = null;
     unawaited(_cache.clear());
     _notify();
   }
@@ -21,7 +24,28 @@ extension RiderRouteControllerActions on RiderRouteController {
     required RiderDeviceLocation location,
     required List<DeliveryRequest> requests,
   }) async {
+    _mapDestination = null;
+    _mapDestinationId = null;
+    _mapDestinationLabel = null;
     _selectedRequestId = requestId;
+    await synchronize(
+      location: location,
+      requests: requests,
+      navigationActive: true,
+    );
+  }
+
+  Future<void> selectMapDestination({
+    required String destinationId,
+    required String destinationLabel,
+    required DeliveryRoutePoint destination,
+    required RiderDeviceLocation location,
+    required List<DeliveryRequest> requests,
+  }) async {
+    _selectedRequestId = null;
+    _mapDestinationId = destinationId;
+    _mapDestinationLabel = destinationLabel;
+    _mapDestination = destination;
     await synchronize(
       location: location,
       requests: requests,

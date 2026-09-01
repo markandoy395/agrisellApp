@@ -24,9 +24,9 @@ void main() {
     );
 
     expect(
-      tester.widget<OtpVerificationScreen>(
-        find.byType(OtpVerificationScreen),
-      ).codeLength,
+      tester
+          .widget<OtpVerificationScreen>(find.byType(OtpVerificationScreen))
+          .codeLength,
       6,
     );
     await tester.enterText(find.byType(TextField), '123456');
@@ -59,6 +59,7 @@ void main() {
 
   testWidgets('change email returns to the signup form', (tester) async {
     bool? result;
+    var changeEmailCalls = 0;
     await tester.pumpWidget(
       MaterialApp(
         home: Builder(
@@ -69,6 +70,7 @@ void main() {
                   builder: (_) => OtpVerificationScreen(
                     destination: 'farmer@example.com',
                     changeDestinationLabel: 'Change email',
+                    onChangeDestination: () => changeEmailCalls++,
                     onVerify: (_) async {},
                   ),
                 ),
@@ -86,5 +88,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(result, false);
+    expect(changeEmailCalls, 1);
   });
 }

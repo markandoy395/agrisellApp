@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -9,6 +10,7 @@ class HomePinnedSearchHeaderDelegate extends SliverPersistentHeaderDelegate {
     required this.bottomGap,
     required this.searchController,
     required this.activeFilterCount,
+    required this.searchSuggestions,
     required this.onQueryChanged,
     required this.onFilterTap,
   });
@@ -19,6 +21,7 @@ class HomePinnedSearchHeaderDelegate extends SliverPersistentHeaderDelegate {
   final double bottomGap;
   final TextEditingController searchController;
   final int activeFilterCount;
+  final List<String> searchSuggestions;
   final ValueChanged<String> onQueryChanged;
   final VoidCallback onFilterTap;
 
@@ -43,6 +46,7 @@ class HomePinnedSearchHeaderDelegate extends SliverPersistentHeaderDelegate {
           child: HomeSearchBar(
             controller: searchController,
             activeFilterCount: activeFilterCount,
+            suggestions: searchSuggestions,
             onChanged: onQueryChanged,
             onFilterTap: onFilterTap,
           ),
@@ -57,6 +61,7 @@ class HomePinnedSearchHeaderDelegate extends SliverPersistentHeaderDelegate {
         oldDelegate.bottomGap != bottomGap ||
         oldDelegate.searchController != searchController ||
         oldDelegate.activeFilterCount != activeFilterCount ||
+        !listEquals(oldDelegate.searchSuggestions, searchSuggestions) ||
         oldDelegate.onQueryChanged != onQueryChanged ||
         oldDelegate.onFilterTap != onFilterTap;
   }

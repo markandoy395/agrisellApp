@@ -1,11 +1,16 @@
 part of 'rider_delivery_repository.dart';
 
 extension _SupabaseRiderDeliveryWorkflow on SupabaseRiderDeliveryRepository {
-  Future<List<DeliveryRequest>> _fetchRequests(String riderId) async {
-    final bundles = <DeliveryBundle>[
-      ...await _dataSource.getAvailableDeliveries(),
-      ...await _dataSource.getAssignedDeliveries(),
-    ];
+  Future<List<DeliveryRequest>> _fetchRequests(
+    String riderId, {
+    RiderDeliverySearch? search,
+  }) async {
+    final bundles = search == null
+        ? <DeliveryBundle>[
+            ...await _dataSource.getAvailableDeliveries(),
+            ...await _dataSource.getAssignedDeliveries(),
+          ]
+        : await _dataSource.getNearbyDeliveries(search);
     final unique = <String, DeliveryBundle>{
       for (final bundle in bundles) bundle.delivery.deliveryId: bundle,
     };
@@ -13,7 +18,10 @@ extension _SupabaseRiderDeliveryWorkflow on SupabaseRiderDeliveryRepository {
   }
 
   Future<RiderRequestPage> _fetchNearbyRequests(RiderRequestQuery query) async {
-    final all = await _fetchRequests(query.matching.riderId);
+    final all = await _fetchRequests(
+      query.matching.riderId,
+      search: query.matching.location,
+    );
     final assigned = all
         .where(
           (request) =>

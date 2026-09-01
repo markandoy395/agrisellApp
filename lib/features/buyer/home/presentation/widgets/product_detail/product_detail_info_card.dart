@@ -60,6 +60,10 @@ class ProductInfoCard extends StatelessWidget {
           ProductSaleStatusBadge(product: product, showCountdown: true),
           const SizedBox(height: 10),
           _ProductFacts(product: product),
+          if (product.storageInstructions case final storage?) ...[
+            const SizedBox(height: 8),
+            _StorageInstructions(text: storage),
+          ],
           if (!product.canOrder) ...[
             const SizedBox(height: 12),
             const ProductDetailUnavailableNotice(),
@@ -117,9 +121,46 @@ class _ProductFacts extends StatelessWidget {
           text: product.availableQuantityLabel,
         ),
         _Fact(icon: Icons.calendar_today_outlined, text: product.harvestDate),
+        if (product.freshnessLabel case final freshness?)
+          _Fact(
+            icon: product.isNearFreshnessDeadline
+                ? Icons.warning_amber_rounded
+                : Icons.event_available_outlined,
+            text: freshness,
+          ),
       ],
     );
   }
+}
+
+class _StorageInstructions extends StatelessWidget {
+  const _StorageInstructions({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Icon(
+        Icons.thermostat_outlined,
+        color: AgrisellColors.authGreen,
+        size: 16,
+      ),
+      const SizedBox(width: 4),
+      Expanded(
+        child: Text(
+          'Storage: $text',
+          style: const TextStyle(
+            color: AgrisellColors.mutedText,
+            fontSize: 12,
+            height: 1.3,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    ],
+  );
 }
 
 class _Fact extends StatelessWidget {

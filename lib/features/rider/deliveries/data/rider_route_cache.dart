@@ -73,6 +73,11 @@ Map<String, Object?> _routeToJson(RiderRoutePlan route) => {
         'text': instruction.text,
         'distanceMeters': instruction.distanceMeters,
         'durationSeconds': instruction.durationSeconds,
+        'maneuverPoint': instruction.maneuverPoint == null
+            ? null
+            : _pointToJson(instruction.maneuverPoint!),
+        'maneuverType': instruction.maneuverType,
+        'maneuverModifier': instruction.maneuverModifier,
       },
   ],
 };
@@ -114,4 +119,9 @@ RiderRouteInstruction _instructionFromJson(Map<String, Object?> json) =>
       text: json['text'] as String,
       distanceMeters: (json['distanceMeters'] as num).toDouble(),
       durationSeconds: (json['durationSeconds'] as num).toDouble(),
+      maneuverPoint: json['maneuverPoint'] == null
+          ? null
+          : _pointFromJson(json['maneuverPoint']),
+      maneuverType: json['maneuverType'] as String? ?? 'continue',
+      maneuverModifier: json['maneuverModifier'] as String? ?? '',
     );

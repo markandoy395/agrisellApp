@@ -20,21 +20,23 @@ extension _FarmerSignUpValidation on _FarmerSignUpScreenState {
         _controllers.email.text,
         show,
       );
-      _put(
-        'password',
-        FarmerSignupValidator.password(_controllers.password.text),
-        _controllers.password.text,
-        show,
-      );
-      _put(
-        'confirmPassword',
-        FarmerSignupValidator.passwordConfirmation(
+      if (_verifiedEmail != _controllers.email.text.trim().toLowerCase()) {
+        _put(
+          'password',
+          FarmerSignupValidator.password(_controllers.password.text),
           _controllers.password.text,
+          show,
+        );
+        _put(
+          'confirmPassword',
+          FarmerSignupValidator.passwordConfirmation(
+            _controllers.password.text,
+            _controllers.confirmPassword.text,
+          ),
           _controllers.confirmPassword.text,
-        ),
-        _controllers.confirmPassword.text,
-        show,
-      );
+          show,
+        );
+      }
     } else if (_step == 1) {
       _requiredProfileFields(show);
     } else {

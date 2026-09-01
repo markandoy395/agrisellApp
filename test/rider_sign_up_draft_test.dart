@@ -8,6 +8,32 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 
 void main() {
+  test('legacy personal-first drafts resume at account credentials', () {
+    final restored = RiderSignUpDraft.fromJson({
+      'step': 3,
+      'values': {'firstName': 'Ana', 'email': 'ana@example.com'},
+    });
+
+    expect(restored.step, RiderSignUpStep.account);
+    expect(restored.value(RiderSignUpFields.firstName), 'Ana');
+    expect(restored.value(RiderSignUpFields.email), 'ana@example.com');
+  });
+
+  test('verified Rider recovery resumes at personal information', () async {
+    final controller = RiderSignUpController(storage: _MemoryDraftStorage());
+    addTearDown(controller.dispose);
+    await controller.initialize();
+
+    await controller.resumeVerifiedEmail('Rider@Example.com');
+
+    expect(controller.draft.step, RiderSignUpStep.personal);
+    expect(
+      controller.draft.value(RiderSignUpFields.email),
+      'rider@example.com',
+    );
+    expect(controller.emailVerified, isTrue);
+  });
+
   test(
     'restores a Rider Sign-Up draft and never stores password data',
     () async {

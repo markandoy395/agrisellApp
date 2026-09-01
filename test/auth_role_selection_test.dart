@@ -57,10 +57,13 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'Buyer'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.widgetWithText(FilledButton, 'Sign up'));
+    expect(find.text('Step 1 of 2'), findsOneWidget);
+    expect(find.text('Account credentials'), findsOneWidget);
+    expect(find.text('First Name'), findsNothing);
+    await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
     await tester.pump();
 
-    expect(find.text('Enter your first name.'), findsOneWidget);
+    expect(find.text('Enter a valid email address.'), findsOneWidget);
     expect(find.text('Are you a'), findsNothing);
   });
 
@@ -116,22 +119,33 @@ void main() {
     expect(find.byType(RiderSignUpScreen), findsOneWidget);
     expect(find.text('Rider Sign-Up'), findsOneWidget);
     expect(find.text('Step 1 of 6'), findsOneWidget);
-    expect(find.text('First name'), findsOneWidget);
-    expect(find.text('Phone number (09XXXXXXXXX)'), findsOneWidget);
+    expect(find.text('Account credentials'), findsOneWidget);
+    expect(find.text('Email address'), findsOneWidget);
+    expect(find.text('Password'), findsOneWidget);
+    expect(find.text('Confirm password'), findsOneWidget);
+    expect(find.text('First name'), findsNothing);
     expect(find.text('Continue'), findsOneWidget);
 
-    final firstName = find.byKey(const ValueKey('First name'));
-    final middleName = find.byKey(const ValueKey('Middle name (optional)'));
-    final lastName = find.byKey(const ValueKey('Last name'));
-    expect(
-      tester.getTopLeft(middleName).dy - tester.getBottomLeft(firstName).dy,
-      10,
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Email address'),
+      'rider@example.com',
     );
-    expect(
-      tester.getTopLeft(lastName).dy - tester.getBottomLeft(middleName).dy,
-      10,
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Password'),
+      'Strong123!',
     );
-    expect(tester.getSize(firstName).height, tester.getSize(lastName).height);
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Confirm password'),
+      'Strong123!',
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Step 2 of 6'), findsOneWidget);
+    expect(find.text('Personal information'), findsWidgets);
+    expect(find.text('First name'), findsOneWidget);
+    expect(find.text('Phone number (09XXXXXXXXX)'), findsOneWidget);
   });
 
   testWidgets('rider account returns to the rider dashboard after login', (

@@ -92,6 +92,34 @@ class AuthRegistrationService {
   Future<RegisteredAccount> register(SignUpAccountData data, AuthRole role) =>
       _register(data, role);
 
+  /// Starts the credentials-first signup flow and returns true when the user
+  /// must enter the Supabase signup OTP before adding profile information.
+  Future<bool> startEmailVerification({
+    required String email,
+    required String password,
+    required AuthRole role,
+  }) async {
+    if (!usesSupabase) {
+      _requireConfiguredBackend();
+      return false;
+    }
+    try {
+      return await _remote.startEmailVerification(
+        email: email,
+        password: password,
+        role: role,
+      );
+    } on AuthRegistrationException {
+      rethrow;
+    } on AuthException catch (error) {
+      throw AuthOtpErrorMapper.signUp(error);
+    } catch (_) {
+      throw const AuthRegistrationException(
+        'We could not send the email OTP. Please try again.',
+      );
+    }
+  }
+
   Future<RegisteredAccount> registerFarmer(FarmerSignupData data) async {
     if (!usesSupabase) {
       _requireConfiguredBackend();
@@ -120,6 +148,27 @@ class AuthRegistrationService {
     } catch (_) {
       throw const AuthRegistrationException(
         'Farmer registration could not be completed. Please try again.',
+      );
+    }
+  }
+
+  Future<RegisteredAccount> completeVerifiedBuyerRegistration(
+    SignUpAccountData data,
+  ) async {
+    if (!usesSupabase) {
+      _requireConfiguredBackend();
+      return _local.register(data, AuthRole.buyer);
+    }
+    try {
+      _remoteAccount = await _remote.completeVerifiedBuyerRegistration(data);
+      return _remoteAccount!;
+    } on AuthRegistrationException {
+      rethrow;
+    } on PostgrestException catch (error) {
+      throw AuthRegistrationException(error.message);
+    } catch (_) {
+      throw const AuthRegistrationException(
+        'Buyer registration could not be completed after verification.',
       );
     }
   }

@@ -1,10 +1,12 @@
 import 'dart:math' as math;
 
 class RiderDeliverySearch {
+  static const defaultRadiusKm = 15.0;
+
   const RiderDeliverySearch({
     required this.latitude,
     required this.longitude,
-    this.radiusKm = 15,
+    this.radiusKm = defaultRadiusKm,
   }) : assert(radiusKm > 0);
 
   final double latitude;

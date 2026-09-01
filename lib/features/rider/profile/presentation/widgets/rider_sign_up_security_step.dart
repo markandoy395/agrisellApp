@@ -3,12 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/password_policy.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_registration_validator.dart';
+import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_validator.dart';
 import 'package:agresell_app/features/rider/profile/presentation/controllers/rider_sign_up_controller.dart';
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_sign_up_widgets.dart';
 
 class RiderSignUpSecurityStep extends StatelessWidget {
-  const RiderSignUpSecurityStep({required this.controller, super.key});
+  const RiderSignUpSecurityStep({
+    required this.controller,
+    this.readOnly = false,
+    super.key,
+  });
   final RiderSignUpController controller;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -19,19 +25,35 @@ class RiderSignUpSecurityStep extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Create a strong password. It is kept only while this app session is open.',
+          'Enter your email and create a strong password. We will verify your email before asking for personal information.',
           style: TextStyle(fontSize: 12, color: AgrisellColors.mutedText),
         ),
         const SizedBox(height: 12),
+        RiderSignUpTextField(
+          label: 'Email address',
+          value: controller.draft.value(RiderSignUpFields.email),
+          error: controller.errorFor(RiderSignUpFields.email),
+          keyboardType: TextInputType.emailAddress,
+          autofillHints: const [AutofillHints.email],
+          readOnly: readOnly,
+          onChanged: (value) =>
+              controller.updateValue(RiderSignUpFields.email, value),
+        ),
+        RiderSignUpAvailabilityNote(
+          state: controller.availabilityFor(RiderSignUpFields.email),
+        ),
+        const SizedBox(height: 10),
         RiderSignUpPasswordField(
           label: 'Password',
           value: password,
+          readOnly: readOnly,
           onChanged: (value) => controller.updateSensitive(password: value),
         ),
         const SizedBox(height: 10),
         RiderSignUpPasswordField(
           label: 'Confirm password',
           value: controller.confirmPassword,
+          readOnly: readOnly,
           error:
               controller.confirmPassword.isNotEmpty &&
                   controller.confirmPassword != password
@@ -62,6 +84,13 @@ class RiderSignUpSecurityStep extends StatelessWidget {
               ),
             ),
         ],
+        if (readOnly) ...[
+          const SizedBox(height: 10),
+          const Text(
+            'These credentials are locked for this registration.',
+            style: TextStyle(fontSize: 12, color: AgrisellColors.mutedText),
+          ),
+        ],
       ],
     );
   }
@@ -73,12 +102,14 @@ class RiderSignUpPasswordField extends StatefulWidget {
     required this.value,
     required this.onChanged,
     this.error,
+    this.readOnly = false,
     super.key,
   });
   final String label;
   final String value;
   final ValueChanged<String> onChanged;
   final String? error;
+  final bool readOnly;
 
   @override
   State<RiderSignUpPasswordField> createState() =>
@@ -93,6 +124,7 @@ class _RiderSignUpPasswordFieldState extends State<RiderSignUpPasswordField> {
     key: ValueKey(widget.label),
     initialValue: widget.value,
     obscureText: _hidden,
+    readOnly: widget.readOnly,
     onChanged: widget.onChanged,
     style: const TextStyle(fontSize: 13),
     decoration: InputDecoration(

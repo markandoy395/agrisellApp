@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_edit_action_button.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_edit_form_rows.dart';
@@ -6,20 +9,29 @@ import 'package:agresell_app/features/farmer/profile/data/farmer_farm_service.da
 import 'package:agresell_app/features/farmer/registration/domain/farm_model.dart';
 import 'package:agresell_app/features/shared/location/presentation/widgets/psgc_address_fields.dart';
 import 'package:agresell_app/features/shared/location/domain/confirmed_location.dart';
+import 'package:agresell_app/features/shared/location/data/gps_location_gateway.dart';
 import 'package:agresell_app/features/shared/location/presentation/location_selector.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_card_shell.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_section_label.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_text_styles.dart';
 
 class FarmerFarmEditCard extends StatefulWidget {
-  const FarmerFarmEditCard({required this.onCancel, super.key});
+  const FarmerFarmEditCard({
+    required this.onCancel,
+    this.service,
+    this.gpsGateway,
+    super.key,
+  });
   final VoidCallback onCancel;
+  final FarmerFarmService? service;
+  final GpsLocationGateway? gpsGateway;
   @override
   State<FarmerFarmEditCard> createState() => _FarmerFarmEditCardState();
 }
 
 class _FarmerFarmEditCardState extends State<FarmerFarmEditCard> {
-  final _service = const FarmerFarmService();
+  late final FarmerFarmService _service;
+  late final GpsLocationGateway _gpsGateway;
   final _nameController = TextEditingController();
   final _locationController = TextEditingController();
   final _barangayController = TextEditingController();
@@ -37,6 +49,8 @@ class _FarmerFarmEditCardState extends State<FarmerFarmEditCard> {
   @override
   void initState() {
     super.initState();
+    _service = widget.service ?? const FarmerFarmService();
+    _gpsGateway = widget.gpsGateway ?? GeolocatorGpsLocationGateway();
     _load();
   }
 
@@ -81,6 +95,8 @@ class _FarmerFarmEditCardState extends State<FarmerFarmEditCard> {
     if (_saving) return;
     setState(() => _saving = true);
     try {
+      await _captureCurrentLocation();
+      if (!mounted) return;
       final farm = await _service.save(
         FarmEditDraft(
           name: _nameController.text,
@@ -112,11 +128,74 @@ class _FarmerFarmEditCardState extends State<FarmerFarmEditCard> {
     }
   }
 
+  Future<void> _captureCurrentLocation() async {
+    try {
+      if (!await _gpsGateway.isServiceEnabled()) {
+        await _gpsGateway.openLocationSettings();
+        throw const FarmerFarmException(
+          'Turn on location services, then save the farm again.',
+        );
+      }
+      var permission = await _gpsGateway.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await _gpsGateway.requestPermission();
+      }
+      if (permission == LocationPermission.denied) {
+        throw const FarmerFarmException(
+          'Allow location access so we can capture your farm location.',
+        );
+      }
+      if (permission == LocationPermission.deniedForever) {
+        await _gpsGateway.openAppSettings();
+        throw const FarmerFarmException(
+          'Allow location permission in app settings, then save again.',
+        );
+      }
+      if (await _gpsGateway.getAccuracyStatus() ==
+          LocationAccuracyStatus.reduced) {
+        await _gpsGateway.openAppSettings();
+        throw const FarmerFarmException(
+          'Enable precise location, then save the farm again.',
+        );
+      }
+      final position = await _gpsGateway.currentPosition(
+        settings: const LocationSettings(
+          accuracy: LocationAccuracy.bestForNavigation,
+          timeLimit: Duration(seconds: 15),
+        ),
+      );
+      if (!position.latitude.isFinite ||
+          !position.longitude.isFinite ||
+          position.latitude < -90 ||
+          position.latitude > 90 ||
+          position.longitude < -180 ||
+          position.longitude > 180) {
+        throw const FarmerFarmException(
+          'GPS returned an invalid farm location. Try again.',
+        );
+      }
+      _latitude = position.latitude;
+      _longitude = position.longitude;
+    } on FarmerFarmException {
+      rethrow;
+    } on TimeoutException {
+      throw const FarmerFarmException(
+        'Location took too long. Check your GPS signal and try again.',
+      );
+    } catch (_) {
+      throw const FarmerFarmException(
+        'Current farm location could not be captured. Try again.',
+      );
+    }
+  }
+
   Future<void> _pickLocation() async {
     final location = await showLocationSelector(
       context,
       role: LocationOwnerRole.farmer,
       initialAddress: _locationController.text,
+      initialLatitude: _latitude,
+      initialLongitude: _longitude,
     );
     if (location == null || !mounted) return;
     setState(() {
@@ -171,8 +250,8 @@ class _FarmerFarmEditCardState extends State<FarmerFarmEditCard> {
                       icon: const Icon(Icons.location_on_outlined, size: 18),
                       label: Text(
                         _latitude == null || _longitude == null
-                            ? 'Choose exact GPS location'
-                            : 'Farm location pinned',
+                            ? 'Optional: choose location on map'
+                            : 'Adjust GPS location on map',
                       ),
                     ),
                   ),

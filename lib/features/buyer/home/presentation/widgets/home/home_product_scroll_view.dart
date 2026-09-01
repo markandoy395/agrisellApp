@@ -4,12 +4,14 @@ import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/features/buyer/home/presentation/controllers/home_product_browse_controller.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_banner_carousel.dart';
-import 'package:agresell_app/features/shared/products/presentation/widgets/home_categories_card.dart';
+import 'package:agresell_app/features/buyer/home/domain/home_banner.dart';
+import 'package:agresell_app/features/buyer/home/presentation/widgets/home/buyer_home_categories.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_entrance_animation.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_header.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_empty_products.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_pinned_search_header.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_product_results_header.dart';
+import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_sale_products_section.dart';
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_grid.dart';
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_grid_skeleton.dart';
 
@@ -19,9 +21,11 @@ class HomeProductScrollView extends StatelessWidget {
     required this.searchController,
     required this.browseController,
     required this.products,
+    required this.saleProducts,
+    required this.onBannerTap,
+    required this.onViewAllSales,
     required this.onShowFilters,
     required this.onReset,
-    required this.onAddToBasket,
     required this.onProductTap,
     required this.onRefresh,
     this.loadFailed = false,
@@ -33,9 +37,11 @@ class HomeProductScrollView extends StatelessWidget {
   final TextEditingController searchController;
   final HomeProductBrowseController browseController;
   final List<HomeProduct> products;
+  final List<HomeProduct> saleProducts;
+  final ValueChanged<HomeBanner> onBannerTap;
+  final VoidCallback onViewAllSales;
   final VoidCallback onShowFilters;
   final VoidCallback onReset;
-  final ValueChanged<HomeProduct> onAddToBasket;
   final ValueChanged<HomeProduct> onProductTap;
   final RefreshCallback onRefresh;
   final bool loadFailed;
@@ -77,6 +83,11 @@ class HomeProductScrollView extends StatelessWidget {
                 bottomGap: width < 380 ? 10 : 12,
                 searchController: searchController,
                 activeFilterCount: browseController.activeFilterCount,
+                searchSuggestions: products
+                    .map((product) => product.name)
+                    .toSet()
+                    .take(8)
+                    .toList(growable: false),
                 onQueryChanged: browseController.updateQuery,
                 onFilterTap: onShowFilters,
               ),
@@ -85,13 +96,24 @@ class HomeProductScrollView extends StatelessWidget {
               child: HomeBannerCarousel(
                 controller: bannerController,
                 height: bannerHeight,
+                onBannerTap: onBannerTap,
               ),
             ),
             SliverToBoxAdapter(child: SizedBox(height: contentGap)),
+            if (saleProducts.isNotEmpty) ...[
+              SliverToBoxAdapter(
+                child: HomeSaleProductsSection(
+                  products: saleProducts,
+                  onViewAll: onViewAllSales,
+                  onProductTap: onProductTap,
+                ),
+              ),
+              SliverToBoxAdapter(child: SizedBox(height: contentGap)),
+            ],
             SliverPadding(
               padding: EdgeInsets.symmetric(horizontal: contentPadding),
               sliver: SliverToBoxAdapter(
-                child: HomeCategoriesCard(
+                child: BuyerHomeCategories(
                   selectedCategory: browseController.selectedCategory,
                   onSelected: browseController.selectCategory,
                 ),
@@ -140,10 +162,6 @@ class HomeProductScrollView extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: contentPadding),
                 sliver: HomeProductGrid(
                   products: products,
-                  isSaved: browseController.isSaved,
-                  onSavedToggle: (product) =>
-                      browseController.toggleSaved(product.id),
-                  onAddToBasket: onAddToBasket,
                   onProductTap: onProductTap,
                 ),
               ),

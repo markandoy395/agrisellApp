@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'package:agresell_app/features/rider/dashboard/domain/rider_availability.dart';
 import 'package:agresell_app/features/rider/deliveries/data/rider_delivery_foundation_repositories.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_acceptance.dart';

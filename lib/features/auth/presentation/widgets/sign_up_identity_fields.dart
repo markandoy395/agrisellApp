@@ -15,6 +15,7 @@ class SignUpIdentityFields extends StatefulWidget {
     required this.genderController,
     required this.shippingAddressController,
     required this.emailController,
+    this.showEmail = true,
     super.key,
   });
 
@@ -26,6 +27,7 @@ class SignUpIdentityFields extends StatefulWidget {
   final TextEditingController genderController;
   final TextEditingController shippingAddressController;
   final TextEditingController emailController;
+  final bool showEmail;
 
   @override
   State<SignUpIdentityFields> createState() => _SignUpIdentityFieldsState();
@@ -116,13 +118,14 @@ class _SignUpIdentityFieldsState extends State<SignUpIdentityFields> {
               setState(() => widget.genderController.text = value ?? ''),
         ),
         const SizedBox(height: 6),
-        AuthTextField(
-          controller: widget.emailController,
-          hintText: 'Email',
-          keyboardType: TextInputType.emailAddress,
-          textInputAction: TextInputAction.next,
-          autofillHints: const [AutofillHints.email],
-        ),
+        if (widget.showEmail)
+          AuthTextField(
+            controller: widget.emailController,
+            hintText: 'Email',
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            autofillHints: const [AutofillHints.email],
+          ),
       ],
     );
   }

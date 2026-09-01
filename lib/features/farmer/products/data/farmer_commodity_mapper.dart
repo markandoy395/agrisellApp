@@ -1,5 +1,6 @@
 import 'package:agresell_app/features/farmer/products/domain/farmer_dashboard_product.dart';
 import 'package:agresell_app/features/shared/products/domain/product_sale_status.dart';
+import 'package:agresell_app/features/shared/products/domain/product_inventory_lot.dart';
 
 import 'farmer_commodity_format.dart';
 
@@ -52,6 +53,22 @@ abstract final class FarmerCommodityMapper {
       isSold:
           FarmerCommodityFormat.text(row['commodity_status']).toLowerCase() ==
           'sold',
+      inventoryDateType: productInventoryDateTypeFromDatabase(
+        FarmerCommodityFormat.optionalText(row['inventory_date_type']),
+      ),
+      harvestedAt: DateTime.tryParse(
+        FarmerCommodityFormat.text(row['next_harvested_at']),
+      ),
+      sellUntil: DateTime.tryParse(
+        FarmerCommodityFormat.text(row['next_sell_until']),
+      ),
+      expiresAt: DateTime.tryParse(
+        FarmerCommodityFormat.text(row['next_expires_at']),
+      ),
+      lotCode: FarmerCommodityFormat.optionalText(row['next_lot_code']),
+      storageInstructions: FarmerCommodityFormat.optionalText(
+        row['storage_instructions'],
+      ),
     );
   }
 }

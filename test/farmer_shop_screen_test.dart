@@ -63,7 +63,7 @@ void main() {
     expect(find.text('Price / unit *'), findsOneWidget);
     expect(find.text('Available quantity *'), findsOneWidget);
     expect(find.text('Expected availability *'), findsNothing);
-    expect(find.byType(TextField), findsNWidgets(5));
+    expect(find.byType(TextField), findsNWidgets(6));
 
     await tester.tap(find.text('Insert photo'));
     await tester.pumpAndSettle();
@@ -111,6 +111,14 @@ void main() {
     final month = _monthNames[expectedDate.month - 1];
     await tester.ensureVisible(find.text('Select date'));
     await tester.tap(find.text('Select date'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(
+      find.byKey(const Key('product-lot-marketable-until')),
+    );
+    await tester.tap(find.byKey(const Key('product-lot-marketable-until')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();

@@ -36,6 +36,13 @@ Future<void> enterValidSignUpDetails(
   WidgetTester tester, {
   required String email,
 }) async {
+  await _enterText(tester, 'Email', email);
+  await _enterText(tester, 'Password', 'Password123!');
+  await _enterText(tester, 'Confirm Password', 'Password123!');
+  await tester.ensureVisible(find.widgetWithText(FilledButton, 'Continue'));
+  await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
+  await tester.pumpAndSettle();
+
   await _enterText(tester, 'First Name', 'Ana');
   await _enterText(tester, 'Last Name', 'Reyes');
   await _enterText(tester, 'Name Extension (Optional)', 'Jr.');
@@ -61,9 +68,6 @@ Future<void> enterValidSignUpDetails(
   await tester.tap(find.text('Female').last);
   await tester.pumpAndSettle();
 
-  await _enterText(tester, 'Email', email);
-  await _enterText(tester, 'Password', 'Password123!');
-  await _enterText(tester, 'Confirm Password', 'Password123!');
   await tester.ensureVisible(find.byType(Checkbox));
   await tester.pumpAndSettle();
   await tester.tap(find.byType(Checkbox));

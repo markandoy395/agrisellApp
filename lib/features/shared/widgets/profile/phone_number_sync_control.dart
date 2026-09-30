@@ -8,11 +8,15 @@ class PhoneNumberSyncControl extends StatefulWidget {
   const PhoneNumberSyncControl({
     required this.controller,
     this.onSynced,
+    this.spacious = false,
+    this.cardStyle = false,
     super.key,
   });
 
   final TextEditingController controller;
   final ValueChanged<String>? onSynced;
+  final bool spacious;
+  final bool cardStyle;
 
   @override
   State<PhoneNumberSyncControl> createState() => _PhoneNumberSyncControlState();
@@ -24,16 +28,58 @@ class _PhoneNumberSyncControlState extends State<PhoneNumberSyncControl> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 42,
+    if (widget.cardStyle) {
+      return Container(
+        constraints: const BoxConstraints(minHeight: 64),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFFEDF8F0),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.sync_rounded, size: 26, color: Color(0xFF075239)),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Sync contact to phone',
+                    style: TextStyle(
+                      color: Color(0xFF075239),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Text(
+                    'Easily find and connect with your contacts.',
+                    style: TextStyle(fontSize: 11, color: Colors.blueGrey),
+                  ),
+                ],
+              ),
+            ),
+            Switch.adaptive(
+              value: _isSynced,
+              onChanged: _isRequesting ? null : _onChanged,
+            ),
+          ],
+        ),
+      );
+    }
+    return ConstrainedBox(
+      constraints: BoxConstraints(minHeight: widget.spacious ? 56 : 42),
       child: Row(
         children: [
-          const Icon(Icons.sync_rounded, size: 18),
+          Icon(Icons.sync_rounded, size: widget.spacious ? 24 : 18),
           const SizedBox(width: 8),
-          const Expanded(
+          Expanded(
             child: Text(
               'Sync contact to phone',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                fontSize: widget.spacious ? 14 : 12,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
           Transform.scale(

@@ -64,7 +64,7 @@ class BasketHeader extends StatelessWidget {
             'Basket',
             style: TextStyle(
               color: AgrisellColors.surface,
-              fontSize: 24,
+              fontSize: 15,
               height: 1.05,
               fontWeight: FontWeight.w800,
             ),

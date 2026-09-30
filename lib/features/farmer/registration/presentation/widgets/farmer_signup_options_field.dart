@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
-import 'package:agresell_app/core/theme/agrisell_theme.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_input_style.dart';
 
 class FarmerSignupOptionsField extends StatefulWidget {
   const FarmerSignupOptionsField({
@@ -60,21 +60,16 @@ class _FarmerSignupOptionsFieldState extends State<FarmerSignupOptionsField> {
           enableFilter: true,
           enableSearch: true,
           requestFocusOnTap: true,
+          leadingIcon: AuthInputStyle.iconBadge(
+            AuthInputStyle.iconFor(widget.label),
+          ),
           menuHeight: 240,
           label: Text(
             '${widget.label} (select or type)',
             style: const TextStyle(fontSize: 12),
           ),
           textStyle: const TextStyle(fontSize: 12),
-          inputDecorationTheme: InputDecorationTheme(
-            isDense: true,
-            filled: true,
-            fillColor: AgrisellColors.fieldFill,
-            floatingLabelStyle: AgrisellTheme.floatingInputLabelStyle,
-            constraints: const BoxConstraints.tightFor(height: 56),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+          inputDecorationTheme: AuthInputStyle.dropdownTheme,
           menuStyle: const MenuStyle(
             backgroundColor: WidgetStatePropertyAll(AgrisellColors.surface),
           ),

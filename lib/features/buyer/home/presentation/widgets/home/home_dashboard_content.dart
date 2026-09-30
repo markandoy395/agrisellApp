@@ -5,6 +5,7 @@ import 'package:agresell_app/features/shared/products/presentation/controllers/h
 import 'package:agresell_app/features/buyer/home/presentation/controllers/home_product_browse_controller.dart';
 import 'package:agresell_app/features/buyer/home/domain/home_banner.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/sale_products_screen.dart';
+import 'package:agresell_app/features/buyer/deals/presentation/screens/deals_and_promos_screen.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_product_filter_sheet.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_product_scroll_view.dart';
 
@@ -93,6 +94,14 @@ class _HomeDashboardContentState extends State<HomeDashboardContent> {
     );
   }
 
+  void _openDealsAndPromos() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const DealsAndPromosScreen(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -110,9 +119,13 @@ class _HomeDashboardContentState extends State<HomeDashboardContent> {
           saleProducts: saleProducts,
           onBannerTap: _openCampaignBanner,
           onViewAllSales: () => _openAllSaleProducts(saleProducts),
+          onOpenDeals: _openDealsAndPromos,
           isLoading: catalog.status == HomeProductCatalogStatus.loading,
           loadFailed: catalog.status == HomeProductCatalogStatus.error,
+          isLoadingMore: catalog.isLoadingMore,
+          hasMore: catalog.hasMore,
           onRefresh: catalog.load,
+          onLoadMore: catalog.loadMore,
           onShowFilters: _showFilters,
           onReset: _resetDiscovery,
           onProductTap: (product) =>

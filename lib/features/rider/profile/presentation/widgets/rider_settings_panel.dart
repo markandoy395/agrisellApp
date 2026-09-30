@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
+import 'package:agresell_app/features/shared/support/presentation/screens/support_center_screen.dart';
 import 'package:agresell_app/features/shared/widgets/profile/font_size_settings_control.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_card_shell.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_settings_action_row.dart';
@@ -17,6 +19,8 @@ class RiderSettingsPanel extends StatelessWidget {
     required this.onSwitchAccount,
     required this.onLogout,
     required this.onBack,
+    this.onIncidentHistory,
+    this.onSupport,
     super.key,
   });
 
@@ -29,6 +33,8 @@ class RiderSettingsPanel extends StatelessWidget {
   final VoidCallback onSwitchAccount;
   final VoidCallback onLogout;
   final VoidCallback onBack;
+  final VoidCallback? onIncidentHistory;
+  final VoidCallback? onSupport;
 
   @override
   Widget build(BuildContext context) {
@@ -89,9 +95,35 @@ class RiderSettingsPanel extends StatelessWidget {
                       children: [
                         ProfileSettingsActionRow(
                           icon: Icons.shield_outlined,
-                          title: 'Safety & report a problem',
-                          subtitle: 'Get help or report a delivery problem',
+                          title: 'Safety & emergency SOS',
+                          subtitle: 'Report a safety issue or emergency alert',
                           onTap: onSafety,
+                        ),
+                        if (onIncidentHistory != null)
+                          ProfileSettingsActionRow(
+                            icon: Icons.history_rounded,
+                            title: 'Incident history & status',
+                            subtitle: 'Track status of submitted safety reports',
+                            onTap: onIncidentHistory!,
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    ProfileSettingsGroup(
+                      title: 'Support',
+                      children: [
+                        ProfileSettingsActionRow(
+                          icon: Icons.support_agent_rounded,
+                          title: 'Customer support tickets',
+                          subtitle: 'Open and track helpdesk inquiries',
+                          onTap: onSupport ??
+                              () {
+                                Navigator.of(context).push(
+                                  agrisellPageRoute<void>(
+                                    builder: (_) => const SupportCenterScreen(),
+                                  ),
+                                );
+                              },
                         ),
                       ],
                     ),

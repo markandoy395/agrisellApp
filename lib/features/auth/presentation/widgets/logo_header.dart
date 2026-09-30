@@ -4,7 +4,7 @@ import 'package:agresell_app/core/constants/agrisell_assets.dart';
 import 'package:agresell_app/core/utils/responsive.dart';
 import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 
-enum LogoHeaderStyle { horizontal, stacked, mark }
+enum LogoHeaderStyle { horizontal, stacked, mark, logoOnly }
 
 class LogoHeader extends StatelessWidget {
   const LogoHeader({
@@ -38,6 +38,7 @@ class LogoHeader extends StatelessWidget {
       LogoHeaderStyle.horizontal => AgrisellAssets.logoLandscape,
       LogoHeaderStyle.stacked => AgrisellAssets.logoPrimary,
       LogoHeaderStyle.mark => AgrisellAssets.logoMark,
+      LogoHeaderStyle.logoOnly => AgrisellAssets.logoOnly,
     };
   }
 }

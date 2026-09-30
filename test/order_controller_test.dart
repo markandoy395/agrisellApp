@@ -272,6 +272,15 @@ class _PlacementRepository implements OrderRepository {
     required String orderId,
     required bool approved,
   }) async {}
+
+  @override
+  Future<void> reportOrderDispute({
+    required String accountId,
+    required String orderId,
+    required String category,
+    required String reason,
+    required String requestedResolution,
+  }) async {}
 }
 
 BasketCartItem _withSeller(

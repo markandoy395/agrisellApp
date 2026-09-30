@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/features/buyer/profile/presentation/widgets/buyer_profile_style.dart';
 import 'package:agresell_app/features/shared/widgets/badges/animated_count_badge.dart';
-import 'package:agresell_app/features/shared/widgets/profile/profile_text_styles.dart';
 
 class OrderStatusItem extends StatelessWidget {
   const OrderStatusItem({
@@ -20,7 +19,8 @@ class OrderStatusItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final compact = MediaQuery.sizeOf(context).width < 380;
+    final width = MediaQuery.sizeOf(context).width;
+    final compact = width < 380;
     final semanticsLabel = count > 0
         ? '$label, $count ${count == 1 ? 'order' : 'orders'}'
         : '$label, no orders';
@@ -33,11 +33,11 @@ class OrderStatusItem extends StatelessWidget {
         child: InkWell(
           key: ValueKey('my-order-$label'),
           onTap: onTap,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: compact ? 1 : 2,
-              vertical: 6,
+              vertical: 4,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -46,39 +46,47 @@ class OrderStatusItem extends StatelessWidget {
                   clipBehavior: Clip.none,
                   children: [
                     Container(
-                      width: compact ? 36 : 40,
-                      height: compact ? 36 : 40,
+                      width: compact ? 44 : 50,
+                      height: compact ? 42 : 48,
                       decoration: BoxDecoration(
-                        color: AgrisellColors.forestSoft,
-                        borderRadius: BorderRadius.circular(12),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFE8F5EE), Color(0xFFD1EDDF)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(13),
                         border: Border.all(
-                          color: AgrisellColors.authGreen.withValues(
-                            alpha: 0.12,
-                          ),
+                          color: BuyerProfileStyle.borderSubtle,
+                          width: 1,
                         ),
                       ),
                       child: Icon(
                         icon,
-                        color: AgrisellColors.authGreen,
-                        size: compact ? 21 : 23,
+                        color: BuyerProfileStyle.green,
+                        size: compact ? 22 : 24,
                       ),
                     ),
                     if (count > 0)
                       Positioned(
                         key: ValueKey('order-count-$label'),
-                        right: -7,
-                        top: -7,
+                        right: -6,
+                        top: -6,
                         child: AnimatedCountBadge(count: count),
                       ),
                   ],
                 ),
-                const SizedBox(height: 7),
+                const SizedBox(height: 6),
                 Text(
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
-                  style: ProfileTextStyles.orderLabel(context),
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    color: BuyerProfileStyle.ink,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),

@@ -31,6 +31,10 @@ class FarmerProductEditFormPanel extends StatelessWidget {
     required this.onProductionStageChanged,
     required this.onCancel,
     required this.onSave,
+    this.activeSaleNotice,
+    this.isFarmerDiscount = false,
+    this.onManageDiscount,
+    this.onRemoveDiscount,
     super.key,
   });
 
@@ -55,6 +59,10 @@ class FarmerProductEditFormPanel extends StatelessWidget {
   final ValueChanged<ProductProductionStage?> onProductionStageChanged;
   final VoidCallback onCancel;
   final VoidCallback onSave;
+  final String? activeSaleNotice;
+  final bool isFarmerDiscount;
+  final VoidCallback? onManageDiscount;
+  final VoidCallback? onRemoveDiscount;
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +75,161 @@ class FarmerProductEditFormPanel extends StatelessWidget {
         padding: EdgeInsets.fromLTRB(25, 31, 25, 30 + bottomInset),
         child: Column(
           children: [
+            if (activeSaleNotice != null) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: AgrisellColors.forestSoft,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: AgrisellColors.authGreen.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.local_offer_rounded,
+                          color: AgrisellColors.authGreen,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isFarmerDiscount
+                                    ? 'Active Product Promotion'
+                                    : 'Featured in Active Admin Sale',
+                                style: const TextStyle(
+                                  color: AgrisellColors.authGreen,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                activeSaleNotice!,
+                                style: const TextStyle(
+                                  color: AgrisellColors.brandBlack,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (isFarmerDiscount && onManageDiscount != null) ...[
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton.icon(
+                            onPressed: onManageDiscount,
+                            icon: const Icon(Icons.edit_outlined, size: 14),
+                            label: const Text('Edit Discount'),
+                            style: TextButton.styleFrom(
+                              foregroundColor: AgrisellColors.authGreen,
+                              visualDensity: VisualDensity.compact,
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                            ),
+                          ),
+                          if (onRemoveDiscount != null) ...[
+                            const SizedBox(width: 4),
+                            TextButton.icon(
+                              onPressed: onRemoveDiscount,
+                              icon: const Icon(Icons.delete_outline_rounded, size: 14),
+                              label: const Text('Remove'),
+                              style: TextButton.styleFrom(
+                                foregroundColor: AgrisellColors.statusRedText,
+                                visualDensity: VisualDensity.compact,
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+            ] else if (onManageDiscount != null) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: AgrisellColors.homeBackground,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: AgrisellColors.borderLine,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.local_offer_outlined,
+                      color: AgrisellColors.mutedText,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Product Discount',
+                            style: TextStyle(
+                              color: AgrisellColors.brandBlack,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'No active promotion on this product.',
+                            style: TextStyle(
+                              color: AgrisellColors.mutedText,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    OutlinedButton(
+                      onPressed: onManageDiscount,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AgrisellColors.authGreen,
+                        side: const BorderSide(color: AgrisellColors.authGreen),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                      child: const Text(
+                        'Put on Sale',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
             ProductEditNameRow(controller: nameController),
             const SizedBox(height: 20),
             ProductEditPriceRow(controller: priceController),

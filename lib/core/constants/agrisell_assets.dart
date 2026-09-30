@@ -1,4 +1,5 @@
 abstract final class AgrisellAssets {
+  static const logoOnly = 'assets/logo/logo_only.png';
   static const logoMark = 'assets/logo/logo.png';
   static const logoPrimary =
       'assets/logo/agrisellPrimaryLogoWithOutTagline.png';

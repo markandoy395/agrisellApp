@@ -26,7 +26,26 @@ extension _FarmerSignUpActions on _FarmerSignUpScreenState {
         _refresh(() => _otpStartedFor = email);
       }
 
-      final verified = await Navigator.of(context).push<bool>(
+      final verified = await _openEmailVerification(email);
+      if (verified != true || !mounted) return;
+      _refresh(() {
+        _verifiedEmail = email;
+        _otpStartedFor = null;
+      });
+      _advanceStep();
+    } on AuthIncompleteRegistrationFound catch (found) {
+      await _resumeFoundAccount(email, found);
+    } on AuthRegistrationException catch (error) {
+      _showMessage(error.message);
+    } catch (_) {
+      _showMessage('We could not verify your email. Please try again.');
+    } finally {
+      if (mounted) _refresh(() => _isSubmitting = false);
+    }
+  }
+
+  Future<bool> _openEmailVerification(String email) async =>
+      await Navigator.of(context).push<bool>(
         agrisellPageRoute<bool>(
           builder: (_) => OtpVerificationScreen(
             destination: email,
@@ -35,27 +54,49 @@ extension _FarmerSignUpActions on _FarmerSignUpScreenState {
             onChangeDestination: () {
               if (mounted) _refresh(() => _otpStartedFor = null);
             },
-            onVerify: (otp) => AuthRegistrationService.instance.verifyEmailOtp(
-              email: email,
-              otp: otp,
-            ),
+            onVerify: (otp) =>
+                AuthRegistrationService.instance.verifySignupEmailOtp(
+                  email: email,
+                  otp: otp,
+                  role: AuthRole.farmer,
+                ),
             onResend: () =>
                 AuthRegistrationService.instance.resendSignupEmailOtp(email),
           ),
         ),
-      );
-      if (verified != true || !mounted) return;
-      _refresh(() {
-        _verifiedEmail = email;
-        _otpStartedFor = null;
-      });
+      ) ??
+      false;
+
+  Future<void> _resumeFoundAccount(
+    String email,
+    AuthIncompleteRegistrationFound found,
+  ) async {
+    if (!mounted) return;
+    final continueRegistration = await AccountFoundDialog.show(context);
+    if (!continueRegistration) {
+      if (found.emailVerified) await AuthRegistrationService.instance.signOut();
+      return;
+    }
+    if (!mounted) return;
+    if (found.emailVerified) {
+      _refresh(() => _verifiedEmail = email);
       _advanceStep();
+      return;
+    }
+    try {
+      await AuthRegistrationService.instance.resendSignupEmailOtp(email);
+      if (!mounted) return;
+      _refresh(() => _otpStartedFor = email);
+      final verified = await _openEmailVerification(email);
+      if (verified && mounted) {
+        _refresh(() {
+          _verifiedEmail = email;
+          _otpStartedFor = null;
+        });
+        _advanceStep();
+      }
     } on AuthRegistrationException catch (error) {
-      _showMessage(error.message);
-    } catch (_) {
-      _showMessage('We could not verify your email. Please try again.');
-    } finally {
-      if (mounted) _refresh(() => _isSubmitting = false);
+      if (mounted) _showMessage(error.message);
     }
   }
 
@@ -211,7 +252,13 @@ extension _FarmerSignUpActions on _FarmerSignUpScreenState {
         ],
       ),
     );
-    if (discard == true && mounted) Navigator.of(context).pop();
+    if (discard == true && mounted) {
+      Navigator.of(context).pushReplacement(
+        agrisellPageRoute<void>(
+          builder: (_) => const RoleSelectionScreen.signUp(),
+        ),
+      );
+    }
   }
 
   void _goToLogin() => Navigator.of(context).pushReplacement(

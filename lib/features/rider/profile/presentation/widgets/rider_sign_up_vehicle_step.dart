@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_input_style.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_registration.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_draft.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_validator.dart';
@@ -24,14 +25,15 @@ class RiderSignUpVehicleStep extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         DropdownButtonFormField<RiderVehicleType>(
+          isExpanded: true,
           dropdownColor: AppDropdownStyle.menuColor,
           borderRadius: AppDropdownStyle.menuBorderRadius,
           style: AppDropdownStyle.textStyle,
           iconEnabledColor: AppDropdownStyle.iconColor,
           initialValue: vehicle,
-          decoration: InputDecoration(
-            labelText: 'Vehicle type',
-            contentPadding: riderSignUpFieldContentPadding,
+          decoration: AuthInputStyle.decoration(
+            label: 'Vehicle type',
+            contentPadding: riderSignUpSelectionContentPadding,
             errorText: controller.errorFor(RiderSignUpFields.vehicleType),
           ),
           items: [

@@ -18,8 +18,6 @@ class FarmerAddressSyncControl extends StatefulWidget {
 }
 
 class _FarmerAddressSyncControlState extends State<FarmerAddressSyncControl> {
-  var _isSynced = false;
-
   @override
   Widget build(BuildContext context) => SizedBox(
     height: 42,
@@ -36,8 +34,10 @@ class _FarmerAddressSyncControlState extends State<FarmerAddressSyncControl> {
         Transform.scale(
           scale: 0.8,
           child: Switch.adaptive(
-            value: _isSynced,
-            onChanged: widget.controllers.hasPersonalAddressDetails
+            value: widget.controllers.sameAsFarmerAddress,
+            onChanged:
+                widget.controllers.sameAsFarmerAddress ||
+                    widget.controllers.hasPersonalAddressDetails
                 ? _onChanged
                 : null,
           ),
@@ -47,10 +47,8 @@ class _FarmerAddressSyncControlState extends State<FarmerAddressSyncControl> {
   );
 
   void _onChanged(bool value) {
-    if (value) {
-      widget.controllers.copyPersonalAddressDetailsToFarm();
-      widget.onSynced();
-    }
-    setState(() => _isSynced = value);
+    widget.controllers.setSameAsFarmerAddress(value);
+    widget.onSynced();
+    setState(() {});
   }
 }

@@ -57,7 +57,12 @@ class BasketCartItem {
 
   double get selectedTotal => isSelected ? quantity * pricePerKg : 0;
 
-  BasketCartItem copyWith({int? quantity, bool? isSelected}) {
+  BasketCartItem copyWith({
+    int? quantity,
+    bool? isSelected,
+    double? pricePerKg,
+    String? priceLabel,
+  }) {
     return BasketCartItem(
       productId: productId,
       productName: productName,
@@ -67,9 +72,9 @@ class BasketCartItem {
       sellerLocation: sellerLocation,
       harvestDate: harvestDate,
       availableWeight: availableWeight,
-      priceLabel: priceLabel,
+      priceLabel: priceLabel ?? this.priceLabel,
       originalPriceLabel: originalPriceLabel,
-      pricePerKg: pricePerKg,
+      pricePerKg: pricePerKg ?? this.pricePerKg,
       unit: unit,
       quantity: quantity ?? this.quantity,
       isSelected: isSelected ?? this.isSelected,

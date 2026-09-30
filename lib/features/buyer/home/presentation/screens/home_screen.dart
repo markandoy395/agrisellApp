@@ -133,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
         body: PageView.builder(
           controller: _navigationController,
           onPageChanged: _handlePageChanged,
-          physics: const ClampingScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           itemCount: homeBottomNavItems.length,
           itemBuilder: _buildTab,
         ),
@@ -154,6 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
           isActive: _activeNavIndex == HomeScreen.messageNavIndex,
           repository: widget.messagingRepository,
           onUnreadCountChanged: _setMessageUnreadCount,
+          chatBottomPadding: MediaQuery.paddingOf(context).bottom + 8,
         ),
       ),
       HomeScreen.farmerNavIndex => const _KeepAliveTab(child: FarmerScreen()),

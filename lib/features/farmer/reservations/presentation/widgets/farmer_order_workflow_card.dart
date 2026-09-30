@@ -10,6 +10,7 @@ import 'package:agresell_app/features/farmer/reservations/presentation/widgets/f
 import 'package:agresell_app/features/farmer/reservations/presentation/widgets/farmer_order_workflow_guidance.dart';
 import 'package:agresell_app/features/farmer/reservations/presentation/widgets/farmer_rider_waiting_panel.dart';
 import 'package:agresell_app/features/shared/orders/presentation/widgets/order_acceptance_deadline_card.dart';
+import 'package:agresell_app/features/shared/tracking/presentation/widgets/delivery_tracking_sheet.dart';
 
 class FarmerOrderWorkflowCard extends StatelessWidget {
   const FarmerOrderWorkflowCard({
@@ -133,6 +134,34 @@ class FarmerOrderWorkflowCard extends StatelessWidget {
                 onCancelRiderRequest: onCancelRiderRequest,
                 isCancellingRiderRequest: isCancellingRiderRequest,
               ),
+            if (order.status == PlacedOrderStatus.shipping ||
+                order.status == PlacedOrderStatus.readyForPickup ||
+                order.status == PlacedOrderStatus.delivered ||
+                riderRequest != null) ...[
+              const SizedBox(height: 9),
+              SizedBox(
+                width: double.infinity,
+                height: 38,
+                child: OutlinedButton.icon(
+                  key: const ValueKey('farmer-track-rider-button'),
+                  onPressed: () => showDeliveryTrackingSheet(context, order: order),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AgrisellColors.authGreen,
+                    side: const BorderSide(color: AgrisellColors.authGreen),
+                    padding: const EdgeInsets.symmetric(horizontal: 13),
+                    textStyle: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  icon: const Icon(Icons.map_rounded, size: 16),
+                  label: const Text('Live Map & Rider Tracking'),
+                ),
+              ),
+            ],
             if (order.status.canFarmerCancel && onCancelOrder != null) ...[
               const SizedBox(height: 9),
               SizedBox(

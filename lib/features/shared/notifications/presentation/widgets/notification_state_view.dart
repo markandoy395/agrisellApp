@@ -6,7 +6,7 @@ class NotificationStateView extends StatelessWidget {
   const NotificationStateView({
     required this.icon,
     required this.title,
-    required this.message,
+    this.message,
     this.isLoading = false,
     this.actionLabel,
     this.onAction,
@@ -15,7 +15,7 @@ class NotificationStateView extends StatelessWidget {
 
   final IconData icon;
   final String title;
-  final String message;
+  final String? message;
   final bool isLoading;
   final String? actionLabel;
   final VoidCallback? onAction;
@@ -68,17 +68,19 @@ class NotificationStateView extends StatelessWidget {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  message,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: AgrisellColors.mutedText,
-                    fontSize: 12,
-                    height: 1.4,
-                    fontWeight: FontWeight.w500,
+                if (message case final text? when text.trim().isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    text,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AgrisellColors.mutedText,
+                      fontSize: 12,
+                      height: 1.4,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
+                ],
                 if (hasAction) ...[
                   const SizedBox(height: 16),
                   SizedBox(

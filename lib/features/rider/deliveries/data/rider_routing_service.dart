@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import 'package:agresell_app/features/rider/deliveries/data/rider_osrm_parser.dart';
-import 'package:agresell_app/features/rider/deliveries/domain/delivery_route.dart';
+import 'package:agresell_app/features/shared/routing/domain/delivery_route.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_road_access.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_route_plan.dart';
 

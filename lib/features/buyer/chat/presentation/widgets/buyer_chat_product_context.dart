@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/chat/domain/marketplace_conversation.dart';
-import 'package:agresell_app/features/shared/products/presentation/widgets/product_thumbnail.dart';
+import 'package:agresell_app/features/shared/chat/presentation/models/chat_participant_data.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_avatar.dart';
 
 class BuyerChatProductContext extends StatelessWidget {
   const BuyerChatProductContext({required this.thread, super.key});
@@ -20,14 +21,19 @@ class BuyerChatProductContext extends StatelessWidget {
       ),
       child: Row(
         children: [
-          ProductThumbnail.square(
-            asset: thread.productImageUrl == null
-                ? 'assets/images/vege.jpeg'
-                : null,
-            imageUrl: thread.productImageUrl,
-            size: 44,
-            borderRadius: 8,
-            semanticLabel: '${thread.productName ?? thread.farmName} context',
+          ChatAvatar(
+            participant: ChatParticipantData(
+              name: thread.farmerName,
+              initials: marketplaceInitials(thread.farmerName),
+              imageUrl: thread.farmerImageUrl,
+              imageSemanticLabel: '${thread.farmerName} profile photo',
+            ),
+            style: const ChatAvatarStyle(
+              diameter: 44,
+              backgroundColor: AgrisellColors.fieldFill,
+              foregroundColor: AgrisellColors.headingGreen,
+              textStyle: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(

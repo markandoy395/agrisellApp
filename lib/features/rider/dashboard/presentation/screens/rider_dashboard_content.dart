@@ -198,7 +198,7 @@ class _RiderEarningsSnapshot extends StatelessWidget {
                 'PHP ${amount.toStringAsFixed(2)}',
                 style: const TextStyle(
                   color: AgrisellColors.headingGreen,
-                  fontSize: 16,
+                  fontSize: 15,
                   height: 1.1,
                   fontWeight: FontWeight.w900,
                 ),

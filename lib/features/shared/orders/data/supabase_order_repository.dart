@@ -26,6 +26,18 @@ class SupabaseOrderRepository
     final cancellations = await client.rpc<Object?>(
       'current_account_cancellation_snapshots',
     );
+    Object? refunds;
+    try {
+      refunds = await client.rpc<Object?>('current_account_refund_snapshots');
+    } catch (_) {
+      // Graceful fallback if database function is pending migration
+    }
+    Object? disputes;
+    try {
+      disputes = await client.rpc<Object?>('current_account_dispute_snapshots');
+    } catch (_) {
+      // Graceful fallback if database function is pending migration
+    }
     return OrderJsonCodec.decodeOrders(
       OrderSnapshotMerger.merge(
         orders,
@@ -33,6 +45,8 @@ class SupabaseOrderRepository
         reviews: reviews,
         expirations: expirations,
         cancellations: cancellations,
+        refunds: refunds,
+        disputes: disputes,
       ),
     );
   }
@@ -181,6 +195,29 @@ class SupabaseOrderRepository
         params: {
           'client_order_id': orderId,
           'refund_reference': reference.trim(),
+        },
+      );
+    } on PostgrestException catch (error) {
+      throw OrderPlacementException(error.message);
+    }
+  }
+
+  @override
+  Future<void> reportOrderDispute({
+    required String accountId,
+    required String orderId,
+    required String category,
+    required String reason,
+    required String requestedResolution,
+  }) async {
+    try {
+      await client.rpc<Object?>(
+        'report_current_buyer_order_dispute',
+        params: {
+          'p_client_order_id': orderId,
+          'p_category': category,
+          'p_reason': reason.trim(),
+          'p_requested_resolution': requestedResolution,
         },
       );
     } on PostgrestException catch (error) {

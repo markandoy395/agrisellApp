@@ -14,6 +14,10 @@ import 'package:agresell_app/features/shared/products/presentation/widgets/produ
 import 'package:agresell_app/features/buyer/chat/presentation/buyer_conversation_launcher.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/common/buyer_responsive_text.dart';
 import 'package:agresell_app/features/buyer/orders/presentation/widgets/gcash_reference_retry_sheet.dart';
+import 'package:agresell_app/features/buyer/orders/presentation/widgets/buyer_refund_detail_sheet.dart';
+import 'package:agresell_app/features/buyer/orders/presentation/widgets/order_dispute_sheet.dart';
+import 'package:agresell_app/features/shared/orders/domain/order_dispute.dart';
+import 'package:agresell_app/features/shared/tracking/presentation/widgets/delivery_tracking_sheet.dart';
 
 part 'package:agresell_app/features/buyer/orders/presentation/widgets/order_tracking/order_tracking_header.dart';
 part 'package:agresell_app/features/buyer/orders/presentation/widgets/order_tracking/order_status_tabs.dart';
@@ -38,7 +42,15 @@ typedef _SubmitOrderFeedback =
       required String comment,
       int? riderRating,
       String riderComment,
-      bool reviewProduct,
+      required bool reviewProduct,
+    });
+
+typedef _ReportOrderDispute =
+    Future<void> Function({
+      required String orderId,
+      required OrderDisputeCategory category,
+      required String reason,
+      required OrderDisputeResolution requestedResolution,
     });
 
 class OrderTrackingScreen extends StatefulWidget {
@@ -98,6 +110,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen>
                           orders: _orderController.ordersForFilter(filter),
                           onCancelOrder: _orderController.cancelOrder,
                           onSubmitFeedback: _orderController.submitFeedback,
+                          onReportDispute: _orderController.reportOrderDispute,
                         ),
                     ],
                   );

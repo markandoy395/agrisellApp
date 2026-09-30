@@ -8,17 +8,26 @@ extension _RiderProfileLogout on _RiderProfileScreenState {
   Future<void> _openSafety() async {
     final profile = _profile;
     if (profile == null) return;
-    final type = await showRiderSafetySheet(context);
-    if (type == null || !mounted) return;
-    final reason = await showRiderSafetyReasonDialog(context, type);
-    if (type.requiresReason && reason == null) return;
-    final sent = await _safety.submit(
-      riderId: profile.id,
-      type: type,
-      reason: reason,
+    await showAppSafetySheet(
+      context: context,
+      role: 'rider',
+      userName: profile.fullName,
+      userContact: profile.contactNumber,
+      userEmail: profile.email,
     );
-    if (!mounted) return;
-    _message(sent ? '${type.label} sent to support.' : _safety.errorMessage!);
+  }
+
+  void _openIncidentHistory() {
+    final profile = _profile;
+    if (profile == null) return;
+    _open(
+      IncidentTrackingScreen(
+        role: 'rider',
+        userName: profile.fullName,
+        userContact: profile.contactNumber,
+        userEmail: profile.email,
+      ),
+    );
   }
 
   void _message(String value) {

@@ -71,7 +71,7 @@ abstract final class ProfileTextStyles {
   static TextStyle editButton(BuildContext context) {
     return _base(context).copyWith(
       color: AgrisellColors.authGreen,
-      fontSize: 13,
+      fontSize: 14,
       fontWeight: FontWeight.w600,
     );
   }

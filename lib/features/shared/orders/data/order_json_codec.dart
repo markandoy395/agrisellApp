@@ -1,6 +1,7 @@
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_feedback.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_payment.dart';
+import 'package:agresell_app/features/shared/orders/domain/order_dispute.dart';
 
 class OrderJsonCodec {
   const OrderJsonCodec._();
@@ -41,6 +42,7 @@ class OrderJsonCodec {
     if (order.cancelledBy case final actor?) 'cancelledBy': actor,
     if (order.cancelledAt case final cancelledAt?)
       'cancelledAt': cancelledAt.toIso8601String(),
+    if (order.dispute case final dispute?) 'dispute': dispute.toJson(),
     'payment': {
       'method': order.payment.method.databaseValue,
       'status': order.payment.status.databaseValue,
@@ -48,6 +50,14 @@ class OrderJsonCodec {
       'refundReference': order.payment.refundReference,
       'receiptImageReference': order.payment.receiptImageReference,
       'receiptImageName': order.payment.receiptImageName,
+      if (order.payment.refundAmount case final refundAmount?)
+        'refundAmount': refundAmount,
+      if (order.payment.refundedAt case final refundedAt?)
+        'refundedAt': refundedAt.toIso8601String(),
+      if (order.payment.refundReason.isNotEmpty)
+        'refundReason': order.payment.refundReason,
+      if (order.payment.refundStatus.isNotEmpty)
+        'refundStatus': order.payment.refundStatus,
     },
     if (order.feedback case final feedback?)
       'feedback': {
@@ -90,6 +100,7 @@ class OrderJsonCodec {
         .toList(growable: false);
     final payment = _decodePayment(json['payment']);
     final feedback = _decodeFeedback(json['feedback']);
+    final dispute = _decodeDispute(json['dispute']);
     return PlacedOrder(
       id: json['id'] as String? ?? '',
       buyerId: json['buyerId']?.toString() ?? '',
@@ -110,6 +121,7 @@ class OrderJsonCodec {
       cancellationReason: _optionalText(json['cancellationReason']),
       cancelledBy: _optionalText(json['cancelledBy']),
       cancelledAt: _date(json['cancelledAt']),
+      dispute: dispute,
       payment: payment,
     );
   }
@@ -124,6 +136,10 @@ class OrderJsonCodec {
       refundReference: json['refundReference'] as String? ?? '',
       receiptImageReference: json['receiptImageReference'] as String? ?? '',
       receiptImageName: json['receiptImageName'] as String? ?? '',
+      refundAmount: (json['refundAmount'] as num?)?.toDouble(),
+      refundedAt: _date(json['refundedAt']),
+      refundReason: json['refundReason'] as String? ?? '',
+      refundStatus: json['refundStatus'] as String? ?? '',
     );
   }
 
@@ -137,6 +153,11 @@ class OrderJsonCodec {
       submittedAt: submittedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
     );
     return feedback.isValid ? feedback : null;
+  }
+
+  static OrderDispute? _decodeDispute(Object? value) {
+    if (value is! Map) return null;
+    return OrderDispute.fromJson(Map<String, Object?>.from(value));
   }
 
   static PlacedOrderItem? _decodeItem(Object? value) {

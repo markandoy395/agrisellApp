@@ -45,22 +45,11 @@ class _OrderFeedbackSheetState extends State<_OrderFeedbackSheet> {
     return SafeArea(
       top: false,
       child: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(16, 10, 16, 16 + bottomInset),
+        padding: EdgeInsets.fromLTRB(16, 4, 16, 16 + bottomInset),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Container(
-                width: 42,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AgrisellColors.borderLine,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-              ),
-            ),
-            const SizedBox(height: 14),
             _FeedbackProductHeader(item: widget.item),
             const SizedBox(height: 15),
             Text(

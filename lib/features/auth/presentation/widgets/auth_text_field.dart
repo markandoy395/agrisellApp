@@ -3,18 +3,24 @@ import 'package:flutter/services.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/core/utils/responsive.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_input_style.dart';
 
 class AuthTextField extends StatefulWidget {
   const AuthTextField({
     required this.hintText,
     this.controller,
     this.showPasswordToggle = false,
+    this.leadingIcon,
+    this.leadingIconBadge = false,
+    this.leadingIconDivider = true,
+    this.trailingIcon,
     this.keyboardType,
     this.textInputAction,
     this.autofillHints,
     this.inputFormatters,
     this.focusNode,
     this.readOnly = false,
+    this.enabled = true,
     this.onTap,
     this.onChanged,
     super.key,
@@ -22,12 +28,17 @@ class AuthTextField extends StatefulWidget {
   final String hintText;
   final TextEditingController? controller;
   final bool showPasswordToggle;
+  final IconData? leadingIcon;
+  final bool leadingIconBadge;
+  final bool leadingIconDivider;
+  final IconData? trailingIcon;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
   final Iterable<String>? autofillHints;
   final List<TextInputFormatter>? inputFormatters;
   final FocusNode? focusNode;
   final bool readOnly;
+  final bool enabled;
   final VoidCallback? onTap;
   final ValueChanged<String>? onChanged;
   @override
@@ -35,7 +46,7 @@ class AuthTextField extends StatefulWidget {
 }
 
 class _AuthTextFieldState extends State<AuthTextField> {
-  static const _fieldHeight = 56.0;
+  static const _fieldHeight = AuthInputStyle.height;
   static const _heightPerExtraTextPixel = 2.0;
   static const _floatingLabelKey = Key('auth-floating-label');
   bool _isHidden = true;
@@ -74,14 +85,8 @@ class _AuthTextFieldState extends State<AuthTextField> {
         _fieldHeight +
         (textScaler.scale(textSize) - textSize).clamp(0.0, double.infinity) *
             _heightPerExtraTextPixel;
-    final suffixIconConstraints = BoxConstraints.tightFor(
-      width: isPassword ? 48 : 0,
-      height: fieldHeight,
-    );
-    final border = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AgrisellColors.borderLine),
-    );
+    const suffixIconConstraints = BoxConstraints(minWidth: 48, minHeight: 40);
+    const border = AuthInputStyle.border;
     final errorBorder = border.copyWith(
       borderSide: const BorderSide(color: AgrisellColors.statusRedText),
     );
@@ -101,6 +106,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
                 autofillHints: widget.autofillHints,
                 inputFormatters: widget.inputFormatters,
                 readOnly: widget.readOnly,
+                enabled: widget.enabled,
                 onTap: widget.onTap,
                 onChanged: _handleChanged,
                 cursorColor: AgrisellColors.authGreen,
@@ -113,10 +119,10 @@ class _AuthTextFieldState extends State<AuthTextField> {
                   ),
                   isDense: true,
                   filled: true,
-                  fillColor: AgrisellColors.fieldFill,
+                  fillColor: AuthInputStyle.fillColor,
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
+                    horizontal: 8,
+                    vertical: 18,
                   ),
                   border: border,
                   enabledBorder: border,
@@ -129,7 +135,18 @@ class _AuthTextFieldState extends State<AuthTextField> {
                   errorBorder: errorBorder,
                   focusedErrorBorder: errorBorder,
                   disabledBorder: border,
-                  suffixIconConstraints: suffixIconConstraints,
+                  prefixIcon: AuthInputStyle.iconBadge(
+                    widget.leadingIcon ??
+                        AuthInputStyle.iconFor(widget.hintText),
+                  ),
+                  prefixIconConstraints: const BoxConstraints(
+                    minWidth: 52,
+                    minHeight: 40,
+                  ),
+                  suffixIconConstraints:
+                      isPassword || widget.trailingIcon != null
+                      ? suffixIconConstraints
+                      : null,
                   suffixIcon: isPassword
                       ? IconButton(
                           tooltip: _isHidden
@@ -147,7 +164,13 @@ class _AuthTextFieldState extends State<AuthTextField> {
                                 : Icons.visibility_off_outlined,
                           ),
                         )
-                      : const SizedBox.shrink(),
+                      : widget.trailingIcon != null
+                      ? Icon(
+                          widget.trailingIcon,
+                          color: AgrisellColors.mutedText,
+                          size: 22,
+                        )
+                      : null,
                 ),
                 style: TextStyle(
                   color: AgrisellColors.brandBlack,
@@ -163,7 +186,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
                 child: IgnorePointer(
                   child: Container(
                     key: _floatingLabelKey,
-                    color: AgrisellColors.fieldFill,
+                    color: AuthInputStyle.fillColor,
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Text(
                       widget.hintText,

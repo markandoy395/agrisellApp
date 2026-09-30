@@ -117,7 +117,7 @@ class _SaleProductsScreenState extends State<SaleProductsScreen> {
           widget.title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
         ),
       ),
       body: RefreshIndicator(

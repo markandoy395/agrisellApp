@@ -149,6 +149,52 @@ void main() {
       '2026-08-09T02:30:00.000Z',
     );
   });
+
+  test('address edits notify once and invalidate captured GPS', () async {
+    final controller = RiderSignUpController(storage: _MemoryDraftStorage());
+    addTearDown(controller.dispose);
+    await controller.initialize();
+    controller.updateLocation(
+      label: '12 Rizal Street',
+      latitude: 8.4822,
+      longitude: 124.6472,
+      accuracyMeters: 8,
+      capturedAt: DateTime.utc(2026, 8, 9),
+    );
+    var notifications = 0;
+    controller.addListener(() => notifications++);
+
+    void update(String street) => controller.updateAddress(
+      addressLine: street,
+      province: 'Misamis Oriental',
+      cityMunicipality: 'Cagayan de Oro City',
+      barangay: 'Cogon',
+      postalCode: '9000',
+      location: '$street, Cogon, Cagayan de Oro City',
+    );
+
+    update('14 Rizal Street');
+    expect(notifications, 1);
+    expect(RiderSignUpValidator.hasValidCoordinates(controller.draft), isFalse);
+    expect(controller.draft.value(RiderSignUpFields.locationAccuracy), isEmpty);
+    expect(
+      controller.draft.value(RiderSignUpFields.locationCapturedAt),
+      isEmpty,
+    );
+
+    update('14 Rizal Street');
+    expect(notifications, 1);
+
+    controller.updateLocation(
+      label: '14 Rizal Street',
+      latitude: 8.4822,
+      longitude: 124.6472,
+      accuracyMeters: 8,
+      capturedAt: DateTime.utc(2026, 8, 9),
+    );
+    controller.updateValue(RiderSignUpFields.barangay, 'Macasandig');
+    expect(RiderSignUpValidator.hasValidCoordinates(controller.draft), isFalse);
+  });
 }
 
 class _MemoryDraftStorage implements RiderSignUpDraftStorage {

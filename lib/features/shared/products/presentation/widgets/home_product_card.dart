@@ -12,21 +12,16 @@ class HomeProductCard extends StatelessWidget {
   });
   final HomeProduct product;
   final VoidCallback onTap;
-  static const imageHeight = 154.0;
+  static const imageHeight = 118.0;
 
-  static double heightForWidth(double width) {
-    // Price and two metadata rows need the full details height even on compact
-    // screens. Keeping this consistent also prevents sale cards from clipping.
-    return imageHeight + 98;
-  }
+  static double heightForWidth(double width) => imageHeight + 90;
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final titleSize = width < 380 ? 13.0 : 15.0;
     final detailsHeight =
         HomeProductCard.heightForWidth(width) - HomeProductCard.imageHeight;
-    final borderRadius = BorderRadius.circular(13);
+    final borderRadius = BorderRadius.circular(10);
 
     return Semantics(
       container: true,
@@ -45,12 +40,14 @@ class HomeProductCard extends StatelessWidget {
           borderRadius: borderRadius,
           child: DecoratedBox(
             decoration: BoxDecoration(
+              color: AgrisellColors.surface,
               borderRadius: borderRadius,
+              border: Border.all(color: AgrisellColors.borderLine),
               boxShadow: [
                 BoxShadow(
-                  color: AgrisellColors.brandBlack.withValues(alpha: 0.08),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
+                  color: AgrisellColors.brandBlack.withValues(alpha: 0.05),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -83,10 +80,7 @@ class HomeProductCard extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     height: detailsHeight,
-                    child: HomeProductCardDetails(
-                      product: product,
-                      titleSize: titleSize,
-                    ),
+                    child: HomeProductCardDetails(product: product),
                   ),
                 ],
               ),

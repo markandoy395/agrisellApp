@@ -4,12 +4,20 @@ class ProductReview {
     required this.rating,
     required this.comment,
     this.submittedAt,
+    this.adminResponse,
+    this.adminRespondedAt,
+    this.moderationNote,
+    this.moderationStatus,
   });
 
   final String reviewerName;
   final double rating;
   final String comment;
   final DateTime? submittedAt;
+  final String? adminResponse;
+  final DateTime? adminRespondedAt;
+  final String? moderationNote;
+  final String? moderationStatus;
 }
 
 class ProductReviewSummary {

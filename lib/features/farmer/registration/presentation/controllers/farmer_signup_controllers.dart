@@ -4,8 +4,16 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/utils/philippine_phone_number.dart';
 import 'package:agresell_app/features/farmer/registration/domain/farmer_signup_data.dart';
+import 'package:agresell_app/features/farmer/registration/domain/philippine_crops.dart';
 
 class FarmerSignupControllers {
+  FarmerSignupControllers() {
+    for (final controller in [address, province, city, barangay]) {
+      controller.addListener(_syncFarmAddress);
+    }
+  }
+
+  bool sameAsFarmerAddress = false;
   final email = TextEditingController();
   final password = TextEditingController();
   final confirmPassword = TextEditingController();
@@ -30,7 +38,7 @@ class FarmerSignupControllers {
   final longitude = TextEditingController();
   final yearsOfExperience = TextEditingController();
   final farmSize = TextEditingController();
-  final farmSizeUnit = TextEditingController(text: 'hectares');
+  final farmSizeUnit = TextEditingController(text: 'ha');
   final farmingType = TextEditingController();
   final mainCrops = TextEditingController();
   final irrigationType = TextEditingController();
@@ -80,7 +88,7 @@ class FarmerSignupControllers {
     lastName: lastName.text,
     phoneNumber: PhilippinePhoneNumber.normalize(phone.text) ?? phone.text,
     farmName: farmName.text,
-    mainCrops: mainCrops.text.split(',').map((crop) => crop.trim()).toList(),
+    mainCrops: PhilippineCrops.parseSelection(mainCrops.text),
     middleName: middleName.text,
     suffix: suffix.text,
     dateOfBirth: dateOfBirth.text,
@@ -115,18 +123,38 @@ class FarmerSignupControllers {
   }
 
   bool get hasPersonalAddressDetails => [
+    address,
     province,
     city,
     barangay,
-  ].any((controller) => controller.text.trim().isNotEmpty);
+  ].every((controller) => controller.text.trim().isNotEmpty);
+
+  void setSameAsFarmerAddress(bool value) {
+    sameAsFarmerAddress = value;
+    if (value) copyPersonalAddressDetailsToFarm();
+  }
+
+  void _syncFarmAddress() {
+    if (sameAsFarmerAddress) copyPersonalAddressDetailsToFarm();
+  }
 
   void copyPersonalAddressDetailsToFarm() {
-    farmProvince.text = province.text.trim();
-    farmCity.text = city.text.trim();
-    farmBarangay.text = barangay.text.trim();
+    final pairs = [
+      (farmAddress, address),
+      (farmProvince, province),
+      (farmCity, city),
+      (farmBarangay, barangay),
+    ];
+    for (final (target, source) in pairs) {
+      final value = source.text.trim();
+      if (target.text != value) target.text = value;
+    }
   }
 
   void dispose() {
+    for (final controller in [address, province, city, barangay]) {
+      controller.removeListener(_syncFarmAddress);
+    }
     for (final controller in all) {
       controller.dispose();
     }

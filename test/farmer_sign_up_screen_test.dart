@@ -28,9 +28,71 @@ void main() {
       ),
     );
 
-    expect(find.text('Step 2 of 3'), findsOneWidget);
+    expect(find.text('2 of 3'), findsOneWidget);
     expect(find.text('Personal information'), findsOneWidget);
     expect(find.widgetWithText(TextField, 'Email'), findsNothing);
+  });
+
+  testWidgets('profile header back button returns to account step', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(430, 932));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AgrisellTheme.light,
+        home: const FarmerSignUpScreen(
+          initialVerifiedEmail: 'farmer@example.com',
+        ),
+      ),
+    );
+
+    expect(find.text('Tell us more about yourself.'), findsOneWidget);
+    expect(
+      find.text('Easily find and connect with your contacts.'),
+      findsOneWidget,
+    );
+    await tester.tap(find.byTooltip('Back'));
+    await tester.pumpAndSettle();
+    expect(find.text('1 of 3'), findsOneWidget);
+    expect(find.text('Account information'), findsOneWidget);
+  });
+
+  testWidgets('populated account fields support enlarged device text', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    await tester.binding.setSurfaceSize(const Size(430, 932));
+    addTearDown(() {
+      tester.view.resetDevicePixelRatio();
+      tester.binding.setSurfaceSize(null);
+    });
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AgrisellTheme.light,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: const TextScaler.linear(1.35)),
+          child: child!,
+        ),
+        home: const FarmerSignUpScreen(),
+      ),
+    );
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Email'),
+      'farmer@example.com',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Password'),
+      'Password123!',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Confirm password'),
+      'Password123!',
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets(
@@ -45,7 +107,7 @@ void main() {
         ),
       );
 
-      expect(find.text('Step 1 of 3'), findsOneWidget);
+      expect(find.text('1 of 3'), findsOneWidget);
       await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
       await tester.pump();
       expect(find.text('Enter a valid email address.'), findsOneWidget);
@@ -67,7 +129,7 @@ void main() {
       await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Step 2 of 3'), findsOneWidget);
+      expect(find.text('2 of 3'), findsOneWidget);
       expect(find.widgetWithText(TextField, 'Email'), findsNothing);
       expect(find.widgetWithText(TextField, 'Password'), findsNothing);
       expect(find.widgetWithText(TextField, 'Confirm password'), findsNothing);
@@ -182,7 +244,7 @@ void main() {
       await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Step 3 of 3'), findsOneWidget);
+      expect(find.text('3 of 3'), findsOneWidget);
       expect(gps.locationSettingsOpenCalls, 1);
       expect(gps.currentPositionCalls, 0);
 

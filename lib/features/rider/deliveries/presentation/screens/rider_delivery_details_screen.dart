@@ -33,6 +33,8 @@ import 'package:agresell_app/features/rider/safety/domain/rider_safety_report.da
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_request_overview.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_evidence_view.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_request_detail_sections.dart';
+import 'package:agresell_app/features/shared/waybills/presentation/widgets/delivery_waybill_sheet.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/utils/rider_delivery_waybill_extension.dart';
 
 part 'rider_delivery_details_acceptance.dart';
 part 'rider_delivery_details_status.dart';

@@ -17,14 +17,17 @@ class AuthDivider extends StatelessWidget {
         const Expanded(
           child: Divider(color: AgrisellColors.dividerLine, thickness: 3),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            text,
-            style: TextStyle(
-              color: AgrisellColors.brandBlack,
-              fontSize: lerpDouble(12, 14, scale),
-              fontWeight: FontWeight.w400,
+        Flexible(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: lerpDouble(8, 16, scale)),
+            child: Text(
+              text,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AgrisellColors.brandBlack,
+                fontSize: lerpDouble(12, 14, scale),
+                fontWeight: FontWeight.w400,
+              ),
             ),
           ),
         ),

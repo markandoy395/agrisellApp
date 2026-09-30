@@ -103,7 +103,7 @@ Production code must never import `test/` fixtures or local demo stores.
 ## What to test by change type
 
 | Change | Minimum relevant validation |
-| --- | --- |
+| :--- | :--- |
 | Pure domain rule or validator | Targeted unit test and `flutter analyze` |
 | Repository mapping or mutation | Repository tests, error mapping, and affected controller tests |
 | Screen or reusable widget | Widget tests for primary states and interactions |

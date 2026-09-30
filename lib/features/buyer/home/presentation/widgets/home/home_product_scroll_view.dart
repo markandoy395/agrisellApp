@@ -28,8 +28,12 @@ class HomeProductScrollView extends StatelessWidget {
     required this.onReset,
     required this.onProductTap,
     required this.onRefresh,
+    this.onOpenDeals,
     this.loadFailed = false,
     this.isLoading = false,
+    this.isLoadingMore = false,
+    this.hasMore = true,
+    this.onLoadMore,
     super.key,
   });
 
@@ -44,38 +48,46 @@ class HomeProductScrollView extends StatelessWidget {
   final VoidCallback onReset;
   final ValueChanged<HomeProduct> onProductTap;
   final RefreshCallback onRefresh;
+  final VoidCallback? onOpenDeals;
+  final VoidCallback? onLoadMore;
   final bool loadFailed;
   final bool isLoading;
+  final bool isLoadingMore;
+  final bool hasMore;
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final horizontalPadding = width < 380 ? 18.0 : 24.0;
-    final contentPadding = width < 380 ? 10.0 : 14.0;
-    final sectionGap = width < 380 ? 18.0 : 24.0;
-    final contentGap = width < 380 ? 16.0 : 20.0;
-    final bannerHeight = (width * 0.48).clamp(164.0, 220.0);
+    final horizontalPadding = width < 380 ? 12.0 : 16.0;
+    final contentPadding = width < 380 ? 12.0 : 14.0;
+    final contentGap = width < 380 ? 12.0 : 16.0;
+    final bannerHeight = (width * 0.44).clamp(168.0, 196.0);
 
-    return SafeArea(
-      bottom: false,
-      child: RefreshIndicator(
-        color: AgrisellColors.authGreen,
-        onRefresh: onRefresh,
-        child: CustomScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          slivers: [
+    return RefreshIndicator(
+      color: AgrisellColors.authGreen,
+      onRefresh: onRefresh,
+      child: SafeArea(
+        bottom: false,
+        child: NotificationListener<ScrollNotification>(
+          onNotification: (notification) {
+            final maxScroll = notification.metrics.maxScrollExtent;
+            final pixels = notification.metrics.pixels;
+            if (maxScroll > 0) {
+              final scrollDepth = pixels / maxScroll;
+              if (scrollDepth >= 0.80) {
+                onLoadMore?.call();
+              }
+            }
+            return false;
+          },
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
             SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  horizontalPadding,
-                  20,
-                  horizontalPadding,
-                  0,
-                ),
-                child: HomeEntranceAnimation(child: const HomeHeader()),
+              child: HomeEntranceAnimation(
+                child: HomeHeader(horizontalPadding: horizontalPadding),
               ),
             ),
-            SliverToBoxAdapter(child: SizedBox(height: sectionGap)),
             SliverPersistentHeader(
               pinned: true,
               delegate: HomePinnedSearchHeaderDelegate(
@@ -100,6 +112,15 @@ class HomeProductScrollView extends StatelessWidget {
               ),
             ),
             SliverToBoxAdapter(child: SizedBox(height: contentGap)),
+            if (onOpenDeals != null) ...[
+              SliverPadding(
+                padding: EdgeInsets.symmetric(horizontal: contentPadding),
+                sliver: SliverToBoxAdapter(
+                  child: _HomeDealsQuickBanner(onTap: onOpenDeals),
+                ),
+              ),
+              SliverToBoxAdapter(child: SizedBox(height: contentGap)),
+            ],
             if (saleProducts.isNotEmpty) ...[
               SliverToBoxAdapter(
                 child: HomeSaleProductsSection(
@@ -157,7 +178,7 @@ class HomeProductScrollView extends StatelessWidget {
                       : 'No commodities have been posted yet. Pull down to refresh the marketplace.',
                 ),
               )
-            else
+            else ...[
               SliverPadding(
                 padding: EdgeInsets.symmetric(horizontal: contentPadding),
                 sliver: HomeProductGrid(
@@ -165,7 +186,132 @@ class HomeProductScrollView extends StatelessWidget {
                   onProductTap: onProductTap,
                 ),
               ),
+              if (isLoadingMore)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Center(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.2,
+                              color: AgrisellColors.authGreen,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            'Loading more products...',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AgrisellColors.brandBlack.withValues(alpha: 0.6),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              else if (!hasMore && products.length >= 10)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Center(
+                      child: Text(
+                        'You’ve reached the end of the catalog',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AgrisellColors.brandBlack.withValues(alpha: 0.45),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
             const SliverToBoxAdapter(child: SizedBox(height: 112)),
+          ],
+        ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HomeDealsQuickBanner extends StatelessWidget {
+  const _HomeDealsQuickBanner({this.onTap});
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF1B5E20), Color(0xFF2E7D32)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: AgrisellColors.brandBlack.withValues(alpha: 0.12),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.local_offer_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Deals & Voucher Wallet',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    'Browse active promos, vouchers & limited discounts',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: Colors.white70,
+              size: 14,
+            ),
           ],
         ),
       ),

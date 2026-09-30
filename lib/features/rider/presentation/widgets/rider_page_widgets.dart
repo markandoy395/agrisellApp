@@ -33,6 +33,7 @@ class RiderPageHeader extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
+                    fontFamily: 'Poppins',
                     color: AgrisellColors.surface,
                     fontSize: 15,
                     height: 1.1,
@@ -46,10 +47,11 @@ class RiderPageHeader extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: AgrisellColors.surface.withValues(alpha: 0.86),
-                      fontSize: 12,
-                      height: 1,
-                      fontWeight: FontWeight.w500,
+                      fontFamily: 'Poppins',
+                      color: AgrisellColors.surface.withValues(alpha: 0.9),
+                      fontSize: 15,
+                      height: 1.2,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],

@@ -62,6 +62,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   final _shownApprovalIds = <String>{};
   var _filter = NotificationFilter.all;
   int? _lastReportedUnreadCount;
+  late final PageController _pageController;
 
   void _updateUi(VoidCallback update) => setState(update);
 
@@ -72,6 +73,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
     _ownsController = widget.controller == null;
     _controller = widget.controller ?? NotificationController();
     _updates = Listenable.merge([_orderController, _controller]);
+    _pageController = PageController(
+      initialPage: NotificationFilter.values.indexOf(_filter),
+    );
     _watchDatabaseNotifications();
   }
 
@@ -93,8 +97,34 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   void dispose() {
     _notificationSubscription?.cancel();
+    _pageController.dispose();
     if (_ownsController) _controller.dispose();
     super.dispose();
+  }
+
+  void _selectFilter(NotificationFilter filter) {
+    if (_filter == filter) return;
+    setState(() => _filter = filter);
+    final targetIndex = NotificationFilter.values.indexOf(filter);
+    if (_pageController.hasClients) {
+      final currentPage = _pageController.page?.round();
+      if (currentPage != targetIndex) {
+        _pageController.animateToPage(
+          targetIndex,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOutCubic,
+        );
+      }
+    }
+  }
+
+  void _onPageChanged(int index) {
+    if (index >= 0 && index < NotificationFilter.values.length) {
+      final newFilter = NotificationFilter.values[index];
+      if (_filter != newFilter) {
+        setState(() => _filter = newFilter);
+      }
+    }
   }
 
   @override
@@ -119,7 +149,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               NotificationHeader(unreadCount: unreadCount),
               NotificationFilterTabs(
                 selected: _filter,
-                onSelected: (value) => setState(() => _filter = value),
+                onSelected: _selectFilter,
               ),
               OrderUpdatesBar(
                 unreadCount: unreadCount,
@@ -190,13 +220,22 @@ class _NotificationScreenState extends State<NotificationScreen> {
         actionLabel: _retryAction == null ? null : 'Try again',
         onAction: _retryAction,
       ),
-      NotificationLoadState.ready => NotificationFeed(
-        notifications: notifications,
-        filter: _filter,
-        controller: _controller,
-        onOpen: _open,
-        onToggleRead: _toggleRead,
-        onDelete: _delete,
+      NotificationLoadState.ready => PageView.builder(
+        controller: _pageController,
+        onPageChanged: _onPageChanged,
+        itemCount: NotificationFilter.values.length,
+        itemBuilder: (context, index) {
+          final filter = NotificationFilter.values[index];
+          return NotificationFeed(
+            key: ValueKey(filter),
+            notifications: notifications,
+            filter: filter,
+            controller: _controller,
+            onOpen: _open,
+            onToggleRead: _toggleRead,
+            onDelete: _delete,
+          );
+        },
       ),
     };
   }

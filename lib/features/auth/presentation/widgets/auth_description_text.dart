@@ -22,7 +22,7 @@ class AuthDescriptionText extends StatelessWidget {
           textAlign: TextAlign.center,
           style: const TextStyle(
             color: AgrisellColors.brandBlack,
-            fontSize: 16,
+            fontSize: 15,
             fontWeight: FontWeight.w400,
             height: 1.18,
           ),

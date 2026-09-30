@@ -44,7 +44,7 @@ class HomeSaleProductsSection extends StatelessWidget {
                         'Sale products',
                         style: TextStyle(
                           color: AgrisellColors.headingGreen,
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.w800,
                         ),
                       ),
@@ -52,7 +52,7 @@ class HomeSaleProductsSection extends StatelessWidget {
                         'Limited-time prices selected for you',
                         style: TextStyle(
                           color: AgrisellColors.mutedText,
-                          fontSize: 11,
+                          fontSize: 12,
                           fontWeight: FontWeight.w500,
                         ),
                       ),

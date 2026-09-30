@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:agresell_app/features/rider/deliveries/data/rider_live_location_store.dart';
 import 'package:agresell_app/features/rider/deliveries/data/rider_location_outbox.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
-import 'package:agresell_app/features/rider/deliveries/domain/delivery_route.dart';
+import 'package:agresell_app/features/shared/routing/domain/delivery_route.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_status.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_status_update.dart';

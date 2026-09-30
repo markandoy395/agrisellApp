@@ -40,9 +40,7 @@ void main() {
     expect(selected, same(testHomeProducts.first));
   });
 
-  testWidgets('home product grid keeps the original image height', (
-    tester,
-  ) async {
+  testWidgets('home product grid uses a compact image height', (tester) async {
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
       tester.view.resetDevicePixelRatio();
@@ -69,7 +67,7 @@ void main() {
     }
 
     await pumpGrid(const Size(320, 568));
-    expect(tester.getSize(find.byType(Hero).first).height, 154);
+    expect(tester.getSize(find.byType(Hero).first).height, 118);
     final productImage = tester.widget<ResponsiveAssetImage>(
       find.descendant(
         of: find.byType(Hero).first,
@@ -86,7 +84,7 @@ void main() {
     expect(tester.takeException(), isNull);
 
     await pumpGrid(const Size(430, 932));
-    expect(tester.getSize(find.byType(Hero).first).height, 154);
+    expect(tester.getSize(find.byType(Hero).first).height, 118);
     expect(tester.takeException(), isNull);
   });
 

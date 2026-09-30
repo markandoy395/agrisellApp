@@ -45,7 +45,7 @@ Future<bool> showRiderMapMarkerSheet(
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: AgrisellColors.headingGreen,
-                          fontSize: 17,
+                          fontSize: 15,
                           fontWeight: FontWeight.w800,
                         ),
                       ),
@@ -170,7 +170,7 @@ Future<bool> showRiderMapFarmSheet(
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: AgrisellColors.headingGreen,
-                          fontSize: 17,
+                          fontSize: 15,
                           fontWeight: FontWeight.w800,
                         ),
                       ),

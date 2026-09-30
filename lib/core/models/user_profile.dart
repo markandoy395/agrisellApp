@@ -11,6 +11,7 @@ class UserProfile {
     this.extensionName = '',
     this.shippingLatitude,
     this.shippingLongitude,
+    this.avatarUrl,
   });
 
   final String name;
@@ -24,6 +25,7 @@ class UserProfile {
   final String extensionName;
   final double? shippingLatitude;
   final double? shippingLongitude;
+  final String? avatarUrl;
 
   String get headerName {
     final value = [
@@ -46,6 +48,7 @@ class UserProfile {
     String? extensionName,
     double? shippingLatitude,
     double? shippingLongitude,
+    String? avatarUrl,
   }) {
     return UserProfile(
       name: name ?? this.name,
@@ -59,6 +62,7 @@ class UserProfile {
       extensionName: extensionName ?? this.extensionName,
       shippingLatitude: shippingLatitude ?? this.shippingLatitude,
       shippingLongitude: shippingLongitude ?? this.shippingLongitude,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
     );
   }
 

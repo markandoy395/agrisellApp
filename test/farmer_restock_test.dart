@@ -67,7 +67,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('OUT OF STOCK'), findsOneWidget);
-    await tester.tap(find.text('Restock'));
+    await tester.tap(find.byTooltip('Restock product'));
     await tester.pumpAndSettle();
 
     expect(find.text('Current stock'), findsOneWidget);
@@ -85,6 +85,29 @@ void main() {
     expect(find.text('OUT OF STOCK'), findsNothing);
     expect(find.text('Stock: 20 kg'), findsOneWidget);
     expect(repository.restockCalls, 1);
+  });
+
+  testWidgets('product card remains usable at compact mobile width', (
+    tester,
+  ) async {
+    final repository = _FakeRestockRepository([_product(stock: 8)]);
+    await tester.binding.setSurfaceSize(const Size(320, 568));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AgrisellTheme.light,
+        home: Scaffold(
+          body: FarmerDashboardScreen(commodityRepository: repository),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Fertilizer'), findsOneWidget);
+    expect(find.text('Stock: 8 kg'), findsOneWidget);
+    expect(find.byTooltip('Add product stock'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }
 

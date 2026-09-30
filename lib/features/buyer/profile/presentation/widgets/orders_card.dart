@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
+import 'package:agresell_app/features/buyer/orders/presentation/screens/buyer_refund_tracker_screen.dart';
+import 'package:agresell_app/features/buyer/orders/presentation/screens/order_tracking_screen.dart';
+import 'package:agresell_app/features/buyer/profile/presentation/widgets/buyer_profile_style.dart';
+import 'package:agresell_app/features/buyer/profile/presentation/widgets/order_status_item.dart';
 import 'package:agresell_app/features/shared/orders/data/home_order_statuses.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_status.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/order_controller.dart';
-import 'package:agresell_app/features/buyer/orders/presentation/screens/order_tracking_screen.dart';
-import 'package:agresell_app/features/buyer/profile/presentation/widgets/order_status_item.dart';
-import 'package:agresell_app/features/shared/widgets/profile/profile_card_shell.dart';
-import 'package:agresell_app/features/shared/widgets/profile/profile_section_label.dart';
-import 'package:agresell_app/features/shared/widgets/profile/profile_text_styles.dart';
 
 class OrdersCard extends StatelessWidget {
   const OrdersCard({super.key});
@@ -21,45 +20,53 @@ class OrdersCard extends StatelessWidget {
       animation: controller,
       builder: (context, _) {
         final width = MediaQuery.sizeOf(context).width;
-        final shortcutSidePadding = width < 380 ? 8.0 : 10.0;
+        final shortcutSidePadding = width < 380 ? 4.0 : 8.0;
 
-        return ProfileCardShell(
+        return BuyerProfileCard(
           child: Padding(
-            padding: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    const ProfileSectionLabel(text: 'My Orders'),
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: InkResponse(
-                          onTap: () => _openOrderTracking(context),
-                          radius: 28,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 4,
-                              vertical: 6,
+                    const Expanded(
+                      child: Text('My orders', style: BuyerProfileStyle.heading),
+                    ),
+                    InkWell(
+                      onTap: () => _openOrderTracking(context),
+                      borderRadius: BorderRadius.circular(8),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 4,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'View all',
+                              style: TextStyle(
+                                color: BuyerProfileStyle.green,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                            child: Text(
-                              'View All Orders  >',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: ProfileTextStyles.cardAction(context),
+                            SizedBox(width: 2),
+                            Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: BuyerProfileStyle.green,
+                              size: 12,
                             ),
-                          ),
+                          ],
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
                   ],
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 14),
                 Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: shortcutSidePadding,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: shortcutSidePadding),
                   child: Row(
                     children: [
                       for (final item in homeOrderStatuses)
@@ -77,6 +84,54 @@ class OrdersCard extends StatelessWidget {
                     ],
                   ),
                 ),
+                const SizedBox(height: 14),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: shortcutSidePadding),
+                  child: InkWell(
+                    key: const ValueKey('buyer-refunds-shortcut'),
+                    onTap: () => _openRefundTracker(context),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF7F4FA),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: const Color(0xFF9C27B0).withValues(alpha: 0.15),
+                        ),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.receipt_long_outlined,
+                            size: 18,
+                            color: Color(0xFF7B1FA2),
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'Refunds & Returns · Track status',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF7B1FA2),
+                              ),
+                            ),
+                          ),
+                          Icon(
+                            Icons.chevron_right_rounded,
+                            size: 20,
+                            color: Color(0xFF7B1FA2),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -92,6 +147,14 @@ class OrdersCard extends StatelessWidget {
     Navigator.of(context).push(
       agrisellPageRoute<void>(
         builder: (_) => OrderTrackingScreen(initialFilter: filter),
+      ),
+    );
+  }
+
+  void _openRefundTracker(BuildContext context) {
+    Navigator.of(context).push(
+      agrisellPageRoute<void>(
+        builder: (_) => const BuyerRefundTrackerScreen(),
       ),
     );
   }

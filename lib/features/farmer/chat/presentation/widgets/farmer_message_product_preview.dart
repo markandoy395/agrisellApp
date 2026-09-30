@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/farmer/chat/presentation/widgets/message_bottom_border.dart';
 import 'package:agresell_app/features/shared/chat/domain/marketplace_conversation.dart';
-import 'package:agresell_app/features/shared/products/presentation/widgets/product_thumbnail.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_product_thumbnail.dart';
 
 class FarmerMessageProductPreview extends StatelessWidget {
   const FarmerMessageProductPreview({required this.thread, super.key});
@@ -30,10 +30,7 @@ class FarmerMessageProductPreview extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(10, 10, 10, 14),
             child: Row(
               children: [
-                ProductThumbnail.square(
-                  asset: thread.productImageUrl == null
-                      ? 'assets/images/vege.jpeg'
-                      : null,
+                ChatProductThumbnail(
                   imageUrl: thread.productImageUrl,
                   size: 58,
                   borderRadius: 8,

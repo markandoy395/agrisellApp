@@ -25,10 +25,10 @@ class ProductDetailPriceLine extends StatelessWidget {
               'SALE',
               style: TextStyle(
                 color: AgrisellColors.surface,
-                fontSize: 9,
+                fontSize: 12,
                 height: 1,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.4,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.3,
               ),
             ),
           ),

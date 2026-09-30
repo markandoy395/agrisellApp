@@ -126,4 +126,13 @@ class _ReservationRepository implements OrderRepository {
 
   @override
   Future<void> save(String accountId, Iterable<PlacedOrder> orders) async {}
+
+  @override
+  Future<void> reportOrderDispute({
+    required String accountId,
+    required String orderId,
+    required String category,
+    required String reason,
+    required String requestedResolution,
+  }) async {}
 }

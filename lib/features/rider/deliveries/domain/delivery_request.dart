@@ -4,7 +4,7 @@ import 'package:agresell_app/features/rider/deliveries/domain/delivery_outcome.d
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_payment.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_location.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_priority.dart';
-import 'package:agresell_app/features/rider/deliveries/domain/delivery_route.dart';
+import 'package:agresell_app/features/shared/routing/domain/delivery_route.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request_metadata.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_registration.dart';

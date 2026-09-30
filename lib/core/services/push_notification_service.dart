@@ -86,17 +86,23 @@ class PushNotificationService {
     if (recipient != null && recipient != userId) {
       _pendingAction = null;
     }
-    await _requestPermission();
-    final token = await FirebaseMessaging.instance.getToken();
-    if (token != null) await _saveToken(userId, token);
-    await _tokenRefreshSubscription?.cancel();
-    _tokenRefreshSubscription = FirebaseMessaging.instance.onTokenRefresh
-        .listen((newToken) {
-          final currentUserId = _userId;
-          if (currentUserId != null) {
-            unawaited(_saveToken(currentUserId, newToken));
-          }
-        });
+    try {
+      await _requestPermission();
+      final token = await FirebaseMessaging.instance.getToken();
+      if (token != null) await _saveToken(userId, token);
+      await _tokenRefreshSubscription?.cancel();
+      _tokenRefreshSubscription = FirebaseMessaging.instance.onTokenRefresh
+          .listen((newToken) {
+            final currentUserId = _userId;
+            if (currentUserId != null) {
+              unawaited(_saveToken(currentUserId, newToken));
+            }
+          });
+    } on Object catch (error) {
+      // Push registration is optional; a missing Firebase configuration must
+      // not leave an unhandled error in the account activation flow.
+      debugPrint('Push notification registration failed: $error');
+    }
   }
 
   Future<void> _requestPermission() async {

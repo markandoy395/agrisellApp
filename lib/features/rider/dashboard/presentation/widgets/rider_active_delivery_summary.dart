@@ -96,7 +96,7 @@ class RiderActiveDeliverySummary extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: AgrisellColors.headingGreen,
-                              fontSize: 16,
+                              fontSize: 15,
                               fontWeight: FontWeight.w900,
                             ),
                           ),
@@ -106,7 +106,7 @@ class RiderActiveDeliverySummary extends StatelessWidget {
                           active.orderNumber,
                           style: const TextStyle(
                             color: AgrisellColors.mutedText,
-                            fontSize: 11,
+                            fontSize: 12,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
@@ -245,7 +245,7 @@ class _RouteStop extends StatelessWidget {
               label,
               style: const TextStyle(
                 color: AgrisellColors.mutedText,
-                fontSize: 11,
+                fontSize: 12,
                 height: 1.1,
                 fontWeight: FontWeight.w800,
               ),

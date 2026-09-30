@@ -4,11 +4,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final _controller = BasketController.instance;
   final _orderController = OrderController.instance;
   final _profile = currentAuthenticatedUserProfile();
+  final _voucherController = TextEditingController();
   late final ConfirmedLocationRepository _locationRepository;
   ConfirmedLocation? _deliveryLocation;
   OrderPayment _payment = const OrderPayment.cashOnDelivery();
   int? _gcashFarmId;
   var _isPlacingOrder = false;
+  AppliedVoucher? _appliedVoucher;
+  var _isValidatingVoucher = false;
+  String? _voucherError;
 
   @override
   void initState() {
@@ -16,6 +20,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _locationRepository =
         widget.locationRepository ?? ConfirmedLocationRepository();
     unawaited(_restoreDeliveryLocation());
+  }
+
+  @override
+  void dispose() {
+    _voucherController.dispose();
+    super.dispose();
   }
 
   Future<void> _restoreDeliveryLocation() async {
@@ -129,6 +139,108 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
+  double get _itemsSubtotal {
+    var subtotal = 0.0;
+    for (final item in _controller.selectedItems) {
+      if (item.hasSale && item.originalPriceLabel != null) {
+        subtotal += item.quantity * _parsePrice(item.originalPriceLabel!);
+      } else {
+        subtotal += item.quantity * item.pricePerKg;
+      }
+    }
+    return double.parse(subtotal.toStringAsFixed(2));
+  }
+
+  double get _productSaleDiscount {
+    var discount = 0.0;
+    for (final item in _controller.selectedItems) {
+      if (item.hasSale && item.originalPriceLabel != null) {
+        final original = _parsePrice(item.originalPriceLabel!);
+        if (original > item.pricePerKg) {
+          discount += item.quantity * (original - item.pricePerKg);
+        }
+      }
+    }
+    return double.parse(discount.toStringAsFixed(2));
+  }
+
+  double get _voucherDiscount => _appliedVoucher?.discountAmount ?? 0.0;
+
+  double get _finalCheckoutTotal {
+    final total = _controller.selectedTotal - _voucherDiscount;
+    return total < 0 ? 0.0 : double.parse(total.toStringAsFixed(2));
+  }
+
+  static double _parsePrice(String price) {
+    final normalized = price.replaceAll(',', '');
+    final match = RegExp(r'\d+(?:\.\d+)?').firstMatch(normalized);
+    if (match == null) return 0.0;
+    return double.tryParse(match.group(0) ?? '') ?? 0.0;
+  }
+
+  Future<void> _applyVoucher() async {
+    final code = _voucherController.text.trim();
+    if (code.isEmpty) {
+      setState(() => _voucherError = 'Please enter a voucher code.');
+      return;
+    }
+    setState(() {
+      _isValidatingVoucher = true;
+      _voucherError = null;
+    });
+    try {
+      final voucher = await widget.voucherService.validateVoucher(
+        code: code,
+        items: _controller.selectedItems,
+      );
+      if (!mounted) return;
+      setState(() {
+        _appliedVoucher = voucher;
+        _voucherError = null;
+      });
+      ScaffoldMessenger.of(context).showAppSnackBar(
+        SnackBar(
+          content: Text(
+            'Voucher "${voucher.code}" applied: ${voucher.discountLabel}',
+          ),
+        ),
+      );
+    } on VoucherValidationException catch (error) {
+      if (!mounted) return;
+      setState(() => _voucherError = error.message);
+    } catch (_) {
+      if (!mounted) return;
+      setState(
+        () => _voucherError = 'Unable to validate voucher. Please try again.',
+      );
+    } finally {
+      if (mounted) setState(() => _isValidatingVoucher = false);
+    }
+  }
+
+  void _removeVoucher() {
+    setState(() {
+      _appliedVoucher = null;
+      _voucherError = null;
+      _voucherController.clear();
+    });
+  }
+
+  Future<void> _browseVouchers() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => CheckoutVoucherPickerSheet(
+        cartItems: _controller.selectedItems,
+        onSelectVoucher: (voucher) {
+          _voucherController.text = voucher.code ?? '';
+          unawaited(_applyVoucher());
+        },
+      ),
+    );
+  }
+
   Future<void> _selectPaymentMethod(OrderPaymentMethod method) async {
     if (method == OrderPaymentMethod.cashOnDelivery) {
       setState(() {
@@ -140,7 +252,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final selection = await chooseGcashPayment(
       context,
       items: _controller.selectedItems,
-      total: _controller.selectedTotal,
+      total: _finalCheckoutTotal,
       repository: widget.paymentRepository,
       receiptImagePicker: widget.gcashReceiptImagePicker,
     );
@@ -178,8 +290,38 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     setState(() => _isPlacingOrder = true);
     final List<PlacedOrder> orders;
     try {
+      var itemsToSubmit = selectedItems;
+      if (_appliedVoucher != null) {
+        itemsToSubmit = selectedItems.map((item) {
+          final parsedId = int.tryParse(item.productId.trim());
+          final isEligible =
+              _appliedVoucher!.applicableCommodityIds.isEmpty ||
+              (parsedId != null &&
+                  _appliedVoucher!.applicableCommodityIds.contains(parsedId));
+          if (!isEligible) return item;
+
+          var discountedPrice = item.pricePerKg;
+          if (_appliedVoucher!.discountType == 'percentage') {
+            discountedPrice =
+                item.pricePerKg * (1 - _appliedVoucher!.discountValue / 100);
+          } else if (_appliedVoucher!.discountType == 'sale_price') {
+            discountedPrice = _appliedVoucher!.discountValue;
+          } else if (_appliedVoucher!.discountType == 'amount') {
+            final itemTotal = item.pricePerKg * item.quantity;
+            final portion =
+                itemTotal > 0 && _controller.selectedTotal > 0
+                    ? (_appliedVoucher!.discountAmount /
+                        _controller.selectedTotal)
+                    : 0;
+            discountedPrice = (item.pricePerKg * (1 - portion)).clamp(0, double.infinity);
+          }
+          discountedPrice = double.parse(discountedPrice.toStringAsFixed(2));
+          return item.copyWith(pricePerKg: discountedPrice);
+        }).toList();
+      }
+
       orders = await _orderController.placeToShipOrders(
-        items: selectedItems,
+        items: itemsToSubmit,
         deliveryAddress: deliveryAddress,
         phoneNumber: _profile.phoneNumber,
         deliveryLatitude: location.latitude,
@@ -251,7 +393,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         animation: _controller,
         builder: (context, _) => _CheckoutBottomBar(
           selectedQuantity: _controller.selectedQuantity,
-          total: _controller.selectedTotal,
+          total: _finalCheckoutTotal,
           isPlacingOrder: _isPlacingOrder,
           onPlaceOrder: _placeOrder,
         ),
@@ -270,6 +412,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 onSelectLocation: _selectDeliveryLocation,
                 payment: _payment,
                 onSelectPayment: _selectPaymentMethod,
+                subtotal: _itemsSubtotal,
+                productSaleDiscount: _productSaleDiscount,
+                voucherDiscount: _voucherDiscount,
+                finalTotal: _finalCheckoutTotal,
+                voucherController: _voucherController,
+                appliedVoucher: _appliedVoucher,
+                isValidatingVoucher: _isValidatingVoucher,
+                voucherError: _voucherError,
+                onApplyVoucher: _applyVoucher,
+                onRemoveVoucher: _removeVoucher,
+                onBrowseVouchers: _browseVouchers,
               ),
             ),
           ),

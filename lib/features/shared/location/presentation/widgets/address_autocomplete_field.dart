@@ -11,6 +11,10 @@ class AddressAutocompleteField extends StatefulWidget {
     required this.options,
     required this.onChanged,
     required this.onSelected,
+    this.externalLabel,
+    this.decorationTheme,
+    this.leadingIcon,
+    this.enabled = true,
     super.key,
   });
 
@@ -19,6 +23,10 @@ class AddressAutocompleteField extends StatefulWidget {
   final List<PsgcAddressOption> options;
   final ValueChanged<String> onChanged;
   final ValueChanged<PsgcAddressOption> onSelected;
+  final Widget? externalLabel;
+  final InputDecorationTheme? decorationTheme;
+  final Widget? leadingIcon;
+  final bool enabled;
 
   @override
   State<AddressAutocompleteField> createState() =>
@@ -54,48 +62,67 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(bottom: 8),
-    child: DropdownMenu<PsgcAddressOption>(
-      controller: widget.controller,
-      focusNode: _focusNode,
-      expandedInsets: EdgeInsets.zero,
-      enableFilter: true,
-      enableSearch: true,
-      requestFocusOnTap: true,
-      menuHeight: 240,
-      label: Text(
-        '${widget.label} (select or type)',
-        style: const TextStyle(fontSize: 12),
-      ),
-      textStyle: const TextStyle(fontSize: 12),
-      inputDecorationTheme: InputDecorationTheme(
-        isDense: true,
-        filled: true,
-        fillColor: AgrisellColors.fieldFill,
-        floatingLabelStyle: AgrisellTheme.floatingInputLabelStyle,
-        constraints: const BoxConstraints.tightFor(height: 56),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      menuStyle: const MenuStyle(
-        backgroundColor: WidgetStatePropertyAll(AgrisellColors.surface),
-      ),
-      dropdownMenuEntries: widget.options
-          .map(
-            (option) => DropdownMenuEntry<PsgcAddressOption>(
-              value: option,
-              label: option.name,
-              labelWidget: Text(
-                option.province.isEmpty
-                    ? option.name
-                    : '${option.name} — ${option.province}',
-                style: const TextStyle(fontSize: 12),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (widget.externalLabel != null) ...[
+          widget.externalLabel!,
+          const SizedBox(height: 8),
+        ],
+        DropdownMenu<PsgcAddressOption>(
+          controller: widget.controller,
+          enabled: widget.enabled,
+          focusNode: _focusNode,
+          expandedInsets: EdgeInsets.zero,
+          enableFilter: true,
+          enableSearch: true,
+          requestFocusOnTap: true,
+          menuHeight: 240,
+          leadingIcon: widget.leadingIcon,
+          label: widget.externalLabel != null
+              ? null
+              : Text(
+                  '${widget.label} (select or type)',
+                  style: const TextStyle(fontSize: 12),
+                ),
+          textStyle: TextStyle(
+            fontSize: widget.externalLabel != null ? 14 : 12,
+          ),
+          inputDecorationTheme:
+              widget.decorationTheme ??
+              InputDecorationTheme(
+                isDense: true,
+                filled: true,
+                fillColor: AgrisellColors.fieldFill,
+                floatingLabelStyle: AgrisellTheme.floatingInputLabelStyle,
+                constraints: const BoxConstraints.tightFor(height: 56),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
-            ),
-          )
-          .toList(growable: false),
-      onSelected: (option) {
-        if (option != null) widget.onSelected(option);
-      },
+          menuStyle: const MenuStyle(
+            backgroundColor: WidgetStatePropertyAll(AgrisellColors.surface),
+          ),
+          dropdownMenuEntries: widget.options
+              .map(
+                (option) => DropdownMenuEntry<PsgcAddressOption>(
+                  value: option,
+                  label: option.name,
+                  labelWidget: Text(
+                    option.province.isEmpty
+                        ? option.name
+                        : '${option.name} — ${option.province}',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+              )
+              .toList(growable: false),
+          onSelected: (option) {
+            if (option != null) widget.onSelected(option);
+          },
+        ),
+      ],
     ),
   );
 }

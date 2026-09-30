@@ -7,6 +7,8 @@ import 'package:agresell_app/features/farmer/reservations/presentation/widgets/f
 import 'package:agresell_app/features/farmer/reservations/presentation/widgets/farmer_order_workflow_card.dart';
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/order_controller.dart';
+import 'package:agresell_app/features/shared/waybills/domain/delivery_waybill.dart';
+import 'package:agresell_app/features/shared/waybills/presentation/widgets/delivery_waybill_sheet.dart';
 
 class FarmerOrderDetailsScreen extends StatelessWidget {
   const FarmerOrderDetailsScreen({
@@ -37,6 +39,14 @@ class FarmerOrderDetailsScreen extends StatelessWidget {
         'Order Details',
         style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
       ),
+      actions: [
+        IconButton(
+          key: const Key('farmer-print-waybill-appbar-button'),
+          tooltip: 'Print Delivery Waybill',
+          icon: const Icon(Icons.print_outlined),
+          onPressed: () => _openWaybill(context),
+        ),
+      ],
     ),
     body: AnimatedBuilder(
       animation: Listenable.merge([controller, riderController]),
@@ -57,6 +67,31 @@ class FarmerOrderDetailsScreen extends StatelessWidget {
               FarmerOrderBuyerInformation(order: currentOrder),
               const SizedBox(height: 14),
               FarmerOrderInformation(order: currentOrder),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                height: 42,
+                child: OutlinedButton.icon(
+                  key: const Key('farmer-open-waybill-button'),
+                  onPressed: () => _openWaybill(context),
+                  icon: const Icon(Icons.receipt_long_rounded, size: 18),
+                  label: const Text(
+                    'Print / Download Delivery Waybill',
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AgrisellColors.authGreen,
+                    backgroundColor: AgrisellColors.surface,
+                    side: const BorderSide(
+                      color: AgrisellColors.authGreen,
+                      width: 1.2,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 18),
               const Text(
                 'Fulfillment',
@@ -84,6 +119,22 @@ class FarmerOrderDetailsScreen extends StatelessWidget {
       },
     ),
   );
+
+  void _openWaybill(BuildContext context) {
+    final currentOrder = _currentOrder;
+    final riderRequest = riderController.requestFor(currentOrder.id);
+    final courierLocation = riderRequest != null
+        ? [riderRequest.riderBarangay, riderRequest.riderMunicipality]
+            .where((s) => s.isNotEmpty)
+            .join(', ')
+        : null;
+    final waybill = DeliveryWaybill.fromFarmerOrder(
+      currentOrder,
+      courierName: riderRequest?.riderName,
+      courierContact: courierLocation,
+    );
+    showDeliveryWaybillSheet(context, waybill);
+  }
 
   PlacedOrder get _currentOrder {
     for (final candidate in controller.orders) {

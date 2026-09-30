@@ -15,7 +15,7 @@ class _FarmerProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(16);
+    final radius = BorderRadius.circular(10);
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -24,9 +24,9 @@ class _FarmerProductCard extends StatelessWidget {
         border: Border.all(color: AgrisellColors.borderLine),
         boxShadow: [
           BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.07),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: AgrisellColors.brandBlack.withValues(alpha: 0.05),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -40,7 +40,7 @@ class _FarmerProductCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 AspectRatio(
-                  aspectRatio: 1.24,
+                  aspectRatio: 1.55,
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
@@ -52,14 +52,22 @@ class _FarmerProductCard extends StatelessWidget {
                         alignment: Alignment.center,
                         semanticLabel: '${product.name} product photo',
                       ),
+                      if (product.isInActiveSale)
+                        Positioned(
+                          top: 8,
+                          left: 8,
+                          child: _FarmerSaleBadge(
+                            label: product.activeSaleDiscount ?? 'SALE',
+                          ),
+                        ),
                       Positioned(
-                        left: 10,
-                        bottom: 10,
+                        left: 8,
+                        bottom: 8,
                         child: _ProductCategoryTag(label: product.category),
                       ),
                       Positioned(
-                        top: 9,
-                        right: 9,
+                        top: 8,
+                        right: 8,
                         child: _EditProductButton(
                           productName: product.name,
                           onTap: onEdit,
@@ -93,11 +101,12 @@ class _ProductCategoryTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) => DecoratedBox(
     decoration: BoxDecoration(
-      color: AgrisellColors.surface.withValues(alpha: 0.92),
-      borderRadius: BorderRadius.circular(12),
+      color: AgrisellColors.surface.withValues(alpha: 0.94),
+      borderRadius: BorderRadius.circular(6),
+      border: Border.all(color: AgrisellColors.borderLine),
     ),
     child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
       child: Text(
         label,
         maxLines: 1,
@@ -108,6 +117,51 @@ class _ProductCategoryTag extends StatelessWidget {
           height: 1,
           fontWeight: FontWeight.w700,
         ),
+      ),
+    ),
+  );
+}
+
+class _FarmerSaleBadge extends StatelessWidget {
+  const _FarmerSaleBadge({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+    decoration: BoxDecoration(
+      color: AgrisellColors.statusRedText,
+      borderRadius: BorderRadius.circular(6),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.15),
+          blurRadius: 4,
+          offset: const Offset(0, 1),
+        ),
+      ],
+    ),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.local_offer_rounded,
+            color: Colors.white,
+            size: 11,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              height: 1,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.3,
+            ),
+          ),
+        ],
       ),
     ),
   );

@@ -75,7 +75,7 @@ extension _FarmerScreenFiltering on _FarmerScreenState {
                 'Sort farmers by',
                 style: TextStyle(
                   color: AgrisellColors.headingGreen,
-                  fontSize: 17,
+                  fontSize: 15,
                   fontWeight: FontWeight.w800,
                 ),
               ),

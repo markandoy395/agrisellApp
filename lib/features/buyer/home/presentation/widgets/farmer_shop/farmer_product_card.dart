@@ -14,10 +14,11 @@ class FarmerProductCard extends StatelessWidget {
 
   final HomeProduct product;
   final VoidCallback? onTap;
+  static const cardHeight = 208.0;
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(13);
+    final radius = BorderRadius.circular(10);
     final label = product.isAvailable
         ? 'View ${product.name}. ${product.availableQuantityLabel}'
         : '${product.name} is sold. ${product.availableQuantityLabel}';
@@ -28,12 +29,14 @@ class FarmerProductCard extends StatelessWidget {
       label: label,
       child: DecoratedBox(
         decoration: BoxDecoration(
+          color: AgrisellColors.surface,
           borderRadius: radius,
+          border: Border.all(color: AgrisellColors.borderLine),
           boxShadow: [
             BoxShadow(
-              color: AgrisellColors.brandBlack.withValues(alpha: 0.1),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
+              color: AgrisellColors.brandBlack.withValues(alpha: 0.05),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -81,8 +84,8 @@ class _ProductImage extends StatelessWidget {
           ),
         ),
         Positioned(
-          left: 10,
-          bottom: 10,
+          left: 8,
+          bottom: 8,
           child: ProductSaleStatusBadge(product: product, iconOnly: true),
         ),
         if (!product.isAvailable) const SoldOverlay(),
@@ -106,31 +109,23 @@ class _ProductDetails extends StatelessWidget {
         : AgrisellColors.mutedText;
 
     return SizedBox(
-      height: 108,
+      height: 90,
       width: double.infinity,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(13, 9, 13, 10),
+        padding: const EdgeInsets.fromLTRB(10, 7, 10, 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    product.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 16,
-                      height: 1.1,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Icon(Icons.arrow_forward_rounded, color: valueColor, size: 18),
-              ],
+            Text(
+              product.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: textColor,
+                fontSize: 14,
+                height: 1.1,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 4),
             Text.rich(
@@ -156,36 +151,30 @@ class _ProductDetails extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             const Spacer(),
-            Text(
-              product.availableQuantityLabel,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: valueColor,
-                fontSize: 12,
-                height: 1,
-                fontWeight: FontWeight.w600,
-              ),
+            _FarmerProductMeta(
+              icon: Icons.inventory_2_outlined,
+              value: product.availableQuantityLabel,
+              color: valueColor,
             ),
             const SizedBox(height: 5),
             Row(
               children: [
                 Icon(
-                  Icons.calendar_month_outlined,
+                  Icons.calendar_today_outlined,
                   color: AgrisellColors.mutedText,
-                  size: 16,
+                  size: 14,
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 5),
                 Expanded(
                   child: Text(
-                    'Harvest date · ${product.harvestDate}',
+                    product.freshnessLabel ?? product.harvestDate,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: AgrisellColors.mutedText,
                       fontSize: 12,
                       height: 1,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -196,4 +185,37 @@ class _ProductDetails extends StatelessWidget {
       ),
     );
   }
+}
+
+class _FarmerProductMeta extends StatelessWidget {
+  const _FarmerProductMeta({
+    required this.icon,
+    required this.value,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Icon(icon, color: color, size: 14),
+      const SizedBox(width: 5),
+      Expanded(
+        child: Text(
+          value,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: color,
+            fontSize: 12,
+            height: 1,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    ],
+  );
 }

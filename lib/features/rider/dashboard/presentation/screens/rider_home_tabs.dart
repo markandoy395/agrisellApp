@@ -2,24 +2,14 @@ part of 'rider_home_screen.dart';
 
 extension _RiderHomeTabs on _RiderHomeScreenState {
   Future<void> _openSafetySupport() async {
-    final riderId = _riderId;
-    if (riderId == null) return;
-    final type = await showRiderSafetySheet(context);
-    if (type == null || !mounted) return;
-    final reason = await showRiderSafetyReasonDialog(context, type);
-    if (type.requiresReason && reason == null) return;
-    final success = await _safetyController.submit(
-      riderId: riderId,
-      type: type,
-      reason: reason,
+    final profile = RiderRegistrationService.instance.currentProfile;
+    await showAppSafetySheet(
+      context: context,
+      role: 'rider',
+      userName: profile?.fullName,
+      userContact: profile?.contactNumber,
+      userEmail: profile?.email,
     );
-    if (!mounted) return;
-    final message = success
-        ? _safetyController.errorMessage ?? '${type.label} sent to support.'
-        : _safetyController.errorMessage ?? 'Support is unavailable.';
-    ScaffoldMessenger.of(
-      context,
-    ).showAppSnackBar(SnackBar(content: Text(message)));
   }
 
   Widget _buildTab(int index, RiderProfile? profile) {

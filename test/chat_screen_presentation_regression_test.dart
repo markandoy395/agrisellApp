@@ -3,8 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/buyer/chat/presentation/screens/buyer_message_screen.dart';
+import 'package:agresell_app/features/buyer/home/presentation/screens/home_screen.dart';
 import 'package:agresell_app/features/farmer/chat/presentation/screens/farmer_message_screen.dart';
 import 'package:agresell_app/features/shared/chat/domain/marketplace_conversation.dart';
+import 'package:agresell_app/features/shared/widgets/navigation/custom_bottom_nav_bar.dart';
 import 'support/marketplace_messaging_fakes.dart';
 
 void main() {
@@ -64,6 +66,40 @@ void main() {
     expect(find.text('Alex Buyer'), findsOneWidget);
     expect(find.byTooltip('Back to messages'), findsOneWidget);
     expect(find.widgetWithText(TextField, 'Type a reply'), findsOneWidget);
+  });
+
+  testWidgets('buyer composer stays above the main navigation safe area', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(430, 932);
+    tester.view.padding = const FakeViewPadding(bottom: 24);
+    addTearDown(() {
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetPhysicalSize();
+      tester.view.resetPadding();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AgrisellTheme.light,
+        home: HomeScreen(
+          initialNavIndex: HomeScreen.messageNavIndex,
+          messagingRepository: FakeMarketplaceMessagingRepository(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(_semanticsLabel('Open chat with Maria Santos'));
+    await tester.pumpAndSettle();
+
+    final composer = tester.getRect(
+      find.widgetWithText(TextField, 'Write a message'),
+    );
+    final navigation = tester.getRect(find.byType(CustomBottomNavBar));
+    expect(composer.bottom, lessThanOrEqualTo(navigation.top));
+    expect(navigation.top - composer.bottom, lessThanOrEqualTo(32));
+    expect(tester.takeException(), isNull);
   });
 }
 

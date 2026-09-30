@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:agresell_app/features/rider/deliveries/domain/delivery_route.dart';
+import 'package:agresell_app/features/shared/routing/domain/delivery_route.dart';
 
 const _earthRadiusMeters = 6371000.0;
 

@@ -57,7 +57,7 @@ class RiderDashboardHeader extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: AgrisellColors.surface,
-                      fontSize: 11,
+                      fontSize: 12,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -88,8 +88,8 @@ class RiderDashboardHeader extends StatelessWidget {
                   top: 3,
                   child: Container(
                     constraints: const BoxConstraints(
-                      minWidth: 16,
-                      minHeight: 16,
+                      minWidth: 18,
+                      minHeight: 18,
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     alignment: Alignment.center,
@@ -102,9 +102,9 @@ class RiderDashboardHeader extends StatelessWidget {
                       unreadNotifications > 9 ? '9+' : '$unreadNotifications',
                       style: const TextStyle(
                         color: AgrisellColors.brandBlack,
-                        fontSize: 9,
+                        fontSize: 12,
                         height: 1,
-                        fontWeight: FontWeight.w900,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ),

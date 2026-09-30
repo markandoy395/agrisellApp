@@ -360,7 +360,7 @@ class _SuggestionCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             color: AgrisellColors.mutedText,
-                            fontSize: 11,
+                            fontSize: 12,
                             height: 1.15,
                             fontWeight: FontWeight.w500,
                           ),

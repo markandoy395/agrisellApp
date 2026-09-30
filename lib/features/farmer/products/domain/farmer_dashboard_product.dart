@@ -31,6 +31,15 @@ class FarmerDashboardProduct {
     this.expiresAt,
     this.lotCode,
     this.storageInstructions,
+    this.activeSaleName,
+    this.activeSaleDiscount,
+    this.activeSaleEndsAt,
+    this.activeSaleId,
+    this.activeSaleIsFarmerOwned = false,
+    this.activeSaleType,
+    this.activeSaleValue,
+    this.activeSalePromoCode,
+    this.activeSaleStartsAt,
   }) : _saleStatus = saleStatus ?? ProductSaleStatus.readyNow,
        _inventoryDateType = inventoryDateType,
        assert(imageAsset != null || imageBytes != null || imageUrl != null);
@@ -60,6 +69,18 @@ class FarmerDashboardProduct {
   final DateTime? expiresAt;
   final String? lotCode;
   final String? storageInstructions;
+  final String? activeSaleName;
+  final String? activeSaleDiscount;
+  final DateTime? activeSaleEndsAt;
+  final int? activeSaleId;
+  final bool activeSaleIsFarmerOwned;
+  final String? activeSaleType;
+  final double? activeSaleValue;
+  final String? activeSalePromoCode;
+  final DateTime? activeSaleStartsAt;
+
+  bool get isInActiveSale =>
+      activeSaleName != null && activeSaleName!.trim().isNotEmpty;
 
   ProductSaleStatus get saleStatus => _saleStatus ?? ProductSaleStatus.readyNow;
   ProductInventoryDateType get inventoryDateType =>
@@ -107,6 +128,16 @@ class FarmerDashboardProduct {
     DateTime? expiresAt,
     String? lotCode,
     String? storageInstructions,
+    String? activeSaleName,
+    String? activeSaleDiscount,
+    DateTime? activeSaleEndsAt,
+    int? activeSaleId,
+    bool? activeSaleIsFarmerOwned,
+    String? activeSaleType,
+    double? activeSaleValue,
+    String? activeSalePromoCode,
+    DateTime? activeSaleStartsAt,
+    bool clearActiveSale = false,
     bool clearImageAsset = false,
     bool clearImageBytes = false,
     bool clearImageUrl = false,
@@ -137,6 +168,17 @@ class FarmerDashboardProduct {
       expiresAt: expiresAt ?? this.expiresAt,
       lotCode: lotCode ?? this.lotCode,
       storageInstructions: storageInstructions ?? this.storageInstructions,
+      activeSaleName: clearActiveSale ? null : activeSaleName ?? this.activeSaleName,
+      activeSaleDiscount: clearActiveSale ? null : activeSaleDiscount ?? this.activeSaleDiscount,
+      activeSaleEndsAt: clearActiveSale ? null : activeSaleEndsAt ?? this.activeSaleEndsAt,
+      activeSaleId: clearActiveSale ? null : activeSaleId ?? this.activeSaleId,
+      activeSaleIsFarmerOwned: clearActiveSale
+          ? false
+          : activeSaleIsFarmerOwned ?? this.activeSaleIsFarmerOwned,
+      activeSaleType: clearActiveSale ? null : activeSaleType ?? this.activeSaleType,
+      activeSaleValue: clearActiveSale ? null : activeSaleValue ?? this.activeSaleValue,
+      activeSalePromoCode: clearActiveSale ? null : activeSalePromoCode ?? this.activeSalePromoCode,
+      activeSaleStartsAt: clearActiveSale ? null : activeSaleStartsAt ?? this.activeSaleStartsAt,
     );
   }
 }

@@ -130,7 +130,7 @@ copying secret values into the repository.
 ## Configuration and secret matrix
 
 | Value | Location | Safe to commit? |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | Supabase project URL | Local JSON or `--dart-define` | Yes, but keep environment-specific values out of shared config when practical |
 | Supabase publishable key | Ignored local JSON or `--dart-define` | Client-safe, but the local file remains ignored |
 | Supabase service-role/secret key | Hosted Edge Function secret | No |

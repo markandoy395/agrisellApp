@@ -43,6 +43,14 @@ abstract interface class OrderRepository {
     required String orderId,
     required String reference,
   });
+
+  Future<void> reportOrderDispute({
+    required String accountId,
+    required String orderId,
+    required String category,
+    required String reason,
+    required String requestedResolution,
+  });
 }
 
 abstract interface class FarmerOrderCancellationRepository {

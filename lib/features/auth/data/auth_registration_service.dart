@@ -22,6 +22,7 @@ class AuthRegistrationService {
   static const SupabaseAuthService _remote = SupabaseAuthService();
   RegisteredAccount? _remoteAccount;
   bool _localStoreEnabledForTesting = false;
+  Future<bool> Function(String, String, AuthRole)? _emailStarterForTesting;
 
   bool get usesSupabase => AgrisellSupabase.isInitialized;
 
@@ -99,6 +100,8 @@ class AuthRegistrationService {
     required String password,
     required AuthRole role,
   }) async {
+    final starter = _emailStarterForTesting;
+    if (starter != null) return starter(email, password, role);
     if (!usesSupabase) {
       _requireConfiguredBackend();
       return false;
@@ -271,6 +274,19 @@ class AuthRegistrationService {
     }
   }
 
+  Future<RegisteredAccount> verifySignupEmailOtp({
+    required String email,
+    required String otp,
+    required AuthRole role,
+  }) async {
+    final account = await verifyEmailOtp(email: email, otp: otp);
+    if (account.profilePending && account.assignedRole == role) return account;
+    await signOut();
+    throw const AuthRegistrationException(
+      'This email is already registered. Log in or use another email.',
+    );
+  }
+
   Future<void> resendSignupEmailOtp(String email) async {
     if (!usesSupabase) {
       throw const AuthRegistrationException(
@@ -401,7 +417,12 @@ class AuthRegistrationService {
     _localStoreEnabledForTesting = true;
     _local.clear();
     _remoteAccount = null;
+    _emailStarterForTesting = null;
   }
+
+  void setEmailStarterForTesting(
+    Future<bool> Function(String, String, AuthRole)? starter,
+  ) => _emailStarterForTesting = starter;
 
   void _requireConfiguredBackend() {
     if (_localStoreEnabledForTesting) return;

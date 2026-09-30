@@ -51,7 +51,7 @@ class BasketCheckoutSummary extends StatelessWidget {
                   maxLines: 1,
                   style: const TextStyle(
                     color: AgrisellColors.mutedText,
-                    fontSize: 10,
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -65,7 +65,7 @@ class BasketCheckoutSummary extends StatelessWidget {
                   maxLines: 1,
                   style: const TextStyle(
                     color: AgrisellColors.authGreen,
-                    fontSize: 16,
+                    fontSize: 15,
                     height: 1,
                     fontWeight: FontWeight.w800,
                   ),

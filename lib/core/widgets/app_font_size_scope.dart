@@ -36,7 +36,11 @@ class _AppTextScaler extends TextScaler {
   final double additionalScale;
 
   @override
-  double scale(double fontSize) => base.scale(fontSize) * additionalScale;
+  double scale(double fontSize) {
+    final rawScale = base.scale(fontSize) * additionalScale;
+    final maxScale = fontSize * 1.35;
+    return rawScale > maxScale ? maxScale : rawScale;
+  }
 
   @override
   double get textScaleFactor => scale(14) / 14;

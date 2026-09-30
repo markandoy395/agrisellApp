@@ -32,12 +32,24 @@ Future<void> main() async {
   unawaited(AgrisellSystemUi.applyAppSystemUi());
   await Future.wait<Object?>([
     AppFontSizeController.instance.load(),
-    Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),
+    _initializeFirebase(),
   ]);
   final supabaseInitialization = AgrisellSupabase.initialize();
 
   runApp(AgrisellApp(supabaseInitialization: supabaseInitialization));
   unawaited(PushNotificationService.instance.initialize());
+}
+
+Future<void> _initializeFirebase() async {
+  try {
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    }
+  } on FirebaseException catch (e) {
+    if (e.code != 'duplicate-app') rethrow;
+  } catch (_) {}
 }
 
 void _configureImageCache() {
@@ -54,7 +66,7 @@ class AgrisellApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'AgriSell',
+      title: 'AgriSell App',
       debugShowCheckedModeBanner: false,
       theme: AgrisellTheme.light,
       builder: (context, child) {

@@ -92,7 +92,7 @@ class _FarmerRestockDialogState extends State<FarmerRestockDialog> {
                   'Add stock',
                   style: TextStyle(
                     color: AgrisellColors.headingGreen,
-                    fontSize: 18,
+                    fontSize: 15,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -367,7 +367,7 @@ class _StockSummary extends StatelessWidget {
         label,
         style: const TextStyle(
           color: AgrisellColors.mutedText,
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
       ),

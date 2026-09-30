@@ -1,6 +1,7 @@
 import '../domain/rider_analytics_models.dart';
 import '../domain/rider_history_models.dart';
 import '../domain/rider_rating_models.dart';
+import '../domain/rider_withdrawal_models.dart';
 import '../../deliveries/domain/delivery_completion.dart';
 import '../../deliveries/domain/delivery_earning.dart';
 import '../../deliveries/domain/delivery_status.dart';
@@ -13,6 +14,34 @@ class RiderDeliveryAnalyticsRepository implements RiderAnalyticsRepository {
 
   final List<DeliveryCompletionRecord> Function() completionRecords;
   final Map<String, List<RiderReview>> _reviewsByRider = {};
+
+  @override
+  Future<List<RiderWithdrawalMethod>> fetchWithdrawalMethods({
+    required String riderId,
+  }) async => const [];
+
+  @override
+  Future<RiderWithdrawalMethod> saveWithdrawalMethod({
+    required String riderId,
+    required RiderWithdrawalMethod method,
+  }) async => method;
+
+  @override
+  Future<void> deleteWithdrawalMethod({
+    required String riderId,
+    required String methodId,
+  }) async {}
+
+  @override
+  Future<RiderWithdrawalRequest> submitWithdrawalRequest({
+    required String riderId,
+    required RiderWithdrawalRequest request,
+  }) async => request;
+
+  @override
+  Future<List<RiderWithdrawalRequest>> fetchWithdrawalRequests({
+    required String riderId,
+  }) async => const [];
 
   @override
   Future<RiderEarningsData> fetchEarnings({

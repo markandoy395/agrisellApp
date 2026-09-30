@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/core/theme/app_typography.dart';
 
 abstract final class AgrisellTheme {
-  static const String fontFamily = 'Poppins';
+  static const String fontFamily = AppTypography.fontFamily;
 
   static const TextStyle floatingInputLabelStyle = TextStyle(
     color: AgrisellColors.authGreen,
@@ -49,7 +50,37 @@ abstract final class AgrisellTheme {
         style: FilledButton.styleFrom(
           backgroundColor: AgrisellColors.primaryButton,
           foregroundColor: AgrisellColors.surface,
+          minimumSize: const Size(64, 38),
+          maximumSize: const Size(double.infinity, 40),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
+          textStyle: AppTypography.button,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size(64, 38),
+          maximumSize: const Size(double.infinity, 40),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
+          textStyle: AppTypography.button,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(64, 38),
+          maximumSize: const Size(double.infinity, 40),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
+          textStyle: AppTypography.button,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          minimumSize: const Size(48, 38),
+          maximumSize: const Size(double.infinity, 40),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+          textStyle: AppTypography.button,
         ),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
@@ -62,18 +93,13 @@ abstract final class AgrisellTheme {
         elevation: 12,
         shadowColor: const Color(0x2E0B0B0B),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        titleTextStyle: const TextStyle(
+        titleTextStyle: AppTypography.title.copyWith(
           color: AgrisellColors.headingGreen,
-          fontFamily: fontFamily,
-          fontSize: 20,
+          fontSize: 15,
           fontWeight: FontWeight.w800,
-          height: 1.2,
         ),
-        contentTextStyle: const TextStyle(
+        contentTextStyle: AppTypography.body.copyWith(
           color: AgrisellColors.brandBlack,
-          fontFamily: fontFamily,
-          fontSize: 14,
-          height: 1.45,
         ),
         actionsPadding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       ),
@@ -93,7 +119,7 @@ abstract final class AgrisellTheme {
         headerHeadlineStyle: const TextStyle(
           color: AgrisellColors.surface,
           fontFamily: fontFamily,
-          fontSize: 28,
+          fontSize: 15,
           fontWeight: FontWeight.w800,
         ),
         weekdayStyle: const TextStyle(
@@ -196,21 +222,9 @@ abstract final class AgrisellTheme {
     );
   }
 
-  static const TextTheme _textTheme = TextTheme(
-    headlineLarge: TextStyle(
-      color: AgrisellColors.headingGreen,
-      fontWeight: FontWeight.w700,
-    ),
-    headlineMedium: TextStyle(
-      color: AgrisellColors.headingGreen,
-      fontWeight: FontWeight.w700,
-    ),
-    titleLarge: TextStyle(
-      color: AgrisellColors.headingGreen,
-      fontWeight: FontWeight.w700,
-    ),
-    bodyMedium: TextStyle(color: AgrisellColors.brandBlack),
-    bodySmall: TextStyle(color: AgrisellColors.mutedText),
+  static final TextTheme _textTheme = AppTypography.createTextTheme(
+    displayColor: AgrisellColors.headingGreen,
+    bodyColor: AgrisellColors.brandBlack,
   );
 
   static final InputDecorationTheme _inputDecoration =

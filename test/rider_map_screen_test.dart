@@ -7,7 +7,7 @@ import 'package:agresell_app/features/rider/deliveries/presentation/screens/ride
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_live_map.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_map_content.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
-import 'package:agresell_app/features/rider/deliveries/domain/delivery_route.dart';
+import 'package:agresell_app/features/shared/routing/domain/delivery_route.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_delivery_search.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_nearby_farm.dart';

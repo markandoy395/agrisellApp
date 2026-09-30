@@ -13,14 +13,18 @@ class NotificationListItem extends StatefulWidget {
     required this.onTap,
     required this.onToggleRead,
     required this.onDelete,
+    this.maxTextLength = defaultMaxTextLength,
     super.key,
   });
+
+  static const int defaultMaxTextLength = 80;
 
   final HomeNotification item;
   final bool isRead;
   final VoidCallback onTap;
   final VoidCallback onToggleRead;
   final VoidCallback onDelete;
+  final int maxTextLength;
 
   @override
   State<NotificationListItem> createState() => _NotificationListItemState();
@@ -28,6 +32,25 @@ class NotificationListItem extends StatefulWidget {
 
 class _NotificationListItemState extends State<NotificationListItem> {
   var _isExpanded = false;
+
+  bool get _isExpandable {
+    final text = widget.item.description.trim();
+    return text.length > widget.maxTextLength || text.contains('\n');
+  }
+
+  String get _displayedDescription {
+    final text = widget.item.description.trim();
+    if (!_isExpandable || _isExpanded) return widget.item.description;
+    if (text.length > widget.maxTextLength) {
+      final cut = text.substring(0, widget.maxTextLength);
+      final lastSpace = cut.lastIndexOf(' ');
+      if (lastSpace > widget.maxTextLength * 0.7) {
+        return '${cut.substring(0, lastSpace).trimRight()}...';
+      }
+      return '${cut.trimRight()}...';
+    }
+    return text;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +97,7 @@ class _NotificationListItemState extends State<NotificationListItem> {
                   NotificationCardActions(
                     title: widget.item.title,
                     isRead: widget.isRead,
-                    isExpandable: widget.item.showChevron,
+                    isExpandable: _isExpandable,
                     isExpanded: _isExpanded,
                     onToggleRead: widget.onToggleRead,
                     onDelete: widget.onDelete,
@@ -160,12 +183,11 @@ class _NotificationListItemState extends State<NotificationListItem> {
       const SizedBox(height: 7),
       AnimatedSize(
         duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
         child: Text(
-          widget.item.description,
-          maxLines: widget.item.showChevron && !_isExpanded ? 3 : null,
-          overflow: widget.item.showChevron && !_isExpanded
-              ? TextOverflow.ellipsis
-              : TextOverflow.visible,
+          _displayedDescription,
+          maxLines: _isExpanded ? null : 2,
+          overflow: _isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
           style: const TextStyle(
             color: AgrisellColors.brandBlack,
             fontSize: 12,

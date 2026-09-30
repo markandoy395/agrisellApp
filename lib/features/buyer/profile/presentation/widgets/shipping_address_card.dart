@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/features/auth/domain/buyer_shipping_address.dart';
+import 'package:agresell_app/features/buyer/profile/presentation/widgets/buyer_profile_style.dart';
 import 'package:agresell_app/features/buyer/profile/presentation/widgets/shipping_address_editor.dart';
 import 'package:agresell_app/features/shared/location/data/gps_location_gateway.dart';
-import 'package:agresell_app/features/shared/widgets/profile/profile_card_shell.dart';
-import 'package:agresell_app/features/shared/widgets/profile/profile_section_label.dart';
-import 'package:agresell_app/features/shared/widgets/profile/profile_text_styles.dart';
 
 class ShippingAddressCard extends StatelessWidget {
   const ShippingAddressCard({
@@ -32,32 +29,26 @@ class ShippingAddressCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasAddress = address.trim().isNotEmpty;
-    return ProfileCardShell(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const ProfileSectionLabel(text: 'Shipping Address'),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const _AddressIcon(),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: hasAddress
-                      ? _SavedAddress(
-                          address: address,
-                          onEdit: () => _showEditor(context),
-                        )
-                      : _MissingAddress(
-                          onSetAddress: () => _showEditor(context),
-                        ),
-                ),
-              ],
+    return BuyerProfileCard(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const _AddressIcon(),
+            const SizedBox(width: 14),
+            Expanded(
+              child: hasAddress
+                  ? _SavedAddress(
+                      address: address,
+                      onEdit: () => _showEditor(context),
+                    )
+                  : _MissingAddress(
+                      onSetAddress: () => _showEditor(context),
+                    ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -90,15 +81,24 @@ class _AddressIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     decoration: BoxDecoration(
-      color: AgrisellColors.authGreen.withValues(alpha: .10),
+      gradient: const LinearGradient(
+        colors: [Color(0xFFE8F5EE), Color(0xFFD1EDDF)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
       borderRadius: BorderRadius.circular(12),
+      border: Border.all(
+        color: BuyerProfileStyle.borderSubtle,
+        width: 1,
+      ),
     ),
     child: const Icon(
       Icons.local_shipping_outlined,
-      color: AgrisellColors.authGreen,
+      color: BuyerProfileStyle.green,
+      size: 22,
     ),
   );
 }
@@ -110,15 +110,48 @@ class _SavedAddress extends StatelessWidget {
   final VoidCallback onEdit;
 
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text('Delivery address', style: ProfileTextStyles.infoLabel(context)),
-      const SizedBox(height: 3),
-      Text(address, style: ProfileTextStyles.infoValue(context)),
-      const SizedBox(height: 4),
-      TextButton(onPressed: onEdit, child: const Text('Edit address')),
-    ],
+  Widget build(BuildContext context) => InkWell(
+    onTap: onEdit,
+    borderRadius: BorderRadius.circular(8),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Delivery address',
+                style: BuyerProfileStyle.tileTitle,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                address,
+                style: BuyerProfileStyle.tileSubtitle,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 8),
+        TextButton(
+          onPressed: onEdit,
+          style: TextButton.styleFrom(
+            foregroundColor: BuyerProfileStyle.green,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+          ),
+          child: const Text(
+            'Edit address',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
+        ),
+      ],
+    ),
   );
 }
 
@@ -131,20 +164,32 @@ class _MissingAddress extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(
+      const Text(
         'No shipping address set',
-        style: ProfileTextStyles.infoValue(context),
+        style: BuyerProfileStyle.tileTitle,
       ),
-      const SizedBox(height: 3),
-      Text(
+      const SizedBox(height: 2),
+      const Text(
         'Add one before placing an order.',
-        style: ProfileTextStyles.profileDescription(context),
+        style: BuyerProfileStyle.tileSubtitle,
       ),
       const SizedBox(height: 10),
       FilledButton.icon(
         onPressed: onSetAddress,
-        icon: const Icon(Icons.add_location_alt_outlined, size: 18),
-        label: const Text('Set shipping address'),
+        style: FilledButton.styleFrom(
+          backgroundColor: BuyerProfileStyle.green,
+          foregroundColor: Colors.white,
+          minimumSize: const Size(0, 38),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
+        ),
+        icon: const Icon(Icons.add_location_alt_outlined, size: 16),
+        label: const Text(
+          'Set shipping address',
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+        ),
       ),
     ],
   );

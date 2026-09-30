@@ -10,15 +10,20 @@ import 'package:agresell_app/features/farmer/products/presentation/widgets/produ
 import 'package:agresell_app/features/farmer/products/presentation/widgets/product_edit/product_edit_image_header.dart';
 import 'package:agresell_app/features/shared/products/domain/product_sale_status.dart';
 import 'package:agresell_app/features/shared/products/domain/product_production_stage.dart';
+import 'package:agresell_app/features/farmer/discounts/domain/farmer_discount.dart';
+import 'package:agresell_app/features/farmer/discounts/data/farmer_discount_repository.dart';
+import 'package:agresell_app/features/farmer/discounts/presentation/widgets/farmer_discount_dialog.dart';
 
 class FarmerProductEditScreen extends StatefulWidget {
   const FarmerProductEditScreen({
     required this.product,
     this.pickProductImageBytes,
+    this.discountRepository = const FarmerDiscountRepository(),
     super.key,
   });
   final FarmerDashboardProduct product;
   final ProductImagePicker? pickProductImageBytes;
+  final FarmerDiscountRepository discountRepository;
   @override
   State<FarmerProductEditScreen> createState() =>
       _FarmerProductEditScreenState();
@@ -39,6 +44,16 @@ class _FarmerProductEditScreenState extends State<FarmerProductEditScreen> {
   late bool _isSold;
   late ProductSaleStatus _saleStatus;
   late ProductProductionStage _productionStage;
+  String? _activeSaleName;
+  String? _activeSaleDiscount;
+  int? _activeSaleId;
+  bool _activeSaleIsFarmerOwned = false;
+  String? _activeSaleType;
+  double? _activeSaleValue;
+  String? _activeSalePromoCode;
+  DateTime? _activeSaleStartsAt;
+  DateTime? _activeSaleEndsAt;
+
   @override
   void initState() {
     super.initState();
@@ -61,6 +76,15 @@ class _FarmerProductEditScreenState extends State<FarmerProductEditScreen> {
     _isSold = product.isSold;
     _saleStatus = product.saleStatus;
     _productionStage = product.productionStage;
+    _activeSaleName = product.activeSaleName;
+    _activeSaleDiscount = product.activeSaleDiscount;
+    _activeSaleId = product.activeSaleId;
+    _activeSaleIsFarmerOwned = product.activeSaleIsFarmerOwned;
+    _activeSaleType = product.activeSaleType;
+    _activeSaleValue = product.activeSaleValue;
+    _activeSalePromoCode = product.activeSalePromoCode;
+    _activeSaleStartsAt = product.activeSaleStartsAt;
+    _activeSaleEndsAt = product.activeSaleEndsAt;
   }
 
   @override
@@ -122,11 +146,116 @@ class _FarmerProductEditScreenState extends State<FarmerProductEditScreen> {
               onProductionStageChanged: _changeProductionStage,
               onCancel: () => Navigator.of(context).pop(),
               onSave: _saveProduct,
+              activeSaleNotice: _activeSaleNotice,
+              isFarmerDiscount: _activeSaleIsFarmerOwned,
+              onManageDiscount: _manageDiscount,
+              onRemoveDiscount: _activeSaleIsFarmerOwned ? _removeDiscount : null,
             ),
           ),
         ],
       ),
     );
+  }
+
+  String? get _activeSaleNotice {
+    if (_activeSaleName == null || _activeSaleName!.trim().isEmpty) return null;
+    return '$_activeSaleName (${_activeSaleDiscount ?? 'Discounted'})';
+  }
+
+  Future<void> _manageDiscount() async {
+    final farmId = widget.product.farmId;
+    if (farmId == null) {
+      showProductFormMessage(context, 'Please save product before adding discount.');
+      return;
+    }
+
+    FarmerDiscount? existing;
+    if (_activeSaleId != null && _activeSaleIsFarmerOwned) {
+      existing = FarmerDiscount(
+        saleId: _activeSaleId!,
+        farmId: farmId,
+        name: _activeSaleName ?? 'Product Discount',
+        discountType: _activeSaleType ?? 'percentage',
+        discountValue: _activeSaleValue ?? 0.0,
+        startsAt: _activeSaleStartsAt,
+        endsAt: _activeSaleEndsAt,
+        promoCode: _activeSalePromoCode,
+        commodityIds: widget.product.commodityId != null ? [widget.product.commodityId!] : [],
+      );
+    }
+
+    final saved = await showFarmerDiscountDialog(
+      context,
+      farmId: farmId,
+      existingDiscount: existing,
+      initialProduct: widget.product,
+      discountRepository: widget.discountRepository,
+    );
+
+    if (saved != null && mounted) {
+      setState(() {
+        _activeSaleId = saved.saleId;
+        _activeSaleIsFarmerOwned = true;
+        _activeSaleName = saved.name;
+        _activeSaleDiscount = saved.discountLabel;
+        _activeSaleType = saved.discountType;
+        _activeSaleValue = saved.discountValue;
+        _activeSalePromoCode = saved.promoCode;
+        _activeSaleStartsAt = saved.startsAt;
+        _activeSaleEndsAt = saved.endsAt;
+      });
+      showProductFormMessage(context, 'Discount applied: ${saved.discountLabel}');
+    }
+  }
+
+  Future<void> _removeDiscount() async {
+    final saleId = _activeSaleId;
+    final farmId = widget.product.farmId;
+    if (saleId == null || farmId == null) return;
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove Discount?'),
+        content: const Text('Are you sure you want to remove the discount from this product?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AgrisellColors.statusRedText,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true || !mounted) return;
+
+    try {
+      await widget.discountRepository.deleteDiscount(saleId, farmId);
+      if (!mounted) return;
+      setState(() {
+        _activeSaleId = null;
+        _activeSaleIsFarmerOwned = false;
+        _activeSaleName = null;
+        _activeSaleDiscount = null;
+        _activeSaleType = null;
+        _activeSaleValue = null;
+        _activeSalePromoCode = null;
+        _activeSaleStartsAt = null;
+        _activeSaleEndsAt = null;
+      });
+      showProductFormMessage(context, 'Discount removed.');
+    } catch (_) {
+      if (!mounted) return;
+      showProductFormMessage(context, 'Failed to remove discount.');
+    }
   }
 
   Future<void> _pickImage() async {
@@ -184,22 +313,34 @@ class _FarmerProductEditScreenState extends State<FarmerProductEditScreen> {
       showProductFormMessage(context, error);
       return;
     }
+    final edited = ProductEditOptions.editedProduct(
+      baseProduct: widget.product,
+      name: name,
+      price: price,
+      weight: weight,
+      day: day,
+      month: month,
+      year: year,
+      category: category!,
+      imageAsset: _imageAsset,
+      imageBytes: _imageBytes,
+      imageUrl: _imageUrl,
+      isSold: _isSold,
+      saleStatus: _saleStatus,
+      productionStage: _productionStage,
+    );
     Navigator.of(context).pop(
-      ProductEditOptions.editedProduct(
-        baseProduct: widget.product,
-        name: name,
-        price: price,
-        weight: weight,
-        day: day,
-        month: month,
-        year: year,
-        category: category!,
-        imageAsset: _imageAsset,
-        imageBytes: _imageBytes,
-        imageUrl: _imageUrl,
-        isSold: _isSold,
-        saleStatus: _saleStatus,
-        productionStage: _productionStage,
+      edited.copyWith(
+        activeSaleId: _activeSaleId,
+        activeSaleIsFarmerOwned: _activeSaleIsFarmerOwned,
+        activeSaleName: _activeSaleName,
+        activeSaleDiscount: _activeSaleDiscount,
+        activeSaleType: _activeSaleType,
+        activeSaleValue: _activeSaleValue,
+        activeSalePromoCode: _activeSalePromoCode,
+        activeSaleStartsAt: _activeSaleStartsAt,
+        activeSaleEndsAt: _activeSaleEndsAt,
+        clearActiveSale: _activeSaleName == null,
       ),
     );
   }

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
-import 'package:agresell_app/core/theme/agrisell_theme.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_input_style.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_draft.dart';
 
 export 'package:agresell_app/features/rider/profile/presentation/widgets/rider_sign_up_availability_note.dart';
 
-const riderSignUpFieldContentPadding = EdgeInsets.fromLTRB(14, 16, 14, 16);
+// Match the 56 px input surface used by login, Buyer, and Farmer forms.
+const riderSignUpFieldContentPadding = EdgeInsets.fromLTRB(14, 19, 14, 19);
+const riderSignUpSelectionContentPadding = EdgeInsets.fromLTRB(14, 16, 14, 16);
 
 class RiderSignUpHeader extends StatelessWidget {
   const RiderSignUpHeader({required this.step, super.key});
@@ -16,7 +18,7 @@ class RiderSignUpHeader extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        'Step ${step.index + 1} of ${RiderSignUpStep.values.length}',
+        '${step.index + 1} of ${RiderSignUpStep.values.length}',
         style: const TextStyle(
           color: AgrisellColors.authGreen,
           fontSize: 12,
@@ -87,13 +89,8 @@ class RiderSignUpTextField extends StatelessWidget {
       autofillHints: autofillHints,
       inputFormatters: inputFormatters,
       style: const TextStyle(fontSize: 13),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(
-          color: AgrisellColors.mutedText,
-          fontSize: 13,
-        ),
-        floatingLabelStyle: AgrisellTheme.floatingInputLabelStyle,
+      decoration: AuthInputStyle.decoration(
+        label: label,
         contentPadding: riderSignUpFieldContentPadding,
         helperText: helper,
         errorText: error,
@@ -108,24 +105,6 @@ class RiderSignUpTextField extends StatelessWidget {
                 color: AgrisellColors.statusGreenText,
               )
             : null,
-        filled: true,
-        fillColor: AgrisellColors.fieldFill,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: error == null
-                ? AgrisellColors.borderLine
-                : AgrisellColors.statusRedText,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: AgrisellColors.authGreen,
-            width: 1.5,
-          ),
-        ),
       ),
     );
   }

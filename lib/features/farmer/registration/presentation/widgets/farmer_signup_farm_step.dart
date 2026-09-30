@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_input_style.dart';
+import 'package:agresell_app/features/farmer/registration/domain/farmer_registration_choices.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/controllers/farmer_signup_controllers.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_address_sync_control.dart';
+import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_crops_field.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_field.dart';
-import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_options_field.dart';
+import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_select_field.dart';
 import 'package:agresell_app/features/shared/location/presentation/widgets/psgc_address_fields.dart';
 
 class FarmerSignupFarmStep extends StatelessWidget {
@@ -41,11 +45,15 @@ class FarmerSignupFarmStep extends StatelessWidget {
         error: errors['farmName'],
         onChanged: (_) => onChanged(),
       ),
-      FarmerSignupField(
-        label: 'Farm street / address line',
-        controller: controllers.farmAddress,
-        error: errors['farmAddress'],
-        onChanged: (_) => onChanged(),
+      Opacity(
+        opacity: controllers.sameAsFarmerAddress ? 0.55 : 1,
+        child: FarmerSignupField(
+          label: 'Farm street / address line',
+          controller: controllers.farmAddress,
+          enabled: !controllers.sameAsFarmerAddress,
+          error: errors['farmAddress'],
+          onChanged: (_) => onChanged(),
+        ),
       ),
       if (errors['farmLocation'] != null)
         Padding(
@@ -59,11 +67,18 @@ class FarmerSignupFarmStep extends StatelessWidget {
           ),
         ),
       FarmerAddressSyncControl(controllers: controllers, onSynced: onChanged),
-      PsgcAddressFields(
-        provinceController: controllers.farmProvince,
-        cityController: controllers.farmCity,
-        barangayController: controllers.farmBarangay,
-        onChanged: onChanged,
+      Opacity(
+        opacity: controllers.sameAsFarmerAddress ? 0.55 : 1,
+        child: PsgcAddressFields(
+          provinceController: controllers.farmProvince,
+          cityController: controllers.farmCity,
+          barangayController: controllers.farmBarangay,
+          enabled: !controllers.sameAsFarmerAddress,
+          onChanged: onChanged,
+          showSignupIcons: true,
+          leadingIconBuilder: AuthInputStyle.iconBadge,
+          decorationTheme: AuthInputStyle.dropdownTheme,
+        ),
       ),
       if (errors['farmAddressDetails'] != null)
         _FarmStepError(message: errors['farmAddressDetails']!),
@@ -78,45 +93,52 @@ class FarmerSignupFarmStep extends StatelessWidget {
         label: 'Farm size',
         controller: controllers.farmSize,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        inputFormatters: [
+          TextInputFormatter.withFunction(
+            (oldValue, newValue) =>
+                RegExp(r'^\d*(\.\d{0,3})?$').hasMatch(newValue.text)
+                ? newValue
+                : oldValue,
+          ),
+        ],
         error: errors['farmSize'],
         onChanged: (_) => onChanged(),
       ),
-      FarmerSignupField(
-        label: 'Farm size unit',
+      FarmerSignupSelectField(
+        label: 'Farm Size Unit',
         controller: controllers.farmSizeUnit,
+        options: FarmerRegistrationChoices.farmSizeUnits,
+        optionLabels: const {
+          'ha': 'Hectares (ha)',
+          'sq m': 'Square Meters (sq m)',
+        },
         error: errors['farmSizeUnit'],
         onChanged: (_) => onChanged(),
       ),
-      FarmerSignupOptionsField(
-        label: 'Farming type',
+      FarmerSignupSelectField(
+        label: 'Farming Type',
         controller: controllers.farmingType,
         error: errors['farmingType'],
-        options: const [
-          'Conventional farming',
-          'Organic farming',
-          'Mixed crop and livestock farming',
-          'Hydroponic farming',
-          'Aquaponic farming',
-          'Livestock farming',
-          'Poultry farming',
-          'Agroforestry',
-        ],
+        options: FarmerRegistrationChoices.farmingTypes,
         onChanged: (_) => onChanged(),
       ),
-      FarmerSignupField(
-        label: 'Main crops (comma-separated)',
+      FarmerSignupSelectField(
+        label: 'Land Tenure / Ownership Status',
+        controller: controllers.ownershipType,
+        error: errors['ownershipType'],
+        options: FarmerRegistrationChoices.landTenures,
+        onChanged: (_) => onChanged(),
+      ),
+      FarmerSignupCropsField(
         controller: controllers.mainCrops,
         error: errors['mainCrops'],
-        onChanged: (_) => onChanged(),
+        onChanged: onChanged,
       ),
-      FarmerSignupField(
-        label: 'Irrigation type (optional)',
+      FarmerSignupSelectField(
+        label: 'Irrigation Type (optional)',
         controller: controllers.irrigationType,
-        onChanged: (_) => onChanged(),
-      ),
-      FarmerSignupField(
-        label: 'Farm ownership type (optional)',
-        controller: controllers.ownershipType,
+        options: FarmerRegistrationChoices.irrigationTypes,
+        error: errors['irrigationType'],
         onChanged: (_) => onChanged(),
       ),
       FarmerImagePickerButton(

@@ -78,7 +78,7 @@ class _EmptyFarmerResults extends StatelessWidget {
             'No farmers found',
             style: TextStyle(
               color: AgrisellColors.headingGreen,
-              fontSize: 16,
+              fontSize: 15,
               fontWeight: FontWeight.w800,
             ),
           ),

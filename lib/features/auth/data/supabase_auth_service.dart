@@ -104,31 +104,42 @@ class SupabaseAuthService {
     final currentUser = _client.auth.currentUser;
     if (currentUser?.email?.trim().toLowerCase() == normalizedEmail &&
         currentUser?.emailConfirmedAt != null) {
-      final requestedRole = _requestedRole(currentUser!);
-      if (requestedRole.isNotEmpty && requestedRole != role.value) {
-        throw const AuthRegistrationException(
-          'This verified email is already assigned to another account role.',
-        );
+      final existing = await loadCurrentAccount();
+      if (existing?.profilePending == true && existing?.assignedRole == role) {
+        throw const AuthIncompleteRegistrationFound(emailVerified: true);
       }
-      return false;
+      throw const AuthRegistrationException(
+        'This email is already registered. Log in or use another email.',
+      );
     }
 
-    final response = await _client.auth.signUp(
-      email: normalizedEmail,
-      password: password,
-      data: <String, Object?>{
-        'requested_role': role.value,
-        'signup_stage': 'profile_pending',
-      },
-    );
+    AuthResponse response;
+    try {
+      response = await _client.auth.signUp(
+        email: normalizedEmail,
+        password: password,
+        data: <String, Object?>{
+          'requested_role': role.value,
+          'signup_stage': 'profile_pending',
+        },
+      );
+    } on AuthException catch (error) {
+      final code = error.code?.toLowerCase();
+      final message = error.message.toLowerCase();
+      if (code == 'user_already_exists' ||
+          code == 'email_exists' ||
+          message.contains('already registered') ||
+          message.contains('already exists')) {
+        return await _probeExistingSignup(normalizedEmail, password, role);
+      }
+      rethrow;
+    }
     final user = response.user;
     if (user == null) {
       throw const AuthRegistrationException('Account creation failed.');
     }
     if (user.identities?.isEmpty == true) {
-      throw const AuthRegistrationException(
-        'This email is already registered. Log in or use another email.',
-      );
+      return await _probeExistingSignup(normalizedEmail, password, role);
     }
     if (response.session != null) {
       await _client.auth.signOut();
@@ -139,6 +150,33 @@ class SupabaseAuthService {
       );
     }
     return true;
+  }
+
+  Future<Never> _probeExistingSignup(
+    String email,
+    String password,
+    AuthRole role,
+  ) async {
+    try {
+      await _client.auth.signInWithPassword(email: email, password: password);
+      final existing = await loadCurrentAccount();
+      if (existing?.profilePending == true && existing?.assignedRole == role) {
+        throw const AuthIncompleteRegistrationFound(emailVerified: true);
+      }
+      await _client.auth.signOut();
+      throw const AuthRegistrationException(
+        'This email is already registered. Log in or use another email.',
+      );
+    } on AuthRegistrationException {
+      rethrow;
+    } on AuthException catch (error) {
+      if (error.code?.toLowerCase() == 'email_not_confirmed') {
+        throw const AuthIncompleteRegistrationFound(emailVerified: false);
+      }
+      throw const AuthRegistrationException(
+        'This email is already registered. Log in or use another email.',
+      );
+    }
   }
 
   Future<RegisteredAccount?> loadCurrentAccount() async {

@@ -119,7 +119,7 @@ class ProductEditCompactDropdown extends StatelessWidget {
       child: DropdownButtonFormField<String>(
         dropdownColor: AppDropdownStyle.menuColor,
         borderRadius: AppDropdownStyle.menuBorderRadius,
-        style: AppDropdownStyle.textStyle.copyWith(fontSize: 11),
+        style: AppDropdownStyle.textStyle.copyWith(fontSize: 12),
         iconEnabledColor: AppDropdownStyle.iconColor,
         initialValue: value,
         isExpanded: true,

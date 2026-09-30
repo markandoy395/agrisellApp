@@ -16,6 +16,10 @@ import 'package:agresell_app/features/farmer/products/presentation/widgets/farm_
 import 'package:agresell_app/features/farmer/products/presentation/widgets/farmer_restock_dialog.dart';
 import 'package:agresell_app/features/farmer/dashboard/presentation/widgets/farmer_quick_menu.dart';
 import 'package:agresell_app/features/farmer/dashboard/presentation/widgets/farmer_sold_status_overlay.dart';
+import 'package:agresell_app/features/farmer/verification/data/farmer_verification_repository.dart';
+import 'package:agresell_app/features/farmer/verification/domain/farmer_verification_details.dart';
+import 'package:agresell_app/features/farmer/verification/presentation/screens/farmer_information_request_screen.dart';
+import 'package:agresell_app/features/farmer/verification/presentation/widgets/farmer_information_request_banner.dart';
 part 'package:agresell_app/features/farmer/dashboard/presentation/widgets/farmer_dashboard_header.dart';
 part 'package:agresell_app/features/farmer/dashboard/presentation/widgets/farmer_add_product_button.dart';
 part 'package:agresell_app/features/farmer/dashboard/presentation/widgets/farmer_dashboard_tabs.dart';
@@ -29,11 +33,13 @@ class FarmerDashboardScreen extends StatefulWidget {
   const FarmerDashboardScreen({
     this.pickProductImageBytes,
     this.commodityRepository = const FarmerCommodityRepository(),
+    this.verificationRepository = const FarmerVerificationRepository(),
     this.onNavigate,
     super.key,
   });
   final ProductImagePicker? pickProductImageBytes;
   final FarmerCommodityRepository commodityRepository;
+  final FarmerVerificationRepository verificationRepository;
   final ValueChanged<FarmerQuickDestination>? onNavigate;
   @override
   State<FarmerDashboardScreen> createState() => _FarmerDashboardScreenState();
@@ -48,11 +54,13 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
   var _isLoadingProducts = false;
   var _isSavingProduct = false;
   final _restockingProductIds = <int>{};
+  FarmerVerificationDetails? _verificationDetails;
   @override
   void initState() {
     super.initState();
     _products = <FarmerDashboardProduct>[];
     _loadProducts();
+    _loadVerificationDetails();
   }
 
   @override
@@ -82,7 +90,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
     final width = MediaQuery.sizeOf(context).width;
     final horizontalPadding = width < 380 ? 12.0 : 14.0;
     final gridSpacing = width < 380 ? 9.0 : 11.0;
-    final productRatio = width < 380 ? 0.6 : 0.65;
+    final productRatio = width < 380 ? 0.72 : 0.75;
     final navClearance = 148.0 + MediaQuery.paddingOf(context).bottom;
     return ColoredBox(
       color: AgrisellColors.homeBackground,
@@ -105,6 +113,13 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
               child: CustomScrollView(
                 physics: const ClampingScrollPhysics(),
                 slivers: [
+                  if (_verificationDetails?.isNeedsInformation == true)
+                    SliverToBoxAdapter(
+                      child: FarmerInformationRequestBanner(
+                        details: _verificationDetails!,
+                        onTap: _openResubmitInformation,
+                      ),
+                    ),
                   SliverToBoxAdapter(
                     child: _FarmerAddProductButton(
                       horizontalPadding: horizontalPadding,
@@ -138,7 +153,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
                       const SliverToBoxAdapter(
                         child: _FarmerDashboardEmptyState(
                           message:
-                              'Products from the backend will appear here.',
+                              'Your products will appear here once you add them.',
                         ),
                       )
                     else if (visibleProducts.isEmpty)
@@ -370,6 +385,31 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
     final messenger = ScaffoldMessenger.of(context);
     messenger.clearSnackBars();
     messenger.showAppSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _loadVerificationDetails() async {
+    final details =
+        await widget.verificationRepository.loadVerificationDetails();
+    if (mounted && details != null) {
+      setState(() => _verificationDetails = details);
+    }
+  }
+
+  Future<void> _openResubmitInformation() async {
+    final details = _verificationDetails;
+    if (details == null) return;
+
+    final resubmitted = await Navigator.of(context).push<bool>(
+      agrisellPageRoute<bool>(
+        builder: (_) => FarmerInformationRequestScreen(
+          details: details,
+          repository: widget.verificationRepository,
+        ),
+      ),
+    );
+    if (resubmitted == true && mounted) {
+      _loadVerificationDetails();
+    }
   }
 
   bool get _canPostProducts {

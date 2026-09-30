@@ -12,145 +12,177 @@ class _FarmerProductDetails extends StatelessWidget {
   final bool isRestocking;
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) {
-      final description = product.description.trim();
-      final isCompact = constraints.maxHeight < 132;
-      final valueColor = product.isSold
-          ? AgrisellColors.mutedText
-          : AgrisellColors.authGreen;
-      final nameColor = product.isSold
-          ? AgrisellColors.brandBlack.withValues(alpha: 0.72)
-          : AgrisellColors.brandBlack;
+  Widget build(BuildContext context) {
+    final valueColor = product.isSold
+        ? AgrisellColors.mutedText
+        : AgrisellColors.authGreen;
+    final nameColor = product.isSold
+        ? AgrisellColors.brandBlack.withValues(alpha: 0.72)
+        : AgrisellColors.brandBlack;
+    final unit = product.unit.trim();
+    final unitLabel = unit.toLowerCase().startsWith('per ')
+        ? ' $unit'
+        : ' / $unit';
 
-      return Padding(
-        padding: const EdgeInsets.fromLTRB(12, 10, 12, 11),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              product.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(10, 8, 8, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            product.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: nameColor,
+              fontSize: 15,
+              height: 1.1,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text.rich(
+            TextSpan(
+              text: product.price,
               style: TextStyle(
-                color: nameColor,
-                fontSize: 13,
-                height: 1.1,
+                color: valueColor,
+                fontSize: 15,
+                height: 1,
                 fontWeight: FontWeight.w800,
               ),
-            ),
-            const SizedBox(height: 5),
-            Text.rich(
-              TextSpan(
-                text: product.price,
-                style: TextStyle(
-                  color: valueColor,
-                  fontSize: 14,
-                  height: 1,
-                  fontWeight: FontWeight.w800,
-                ),
-                children: [
-                  TextSpan(
-                    text: ' / ${product.unit}',
-                    style: const TextStyle(
-                      color: AgrisellColors.mutedText,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            if (description.isNotEmpty) ...[
-              const SizedBox(height: 6),
-              Text(
-                description,
-                maxLines: isCompact ? 1 : 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 12,
-                  height: 1.25,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-            const SizedBox(height: 4),
-            Text(
-              product.harvestDate,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AgrisellColors.mutedText,
-                fontSize: 10,
-                height: 1,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const Spacer(),
-            Container(height: 1, color: AgrisellColors.borderLine),
-            const SizedBox(height: 7),
-            Row(
               children: [
-                Icon(
-                  product.isOutOfStock
-                      ? Icons.inventory_2_outlined
-                      : Icons.inventory_outlined,
-                  color: valueColor,
-                  size: 14,
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    product.isOutOfStock
-                        ? 'OUT OF STOCK'
-                        : 'Stock: ${product.availableWeight}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: product.isOutOfStock
-                          ? AgrisellColors.statusRedText
-                          : AgrisellColors.mutedText,
-                      fontSize: 11,
-                      height: 1,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 4),
-                SizedBox(
-                  height: 28,
-                  child: TextButton(
-                    onPressed: isRestocking ? null : onRestock,
-                    style: TextButton.styleFrom(
-                      foregroundColor: AgrisellColors.authGreen,
-                      padding: const EdgeInsets.symmetric(horizontal: 7),
-                      minimumSize: const Size(0, 28),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: isRestocking
-                        ? const SizedBox.square(
-                            dimension: 14,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Text(
-                            product.isOutOfStock ? 'Restock' : 'Add stock',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
+                TextSpan(
+                  text: unitLabel,
+                  style: const TextStyle(
+                    color: AgrisellColors.mutedText,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          if (product.isInActiveSale) ...[
+            const SizedBox(height: 3),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              decoration: BoxDecoration(
+                color: AgrisellColors.forestSoft,
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(
+                  color: AgrisellColors.authGreen.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Text(
+                'In Sale: ${product.activeSaleName ?? 'Admin Promotion'}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: AgrisellColors.authGreen,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
           ],
-        ),
-      );
-    },
-  );
+          const Spacer(),
+          Row(
+            children: [
+              Icon(
+                Icons.inventory_2_outlined,
+                color: product.isOutOfStock
+                    ? AgrisellColors.statusRedText
+                    : AgrisellColors.mutedText,
+                size: 14,
+              ),
+              const SizedBox(width: 5),
+              Expanded(
+                child: Text(
+                  product.isOutOfStock
+                      ? 'OUT OF STOCK'
+                      : 'Stock: ${product.availableWeight}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: product.isOutOfStock
+                        ? AgrisellColors.statusRedText
+                        : AgrisellColors.mutedText,
+                    fontSize: 12,
+                    height: 1,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              _StockActionButton(
+                isOutOfStock: product.isOutOfStock,
+                isLoading: isRestocking,
+                onPressed: onRestock,
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              const Icon(
+                Icons.calendar_today_outlined,
+                color: AgrisellColors.mutedText,
+                size: 14,
+              ),
+              const SizedBox(width: 5),
+              Expanded(
+                child: Text(
+                  product.harvestDate,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AgrisellColors.mutedText,
+                    fontSize: 12,
+                    height: 1,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StockActionButton extends StatelessWidget {
+  const _StockActionButton({
+    required this.isOutOfStock,
+    required this.isLoading,
+    required this.onPressed,
+  });
+
+  final bool isOutOfStock;
+  final bool isLoading;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = isOutOfStock ? 'Restock product' : 'Add product stock';
+    return SizedBox.square(
+      dimension: 30,
+      child: IconButton(
+        tooltip: label,
+        onPressed: isLoading ? null : onPressed,
+        padding: EdgeInsets.zero,
+        visualDensity: VisualDensity.compact,
+        color: AgrisellColors.authGreen,
+        iconSize: 18,
+        icon: isLoading
+            ? const SizedBox.square(
+                dimension: 14,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const Icon(Icons.add_circle_outline_rounded),
+      ),
+    );
+  }
 }
 
 class _EditProductButton extends StatelessWidget {
@@ -168,23 +200,17 @@ class _EditProductButton extends StatelessWidget {
         onTap: onTap,
         radius: 19,
         child: Container(
-          width: 34,
-          height: 34,
+          width: 30,
+          height: 30,
           decoration: BoxDecoration(
             color: AgrisellColors.surface.withValues(alpha: 0.94),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: AgrisellColors.brandBlack.withValues(alpha: 0.14),
-                blurRadius: 7,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(7),
+            border: Border.all(color: AgrisellColors.borderLine),
           ),
           child: const Icon(
-            Icons.edit_rounded,
+            Icons.edit_outlined,
             color: AgrisellColors.authGreen,
-            size: 18,
+            size: 16,
           ),
         ),
       ),

@@ -1,5 +1,5 @@
 import 'package:agresell_app/features/rider/deliveries/data/rider_routing_service.dart';
-import 'package:agresell_app/features/rider/deliveries/domain/delivery_route.dart';
+import 'package:agresell_app/features/shared/routing/domain/delivery_route.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_route_plan.dart';
 
 List<RiderRoutePlan> parseOsrmRiderRoutes(

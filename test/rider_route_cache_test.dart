@@ -1,6 +1,6 @@
 import 'package:agresell_app/features/rider/deliveries/data/rider_route_cache.dart';
 import 'package:agresell_app/features/rider/deliveries/data/rider_map_view_cache.dart';
-import 'package:agresell_app/features/rider/deliveries/domain/delivery_route.dart';
+import 'package:agresell_app/features/shared/routing/domain/delivery_route.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_route_plan.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';

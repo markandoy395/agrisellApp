@@ -1,5 +1,7 @@
 import 'package:agresell_app/features/rider/safety/domain/rider_safety_action.dart';
 import 'package:agresell_app/features/rider/safety/domain/rider_safety_report.dart';
+import 'package:agresell_app/features/shared/support/data/support_ticket_repository.dart';
+import 'package:agresell_app/features/shared/support/domain/support_ticket.dart';
 
 abstract interface class RiderSafetyRepository {
   Future<void> submit(RiderSafetyAction action);
@@ -13,20 +15,32 @@ abstract interface class RiderSafetyRepository {
   });
 }
 
-/// Empty local adapter; production should send these actions to a support API.
+/// Local adapter; can forward actions to SupportTicketRepository.
 class InMemoryRiderSafetyRepository implements RiderSafetyRepository {
   InMemoryRiderSafetyRepository({
     Iterable<RiderSafetyAction> actions = const [],
     Iterable<RiderSafetyReport> reports = const [],
+    SupportTicketRepository? supportTicketRepository,
   }) : _actions = [...actions],
-       _reports = {for (final report in reports) report.id: report};
+       _reports = {for (final report in reports) report.id: report},
+       _supportTicketRepository = supportTicketRepository;
 
   final List<RiderSafetyAction> _actions;
   final Map<String, RiderSafetyReport> _reports;
+  final SupportTicketRepository? _supportTicketRepository;
 
   @override
   Future<void> submit(RiderSafetyAction action) async {
     _actions.add(action);
+    if (action.type == RiderSafetyActionType.contactSupport &&
+        _supportTicketRepository != null) {
+      await _supportTicketRepository.createTicket(
+        subject: 'Rider Safety: ${action.type.label}',
+        category: SupportTicketCategory.safety,
+        message: action.reason ?? 'Rider requested support through safety tools.',
+        priority: SupportTicketPriority.high,
+      );
+    }
   }
 
   @override

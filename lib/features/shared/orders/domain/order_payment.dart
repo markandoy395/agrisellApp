@@ -79,6 +79,10 @@ class OrderPayment {
     this.refundReference = '',
     this.receiptImageReference = '',
     this.receiptImageName = '',
+    this.refundAmount,
+    this.refundedAt,
+    this.refundReason = '',
+    this.refundStatus = '',
   });
 
   const OrderPayment.cashOnDelivery()
@@ -87,7 +91,11 @@ class OrderPayment {
       transactionReference = '',
       refundReference = '',
       receiptImageReference = '',
-      receiptImageName = '';
+      receiptImageName = '',
+      refundAmount = null,
+      refundedAt = null,
+      refundReason = '',
+      refundStatus = '';
 
   factory OrderPayment.gcash(
     String reference, {
@@ -100,6 +108,10 @@ class OrderPayment {
     refundReference: '',
     receiptImageReference: receiptImageReference.trim(),
     receiptImageName: receiptImageName.trim(),
+    refundAmount: null,
+    refundedAt: null,
+    refundReason: '',
+    refundStatus: '',
   );
 
   final OrderPaymentMethod method;
@@ -108,6 +120,10 @@ class OrderPayment {
   final String refundReference;
   final String receiptImageReference;
   final String receiptImageName;
+  final double? refundAmount;
+  final DateTime? refundedAt;
+  final String refundReason;
+  final String refundStatus;
 
   static final _gcashReferenceSeparators = RegExp(r'[\s_-]+');
 
@@ -126,6 +142,13 @@ class OrderPayment {
       (status == OrderPaymentStatus.submittedForVerification ||
           status == OrderPaymentStatus.paymentReviewRequired);
   bool get hasReceiptImage => receiptImageReference.trim().isNotEmpty;
+  bool get hasRefund =>
+      refundReference.isNotEmpty ||
+      status == OrderPaymentStatus.refundRequired ||
+      status == OrderPaymentStatus.refunded;
+  bool get isRefundCompleted =>
+      status == OrderPaymentStatus.refunded ||
+      refundStatus.toLowerCase() == 'completed';
 
   OrderPayment copyWith({
     OrderPaymentStatus? status,
@@ -133,6 +156,10 @@ class OrderPayment {
     String? refundReference,
     String? receiptImageReference,
     String? receiptImageName,
+    double? refundAmount,
+    DateTime? refundedAt,
+    String? refundReason,
+    String? refundStatus,
   }) => OrderPayment(
     method: method,
     status: status ?? this.status,
@@ -140,5 +167,9 @@ class OrderPayment {
     refundReference: refundReference ?? this.refundReference,
     receiptImageReference: receiptImageReference ?? this.receiptImageReference,
     receiptImageName: receiptImageName ?? this.receiptImageName,
+    refundAmount: refundAmount ?? this.refundAmount,
+    refundedAt: refundedAt ?? this.refundedAt,
+    refundReason: refundReason ?? this.refundReason,
+    refundStatus: refundStatus ?? this.refundStatus,
   );
 }

@@ -7,11 +7,15 @@ class OrderSnapshotMerger {
     Object? reviews,
     Object? expirations,
     Object? cancellations,
+    Object? refunds,
+    Object? disputes,
   }) {
     final paymentByOrder = _byOrderId(payments);
     final reviewByOrder = _byOrderId(reviews);
     final expirationByOrder = _byOrderId(expirations);
     final cancellationByOrder = _byOrderId(cancellations);
+    final refundByOrder = _byOrderId(refunds);
+    final disputeByOrder = _byOrderId(disputes);
     if (orders is! List) return const [];
 
     return orders
@@ -23,7 +27,32 @@ class OrderSnapshotMerger {
           final review = reviewByOrder[id];
           final expiration = expirationByOrder[id];
           final cancellation = cancellationByOrder[id];
+          final refund = refundByOrder[id];
+          final dispute = disputeByOrder[id];
+          if (dispute != null) order['dispute'] = dispute;
           if (payment != null) order['payment'] = payment;
+          if (refund != null) {
+            final currentPayment = Map<String, Object?>.from(
+              (order['payment'] as Map?) ?? const {},
+            );
+            if (refund['refundReference'] != null &&
+                (refund['refundReference'] as String).isNotEmpty) {
+              currentPayment['refundReference'] = refund['refundReference'];
+            }
+            if (refund['amount'] != null) {
+              currentPayment['refundAmount'] = refund['amount'];
+            }
+            if (refund['completedAt'] != null) {
+              currentPayment['refundedAt'] = refund['completedAt'];
+            }
+            if (refund['reason'] != null) {
+              currentPayment['refundReason'] = refund['reason'];
+            }
+            if (refund['refundStatus'] != null) {
+              currentPayment['refundStatus'] = refund['refundStatus'];
+            }
+            order['payment'] = currentPayment;
+          }
           if (review != null) {
             final itemReviews = review['itemReviews'];
             if (itemReviews is List) {

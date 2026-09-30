@@ -5,7 +5,7 @@ import 'package:flutter_map/flutter_map.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
-import 'package:agresell_app/features/rider/deliveries/domain/delivery_route.dart';
+import 'package:agresell_app/features/shared/routing/domain/delivery_route.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_nearby_farm.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_road_access.dart';
@@ -329,7 +329,7 @@ class _MapToolbar extends StatelessWidget {
                   'Live GPS · ${radiusKm.toStringAsFixed(0)} km service radius',
                   style: const TextStyle(
                     color: AgrisellColors.mutedText,
-                    fontSize: 11,
+                    fontSize: 12,
                   ),
                 ),
               ],
@@ -383,7 +383,7 @@ class _MapDiscoveryError extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: AgrisellColors.statusOrangeText,
-                fontSize: 11,
+                fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -470,8 +470,9 @@ class _ActiveDeliveryCard extends StatelessWidget {
                     'ACTIVE DELIVERY',
                     style: TextStyle(
                       color: AgrisellColors.statusOrangeText,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.3,
                     ),
                   ),
                   Text(

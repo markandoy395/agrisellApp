@@ -111,7 +111,7 @@ class _CheckoutItemDetails extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: AgrisellColors.authGreen,
-                    fontSize: 11.5,
+                    fontSize: 12,
                     height: 1,
                     fontWeight: FontWeight.w700,
                   ),
@@ -137,7 +137,7 @@ class _CheckoutItemDetails extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   color: AgrisellColors.forestDark,
-                  fontSize: 11,
+                  fontSize: 12,
                   height: 1,
                   fontWeight: FontWeight.w800,
                 ),

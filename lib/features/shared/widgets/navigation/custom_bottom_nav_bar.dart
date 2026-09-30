@@ -8,6 +8,15 @@ export 'package:agresell_app/core/models/home_bottom_nav_item.dart';
 export 'package:agresell_app/features/shared/widgets/navigation/notch_nav_button.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
+  static const defaultHeight = 68.0;
+  static const verticalMargin = 8.0;
+
+  static double clearanceFor(BuildContext context) {
+    return defaultHeight +
+        (verticalMargin * 2) +
+        MediaQuery.paddingOf(context).bottom;
+  }
+
   const CustomBottomNavBar({
     required this.items,
     required this.selectedIndex,
@@ -19,7 +28,7 @@ class CustomBottomNavBar extends StatelessWidget {
     required this.inactiveLabelColor,
     required this.shadowColor,
     this.badgeCounts = const {},
-    this.height = 68,
+    this.height = defaultHeight,
     this.activeButtonSize = 40,
     this.activeVerticalOffset = 0,
     this.duration = const Duration(milliseconds: 220),
@@ -63,9 +72,9 @@ class CustomBottomNavBar extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.fromLTRB(
           horizontalMargin,
-          8,
+          verticalMargin,
           horizontalMargin,
-          bottomInset + 8,
+          bottomInset + verticalMargin,
         ),
         child: Material(
           color: background,

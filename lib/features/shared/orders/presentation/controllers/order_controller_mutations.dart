@@ -177,4 +177,50 @@ extension OrderControllerMutations on OrderController {
       rethrow;
     }
   }
+
+  Future<void> reportOrderDispute({
+    required String orderId,
+    required OrderDisputeCategory category,
+    required String reason,
+    required OrderDisputeResolution requestedResolution,
+  }) async {
+    final index = _orders.indexWhere((order) => order.id == orderId);
+    if (index == -1) return;
+    final cleanReason = reason.trim();
+    if (cleanReason.isEmpty) {
+      throw StateError('Please explain the issue with your delivered produce.');
+    }
+    final previousOrder = _orders[index];
+    if (!previousOrder.canDispute) {
+      throw StateError('This order cannot be disputed.');
+    }
+    final accountId = _accountId;
+    if (accountId == null) throw StateError('Sign in before reporting an issue.');
+
+    final dispute = OrderDispute(
+      status: OrderDisputeStatus.pending,
+      category: category,
+      reason: cleanReason,
+      requestedResolution: requestedResolution,
+      submittedAt: DateTime.now(),
+    );
+
+    await _repository.reportOrderDispute(
+      accountId: accountId,
+      orderId: orderId,
+      category: category.value,
+      reason: cleanReason,
+      requestedResolution: requestedResolution.value,
+    );
+
+    _orders[index] = previousOrder.copyWith(dispute: dispute);
+    _addOrderNotification(
+      order: _orders[index],
+      title: 'Dispute submitted',
+      description:
+          'Your dispute for "${_orders[index].title}" was submitted for review.',
+      visibleTo: const {AuthRole.buyer},
+    );
+    _commitChange(persist: false);
+  }
 }

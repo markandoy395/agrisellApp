@@ -145,7 +145,7 @@ class _EarningsCard extends StatelessWidget {
                 'PHP ${metrics.todayEstimatedEarnings.toStringAsFixed(2)}',
                 style: const TextStyle(
                   color: AgrisellColors.headingGreen,
-                  fontSize: 17,
+                  fontSize: 15,
                   height: 1.1,
                   fontWeight: FontWeight.w900,
                 ),

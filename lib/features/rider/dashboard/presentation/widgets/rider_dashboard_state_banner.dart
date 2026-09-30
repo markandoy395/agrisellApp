@@ -253,7 +253,7 @@ class _StatsChip extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
             color: AgrisellColors.mutedText,
-            fontSize: 10,
+            fontSize: 12,
             height: 1.1,
             fontWeight: FontWeight.w700,
           ),

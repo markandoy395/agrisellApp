@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
+
 class NotificationCardActions extends StatelessWidget {
   const NotificationCardActions({
     required this.title,
@@ -22,6 +24,7 @@ class NotificationCardActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
+    mainAxisSize: MainAxisSize.min,
     children: [
       PopupMenuButton<_NotificationAction>(
         tooltip: 'Options for $title',
@@ -43,12 +46,18 @@ class NotificationCardActions extends StatelessWidget {
       ),
       if (isExpandable)
         IconButton(
+          key: const Key('notification_expand_button'),
           tooltip: isExpanded ? 'Collapse notification' : 'Expand notification',
           onPressed: onToggleExpanded,
+          visualDensity: VisualDensity.compact,
           icon: AnimatedRotation(
             turns: isExpanded ? 0.5 : 0,
             duration: const Duration(milliseconds: 180),
-            child: const Icon(Icons.keyboard_arrow_down, size: 24),
+            child: const Icon(
+              Icons.keyboard_arrow_down,
+              size: 24,
+              color: AgrisellColors.mutedText,
+            ),
           ),
         ),
     ],

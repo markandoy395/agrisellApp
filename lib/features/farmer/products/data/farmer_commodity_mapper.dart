@@ -69,6 +69,23 @@ abstract final class FarmerCommodityMapper {
       storageInstructions: FarmerCommodityFormat.optionalText(
         row['storage_instructions'],
       ),
+      activeSaleName: FarmerCommodityFormat.optionalText(row['active_sale_name']),
+      activeSaleDiscount: FarmerCommodityFormat.optionalText(
+        row['active_sale_discount'],
+      ),
+      activeSaleEndsAt: DateTime.tryParse(
+        FarmerCommodityFormat.text(row['active_sale_ends_at']),
+      ),
+      activeSaleId: FarmerCommodityFormat.integer(row['active_sale_id']),
+      activeSaleIsFarmerOwned: row['active_sale_is_farmer_owned'] == true,
+      activeSaleType: FarmerCommodityFormat.optionalText(row['active_sale_type']),
+      activeSaleValue: (row['active_sale_value'] as num?)?.toDouble(),
+      activeSalePromoCode: FarmerCommodityFormat.optionalText(
+        row['active_sale_promo_code'],
+      ),
+      activeSaleStartsAt: DateTime.tryParse(
+        FarmerCommodityFormat.text(row['active_sale_starts_at']),
+      ),
     );
   }
 }

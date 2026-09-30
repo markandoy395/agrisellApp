@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/responsive.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/keyboard_adaptive_scroll_view.dart';
 
 class AuthCard extends StatelessWidget {
   const AuthCard({
@@ -9,6 +10,7 @@ class AuthCard extends StatelessWidget {
     required this.child,
     this.largeTitle = false,
     this.scrollable = true,
+    this.fillRemaining = true,
     super.key,
   });
 
@@ -16,6 +18,7 @@ class AuthCard extends StatelessWidget {
   final Widget child;
   final bool largeTitle;
   final bool scrollable;
+  final bool fillRemaining;
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +32,9 @@ class AuthCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(
-        lerpDouble(30, 42, scale),
+        lerpDouble(24, 42, scale),
         lerpDouble(28, 36, scale) - keyboardCompaction,
-        lerpDouble(30, 42, scale),
+        lerpDouble(24, 42, scale),
         lerpDouble(22, 28, scale) +
             bottomPadding +
             keyboardPadding +
@@ -56,12 +59,9 @@ class AuthCard extends StatelessWidget {
           SizedBox(height: lerpDouble(18, 22, scale) - keyboardCompaction),
           Expanded(
             child: scrollable
-                ? CustomScrollView(
-                    keyboardDismissBehavior:
-                        ScrollViewKeyboardDismissBehavior.onDrag,
-                    slivers: [
-                      SliverFillRemaining(hasScrollBody: false, child: child),
-                    ],
+                ? KeyboardAdaptiveScrollView(
+                    fillRemaining: fillRemaining,
+                    child: child,
                   )
                 : child,
           ),

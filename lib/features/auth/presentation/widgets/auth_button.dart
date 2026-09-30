@@ -8,18 +8,27 @@ class AuthPrimaryButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.isLoading = false,
+    this.loginStyle = false,
+    this.borderRadius,
+    this.hasShadow = false,
+    this.fontSize,
     super.key,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final bool isLoading;
+  final bool loginStyle;
+  final double? borderRadius;
+  final bool hasShadow;
+  final double? fontSize;
 
   @override
   Widget build(BuildContext context) {
     final scale = authScale(MediaQuery.sizeOf(context).width);
+    final effectiveRadius = borderRadius ?? (loginStyle ? 14.0 : 8.0);
 
-    return SizedBox(
+    final button = SizedBox(
       width: double.infinity,
       height: 50,
       child: FilledButton(
@@ -27,9 +36,11 @@ class AuthPrimaryButton extends StatelessWidget {
         style: FilledButton.styleFrom(
           backgroundColor: AgrisellColors.authGreen,
           foregroundColor: AgrisellColors.surface,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(effectiveRadius),
+          ),
           textStyle: TextStyle(
-            fontSize: lerpDouble(12, 13, scale),
+            fontSize: fontSize ?? lerpDouble(12, 13, scale),
             fontWeight: FontWeight.w600,
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -40,9 +51,37 @@ class AuthPrimaryButton extends StatelessWidget {
                 height: 18,
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
+            : loginStyle
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(label),
+                  const SizedBox(width: 12),
+                  const Icon(Icons.arrow_forward, size: 20),
+                ],
+              )
             : Text(label),
       ),
     );
+
+    if (hasShadow) {
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(effectiveRadius),
+          boxShadow: [
+            BoxShadow(
+              color: AgrisellColors.authGreen.withValues(alpha: 0.32),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: button,
+      );
+    }
+
+    return button;
   }
 }
 

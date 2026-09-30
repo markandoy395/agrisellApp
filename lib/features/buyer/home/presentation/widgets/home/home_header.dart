@@ -9,11 +9,16 @@ import 'package:agresell_app/features/buyer/cart/presentation/widgets/common/bas
 import 'package:agresell_app/features/shared/widgets/navigation/home_asset_icon.dart';
 
 class HomeHeader extends StatelessWidget {
-  const HomeHeader({super.key});
+  const HomeHeader({
+    this.horizontalPadding,
+    super.key,
+  });
+
+  final double? horizontalPadding;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    Widget content = Row(
       children: [
         const ResponsiveAssetImage(
           asset: AgrisellAssets.logoLandscapeTextOnly,
@@ -42,6 +47,20 @@ class HomeHeader extends StatelessWidget {
         ),
       ],
     );
+
+    if (horizontalPadding != null) {
+      return Padding(
+        padding: EdgeInsets.fromLTRB(
+          horizontalPadding!,
+          14,
+          horizontalPadding!,
+          12,
+        ),
+        child: content,
+      );
+    }
+
+    return content;
   }
 
   void _showQuickMenu(BuildContext context) {

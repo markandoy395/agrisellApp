@@ -11,7 +11,7 @@ import 'package:agresell_app/features/auth/domain/auth_route_guard.dart';
 import 'package:agresell_app/features/auth/domain/login_validator.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/auth/presentation/auth_dashboard_router.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/auth_scaffold.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/login_page_layout.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/login_form.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/otp_verification_screen.dart';
 import 'package:agresell_app/features/auth/presentation/screens/role_selection_screen.dart';
@@ -69,10 +69,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AuthScaffold(
-      title: widget.title,
-      largeTitle: true,
-      compactCard: true,
+    return LoginPageLayout(
+      title: widget.title == 'Log In' ? 'Welcome Back' : widget.title,
+      cardHeightFactor: .60,
+      minimumCardHeight: 500,
+      maximumCardHeight: 560,
       child: LoginForm(
         identifierController: _identifier,
         passwordController: _password,

@@ -16,6 +16,7 @@ import 'package:agresell_app/features/auth/presentation/widgets/auth_divider.dar
 import 'package:agresell_app/features/auth/presentation/widgets/auth_password_requirements.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_scaffold.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_text_field.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/account_found_dialog.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/otp_verification_screen.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/sign_up_identity_fields.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/social_sign_in_button.dart';
@@ -86,6 +87,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) => AuthScaffold(
     key: ValueKey(_step),
     title: 'Sign Up',
+    fillRemaining: false,
     child: Column(
       children: [
         _progress(),
@@ -105,7 +107,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        'Step ${_step + 1} of 2',
+        '${_step + 1} of 2',
         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
       ),
       const SizedBox(height: 6),
@@ -272,12 +274,49 @@ class _SignUpScreenState extends State<SignUpScreen> {
         _otpStartedFor = null;
         _step = 1;
       });
+    } on AuthIncompleteRegistrationFound catch (found) {
+      await _resumeFoundAccount(email, found);
     } on AuthRegistrationException catch (error) {
       _showMessage(error.message);
     } catch (_) {
       _showMessage('We could not verify your email. Please try again.');
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  Future<void> _resumeFoundAccount(
+    String email,
+    AuthIncompleteRegistrationFound found,
+  ) async {
+    if (!mounted) return;
+    final continueRegistration = await AccountFoundDialog.show(context);
+    if (!continueRegistration) {
+      if (found.emailVerified) await AuthRegistrationService.instance.signOut();
+      return;
+    }
+    if (!mounted) return;
+    if (found.emailVerified) {
+      setState(() {
+        _verifiedEmail = email;
+        _step = 1;
+      });
+      return;
+    }
+    try {
+      await AuthRegistrationService.instance.resendSignupEmailOtp(email);
+      if (!mounted) return;
+      setState(() => _otpStartedFor = email);
+      final verified = await _verifySignupEmail(email);
+      if (verified && mounted) {
+        setState(() {
+          _verifiedEmail = email;
+          _otpStartedFor = null;
+          _step = 1;
+        });
+      }
+    } on AuthRegistrationException catch (error) {
+      if (mounted) _showMessage(error.message);
     }
   }
 
@@ -291,10 +330,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
           onChangeDestination: () {
             if (mounted) setState(() => _otpStartedFor = null);
           },
-          onVerify: (otp) => AuthRegistrationService.instance.verifyEmailOtp(
-            email: email,
-            otp: otp,
-          ),
+          onVerify: (otp) => AuthRegistrationService.instance
+              .verifySignupEmailOtp(email: email, otp: otp, role: widget.role),
           onResend: () =>
               AuthRegistrationService.instance.resendSignupEmailOtp(email),
         ),

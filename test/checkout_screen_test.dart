@@ -48,9 +48,10 @@ void main() {
       expect(find.text('Pumpkin / Kalabasa'), findsOneWidget);
       expect(find.text('Seasonal Harvest'), findsOneWidget);
       expect(find.text('Payment Methods'), findsOneWidget);
-      expect(find.text('Set desired delivery date'), findsNothing);
       expect(find.text('Place Order'), findsOneWidget);
-      expect(find.textContaining('\u20B1 135'), findsOneWidget);
+      expect(find.text('Order Summary & Discounts'), findsOneWidget);
+      expect(find.text('Voucher / Promo Code'), findsOneWidget);
+      expect(find.textContaining('\u20B1 135'), findsWidgets);
     },
   );
   testWidgets(

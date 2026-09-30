@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
-import 'package:agresell_app/features/auth/data/auth_registration_exception.dart';
+import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/account_found_dialog.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/keyboard_adaptive_scroll_view.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_draft.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_validator.dart';
@@ -125,79 +127,78 @@ class RiderRegistrationFormState extends State<RiderRegistrationForm>
         return const Center(child: CircularProgressIndicator());
       }
       final step = _controller.draft.step;
-      return Material(
-        color: AgrisellColors.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(18, 18, 14, 10),
-              child: Row(
-                children: [
-                  const Expanded(
-                    child: Text(
-                      'Rider Sign-Up',
-                      style: TextStyle(
-                        color: AgrisellColors.authGreen,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
+      final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+      return Padding(
+        padding: EdgeInsets.only(bottom: keyboardInset),
+        child: Material(
+          color: AgrisellColors.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 18, 14, 10),
+                child: Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Rider Sign-Up',
+                        style: TextStyle(
+                          color: AgrisellColors.authGreen,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
-                  ),
-                  TextButton(
-                    onPressed: confirmExit,
-                    child: const Text('Save & Exit'),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: CustomScrollView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                slivers: [
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(18, 8, 18, 18),
-                    sliver: SliverList.list(
-                      children: [
-                        RiderSignUpHeader(step: step),
-                        const SizedBox(height: 18),
-                        _stepBody(step),
-                        if (_controller.errorMessage != null) ...[
-                          const SizedBox(height: 12),
-                          Text(
-                            _controller.errorMessage!,
-                            style: const TextStyle(
-                              color: AgrisellColors.statusRedText,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ],
+                    TextButton(
+                      onPressed: confirmExit,
+                      child: const Text('Save & Exit'),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(18, 10, 18, 12),
-                child: RiderSignUpActions(
-                  isFirst: step == RiderSignUpStep.account,
-                  isLast: step == RiderSignUpStep.review,
-                  enabled: _controller.canContinue,
-                  loading:
-                      _controller.isSubmitting ||
-                      _controller.isCapturingLocation ||
-                      _isVerifyingEmail,
-                  onPrevious: () => unawaited(_controller.previousStep()),
-                  onContinue: _continue,
+                  ],
                 ),
               ),
-            ),
-          ],
+              Expanded(
+                child: KeyboardAdaptiveScrollView(
+                  padding: const EdgeInsets.fromLTRB(18, 8, 18, 18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      RiderSignUpHeader(step: step),
+                      const SizedBox(height: 18),
+                      _stepBody(step),
+                      if (_controller.errorMessage != null) ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          _controller.errorMessage!,
+                          style: const TextStyle(
+                            color: AgrisellColors.statusRedText,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 10, 18, 12),
+                  child: RiderSignUpActions(
+                    isFirst: step == RiderSignUpStep.account,
+                    isLast: step == RiderSignUpStep.review,
+                    enabled: _controller.canContinue,
+                    loading:
+                        _controller.isSubmitting ||
+                        _controller.isCapturingLocation ||
+                        _isVerifyingEmail,
+                    onPrevious: () => unawaited(_controller.previousStep()),
+                    onContinue: _continue,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     },
@@ -278,6 +279,8 @@ class RiderRegistrationFormState extends State<RiderRegistrationForm>
       setState(() => _otpStartedFor = null);
       _controller.markEmailVerified(email);
       await _controller.continueToNextStep();
+    } on AuthIncompleteRegistrationFound catch (found) {
+      await _resumeFoundAccount(email, found);
     } on AuthRegistrationException catch (error) {
       _controller.showEmailVerificationError(error.message);
     } catch (_) {
@@ -286,6 +289,38 @@ class RiderRegistrationFormState extends State<RiderRegistrationForm>
       );
     } finally {
       if (mounted) setState(() => _isVerifyingEmail = false);
+    }
+  }
+
+  Future<void> _resumeFoundAccount(
+    String email,
+    AuthIncompleteRegistrationFound found,
+  ) async {
+    if (!mounted) return;
+    final continueRegistration = await AccountFoundDialog.show(context);
+    if (!continueRegistration) {
+      if (found.emailVerified) await AuthRegistrationService.instance.signOut();
+      return;
+    }
+    if (!mounted) return;
+    if (found.emailVerified) {
+      _controller.markEmailVerified(email);
+      await _controller.continueToNextStep();
+      return;
+    }
+    try {
+      await AuthRegistrationService.instance.resendSignupEmailOtp(email);
+      if (!mounted) return;
+      setState(() => _otpStartedFor = email);
+      final verified = await widget.onEmailOtpRequired(email, () {
+        if (mounted) setState(() => _otpStartedFor = null);
+      });
+      if (!verified || !mounted) return;
+      setState(() => _otpStartedFor = null);
+      _controller.markEmailVerified(email);
+      await _controller.continueToNextStep();
+    } on AuthRegistrationException catch (error) {
+      _controller.showEmailVerificationError(error.message);
     }
   }
 }

@@ -6,6 +6,7 @@ import 'package:agresell_app/features/rider/dashboard/data/supabase_rider_analyt
 import 'package:agresell_app/features/rider/dashboard/domain/rider_analytics_models.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_history_models.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_rating_models.dart';
+import 'package:agresell_app/features/rider/dashboard/domain/rider_withdrawal_models.dart';
 
 enum RiderAnalyticsLoadState { idle, loading, ready, error }
 
@@ -20,6 +21,8 @@ class RiderAnalyticsController extends ChangeNotifier {
   RiderEarningsData _earnings = const RiderEarningsData.empty();
   List<RiderDeliveryHistoryEntry> _history = const [];
   RiderRatingsData _ratings = const RiderRatingsData.empty();
+  List<RiderWithdrawalMethod> _withdrawalMethods = const [];
+  List<RiderWithdrawalRequest> _withdrawalRequests = const [];
   String? _earningsError;
   String? _historyError;
   String? _ratingsError;
@@ -30,6 +33,10 @@ class RiderAnalyticsController extends ChangeNotifier {
   RiderEarningsData get earnings => _earnings;
   List<RiderDeliveryHistoryEntry> get history => List.unmodifiable(_history);
   RiderRatingsData get ratings => _ratings;
+  List<RiderWithdrawalMethod> get withdrawalMethods =>
+      List.unmodifiable(_withdrawalMethods);
+  List<RiderWithdrawalRequest> get withdrawalRequests =>
+      List.unmodifiable(_withdrawalRequests);
   String? get earningsError => _earningsError;
   String? get historyError => _historyError;
   String? get ratingsError => _ratingsError;
@@ -85,6 +92,57 @@ class RiderAnalyticsController extends ChangeNotifier {
       _ratingsError = 'Ratings could not be loaded.';
     }
     notifyListeners();
+  }
+
+  Future<void> loadWithdrawalMethods({required String riderId}) async {
+    try {
+      _withdrawalMethods =
+          await _repository.fetchWithdrawalMethods(riderId: riderId);
+      notifyListeners();
+    } catch (_) {}
+  }
+
+  Future<RiderWithdrawalMethod> saveWithdrawalMethod({
+    required String riderId,
+    required RiderWithdrawalMethod method,
+  }) async {
+    final saved = await _repository.saveWithdrawalMethod(
+      riderId: riderId,
+      method: method,
+    );
+    await loadWithdrawalMethods(riderId: riderId);
+    return saved;
+  }
+
+  Future<void> deleteWithdrawalMethod({
+    required String riderId,
+    required String methodId,
+  }) async {
+    await _repository.deleteWithdrawalMethod(
+      riderId: riderId,
+      methodId: methodId,
+    );
+    await loadWithdrawalMethods(riderId: riderId);
+  }
+
+  Future<RiderWithdrawalRequest> submitWithdrawalRequest({
+    required String riderId,
+    required RiderWithdrawalRequest request,
+  }) async {
+    final saved = await _repository.submitWithdrawalRequest(
+      riderId: riderId,
+      request: request,
+    );
+    await loadWithdrawalRequests(riderId: riderId);
+    return saved;
+  }
+
+  Future<void> loadWithdrawalRequests({required String riderId}) async {
+    try {
+      _withdrawalRequests =
+          await _repository.fetchWithdrawalRequests(riderId: riderId);
+      notifyListeners();
+    } catch (_) {}
   }
 }
 

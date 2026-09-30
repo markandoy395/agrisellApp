@@ -11,13 +11,27 @@ extension _RiderDeliveryDetailsContent on _RiderDeliveryDetailsScreenState {
           RiderPageHeader(
             title: 'Delivery details',
             subtitle: 'Order ${_request.orderNumber}',
-            action: IconButton(
-              tooltip: 'Back',
-              onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(
-                Icons.close_rounded,
-                color: AgrisellColors.surface,
-              ),
+            action: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  key: const Key('rider-print-waybill-button'),
+                  tooltip: 'Print Delivery Waybill',
+                  onPressed: _openWaybill,
+                  icon: const Icon(
+                    Icons.print_outlined,
+                    color: AgrisellColors.surface,
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'Back',
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    color: AgrisellColors.surface,
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -35,6 +49,28 @@ extension _RiderDeliveryDetailsContent on _RiderDeliveryDetailsScreenState {
 
   List<Widget> _requestContent() => [
     RiderRequestDetailSections(request: _request),
+    const SizedBox(height: 12),
+    SizedBox(
+      width: double.infinity,
+      height: 40,
+      child: OutlinedButton.icon(
+        key: const Key('rider-request-waybill-button'),
+        onPressed: _openWaybill,
+        icon: const Icon(Icons.receipt_long_rounded, size: 16),
+        label: const Text(
+          'Print / Download Waybill',
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+        ),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AgrisellColors.authGreen,
+          backgroundColor: AgrisellColors.surface,
+          side: const BorderSide(color: AgrisellColors.borderLine),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
+    ),
     const SizedBox(height: 12),
     RiderDeliveryActionPanel(
       request: _request,
@@ -91,6 +127,7 @@ extension _RiderDeliveryDetailsContent on _RiderDeliveryDetailsScreenState {
               : () => unawaited(_openConversation()),
           onProblem: _openProblemReport,
           onSafety: () => _openSafetyReport(currentStatus),
+          onWaybill: _openWaybill,
         ),
       ),
       const SizedBox(height: 14),
@@ -183,5 +220,10 @@ extension _RiderDeliveryDetailsContent on _RiderDeliveryDetailsScreenState {
         'Current rider GPS location is unavailable. Enable location services '
             'and Precise Location, then try again.',
     };
+  }
+
+  void _openWaybill() {
+    final waybill = _request.toWaybill();
+    showDeliveryWaybillSheet(context, waybill);
   }
 }

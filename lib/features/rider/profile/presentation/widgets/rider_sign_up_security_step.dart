@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_input_style.dart';
 import 'package:agresell_app/core/utils/password_policy.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_registration_validator.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_validator.dart';
@@ -127,13 +128,10 @@ class _RiderSignUpPasswordFieldState extends State<RiderSignUpPasswordField> {
     readOnly: widget.readOnly,
     onChanged: widget.onChanged,
     style: const TextStyle(fontSize: 13),
-    decoration: InputDecoration(
-      labelText: widget.label,
+    decoration: AuthInputStyle.decoration(
+      label: widget.label,
       contentPadding: riderSignUpFieldContentPadding,
       errorText: widget.error,
-      filled: true,
-      fillColor: AgrisellColors.fieldFill,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       suffixIcon: IconButton(
         tooltip: _hidden ? 'Show password' : 'Hide password',
         onPressed: () => setState(() => _hidden = !_hidden),

@@ -29,7 +29,7 @@ class _MetricTile extends StatelessWidget {
                 data.value,
                 style: const TextStyle(
                   color: AgrisellColors.headingGreen,
-                  fontSize: 18,
+                  fontSize: 15,
                   height: 1,
                   fontWeight: FontWeight.w900,
                 ),

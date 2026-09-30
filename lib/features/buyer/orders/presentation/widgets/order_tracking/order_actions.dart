@@ -10,16 +10,26 @@ class _OrderCardActions extends StatelessWidget {
     required this.onContactSeller,
     required this.onLeaveFeedback,
     required this.onRetryPayment,
+    this.hasRefund = false,
+    this.onTrackRefund,
+    this.hasDispute = false,
+    this.canDispute = false,
+    this.onDispute,
   });
 
   final PlacedOrderStatus status;
   final bool canLeaveFeedback;
   final bool canRetryPayment;
+  final bool hasRefund;
+  final bool hasDispute;
+  final bool canDispute;
   final VoidCallback onViewDetails;
   final VoidCallback onCancel;
   final VoidCallback onContactSeller;
   final VoidCallback onLeaveFeedback;
   final VoidCallback onRetryPayment;
+  final VoidCallback? onTrackRefund;
+  final VoidCallback? onDispute;
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +39,13 @@ class _OrderCardActions extends StatelessWidget {
         icon: Icons.visibility_outlined,
         onPressed: onViewDetails,
       ),
+      if (hasRefund && onTrackRefund != null)
+        _CompactActionButton(
+          label: 'Refund',
+          icon: Icons.receipt_long_outlined,
+          onPressed: onTrackRefund!,
+          isFilled: true,
+        ),
       if (status.canCancel)
         _CompactActionButton(
           label: 'Cancel',
@@ -48,6 +65,19 @@ class _OrderCardActions extends StatelessWidget {
           label: 'Chat',
           icon: Icons.chat_bubble_outline_rounded,
           onPressed: onContactSeller,
+        ),
+      if (hasDispute && onDispute != null)
+        _CompactActionButton(
+          label: 'Dispute',
+          icon: Icons.shield_outlined,
+          onPressed: onDispute!,
+          isFilled: true,
+        )
+      else if (canDispute && onDispute != null)
+        _CompactActionButton(
+          label: 'Dispute',
+          icon: Icons.report_problem_outlined,
+          onPressed: onDispute!,
         ),
       if (canLeaveFeedback)
         _CompactActionButton(

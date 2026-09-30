@@ -32,16 +32,18 @@ class NotificationFeed extends StatelessWidget {
         .where((notification) => filter.includes(notification.category))
         .toList(growable: false);
     if (filtered.isEmpty) {
-      return NotificationStateView(
-        icon: filter == NotificationFilter.all
-            ? Icons.notifications_none_rounded
-            : Icons.filter_alt_off_outlined,
-        title: filter == NotificationFilter.all
-            ? 'No notifications yet'
-            : 'No ${filter.label.toLowerCase()} updates',
-        message: filter == NotificationFilter.all
-            ? 'Orders, deliveries, messages, and account updates will appear here.'
-            : 'Try another filter or check again later.',
+      return SizedBox.expand(
+        child: NotificationStateView(
+          icon: filter == NotificationFilter.all
+              ? Icons.notifications_none_rounded
+              : Icons.filter_alt_off_outlined,
+          title: filter == NotificationFilter.all
+              ? 'No notifications yet'
+              : 'No ${filter.label.toLowerCase()} updates',
+          message: filter == NotificationFilter.all
+              ? 'Orders, deliveries, messages, and account updates will appear here.'
+              : null,
+        ),
       );
     }
     final groups = _group(filtered);

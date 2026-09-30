@@ -120,10 +120,7 @@ extension _FarmerSignUpValidation on _FarmerSignUpScreenState {
     );
     _put(
       'mainCrops',
-      FarmerSignupValidator.required(
-        _controllers.mainCrops.text,
-        'at least one main crop',
-      ),
+      FarmerSignupValidator.mainCrops(_controllers.mainCrops.text),
       _controllers.mainCrops.text,
       show,
     );
@@ -144,20 +141,42 @@ extension _FarmerSignUpValidation on _FarmerSignUpScreenState {
     );
     _put(
       'farmSizeUnit',
-      FarmerSignupValidator.required(
+      FarmerSignupValidator.choice(
         _controllers.farmSizeUnit.text,
-        'the farm size unit',
+        FarmerRegistrationChoices.farmSizeUnits,
+        'a farm size unit',
       ),
       _controllers.farmSizeUnit.text,
       show,
     );
     _put(
       'farmingType',
-      FarmerSignupValidator.required(
+      FarmerSignupValidator.choice(
         _controllers.farmingType.text,
-        'the farming type',
+        FarmerRegistrationChoices.farmingTypes,
+        'a farming type',
       ),
       _controllers.farmingType.text,
+      show,
+    );
+    _put(
+      'ownershipType',
+      FarmerSignupValidator.choice(
+        _controllers.ownershipType.text,
+        FarmerRegistrationChoices.landTenures,
+        'a land tenure / ownership status',
+      ),
+      _controllers.ownershipType.text,
+      show,
+    );
+    _put(
+      'irrigationType',
+      FarmerSignupValidator.optionalChoice(
+        _controllers.irrigationType.text,
+        FarmerRegistrationChoices.irrigationTypes,
+        'an irrigation type',
+      ),
+      _controllers.irrigationType.text,
       show,
     );
   }

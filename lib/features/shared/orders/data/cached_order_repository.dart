@@ -167,4 +167,30 @@ class CachedOrderRepository
       reference: reference,
     );
   }
+
+  @override
+  Future<void> reportOrderDispute({
+    required String accountId,
+    required String orderId,
+    required String category,
+    required String reason,
+    required String requestedResolution,
+  }) async {
+    if (_hasRemoteSession) {
+      await SupabaseOrderRepository(AgrisellSupabase.client).reportOrderDispute(
+        accountId: accountId,
+        orderId: orderId,
+        category: category,
+        reason: reason,
+        requestedResolution: requestedResolution,
+      );
+    }
+    await _local.reportOrderDispute(
+      accountId: accountId,
+      orderId: orderId,
+      category: category,
+      reason: reason,
+      requestedResolution: requestedResolution,
+    );
+  }
 }

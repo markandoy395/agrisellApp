@@ -10,8 +10,10 @@ import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider
 import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_history_filters.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_state_cards.dart';
+import 'package:agresell_app/features/rider/reporting/rider_financial_exporter.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/screens/rider_history_details_screen.dart';
+import 'package:agresell_app/features/shared/reporting/widgets/export_report_sheet.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 
 part 'rider_history_filters.dart';
@@ -54,6 +56,23 @@ class _RiderHistoryScreenState extends State<RiderHistoryScreen> {
     super.dispose();
   }
 
+  void _exportDeliveriesCsv() {
+    final report = RiderFinancialExporter.buildDeliveryHistoryReport(
+      deliveries: _controller.history,
+    );
+    final now = DateTime.now();
+    final dateStr =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    ExportReportSheet.show(
+      context,
+      title: 'Rider Delivery Manifest',
+      fileName: 'rider_deliveries_$dateStr.csv',
+      headers: report.headers,
+      rows: report.rows,
+      totalAmountLabel: '₱${report.totalAmount.toStringAsFixed(2)}',
+    );
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: AgrisellColors.homeBackground,
@@ -62,13 +81,26 @@ class _RiderHistoryScreenState extends State<RiderHistoryScreen> {
         RiderPageHeader(
           title: 'Delivery history',
           subtitle: 'Completed, cancelled, and failed deliveries',
-          action: IconButton(
-            tooltip: 'Close',
-            onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(
-              Icons.close_rounded,
-              color: AgrisellColors.surface,
-            ),
+          action: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                tooltip: 'Export CSV',
+                onPressed: _exportDeliveriesCsv,
+                icon: const Icon(
+                  Icons.file_download_outlined,
+                  color: AgrisellColors.surface,
+                ),
+              ),
+              IconButton(
+                tooltip: 'Close',
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(
+                  Icons.close_rounded,
+                  color: AgrisellColors.surface,
+                ),
+              ),
+            ],
           ),
         ),
         Expanded(

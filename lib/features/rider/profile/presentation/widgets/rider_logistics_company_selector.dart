@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_input_style.dart';
 import 'package:agresell_app/features/rider/profile/data/logistics_company_repository.dart';
 import 'package:agresell_app/features/rider/profile/domain/logistics_company.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_validator.dart';
@@ -69,8 +70,12 @@ class _RiderLogisticsCompanySelectorState
             key: ValueKey(value),
             initialValue: value,
             isExpanded: true,
-            decoration: const InputDecoration(
-              labelText: 'Logistics company (optional)',
+            decoration: AuthInputStyle.decoration(
+              label: 'Logistics company (optional)',
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 16,
+              ),
             ),
             items: [
               const DropdownMenuItem(
@@ -101,7 +106,7 @@ class _RiderLogisticsCompanySelectorState
           const SizedBox(height: 5),
           const Text(
             'Only active partners are shown. Your selection is verified when the application is submitted.',
-            style: TextStyle(fontSize: 11, color: AgrisellColors.mutedText),
+            style: TextStyle(fontSize: 12, color: AgrisellColors.mutedText),
           ),
         ],
       );

@@ -3190,19 +3190,19 @@ Report:
 
 Stop after Phase 13.
 
-| Phase                                 | Recommended capability |
-| ------------------------------------- | ---------------------- |
-| Phase 0 — Codebase audit              | **Extra High**         |
-| Phase 1 — Statuses and architecture   | **Extra High**         |
-| Phase 2 — Availability and dashboard  | **High**               |
-| Phase 3 — Requests and matching       | **High**               |
-| Phase 4 — Safe acceptance             | **Extra High**         |
-| Phase 5 — Delivery workflow           | **Extra High**         |
-| Phase 6 — Pickup confirmation         | **High**               |
-| Phase 7 — Map, GPS, and routing       | **Extra High**         |
-| Phase 8 — Delivery completion         | **High**               |
-| Phase 9 — Offline synchronization     | **Extra High**         |
-| Phase 10 — Cancellation and returns   | **Extra High**         |
-| Phase 11 — Messages and notifications | **High**               |
-| Phase 12 — Earnings and final testing | **Extra High**         |
-| Phase 13 — Batch delivery, optional   | **Extra High**         |
+| Phase | Recommended capability |
+| :--- | :--- |
+| Phase 0 — Codebase audit | **Extra High** |
+| Phase 1 — Statuses and architecture | **Extra High** |
+| Phase 2 — Availability and dashboard | **High** |
+| Phase 3 — Requests and matching | **High** |
+| Phase 4 — Safe acceptance | **Extra High** |
+| Phase 5 — Delivery workflow | **Extra High** |
+| Phase 6 — Pickup confirmation | **High** |
+| Phase 7 — Map, GPS, and routing | **Extra High** |
+| Phase 8 — Delivery completion | **High** |
+| Phase 9 — Offline synchronization | **Extra High** |
+| Phase 10 — Cancellation and returns | **Extra High** |
+| Phase 11 — Messages and notifications | **High** |
+| Phase 12 — Earnings and final testing | **Extra High** |
+| Phase 13 — Batch delivery, optional | **Extra High** |

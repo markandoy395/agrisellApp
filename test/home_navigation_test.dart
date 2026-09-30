@@ -59,7 +59,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('horizontal swipe changes tabs while navigation stays visible', (
+  testWidgets('horizontal swipe does not change tabs or navigation', (
     tester,
   ) async {
     await _pumpHome(tester, const Size(320, 568));
@@ -70,9 +70,9 @@ void main() {
     await tester.dragFrom(const Offset(160, 390), const Offset(-300, 0));
     await tester.pumpAndSettle();
 
-    expect(find.text('Search farmers or products'), findsOneWidget);
-    expect(find.text('Home'), findsOneWidget);
-    expect(find.text('Messages'), findsWidgets);
+    // Still on Home tab: swipe does not change screen or navigation
+    expect(find.text('Search in AgriSell'), findsOneWidget);
+    expect(find.text('Search farmers or products'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_input_style.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_address.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_validator.dart';
 import 'package:agresell_app/features/rider/profile/presentation/controllers/rider_sign_up_controller.dart';
@@ -54,6 +55,9 @@ class _RiderSignUpAddressStepState extends State<RiderSignUpAddressStep> {
           cityController: _city,
           barangayController: _barangay,
           onChanged: _saveAddress,
+          showSignupIcons: true,
+          leadingIconBuilder: AuthInputStyle.iconBadge,
+          decorationTheme: AuthInputStyle.dropdownTheme,
         ),
         _field(
           'Postal code (optional)',
@@ -76,22 +80,22 @@ class _RiderSignUpAddressStepState extends State<RiderSignUpAddressStep> {
       controller: field,
       keyboardType: type,
       onChanged: (_) => _saveAddress(),
-      decoration: InputDecoration(
-        labelText: label,
+      decoration: AuthInputStyle.decoration(
+        label: label,
         errorText: controller.errorFor(key),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 19),
       ),
     ),
   );
 
   void _saveAddress() {
-    controller.updateValue(RiderSignUpFields.addressLine, _street.text);
-    controller.updateValue(RiderSignUpFields.province, _province.text);
-    controller.updateValue(RiderSignUpFields.cityMunicipality, _city.text);
-    controller.updateValue(RiderSignUpFields.barangay, _barangay.text);
-    controller.updateValue(RiderSignUpFields.postalCode, _postal.text);
-    controller.updateValue(
-      RiderSignUpFields.location,
-      RiderAddress.format(
+    controller.updateAddress(
+      addressLine: _street.text,
+      province: _province.text,
+      cityMunicipality: _city.text,
+      barangay: _barangay.text,
+      postalCode: _postal.text,
+      location: RiderAddress.format(
         addressLine: _street.text,
         barangay: _barangay.text,
         cityMunicipality: _city.text,

@@ -12,6 +12,7 @@ class AuthScaffold extends StatelessWidget {
     this.largeTitle = false,
     this.compactCard = false,
     this.scrollable = true,
+    this.fillRemaining = true,
     super.key,
   });
 
@@ -20,6 +21,7 @@ class AuthScaffold extends StatelessWidget {
   final bool largeTitle;
   final bool compactCard;
   final bool scrollable;
+  final bool fillRemaining;
 
   @override
   Widget build(BuildContext context) {
@@ -42,13 +44,13 @@ class AuthScaffold extends StatelessWidget {
             bottom: false,
             child: Column(
               children: [
-                SizedBox(height: lerpDouble(36, 64, layoutScale)),
+                SizedBox(height: lerpDouble(12, 40, layoutScale)),
                 LogoHeader(
                   style: LogoHeaderStyle.horizontal,
                   widthMin: 180,
                   widthMax: lerpDouble(220, 240, layoutScale),
                 ),
-                SizedBox(height: lerpDouble(24, 34, layoutScale)),
+                SizedBox(height: lerpDouble(12, 28, layoutScale)),
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
@@ -56,6 +58,7 @@ class AuthScaffold extends StatelessWidget {
                         title: title,
                         largeTitle: largeTitle,
                         scrollable: scrollable,
+                        fillRemaining: fillRemaining,
                         child: child,
                       );
 

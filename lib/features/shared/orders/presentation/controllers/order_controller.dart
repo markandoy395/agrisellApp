@@ -10,6 +10,7 @@ import 'package:agresell_app/features/shared/orders/domain/order_status.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_feedback.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_payment.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_acceptance_policy.dart';
+import 'package:agresell_app/features/shared/orders/domain/order_dispute.dart';
 import 'package:agresell_app/features/shared/orders/data/cached_order_repository.dart';
 import 'package:agresell_app/features/shared/orders/data/order_repository.dart';
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
@@ -146,5 +147,13 @@ class OrderController extends ChangeNotifier {
     _filterCache.clear();
     notifyListeners();
     if (persist) unawaited(_persistOrdersSilently());
+  }
+
+  @visibleForTesting
+  void setOrdersForTesting(Iterable<PlacedOrder> orders) {
+    _orders
+      ..clear()
+      ..addAll(orders);
+    _commitChange(persist: false);
   }
 }

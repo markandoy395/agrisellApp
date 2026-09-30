@@ -1,9 +1,13 @@
 part of 'package:agresell_app/features/buyer/orders/presentation/screens/order_tracking_screen.dart';
 
 class _DeliveryRouteTracker extends StatelessWidget {
-  const _DeliveryRouteTracker({required this.status});
+  const _DeliveryRouteTracker({
+    required this.status,
+    this.order,
+  });
 
   final PlacedOrderStatus status;
+  final PlacedOrder? order;
 
   static const _steps = [
     _RouteStep(label: 'Order Placed', icon: Icons.receipt_long_rounded),
@@ -31,53 +35,150 @@ class _DeliveryRouteTracker extends StatelessWidget {
       _ => AgrisellColors.authGreen,
     };
 
+    final isTrackingAvailable = order != null &&
+        (status == PlacedOrderStatus.shipping ||
+            status == PlacedOrderStatus.readyForPickup ||
+            status == PlacedOrderStatus.delivered);
+
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AgrisellColors.forestSoft,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: AgrisellColors.authGreen.withValues(alpha: 0.15),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final stepWidth = constraints.maxWidth / _steps.length;
-            final lineLeft = stepWidth / 2;
-            final lineWidth = constraints.maxWidth - stepWidth;
-            final progress = activeIndex / (_steps.length - 1);
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 6-step progress bar
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final stepWidth = constraints.maxWidth / _steps.length;
+                final lineLeft = stepWidth / 2;
+                final lineWidth = constraints.maxWidth - stepWidth;
+                final progress = activeIndex / (_steps.length - 1);
 
-            return SizedBox(
-              height: 42,
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: lineLeft,
-                    top: 16,
-                    width: lineWidth,
-                    child: const _RouteLine(color: AgrisellColors.deliveryGray),
-                  ),
-                  Positioned(
-                    left: lineLeft,
-                    top: 16,
-                    width: lineWidth * progress,
-                    child: _RouteLine(color: routeColor),
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                return SizedBox(
+                  height: 42,
+                  child: Stack(
                     children: [
-                      for (var index = 0; index < _steps.length; index++)
-                        Expanded(
-                          child: _RouteStop(
-                            step: _steps[index],
-                            isActive: index <= activeIndex,
-                            color: routeColor,
-                          ),
-                        ),
+                      Positioned(
+                        left: lineLeft,
+                        top: 16,
+                        width: lineWidth,
+                        child: const _RouteLine(color: AgrisellColors.deliveryGray),
+                      ),
+                      Positioned(
+                        left: lineLeft,
+                        top: 16,
+                        width: lineWidth * progress,
+                        child: _RouteLine(color: routeColor),
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          for (var index = 0; index < _steps.length; index++)
+                            Expanded(
+                              child: _RouteStop(
+                                step: _steps[index],
+                                isActive: index <= activeIndex,
+                                color: routeColor,
+                              ),
+                            ),
+                        ],
+                      ),
                     ],
                   ),
-                ],
+                );
+              },
+            ),
+
+            // Live GPS & ETA Window Bar
+            if (isTrackingAvailable && order != null) ...[
+              const SizedBox(height: 10),
+              const Divider(height: 1, color: AgrisellColors.borderLine),
+              const SizedBox(height: 8),
+              InkWell(
+                onTap: () => showDeliveryTrackingSheet(context, order: order!),
+                borderRadius: BorderRadius.circular(10),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: AgrisellColors.authGreen.withValues(alpha: 0.12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.location_on_rounded,
+                          size: 16,
+                          color: AgrisellColors.authGreen,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              status == PlacedOrderStatus.shipping
+                                  ? 'Rider en route • Live GPS active'
+                                  : (status == PlacedOrderStatus.readyForPickup
+                                      ? 'Awaiting pickup • Live Map available'
+                                      : 'Delivered • View route summary'),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: AgrisellColors.brandBlack,
+                              ),
+                            ),
+                            const SizedBox(height: 1),
+                            Text(
+                              status == PlacedOrderStatus.shipping
+                                  ? 'ETA: ~15 mins (2.4 km) • ~28 km/h'
+                                  : 'Tap to inspect live map & checkpoints',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: AgrisellColors.mutedText,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AgrisellColors.authGreen,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.map_rounded, size: 13, color: Colors.white),
+                            SizedBox(width: 4),
+                            Text(
+                              'Live Map',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            );
-          },
+            ],
+          ],
         ),
       ),
     );

@@ -27,7 +27,7 @@ class ProductEditSaleStatusRow extends StatelessWidget {
         child: DropdownButtonFormField<ProductSaleStatus>(
           dropdownColor: AppDropdownStyle.menuColor,
           borderRadius: AppDropdownStyle.menuBorderRadius,
-          style: AppDropdownStyle.textStyle.copyWith(fontSize: 11),
+          style: AppDropdownStyle.textStyle.copyWith(fontSize: 12),
           iconEnabledColor: AppDropdownStyle.iconColor,
           initialValue: value,
           isExpanded: true,
@@ -113,7 +113,7 @@ class ProductEditProductionStageRow extends StatelessWidget {
         child: DropdownButtonFormField<ProductProductionStage>(
           dropdownColor: AppDropdownStyle.menuColor,
           borderRadius: AppDropdownStyle.menuBorderRadius,
-          style: AppDropdownStyle.textStyle.copyWith(fontSize: 11),
+          style: AppDropdownStyle.textStyle.copyWith(fontSize: 12),
           iconEnabledColor: AppDropdownStyle.iconColor,
           initialValue: value,
           isExpanded: true,

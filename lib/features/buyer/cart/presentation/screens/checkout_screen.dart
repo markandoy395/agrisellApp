@@ -25,9 +25,11 @@ import 'package:agresell_app/features/shared/location/domain/confirmed_location.
 import 'package:agresell_app/features/shared/location/data/confirmed_location_repository.dart';
 import 'package:agresell_app/features/shared/location/presentation/location_selector.dart';
 import 'package:agresell_app/features/shared/payments/price_formatter.dart';
-import 'package:agresell_app/features/shared/products/presentation/widgets/product_thumbnail.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/widgets/basket/notched_checkout_footer.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/common/buyer_responsive_text.dart';
+import 'package:agresell_app/features/buyer/cart/data/checkout_voucher_service.dart';
+import 'package:agresell_app/features/buyer/cart/presentation/widgets/checkout/checkout_voucher_picker_sheet.dart';
+import 'package:agresell_app/features/shared/products/presentation/widgets/product_thumbnail.dart';
 import 'package:agresell_app/features/buyer/orders/presentation/screens/order_tracking_screen.dart';
 
 part 'checkout_screen_state.dart';
@@ -41,12 +43,15 @@ part 'package:agresell_app/features/buyer/cart/presentation/widgets/checkout/che
 part 'package:agresell_app/features/buyer/cart/presentation/widgets/checkout/gcash_payment_sheet.dart';
 part 'package:agresell_app/features/buyer/cart/presentation/widgets/checkout/gcash_payment_notice.dart';
 part 'package:agresell_app/features/buyer/cart/presentation/widgets/checkout/gcash_multi_farm_notice.dart';
+part 'package:agresell_app/features/buyer/cart/presentation/widgets/checkout/checkout_voucher_panel.dart';
+part 'package:agresell_app/features/buyer/cart/presentation/widgets/checkout/checkout_order_summary_panel.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({
     this.initialDeliveryAddress,
     this.paymentRepository = const SupabaseCheckoutPaymentRepository(),
     this.inventoryRepository = const SupabaseCheckoutInventoryRepository(),
+    this.voucherService = const CheckoutVoucherService(),
     this.locationRepository,
     this.gcashReceiptImagePicker,
     this.messagingRepository,
@@ -56,6 +61,7 @@ class CheckoutScreen extends StatefulWidget {
   final String? initialDeliveryAddress;
   final CheckoutPaymentRepository paymentRepository;
   final CheckoutInventoryRepository inventoryRepository;
+  final CheckoutVoucherService voucherService;
   final ConfirmedLocationRepository? locationRepository;
   final GcashReceiptImagePicker? gcashReceiptImagePicker;
   final MarketplaceMessagingRepository? messagingRepository;

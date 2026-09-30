@@ -1,4 +1,5 @@
 import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
+import 'package:agresell_app/features/shared/orders/domain/order_dispute.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_feedback.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_payment.dart';
 
@@ -125,6 +126,7 @@ class PlacedOrder {
     this.cancellationReason,
     this.cancelledBy,
     this.cancelledAt,
+    this.dispute,
     OrderPayment? payment,
   }) : payment = payment ?? const OrderPayment.cashOnDelivery();
 
@@ -147,12 +149,16 @@ class PlacedOrder {
   final String? cancellationReason;
   final String? cancelledBy;
   final DateTime? cancelledAt;
+  final OrderDispute? dispute;
   final OrderPayment payment;
+
+  bool get hasDispute => dispute != null;
+  bool get canDispute => status == PlacedOrderStatus.delivered && dispute == null;
 
   bool get canLeaveFeedback {
     if (!status.canLeaveFeedback) return false;
     final hasUnreviewedProduct =
-        !isRated && items.any((item) => item.feedback == null);
+        !isRated && (items.isEmpty || items.any((item) => item.feedback == null));
     final canRateRider = deliveryId != null && !riderRated;
     return hasUnreviewedProduct || canRateRider;
   }
@@ -184,6 +190,7 @@ class PlacedOrder {
     String? cancellationReason,
     String? cancelledBy,
     DateTime? cancelledAt,
+    OrderDispute? dispute,
   }) {
     return PlacedOrder(
       id: id,
@@ -205,6 +212,7 @@ class PlacedOrder {
       cancellationReason: cancellationReason ?? this.cancellationReason,
       cancelledBy: cancelledBy ?? this.cancelledBy,
       cancelledAt: cancelledAt ?? this.cancelledAt,
+      dispute: dispute ?? this.dispute,
       payment: payment ?? this.payment,
     );
   }

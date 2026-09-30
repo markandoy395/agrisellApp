@@ -179,8 +179,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Esperanza â€” Agusan del Sur'), findsOneWidget);
-    expect(find.text('Esperanza â€” Masbate'), findsNothing);
+    expect(find.text('Esperanza \u2014 Agusan del Sur'), findsOneWidget);
+    expect(find.text('Esperanza \u2014 Masbate'), findsNothing);
   });
 }
 

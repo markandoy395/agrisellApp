@@ -159,4 +159,13 @@ class _CancellationRepository
     int? riderRating,
     String riderComment = '',
   }) async {}
+
+  @override
+  Future<void> reportOrderDispute({
+    required String accountId,
+    required String orderId,
+    required String category,
+    required String reason,
+    required String requestedResolution,
+  }) async {}
 }

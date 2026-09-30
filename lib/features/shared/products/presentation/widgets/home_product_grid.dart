@@ -29,6 +29,7 @@ class HomeProductGrid extends StatelessWidget {
         final product = products[index];
 
         return HomeProductCard(
+          key: ValueKey('home-product-${product.id}'),
           product: product,
           onTap: () => onProductTap(product),
         );

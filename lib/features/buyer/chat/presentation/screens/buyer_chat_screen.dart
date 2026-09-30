@@ -57,6 +57,8 @@ class _BuyerChatScreenState extends State<BuyerChatScreen> {
     final messages = controller.messagesFor(widget.thread.id);
     final isLoading = controller.isLoadingMessages(widget.thread.id);
     final error = controller.messageErrorFor(widget.thread.id);
+    final keyboardIsOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
+    final composerBottomPadding = keyboardIsOpen ? 12.0 : widget.bottomPadding;
 
     return ColoredBox(
       color: AgrisellColors.homeBackground,
@@ -165,7 +167,7 @@ class _BuyerChatScreenState extends State<BuyerChatScreen> {
             onSend: _sendMessage,
             isSending: controller.isSending(widget.thread.id),
             style: ChatMessageComposerStyle(
-              padding: EdgeInsets.fromLTRB(12, 8, 12, widget.bottomPadding),
+              padding: EdgeInsets.fromLTRB(12, 8, 12, composerBottomPadding),
               decoration: const BoxDecoration(color: AgrisellColors.surface),
               hintText: 'Write a message',
               inputDecoration: InputDecoration(

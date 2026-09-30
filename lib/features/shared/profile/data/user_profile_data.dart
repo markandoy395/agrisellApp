@@ -36,5 +36,6 @@ UserProfile currentAuthenticatedUserProfile() {
     extensionName: account.extensionName ?? '',
     shippingLatitude: account.shippingLatitude,
     shippingLongitude: account.shippingLongitude,
+    avatarUrl: account.profileImageUrl,
   );
 }

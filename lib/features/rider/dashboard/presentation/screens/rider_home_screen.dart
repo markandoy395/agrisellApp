@@ -38,9 +38,8 @@ import 'package:agresell_app/features/rider/deliveries/presentation/screens/ride
 import 'package:agresell_app/features/rider/profile/data/rider_registration_service.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
 import 'package:agresell_app/features/rider/profile/presentation/screens/rider_profile_screen.dart';
-import 'package:agresell_app/features/rider/safety/domain/rider_safety_action.dart';
 import 'package:agresell_app/features/rider/safety/presentation/controllers/rider_safety_controller.dart';
-import 'package:agresell_app/features/rider/safety/presentation/widgets/rider_safety_sheet.dart';
+import 'package:agresell_app/features/shared/safety/presentation/widgets/app_safety_sheet.dart';
 import 'package:agresell_app/features/shared/widgets/navigation/custom_bottom_nav_bar.dart';
 
 part 'rider_home_tabs.dart';
@@ -185,7 +184,7 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
       body: PageView.builder(
         controller: _pageController,
         onPageChanged: _handlePageChanged,
-        physics: const ClampingScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         itemCount: riderBottomNavItems.length,
         itemBuilder: (context, index) => _buildTab(index, profile),
       ),

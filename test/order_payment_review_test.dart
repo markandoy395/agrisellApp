@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_review_tile.dart';
 import 'package:agresell_app/features/shared/orders/data/order_json_codec.dart';
 import 'package:agresell_app/features/shared/orders/data/order_local_repository.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_feedback.dart';
@@ -8,6 +10,7 @@ import 'package:agresell_app/features/shared/orders/domain/order_payment.dart';
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/order_controller.dart';
 import 'package:agresell_app/features/shared/products/data/product_reviews.dart';
+import 'package:agresell_app/features/shared/products/domain/product_review.dart';
 
 void main() {
   test('order codec preserves payment and feedback evidence', () {
@@ -140,25 +143,108 @@ void main() {
     },
   );
 
-  test('product review response exposes aggregate and verified reviews', () {
-    final summary = ProductReviewRepository.parse({
-      'averageRating': 4.5,
-      'reviewCount': 2,
-      'reviews': [
-        {
-          'reviewerName': 'Ana D.',
-          'rating': 5,
-          'comment': 'Very fresh.',
-          'submittedAt': '2026-07-29T10:00:00Z',
-        },
-      ],
-    });
+  test(
+    'product review response exposes aggregate and verified reviews with admin reply and moderation',
+    () {
+      final summary = ProductReviewRepository.parse({
+        'averageRating': 4.5,
+        'reviewCount': 2,
+        'reviews': [
+          {
+            'reviewerName': 'Ana D.',
+            'rating': 5,
+            'comment': 'Very fresh.',
+            'submittedAt': '2026-07-29T10:00:00Z',
+            'adminResponse': 'Thank you for supporting our local farmers!',
+            'adminRespondedAt': '2026-07-29T12:00:00Z',
+            'moderationNote': 'Verified authentic buyer purchase.',
+            'moderationStatus': 'resolved',
+          },
+        ],
+      });
 
-    expect(summary.averageRating, 4.5);
-    expect(summary.reviewCount, 2);
-    expect(summary.reviews.single.reviewerName, 'Ana D.');
-    expect(summary.reviews.single.comment, 'Very fresh.');
-  });
+      expect(summary.averageRating, 4.5);
+      expect(summary.reviewCount, 2);
+      expect(summary.reviews.single.reviewerName, 'Ana D.');
+      expect(summary.reviews.single.comment, 'Very fresh.');
+      expect(
+        summary.reviews.single.adminResponse,
+        'Thank you for supporting our local farmers!',
+      );
+      expect(
+        summary.reviews.single.adminRespondedAt,
+        DateTime.parse('2026-07-29T12:00:00Z'),
+      );
+      expect(
+        summary.reviews.single.moderationNote,
+        'Verified authentic buyer purchase.',
+      );
+      expect(summary.reviews.single.moderationStatus, 'resolved');
+    },
+  );
+
+  testWidgets(
+    'product detail review tile renders admin response and moderation notes',
+    (tester) async {
+      final review = ProductReview(
+        reviewerName: 'Ana D.',
+        rating: 5,
+        comment: 'Very fresh produce!',
+        submittedAt: DateTime.utc(2026, 7, 29),
+        adminResponse: 'Thank you for supporting our local farmers!',
+        adminRespondedAt: DateTime.utc(2026, 7, 30),
+        moderationNote: 'Verified authentic purchase.',
+        moderationStatus: 'resolved',
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ProductDetailReviewTile(review: review),
+          ),
+        ),
+      );
+
+      expect(find.text('Ana D.'), findsOneWidget);
+      expect(find.text('Very fresh produce!'), findsOneWidget);
+      expect(
+        find.byKey(const Key('review-admin-response-card')),
+        findsOneWidget,
+      );
+      expect(find.text('Admin response'), findsOneWidget);
+      expect(
+        find.text('Thank you for supporting our local farmers!'),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('review-moderation-banner')), findsOneWidget);
+      expect(find.text('Moderation: Report resolved'), findsOneWidget);
+      expect(find.text('Verified authentic purchase.'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'product detail review tile omits response card and moderation banner when absent',
+    (tester) async {
+      const review = ProductReview(
+        reviewerName: 'Juan C.',
+        rating: 4,
+        comment: 'Good quality.',
+      );
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ProductDetailReviewTile(review: review),
+          ),
+        ),
+      );
+
+      expect(find.text('Juan C.'), findsOneWidget);
+      expect(find.text('Good quality.'), findsOneWidget);
+      expect(find.byKey(const Key('review-admin-response-card')), findsNothing);
+      expect(find.byKey(const Key('review-moderation-banner')), findsNothing);
+    },
+  );
 
   test('cancelling verified GCash marks the payment for refund', () async {
     SharedPreferences.setMockInitialValues({});

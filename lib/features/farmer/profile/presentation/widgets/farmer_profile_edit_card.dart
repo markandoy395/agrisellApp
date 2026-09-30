@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'farmer_profile_style.dart';
 import 'package:agresell_app/core/utils/profile_birth_date.dart';
 import 'package:agresell_app/core/utils/profile_identity_validator.dart';
 import 'package:agresell_app/core/models/user_profile.dart';
-import 'package:agresell_app/features/shared/widgets/profile/profile_card_shell.dart';
-import 'package:agresell_app/features/shared/widgets/profile/profile_identity_edit_fields.dart';
-import 'package:agresell_app/features/shared/widgets/profile/profile_section_label.dart';
+import 'farmer_profile_edit_fields.dart';
+
 import 'package:agresell_app/features/shared/widgets/profile/profile_text_styles.dart';
 
 class FarmerProfileEditCard extends StatefulWidget {
@@ -97,42 +96,52 @@ class _FarmerProfileEditCardState extends State<FarmerProfileEditCard> {
 
   @override
   Widget build(BuildContext context) {
-    return ProfileCardShell(
+    return FarmerProfileCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const ProfileSectionLabel(text: 'My Profile'),
           Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
+            padding: const EdgeInsets.fromLTRB(18, 20, 18, 24),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const Text(
+                  'Personal information',
+                  style: TextStyle(
+                    color: FarmerProfileStyle.ink,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 3),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Manage and protect your account',
-                    style: ProfileTextStyles.profileDescription(context),
+                    'Update your account details.',
+                    style: const TextStyle(
+                      color: FarmerProfileStyle.muted,
+                      fontSize: 15,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 7),
+                const SizedBox(height: 16),
                 const Divider(
                   height: 1,
                   thickness: 1,
-                  color: AgrisellColors.dividerLine,
+                  color: Color(0xFFCCD6DA),
                 ),
                 if (_validationError != null) ...[
-                  const SizedBox(height: 7),
+                  const SizedBox(height: 16),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       _validationError!,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                       style: ProfileTextStyles.validationError(context),
                     ),
                   ),
                 ],
-                const SizedBox(height: 9),
-                ProfileIdentityEditFields(
+                const SizedBox(height: 16),
+                FarmerProfileEditFields(
                   firstNameController: _firstNameController,
                   lastNameController: _lastNameController,
                   extensionNameController: _extensionNameController,

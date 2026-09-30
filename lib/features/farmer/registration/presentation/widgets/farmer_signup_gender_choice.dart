@@ -20,9 +20,13 @@ class FarmerSignupGenderChoice extends StatelessWidget {
       children: [
         const Text(
           'Gender',
-          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: Color(0xFF075239),
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+          ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         Row(
           children: [
             Expanded(child: _choice('Male')),
@@ -46,15 +50,15 @@ class FarmerSignupGenderChoice extends StatelessWidget {
           controller.text = value;
           onChanged();
         },
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 160),
-          height: 38,
+          height: 48,
           decoration: BoxDecoration(
             color: isSelected
-                ? AgrisellColors.authGreen.withValues(alpha: 0.1)
-                : AgrisellColors.fieldFill,
-            borderRadius: BorderRadius.circular(8),
+                ? AgrisellColors.authGreen.withValues(alpha: 0.06)
+                : AgrisellColors.surface,
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isSelected
                   ? AgrisellColors.authGreen
@@ -62,17 +66,35 @@ class FarmerSignupGenderChoice extends StatelessWidget {
             ),
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              const SizedBox(width: 8),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFEDF8F0),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  value == 'Male' ? Icons.male_rounded : Icons.female_rounded,
+                  color: AgrisellColors.authGreen,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(value, style: const TextStyle(fontSize: 13)),
+              ),
               Icon(
                 isSelected
                     ? Icons.radio_button_checked_rounded
                     : Icons.radio_button_unchecked_rounded,
-                color: AgrisellColors.authGreen,
-                size: 17,
+                color: isSelected
+                    ? AgrisellColors.authGreen
+                    : AgrisellColors.mutedText,
+                size: 20,
               ),
-              const SizedBox(width: 6),
-              Text(value, style: const TextStyle(fontSize: 12)),
+              const SizedBox(width: 8),
             ],
           ),
         ),

@@ -8,12 +8,14 @@ class AuthCheckbox extends StatefulWidget {
     required this.label,
     this.value,
     this.onChanged,
+    this.compact = false,
     super.key,
   });
 
   final String label;
   final bool? value;
   final ValueChanged<bool>? onChanged;
+  final bool compact;
 
   @override
   State<AuthCheckbox> createState() => _AuthCheckboxState();
@@ -29,7 +31,12 @@ class _AuthCheckboxState extends State<AuthCheckbox> {
     return _CheckboxRow(
       value: widget.value ?? _isChecked,
       onChanged: _handleChanged,
-      child: Text(widget.label, style: _labelStyle(scale)),
+      child: Text(
+        widget.label,
+        style: widget.compact
+            ? _labelStyle(scale).copyWith(fontSize: 12)
+            : _labelStyle(scale),
+      ),
     );
   }
 

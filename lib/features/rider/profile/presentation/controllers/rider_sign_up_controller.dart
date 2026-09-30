@@ -78,11 +78,13 @@ class RiderSignUpController extends ChangeNotifier {
   }
 
   void updateValue(String field, String value) {
+    if (_draft.value(field) == value) return;
     if (field == RiderSignUpFields.email &&
         value.trim().toLowerCase() != _verifiedEmail) {
       _verifiedEmail = null;
     }
     _draft = _draft.withValue(field, value);
+    if (_addressFields.contains(field)) _clearCapturedLocation();
     _touched.add(field);
     _showStepErrors = false;
     _queueSave();
@@ -90,6 +92,57 @@ class RiderSignUpController extends ChangeNotifier {
       _checkAvailability(field, value);
     }
     notifyListeners();
+  }
+
+  static const _addressFields = {
+    RiderSignUpFields.addressLine,
+    RiderSignUpFields.province,
+    RiderSignUpFields.cityMunicipality,
+    RiderSignUpFields.barangay,
+    RiderSignUpFields.postalCode,
+  };
+
+  void updateAddress({
+    required String addressLine,
+    required String province,
+    required String cityMunicipality,
+    required String barangay,
+    required String postalCode,
+    required String location,
+  }) {
+    final values = <String, String>{
+      RiderSignUpFields.addressLine: addressLine,
+      RiderSignUpFields.province: province,
+      RiderSignUpFields.cityMunicipality: cityMunicipality,
+      RiderSignUpFields.barangay: barangay,
+      RiderSignUpFields.postalCode: postalCode,
+      RiderSignUpFields.location: location,
+    };
+    final changed = values.entries
+        .where((entry) => _draft.value(entry.key) != entry.value)
+        .toList();
+    if (changed.isEmpty) return;
+    _draft = _draft.copyWith(values: {..._draft.values, ...values});
+    if (changed.any((entry) => _addressFields.contains(entry.key))) {
+      _clearCapturedLocation();
+    }
+    _touched.addAll(changed.map((entry) => entry.key));
+    _showStepErrors = false;
+    _queueSave();
+    notifyListeners();
+  }
+
+  void _clearCapturedLocation() {
+    _draft = _draft.copyWith(
+      values: {
+        ..._draft.values,
+        RiderSignUpFields.latitude: '',
+        RiderSignUpFields.longitude: '',
+        RiderSignUpFields.locationAccuracy: '',
+        RiderSignUpFields.locationCapturedAt: '',
+        RiderSignUpFields.locationNotes: '',
+      },
+    );
   }
 
   void updateSensitive({
@@ -165,8 +218,8 @@ class RiderSignUpController extends ChangeNotifier {
     final checking = switch (_draft.step) {
       RiderSignUpStep.account =>
         !emailVerified &&
-            availabilityFor(RiderSignUpFields.email) !=
-                RiderFieldAvailability.available,
+            availabilityFor(RiderSignUpFields.email) ==
+                RiderFieldAvailability.checking,
       RiderSignUpStep.personal =>
         availabilityFor(RiderSignUpFields.mobile) !=
             RiderFieldAvailability.available,

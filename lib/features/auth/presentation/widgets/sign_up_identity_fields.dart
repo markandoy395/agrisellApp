@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_text_field.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_input_style.dart';
 import 'package:agresell_app/core/utils/philippine_phone_number.dart';
 import 'package:agresell_app/features/shared/widgets/profile/phone_number_sync_control.dart';
 
@@ -38,28 +39,35 @@ class _SignUpIdentityFieldsState extends State<SignUpIdentityFields> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: AuthTextField(
-                controller: widget.firstNameController,
-                hintText: 'First Name',
-                keyboardType: TextInputType.name,
-                textInputAction: TextInputAction.next,
-                autofillHints: const [AutofillHints.givenName],
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: AuthTextField(
-                controller: widget.lastNameController,
-                hintText: 'Last Name',
-                keyboardType: TextInputType.name,
-                textInputAction: TextInputAction.next,
-                autofillHints: const [AutofillHints.familyName],
-              ),
-            ),
-          ],
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final firstName = AuthTextField(
+              controller: widget.firstNameController,
+              hintText: 'First Name',
+              keyboardType: TextInputType.name,
+              textInputAction: TextInputAction.next,
+              autofillHints: const [AutofillHints.givenName],
+            );
+            final lastName = AuthTextField(
+              controller: widget.lastNameController,
+              hintText: 'Last Name',
+              keyboardType: TextInputType.name,
+              textInputAction: TextInputAction.next,
+              autofillHints: const [AutofillHints.familyName],
+            );
+            if (constraints.maxWidth < 320) {
+              return Column(
+                children: [firstName, const SizedBox(height: 6), lastName],
+              );
+            }
+            return Row(
+              children: [
+                Expanded(child: firstName),
+                const SizedBox(width: 10),
+                Expanded(child: lastName),
+              ],
+            );
+          },
         ),
         const SizedBox(height: 6),
         AuthTextField(
@@ -98,6 +106,7 @@ class _SignUpIdentityFieldsState extends State<SignUpIdentityFields> {
         ),
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
+          isExpanded: true,
           dropdownColor: AppDropdownStyle.menuColor,
           borderRadius: AppDropdownStyle.menuBorderRadius,
           style: AppDropdownStyle.textStyle,
@@ -105,7 +114,13 @@ class _SignUpIdentityFieldsState extends State<SignUpIdentityFields> {
           initialValue: widget.genderController.text.isEmpty
               ? null
               : widget.genderController.text,
-          decoration: const InputDecoration(labelText: 'Gender'),
+          decoration: AuthInputStyle.decoration(
+            label: 'Gender',
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 8,
+              vertical: 16,
+            ),
+          ),
           items: const [
             DropdownMenuItem(value: 'Female', child: Text('Female')),
             DropdownMenuItem(value: 'Male', child: Text('Male')),

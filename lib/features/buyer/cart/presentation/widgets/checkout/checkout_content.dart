@@ -9,6 +9,17 @@ class _CheckoutContent extends StatelessWidget {
     required this.onSelectLocation,
     required this.payment,
     required this.onSelectPayment,
+    required this.subtotal,
+    required this.productSaleDiscount,
+    required this.voucherDiscount,
+    required this.finalTotal,
+    required this.voucherController,
+    required this.appliedVoucher,
+    required this.isValidatingVoucher,
+    required this.voucherError,
+    required this.onApplyVoucher,
+    required this.onRemoveVoucher,
+    this.onBrowseVouchers,
   });
   final List<BasketCartItem> items;
   final String deliveryAddress;
@@ -17,6 +28,18 @@ class _CheckoutContent extends StatelessWidget {
   final VoidCallback onSelectLocation;
   final OrderPayment payment;
   final ValueChanged<OrderPaymentMethod> onSelectPayment;
+  final double subtotal;
+  final double productSaleDiscount;
+  final double voucherDiscount;
+  final double finalTotal;
+  final TextEditingController voucherController;
+  final AppliedVoucher? appliedVoucher;
+  final bool isValidatingVoucher;
+  final String? voucherError;
+  final VoidCallback onApplyVoucher;
+  final VoidCallback onRemoveVoucher;
+  final VoidCallback? onBrowseVouchers;
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
@@ -40,8 +63,27 @@ class _CheckoutContent extends StatelessWidget {
           const SizedBox(height: 7),
           if (items.isEmpty)
             const _EmptyCheckoutState()
-          else
+          else ...[
             _CheckoutItemsPanel(items: items),
+            const SizedBox(height: 7),
+            _CheckoutVoucherPanel(
+              controller: voucherController,
+              appliedVoucher: appliedVoucher,
+              isValidating: isValidatingVoucher,
+              errorMessage: voucherError,
+              onApply: onApplyVoucher,
+              onRemove: onRemoveVoucher,
+              onBrowseVouchers: onBrowseVouchers,
+            ),
+            const SizedBox(height: 7),
+            _CheckoutOrderSummaryPanel(
+              subtotal: subtotal,
+              productSaleDiscount: productSaleDiscount,
+              voucherDiscount: voucherDiscount,
+              finalTotal: finalTotal,
+              appliedVoucherCode: appliedVoucher?.code,
+            ),
+          ],
           const SizedBox(height: 7),
           _PaymentMethodsPanel(payment: payment, onSelect: onSelectPayment),
         ],

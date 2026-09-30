@@ -82,17 +82,18 @@ class _SkeletonCard extends StatelessWidget {
       key: const ValueKey('home-product-skeleton-card'),
       decoration: BoxDecoration(
         color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(13),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AgrisellColors.borderLine),
         boxShadow: [
           BoxShadow(
             color: AgrisellColors.brandBlack.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(13),
+        borderRadius: BorderRadius.circular(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -100,16 +101,16 @@ class _SkeletonCard extends StatelessWidget {
             SizedBox(
               height: detailsHeight,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+                padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _SkeletonLine(widthFactor: 0.72, color: baseColor),
-                    const SizedBox(height: 9),
+                    const SizedBox(height: 7),
                     _SkeletonLine(widthFactor: 0.48, color: baseColor),
-                    const SizedBox(height: 8),
+                    const Spacer(),
                     _SkeletonLine(widthFactor: 0.62, color: baseColor),
-                    const SizedBox(height: 9),
+                    const SizedBox(height: 7),
                     _SkeletonLine(widthFactor: 0.4, color: baseColor),
                   ],
                 ),

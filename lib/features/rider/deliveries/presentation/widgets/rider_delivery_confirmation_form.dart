@@ -119,7 +119,7 @@ class RiderDeliveryConfirmationForm extends StatelessWidget {
                   children: [
                     const Text(
                       'Recipient name',
-                      style: TextStyle(fontSize: 11),
+                      style: TextStyle(fontSize: 12),
                     ),
                     Text(
                       recipientName,
@@ -130,7 +130,7 @@ class RiderDeliveryConfirmationForm extends StatelessWidget {
                     ),
                     const Text(
                       'From the buyer information',
-                      style: TextStyle(fontSize: 11),
+                      style: TextStyle(fontSize: 12),
                     ),
                   ],
                 ),

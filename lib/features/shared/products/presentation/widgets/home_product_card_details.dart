@@ -4,23 +4,15 @@ import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 
 class HomeProductCardDetails extends StatelessWidget {
-  const HomeProductCardDetails({
-    required this.product,
-    required this.titleSize,
-    super.key,
-  });
+  const HomeProductCardDetails({required this.product, super.key});
 
   final HomeProduct product;
-  final double titleSize;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(13)),
-      ),
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
+      decoration: const BoxDecoration(color: AgrisellColors.surface),
+      padding: const EdgeInsets.fromLTRB(10, 7, 10, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -30,14 +22,14 @@ class HomeProductCardDetails extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: AgrisellColors.brandBlack,
-              fontSize: titleSize > 12 ? titleSize - 1 : titleSize,
-              height: 1.05,
-              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              height: 1.1,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 2),
           _ProductCardPrice(product: product),
-          const SizedBox(height: 5),
+          const Spacer(),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -46,9 +38,9 @@ class HomeProductCardDetails extends StatelessWidget {
                 value: product.availableQuantityValue,
                 emphasis: true,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 5),
               _ProductCardMeta(
-                icon: Icons.calendar_month_outlined,
+                icon: Icons.calendar_today_outlined,
                 value: product.freshnessLabel ?? product.harvestDate,
               ),
             ],
@@ -74,8 +66,8 @@ class _ProductCardMeta extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 12, color: AgrisellColors.authGreen),
-        const SizedBox(width: 4),
+        Icon(icon, size: 14, color: AgrisellColors.mutedText),
+        const SizedBox(width: 5),
         Expanded(
           child: Text(
             value,

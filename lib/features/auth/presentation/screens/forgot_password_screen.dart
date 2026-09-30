@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/core/utils/password_policy.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_button.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_password_requirements.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/auth_scaffold.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_text_field.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/login_page_layout.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/otp_verification_screen.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -42,28 +43,44 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => AuthScaffold(
-    title: _step == _PasswordRecoveryStep.requestOtp
-        ? 'Forgot Password'
-        : 'Set New Password',
-    largeTitle: true,
-    compactCard: true,
-    child: _step == _PasswordRecoveryStep.requestOtp
-        ? _requestCodeContent()
-        : _newPasswordContent(),
-  );
+  Widget build(BuildContext context) {
+    final height = MediaQuery.sizeOf(context).height;
+    final isRequestStep = _step == _PasswordRecoveryStep.requestOtp;
+    final cardHeight = (height * (isRequestStep ? .495 : .68))
+        .clamp(isRequestStep ? 390.0 : 500.0, isRequestStep ? 480.0 : 640.0)
+        .toDouble();
+
+    return LoginPageLayout(
+      title: isRequestStep ? 'Forgot Password' : 'Set New Password',
+      titleColor: AgrisellColors.authGreen,
+      subtitle: null,
+      cardHeight: cardHeight,
+      cardTopPadding: 44,
+      child: isRequestStep ? _requestCodeContent() : _newPasswordContent(),
+    );
+  }
 
   Widget _requestCodeContent() => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      const Text(
-        'Enter your email address and we will send a password-reset code.',
-        textAlign: TextAlign.center,
+      const SizedBox(
+        width: double.infinity,
+        child: Text(
+          'Enter your email address and we will send a password-reset code.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: AgrisellColors.headingGreenAlt,
+            fontSize: 15,
+            height: 1.4,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
       ),
       const SizedBox(height: 24),
       AuthTextField(
         controller: _email,
         hintText: 'Email address',
+        leadingIcon: Icons.mail_outline,
         keyboardType: TextInputType.emailAddress,
         autofillHints: const [AutofillHints.email],
       ),
@@ -71,11 +88,24 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       AuthPrimaryButton(
         label: 'Send code',
         isLoading: _loading,
+        borderRadius: 14,
+        hasShadow: true,
+        fontSize: 15,
         onPressed: _loading ? null : _sendCode,
       ),
-      TextButton(
-        onPressed: () => Navigator.of(context).pop(),
-        child: const Text('Back to login'),
+      const SizedBox(height: 14),
+      Center(
+        child: TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          style: TextButton.styleFrom(
+            foregroundColor: AgrisellColors.authGreen,
+            textStyle: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          child: const Text('Back to login'),
+        ),
       ),
     ],
   );
@@ -83,14 +113,24 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget _newPasswordContent() => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      const Text(
-        'Your email is verified. Choose a new password for your account.',
-        textAlign: TextAlign.center,
+      const SizedBox(
+        width: double.infinity,
+        child: Text(
+          'Your email is verified. Choose a new password for your account.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: AgrisellColors.headingGreenAlt,
+            fontSize: 15,
+            height: 1.4,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
       ),
       const SizedBox(height: 24),
       AuthTextField(
         controller: _password,
         hintText: 'New password',
+        leadingIcon: Icons.lock_outline,
         showPasswordToggle: true,
         autofillHints: const [AutofillHints.newPassword],
         onChanged: (_) {
@@ -102,6 +142,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       AuthTextField(
         controller: _confirmation,
         hintText: 'Confirm new password',
+        leadingIcon: Icons.lock_outline,
         showPasswordToggle: true,
         autofillHints: const [AutofillHints.newPassword],
         onChanged: (_) => setState(() => _confirmationTouched = true),
@@ -122,7 +163,24 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       AuthPrimaryButton(
         label: 'Update password',
         isLoading: _loading,
+        borderRadius: 14,
+        hasShadow: true,
+        fontSize: 15,
         onPressed: _loading ? null : _updatePassword,
+      ),
+      const SizedBox(height: 14),
+      Center(
+        child: TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          style: TextButton.styleFrom(
+            foregroundColor: AgrisellColors.authGreen,
+            textStyle: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          child: const Text('Back to login'),
+        ),
       ),
     ],
   );
@@ -141,7 +199,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         agrisellPageRoute<bool>(
           builder: (_) => OtpVerificationScreen(
             destination: email,
-            title: 'We just sent an email',
+            title: 'Verify your login',
             onVerify: (otp) => AuthRegistrationService.instance
                 .verifyPasswordRecoveryOtp(email: email, otp: otp),
             onResend: () => AuthRegistrationService.instance

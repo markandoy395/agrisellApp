@@ -6,6 +6,7 @@ class _TrackingOrderCard extends StatelessWidget {
     required this.item,
     required this.onCancelOrder,
     required this.onSubmitFeedback,
+    this.onReportDispute,
     super.key,
   });
 
@@ -13,6 +14,7 @@ class _TrackingOrderCard extends StatelessWidget {
   final PlacedOrderItem item;
   final Future<void> Function(String orderId) onCancelOrder;
   final _SubmitOrderFeedback onSubmitFeedback;
+  final _ReportOrderDispute? onReportDispute;
 
   @override
   Widget build(BuildContext context) {
@@ -84,10 +86,16 @@ class _TrackingOrderCard extends StatelessWidget {
             if (order.acceptanceExpiresAt != null &&
                 (order.isExpired || order.status == PlacedOrderStatus.toShip))
               const SizedBox(height: 14),
-            _DeliveryRouteTracker(status: order.status),
+            _DeliveryRouteTracker(
+              status: order.status,
+              order: order,
+            ),
             const SizedBox(height: 14),
             _OrderCardActions(
               status: order.status,
+              hasRefund: order.payment.hasRefund ||
+                  (order.status == PlacedOrderStatus.cancelled &&
+                      order.payment.method == OrderPaymentMethod.gcash),
               canLeaveFeedback:
                   order.canReviewProduct(item.productId) ||
                   (order.status.canLeaveFeedback &&
@@ -96,7 +104,14 @@ class _TrackingOrderCard extends StatelessWidget {
               canRetryPayment:
                   order.payment.method == OrderPaymentMethod.gcash &&
                   order.payment.status == OrderPaymentStatus.rejected,
+              hasDispute: order.hasDispute,
+              canDispute: order.canDispute,
+              onDispute: onReportDispute != null
+                  ? () => _showDisputeSheet(context)
+                  : null,
               onViewDetails: () => _showOrderDetails(context),
+              onTrackRefund: () =>
+                  showBuyerRefundDetailSheet(context, order: order),
               onCancel: () => _cancelOrder(context),
               onContactSeller: () => _contactSeller(context),
               onLeaveFeedback: () => _leaveFeedback(context),
@@ -112,6 +127,8 @@ class _TrackingOrderCard extends StatelessWidget {
   void _showOrderDetails(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
       ),
@@ -119,7 +136,23 @@ class _TrackingOrderCard extends StatelessWidget {
     );
   }
 
+  void _showDisputeSheet(BuildContext context) {
+    if (onReportDispute == null) return;
+    showOrderDisputeSheet(
+      context,
+      order: order,
+      onSubmitDispute: onReportDispute!,
+    );
+  }
+
   String _statusLabel(PlacedOrder order) {
+    if (order.hasDispute) {
+      return switch (order.dispute!.status) {
+        OrderDisputeStatus.pending => 'Dispute: Under review',
+        OrderDisputeStatus.resolved => 'Dispute: Resolved',
+        OrderDisputeStatus.rejected => 'Dispute: Rejected',
+      };
+    }
     if (order.isExpired) return 'Expired';
     if (order.payment.status == OrderPaymentStatus.rejected) {
       return 'Fix payment';

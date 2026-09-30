@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
-enum FarmerQuickDestination { products, messages, reservations, account }
+enum FarmerQuickDestination { products, messages, reservations, discounts, payouts, reviews, account }
 
 Future<FarmerQuickDestination?> showFarmerQuickMenu(
   BuildContext context, {
@@ -13,7 +13,7 @@ Future<FarmerQuickDestination?> showFarmerQuickMenu(
     showDragHandle: true,
     builder: (context) => SafeArea(
       top: false,
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(12, 0, 12, 14),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -62,6 +62,9 @@ extension on FarmerQuickDestination {
     FarmerQuickDestination.products => 'Products',
     FarmerQuickDestination.messages => 'Messages',
     FarmerQuickDestination.reservations => 'Reservations',
+    FarmerQuickDestination.discounts => 'Discounts & Promos',
+    FarmerQuickDestination.payouts => 'Payouts',
+    FarmerQuickDestination.reviews => 'Customer Reviews',
     FarmerQuickDestination.account => 'Account',
   };
 
@@ -69,6 +72,9 @@ extension on FarmerQuickDestination {
     FarmerQuickDestination.products => Icons.inventory_2_outlined,
     FarmerQuickDestination.messages => Icons.sms_outlined,
     FarmerQuickDestination.reservations => Icons.receipt_long_outlined,
+    FarmerQuickDestination.discounts => Icons.local_offer_outlined,
+    FarmerQuickDestination.payouts => Icons.account_balance_wallet_outlined,
+    FarmerQuickDestination.reviews => Icons.star_outline_rounded,
     FarmerQuickDestination.account => Icons.person_outline_rounded,
   };
 }

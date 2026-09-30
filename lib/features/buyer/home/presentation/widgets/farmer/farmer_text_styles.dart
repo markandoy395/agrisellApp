@@ -16,7 +16,7 @@ abstract final class FarmerTextStyles {
       color: AgrisellColors.surface,
       fontSize: 15,
       fontWeight: FontWeight.w800,
-      height: 1.05,
+      height: 1.1,
     );
   }
 
@@ -30,7 +30,10 @@ abstract final class FarmerTextStyles {
   }
 
   static TextStyle actionLabel(BuildContext context) {
-    return _base(context).copyWith(fontSize: 13, fontWeight: FontWeight.w500);
+    return _base(context).copyWith(
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+    );
   }
 
   static TextStyle productLabel(BuildContext context) {
@@ -44,9 +47,9 @@ abstract final class FarmerTextStyles {
   static TextStyle productName(BuildContext context) {
     return _base(context).copyWith(
       color: AgrisellColors.brandBlack,
-      fontSize: 13,
-      fontWeight: FontWeight.w500,
-      height: 1.08,
+      fontSize: 15,
+      fontWeight: FontWeight.w600,
+      height: 1.1,
     );
   }
 

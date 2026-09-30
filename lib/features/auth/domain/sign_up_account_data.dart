@@ -115,6 +115,10 @@ class RegisteredAccount {
       assignedRole == AuthRole.farmer &&
       verificationStatus?.trim().toLowerCase() == 'verified';
 
+  bool get isBuyerVerified =>
+      assignedRole == AuthRole.buyer &&
+      verificationStatus?.trim().toLowerCase() == 'verified';
+
   bool get requiresRiderApplicationStatus =>
       assignedRole == AuthRole.rider &&
       status == AuthAccountStatus.pending &&

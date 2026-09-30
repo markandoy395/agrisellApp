@@ -1,6 +1,7 @@
 import 'package:agresell_app/features/rider/dashboard/domain/rider_analytics_models.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_history_models.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_rating_models.dart';
+import 'package:agresell_app/features/rider/dashboard/domain/rider_withdrawal_models.dart';
 import 'package:agresell_app/features/rider/dashboard/data/rider_earnings_summary_builder.dart';
 
 /// Server contract for rider earnings, delivery history, and ratings.
@@ -20,6 +21,29 @@ abstract interface class RiderAnalyticsRepository {
   /// The remote implementation must verify a completed delivery and reviewer
   /// role before accepting this submission.
   Future<void> submitRating(RiderRatingSubmission submission);
+
+  Future<List<RiderWithdrawalMethod>> fetchWithdrawalMethods({
+    required String riderId,
+  });
+
+  Future<RiderWithdrawalMethod> saveWithdrawalMethod({
+    required String riderId,
+    required RiderWithdrawalMethod method,
+  });
+
+  Future<void> deleteWithdrawalMethod({
+    required String riderId,
+    required String methodId,
+  });
+
+  Future<RiderWithdrawalRequest> submitWithdrawalRequest({
+    required String riderId,
+    required RiderWithdrawalRequest request,
+  });
+
+  Future<List<RiderWithdrawalRequest>> fetchWithdrawalRequests({
+    required String riderId,
+  });
 }
 
 /// Empty local adapter for development and widget tests.
@@ -30,16 +54,29 @@ class InMemoryRiderAnalyticsRepository implements RiderAnalyticsRepository {
     Map<String, RiderEarningsData> earningsByRider = const {},
     Map<String, List<RiderDeliveryHistoryEntry>> historyByRider = const {},
     Map<String, RiderRatingsData> ratingsByRider = const {},
-  }) : _earningsByRider = {...earningsByRider},
-       _historyByRider = {
-         for (final entry in historyByRider.entries)
-           entry.key: [...entry.value],
-       },
-       _ratingsByRider = {...ratingsByRider};
+    Map<String, List<RiderWithdrawalMethod>> withdrawalMethodsByRider = const {},
+    Map<String, List<RiderWithdrawalRequest>> withdrawalRequestsByRider =
+        const {},
+  })  : _earningsByRider = {...earningsByRider},
+        _historyByRider = {
+          for (final entry in historyByRider.entries)
+            entry.key: [...entry.value],
+        },
+        _ratingsByRider = {...ratingsByRider},
+        _withdrawalMethodsByRider = {
+          for (final entry in withdrawalMethodsByRider.entries)
+            entry.key: [...entry.value],
+        },
+        _withdrawalRequestsByRider = {
+          for (final entry in withdrawalRequestsByRider.entries)
+            entry.key: [...entry.value],
+        };
 
   final Map<String, RiderEarningsData> _earningsByRider;
   final Map<String, List<RiderDeliveryHistoryEntry>> _historyByRider;
   final Map<String, RiderRatingsData> _ratingsByRider;
+  final Map<String, List<RiderWithdrawalMethod>> _withdrawalMethodsByRider;
+  final Map<String, List<RiderWithdrawalRequest>> _withdrawalRequestsByRider;
 
   @override
   Future<RiderEarningsData> fetchEarnings({
@@ -116,6 +153,87 @@ class InMemoryRiderAnalyticsRepository implements RiderAnalyticsRepository {
       ),
       reviews: reviews,
     );
+  }
+
+  @override
+  Future<List<RiderWithdrawalMethod>> fetchWithdrawalMethods({
+    required String riderId,
+  }) async {
+    final list = _withdrawalMethodsByRider[riderId] ?? const [];
+    return List.unmodifiable(list);
+  }
+
+  @override
+  Future<RiderWithdrawalMethod> saveWithdrawalMethod({
+    required String riderId,
+    required RiderWithdrawalMethod method,
+  }) async {
+    final current = _withdrawalMethodsByRider.putIfAbsent(riderId, () => []);
+    if (method.isDefault) {
+      for (var i = 0; i < current.length; i++) {
+        current[i] = RiderWithdrawalMethod(
+          methodId: current[i].methodId,
+          payoutMethod: current[i].payoutMethod,
+          accountName: current[i].accountName,
+          accountNumber: current[i].accountNumber,
+          bankName: current[i].bankName,
+          isDefault: false,
+          createdAt: current[i].createdAt,
+        );
+      }
+    }
+    final saved = RiderWithdrawalMethod(
+      methodId: method.methodId.isNotEmpty
+          ? method.methodId
+          : 'wm-${DateTime.now().millisecondsSinceEpoch}',
+      payoutMethod: method.payoutMethod,
+      accountName: method.accountName,
+      accountNumber: method.accountNumber,
+      bankName: method.bankName,
+      isDefault: method.isDefault,
+      createdAt: DateTime.now(),
+    );
+    current.insert(0, saved);
+    return saved;
+  }
+
+  @override
+  Future<void> deleteWithdrawalMethod({
+    required String riderId,
+    required String methodId,
+  }) async {
+    _withdrawalMethodsByRider[riderId]?.removeWhere((m) => m.methodId == methodId);
+  }
+
+  @override
+  Future<RiderWithdrawalRequest> submitWithdrawalRequest({
+    required String riderId,
+    required RiderWithdrawalRequest request,
+  }) async {
+    final list = _withdrawalRequestsByRider.putIfAbsent(riderId, () => []);
+    final saved = RiderWithdrawalRequest(
+      requestId: request.requestId.isNotEmpty
+          ? request.requestId
+          : 'req-${DateTime.now().millisecondsSinceEpoch}',
+      amount: request.amount,
+      payoutMethod: request.payoutMethod,
+      accountName: request.accountName,
+      accountNumber: request.accountNumber,
+      bankName: request.bankName,
+      status: 'pending',
+      notes: request.notes,
+      createdAt: DateTime.now(),
+    );
+    list.insert(0, saved);
+    return saved;
+  }
+
+  @override
+  Future<List<RiderWithdrawalRequest>> fetchWithdrawalRequests({
+    required String riderId,
+  }) async {
+    final list = _withdrawalRequestsByRider[riderId] ?? const [];
+    return List.unmodifiable(list);
   }
 
   bool _matches(RiderDeliveryHistoryEntry record, RiderHistoryQuery query) {

@@ -6,12 +6,14 @@ class _OrdersForFilter extends StatelessWidget {
     required this.orders,
     required this.onCancelOrder,
     required this.onSubmitFeedback,
+    this.onReportDispute,
   });
 
   final OrderTrackingFilter filter;
   final List<PlacedOrder> orders;
   final Future<void> Function(String orderId) onCancelOrder;
   final _SubmitOrderFeedback onSubmitFeedback;
+  final _ReportOrderDispute? onReportDispute;
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +43,7 @@ class _OrdersForFilter extends StatelessWidget {
           item: entry.item,
           onCancelOrder: onCancelOrder,
           onSubmitFeedback: onSubmitFeedback,
+          onReportDispute: onReportDispute,
         );
       },
     );

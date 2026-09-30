@@ -1,5 +1,6 @@
 import 'package:agresell_app/core/utils/password_policy.dart';
 import 'package:agresell_app/core/utils/philippine_phone_number.dart';
+import 'package:agresell_app/features/farmer/registration/domain/philippine_crops.dart';
 
 abstract final class FarmerSignupValidator {
   static final _email = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
@@ -16,6 +17,24 @@ abstract final class FarmerSignupValidator {
 
   static String? required(String value, String label) =>
       value.trim().isEmpty ? 'Enter $label.' : null;
+
+  static String? choice(String value, List<String> choices, String label) =>
+      choices.contains(value.trim()) ? null : 'Select $label.';
+
+  static String? optionalChoice(
+    String value,
+    List<String> choices,
+    String label,
+  ) => value.trim().isEmpty ? null : choice(value, choices, label);
+
+  static String? mainCrops(String value) {
+    final selected = PhilippineCrops.parseSelection(value);
+    if (selected.isEmpty) return 'Choose at least one main crop.';
+    if (selected.any((crop) => !PhilippineCrops.names.contains(crop))) {
+      return 'Choose crops from the list.';
+    }
+    return null;
+  }
 
   static String? phone(String value) => PhilippinePhoneNumber.isValid(value)
       ? null

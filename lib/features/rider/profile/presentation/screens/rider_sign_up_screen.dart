@@ -39,7 +39,7 @@ class _RiderSignUpScreenState extends State<RiderSignUpScreen> {
       canPop: false,
       onPopInvokedWithResult: (_, _) => unawaited(_requestExit()),
       child: Scaffold(
-        resizeToAvoidBottomInset: true,
+        resizeToAvoidBottomInset: false,
         body: Stack(
           fit: StackFit.expand,
           children: [
@@ -123,10 +123,12 @@ class _RiderSignUpScreenState extends State<RiderSignUpScreen> {
           title: 'We just sent an email',
           changeDestinationLabel: 'Change email',
           onChangeDestination: onChangeDestination,
-          onVerify: (otp) => AuthRegistrationService.instance.verifyEmailOtp(
-            email: email,
-            otp: otp,
-          ),
+          onVerify: (otp) =>
+              AuthRegistrationService.instance.verifySignupEmailOtp(
+                email: email,
+                otp: otp,
+                role: AuthRole.rider,
+              ),
           onResend: () =>
               AuthRegistrationService.instance.resendSignupEmailOtp(email),
         ),

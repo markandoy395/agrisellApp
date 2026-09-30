@@ -59,25 +59,10 @@ class _BirthDateField extends StatelessWidget {
   Widget build(BuildContext context) {
     final value = controller.draft.value(RiderSignUpFields.dateOfBirth);
     return InputDecorator(
-      decoration: InputDecoration(
-        labelText: 'Date of birth',
-        contentPadding: riderSignUpFieldContentPadding,
+      decoration: AuthInputStyle.decoration(
+        label: 'Date of birth',
+        contentPadding: riderSignUpSelectionContentPadding,
         errorText: controller.errorFor(RiderSignUpFields.dateOfBirth),
-        labelStyle: const TextStyle(
-          color: AgrisellColors.mutedText,
-          fontSize: 13,
-        ),
-        floatingLabelStyle: AgrisellTheme.floatingInputLabelStyle,
-        filled: true,
-        fillColor: AgrisellColors.fieldFill,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: AgrisellColors.authGreen,
-            width: 1.5,
-          ),
-        ),
       ),
       child: InkWell(
         onTap: () => _select(context, value),

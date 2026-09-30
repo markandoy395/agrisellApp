@@ -37,6 +37,8 @@ class FarmerSignupAccountStep extends StatelessWidget {
       FarmerSignupField(
         label: 'Email',
         controller: controllers.email,
+        leadingIcon: Icons.mail_outline,
+        leadingIconBadge: true,
         keyboardType: TextInputType.emailAddress,
         error: errors['email'],
         readOnly: readOnly,
@@ -45,6 +47,8 @@ class FarmerSignupAccountStep extends StatelessWidget {
       FarmerSignupField(
         label: 'Password',
         controller: controllers.password,
+        leadingIcon: Icons.lock_outline,
+        leadingIconBadge: true,
         password: true,
         error: errors['password'],
         readOnly: readOnly,
@@ -55,6 +59,8 @@ class FarmerSignupAccountStep extends StatelessWidget {
       FarmerSignupField(
         label: 'Confirm password',
         controller: controllers.confirmPassword,
+        leadingIcon: Icons.lock_outline,
+        leadingIconBadge: true,
         password: true,
         error: errors['confirmPassword'],
         readOnly: readOnly,

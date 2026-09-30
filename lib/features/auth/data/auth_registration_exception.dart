@@ -17,6 +17,13 @@ class AuthEmailNotVerified extends AuthRegistrationException {
     : super('Please verify your email address before signing in.');
 }
 
+class AuthIncompleteRegistrationFound extends AuthRegistrationException {
+  const AuthIncompleteRegistrationFound({required this.emailVerified})
+    : super('This account has an unfinished registration.');
+
+  final bool emailVerified;
+}
+
 enum AuthOtpFailureReason {
   invalid,
   expired,

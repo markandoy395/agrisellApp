@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:agresell_app/features/shared/orders/data/order_json_codec.dart';
 import 'package:agresell_app/features/shared/orders/data/order_repository.dart';
+import 'package:agresell_app/features/shared/orders/domain/order_dispute.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_feedback.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_payment.dart';
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
@@ -160,6 +161,28 @@ class OrderLocalRepository
     required String orderId,
     required String reference,
   }) async {}
+
+  @override
+  Future<void> reportOrderDispute({
+    required String accountId,
+    required String orderId,
+    required String category,
+    required String reason,
+    required String requestedResolution,
+  }) async {
+    final orders = (await load(accountId)).toList();
+    final index = orders.indexWhere((order) => order.id == orderId);
+    if (index == -1) return;
+    final dispute = OrderDispute(
+      status: OrderDisputeStatus.pending,
+      category: OrderDisputeCategory.fromValue(category),
+      reason: reason.trim(),
+      requestedResolution: OrderDisputeResolution.fromValue(requestedResolution),
+      submittedAt: DateTime.now(),
+    );
+    orders[index] = orders[index].copyWith(dispute: dispute);
+    await save(accountId, orders);
+  }
 
   Future<SharedPreferences> get _instance async =>
       preferences ?? await SharedPreferences.getInstance();

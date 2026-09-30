@@ -57,7 +57,7 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'Buyer'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Step 1 of 2'), findsOneWidget);
+    expect(find.text('1 of 2'), findsOneWidget);
     expect(find.text('Account credentials'), findsOneWidget);
     expect(find.text('First Name'), findsNothing);
     await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
@@ -105,9 +105,46 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(FarmerSignUpScreen), findsOneWidget);
-    expect(find.text('Step 1 of 3'), findsOneWidget);
+    expect(find.text('1 of 3'), findsOneWidget);
     expect(find.text('Account information'), findsOneWidget);
     expect(find.text('Submit registration'), findsNothing);
+  });
+
+  testWidgets('discarding Farmer signup returns to role selection', (
+    tester,
+  ) async {
+    await pumpRoleSelection(tester);
+    await tester.tap(find.widgetWithText(FilledButton, 'Farmer'));
+    await tester.pumpAndSettle();
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('Discard registration?'), findsOneWidget);
+    await tester.tap(find.widgetWithText(TextButton, 'Discard'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Are you a'), findsOneWidget);
+    expect(find.byType(FarmerSignUpScreen), findsNothing);
+  });
+
+  testWidgets('discarding Rider signup returns to role selection', (
+    tester,
+  ) async {
+    await pumpRoleSelection(tester);
+    await tester.tap(find.widgetWithText(FilledButton, 'Rider'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Back to role selection'));
+    await tester.pumpAndSettle();
+    expect(
+      find.textContaining('Your Rider Sign-Up is not yet complete'),
+      findsOneWidget,
+    );
+    await tester.tap(find.widgetWithText(FilledButton, 'Discard Registration'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Are you a'), findsOneWidget);
+    expect(find.byType(RiderSignUpScreen), findsNothing);
   });
 
   testWidgets('rider role opens the rider registration form', (tester) async {
@@ -118,7 +155,7 @@ void main() {
 
     expect(find.byType(RiderSignUpScreen), findsOneWidget);
     expect(find.text('Rider Sign-Up'), findsOneWidget);
-    expect(find.text('Step 1 of 6'), findsOneWidget);
+    expect(find.text('1 of 6'), findsOneWidget);
     expect(find.text('Account credentials'), findsOneWidget);
     expect(find.text('Email address'), findsOneWidget);
     expect(find.text('Password'), findsOneWidget);
@@ -142,7 +179,7 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Step 2 of 6'), findsOneWidget);
+    expect(find.text('2 of 6'), findsOneWidget);
     expect(find.text('Personal information'), findsWidgets);
     expect(find.text('First name'), findsOneWidget);
     expect(find.text('Phone number (09XXXXXXXXX)'), findsOneWidget);

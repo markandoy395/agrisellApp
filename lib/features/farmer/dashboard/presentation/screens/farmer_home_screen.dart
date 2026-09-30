@@ -20,6 +20,10 @@ import 'package:agresell_app/features/shared/orders/presentation/screens/notific
 import 'package:agresell_app/features/shared/orders/data/home_notification_badge_loader.dart';
 import 'package:agresell_app/features/shared/orders/domain/home_notification.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/order_controller.dart';
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
+import 'package:agresell_app/features/farmer/payouts/presentation/screens/farmer_payout_history_screen.dart';
+import 'package:agresell_app/features/farmer/discounts/presentation/screens/farmer_discounts_screen.dart';
+import 'package:agresell_app/features/farmer/reviews/presentation/screens/farmer_reviews_screen.dart';
 import 'package:agresell_app/features/shared/orders/presentation/widgets/notification/notification_approval_alert.dart';
 
 part 'farmer_home_screen_messaging.dart';
@@ -107,11 +111,38 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
   }
 
   void _openQuickDestination(FarmerQuickDestination destination) {
+    if (destination == FarmerQuickDestination.payouts) {
+      Navigator.of(context).push(
+        agrisellPageRoute<void>(
+          builder: (_) => const FarmerPayoutHistoryScreen(),
+        ),
+      );
+      return;
+    }
+    if (destination == FarmerQuickDestination.discounts) {
+      Navigator.of(context).push(
+        agrisellPageRoute<void>(
+          builder: (_) => const FarmerDiscountsScreen(),
+        ),
+      );
+      return;
+    }
+    if (destination == FarmerQuickDestination.reviews) {
+      Navigator.of(context).push(
+        agrisellPageRoute<void>(
+          builder: (_) => const FarmerReviewsScreen(),
+        ),
+      );
+      return;
+    }
     final index = switch (destination) {
       FarmerQuickDestination.products => FarmerHomeScreen.productNavIndex,
       FarmerQuickDestination.messages => FarmerHomeScreen.messageNavIndex,
       FarmerQuickDestination.reservations => FarmerHomeScreen.reserveNavIndex,
       FarmerQuickDestination.account => FarmerHomeScreen.profileNavIndex,
+      FarmerQuickDestination.discounts => FarmerHomeScreen.productNavIndex,
+      FarmerQuickDestination.payouts => FarmerHomeScreen.productNavIndex,
+      FarmerQuickDestination.reviews => FarmerHomeScreen.productNavIndex,
     };
     unawaited(_selectTab(index));
   }
@@ -136,7 +167,7 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
       body: PageView.builder(
         controller: _navigationController,
         onPageChanged: _handlePageChanged,
-        physics: const ClampingScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         itemCount: farmerBottomNavItems.length,
         itemBuilder: _buildTab,
       ),

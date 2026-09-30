@@ -10,7 +10,6 @@ import 'package:agresell_app/features/auth/presentation/account_session_navigati
 import 'package:agresell_app/features/rider/profile/data/rider_registration_service.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_account_exit_policy.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
-import 'package:agresell_app/features/rider/safety/domain/rider_safety_action.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/controllers/rider_analytics_controller.dart';
 import 'package:agresell_app/features/rider/safety/presentation/controllers/rider_safety_controller.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
@@ -21,7 +20,9 @@ import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_p
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_settings_panel.dart';
 import 'package:agresell_app/features/rider/profile/presentation/screens/rider_documents_screen.dart';
 import 'package:agresell_app/features/rider/profile/presentation/screens/rider_vehicle_screen.dart';
-import 'package:agresell_app/features/rider/safety/presentation/widgets/rider_safety_sheet.dart';
+import 'package:agresell_app/features/shared/safety/presentation/screens/incident_tracking_screen.dart';
+import 'package:agresell_app/features/shared/safety/presentation/widgets/app_safety_sheet.dart';
+import 'package:agresell_app/features/shared/support/presentation/screens/support_center_screen.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/screens/rider_earnings_screen.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/screens/rider_history_screen.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/screens/rider_ratings_screen.dart';
@@ -138,6 +139,8 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
                               _open(const RiderDocumentsScreen()),
                           onChangePassword: _changePassword,
                           onSafety: _openSafety,
+                          onIncidentHistory: _openIncidentHistory,
+                          onSupport: () => _open(const SupportCenterScreen()),
                           onSwitchAccount: _switchAccount,
                           onLogout: _logout,
                           onBack: () => _setMode(_RiderProfileMode.overview),

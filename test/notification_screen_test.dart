@@ -169,6 +169,61 @@ void main() {
     expect(find.text('Loaded after retry'), findsOneWidget);
     expect(repository.attempts, 2);
   });
+
+  testWidgets(
+    'swiping horizontally inside alerts switches category filter tabs',
+    (tester) async {
+      final notifications = [
+        _notification(
+          id: 'order-1',
+          title: 'Order notification',
+          category: NotificationCategory.orders,
+          visibleTo: const {AuthRole.farmer},
+        ),
+        _notification(
+          id: 'delivery-1',
+          title: 'Delivery notification',
+          type: HomeNotificationType.deliveryRequest,
+          category: NotificationCategory.deliveries,
+          destination: HomeNotificationDestination.deliveries,
+          visibleTo: const {AuthRole.farmer},
+        ),
+      ];
+
+      await _pumpScreen(
+        tester,
+        NotificationScreen(
+          role: AuthRole.farmer,
+          notifications: notifications,
+        ),
+      );
+
+      // Initial page is 'All': shows both
+      expect(find.text('Order notification'), findsOneWidget);
+      expect(find.text('Delivery notification'), findsOneWidget);
+
+      // Swipe left: moves to 'Orders'
+      await tester.fling(find.byType(PageView), const Offset(-500, 0), 1000);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Order notification'), findsOneWidget);
+      expect(find.text('Delivery notification'), findsNothing);
+
+      // Swipe left: moves to 'Deliveries'
+      await tester.fling(find.byType(PageView), const Offset(-500, 0), 1000);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Order notification'), findsNothing);
+      expect(find.text('Delivery notification'), findsOneWidget);
+
+      // Swipe right: moves back to 'Orders'
+      await tester.fling(find.byType(PageView), const Offset(500, 0), 1000);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Order notification'), findsOneWidget);
+      expect(find.text('Delivery notification'), findsNothing);
+    },
+  );
 }
 
 Future<void> _pumpScreen(WidgetTester tester, Widget screen) async {

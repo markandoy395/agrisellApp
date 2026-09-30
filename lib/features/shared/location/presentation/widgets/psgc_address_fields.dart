@@ -13,6 +13,11 @@ class PsgcAddressFields extends StatefulWidget {
     required this.barangayController,
     required this.onChanged,
     this.lookup,
+    this.labelBuilder,
+    this.decorationTheme,
+    this.showSignupIcons = false,
+    this.enabled = true,
+    this.leadingIconBuilder,
     super.key,
   });
 
@@ -21,6 +26,11 @@ class PsgcAddressFields extends StatefulWidget {
   final TextEditingController barangayController;
   final VoidCallback onChanged;
   final PhilippineAddressLookup? lookup;
+  final Widget Function(String label)? labelBuilder;
+  final InputDecorationTheme? decorationTheme;
+  final bool showSignupIcons;
+  final bool enabled;
+  final Widget Function(IconData icon)? leadingIconBuilder;
 
   @override
   State<PsgcAddressFields> createState() => _PsgcAddressFieldsState();
@@ -114,6 +124,12 @@ class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
     children: [
       AddressAutocompleteField(
         label: 'Province',
+        enabled: widget.enabled,
+        externalLabel: widget.labelBuilder?.call('Province'),
+        decorationTheme: widget.decorationTheme,
+        leadingIcon: widget.showSignupIcons
+            ? _signupIcon(Icons.map_outlined)
+            : null,
         controller: widget.provinceController,
         options: _provinces,
         onChanged: _provinceChanged,
@@ -133,6 +149,12 @@ class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
           'city:${widget.provinceController.text.trim().toLowerCase()}',
         ),
         label: 'City or municipality',
+        enabled: widget.enabled,
+        externalLabel: widget.labelBuilder?.call('City or municipality'),
+        decorationTheme: widget.decorationTheme,
+        leadingIcon: widget.showSignupIcons
+            ? _signupIcon(Icons.location_city_outlined)
+            : null,
         controller: widget.cityController,
         options: _filteredLocalities,
         onChanged: _cityChanged,
@@ -141,6 +163,12 @@ class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
       AddressAutocompleteField(
         key: ValueKey('barangay:${_loadedLocalityCode ?? ''}'),
         label: 'Barangay',
+        enabled: widget.enabled,
+        externalLabel: widget.labelBuilder?.call('Barangay'),
+        decorationTheme: widget.decorationTheme,
+        leadingIcon: widget.showSignupIcons
+            ? _signupIcon(Icons.home_outlined)
+            : null,
         controller: widget.barangayController,
         options: _barangays,
         onChanged: (_) => widget.onChanged(),
@@ -162,6 +190,10 @@ class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
         ),
     ],
   );
+
+  Widget _signupIcon(IconData icon) =>
+      widget.leadingIconBuilder?.call(icon) ??
+      Icon(icon, color: AgrisellColors.mutedText);
 }
 
 PsgcAddressOption? _exact(List<PsgcAddressOption> values, String text) {

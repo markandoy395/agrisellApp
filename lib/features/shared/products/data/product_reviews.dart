@@ -38,11 +38,19 @@ class ProductReviewRepository {
 
   static ProductReview _reviewFrom(Map<Object?, Object?> row) {
     final json = Map<String, Object?>.from(row);
+    final adminResponseText = _text(json['adminResponse']);
+    final moderationNoteText = _text(json['moderationNote']);
+    final moderationStatusText = _text(json['moderationStatus']);
     return ProductReview(
       reviewerName: _text(json['reviewerName'], fallback: 'Verified buyer'),
       rating: _number(json['rating']),
       comment: _text(json['comment']),
       submittedAt: DateTime.tryParse(_text(json['submittedAt'])),
+      adminResponse: adminResponseText.isEmpty ? null : adminResponseText,
+      adminRespondedAt: DateTime.tryParse(_text(json['adminRespondedAt'])),
+      moderationNote: moderationNoteText.isEmpty ? null : moderationNoteText,
+      moderationStatus:
+          moderationStatusText.isEmpty ? null : moderationStatusText,
     );
   }
 

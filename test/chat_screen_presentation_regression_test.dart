@@ -5,6 +5,7 @@ import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/buyer/chat/presentation/screens/buyer_message_screen.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/home_screen.dart';
 import 'package:agresell_app/features/farmer/chat/presentation/screens/farmer_message_screen.dart';
+import 'package:agresell_app/features/farmer/dashboard/presentation/screens/farmer_home_screen.dart';
 import 'package:agresell_app/features/shared/chat/domain/marketplace_conversation.dart';
 import 'package:agresell_app/features/shared/widgets/navigation/custom_bottom_nav_bar.dart';
 import 'support/marketplace_messaging_fakes.dart';
@@ -101,6 +102,46 @@ void main() {
     expect(navigation.top - composer.bottom, lessThanOrEqualTo(32));
     expect(tester.takeException(), isNull);
   });
+
+  for (final bottomInset in [0.0, 24.0]) {
+    testWidgets(
+      'farmer reply has space above navigation (inset $bottomInset)',
+      (tester) async {
+        tester.view.devicePixelRatio = 1;
+        tester.view.physicalSize = const Size(360, 696);
+        tester.view.padding = FakeViewPadding(bottom: bottomInset);
+        addTearDown(() {
+          tester.view.resetDevicePixelRatio();
+          tester.view.resetPhysicalSize();
+          tester.view.resetPadding();
+        });
+
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AgrisellTheme.light,
+            home: FarmerHomeScreen(
+              initialNavIndex: FarmerHomeScreen.messageNavIndex,
+              messagingRepository: FakeMarketplaceMessagingRepository(
+                actorRole: MarketplaceActorRole.farmer,
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(_semanticsLabel('Open chat with Alex Buyer'));
+        await tester.pumpAndSettle();
+
+        final replyField = tester.getRect(
+          find.widgetWithText(TextField, 'Type a reply'),
+        );
+        final navigation = tester.getRect(find.byType(CustomBottomNavBar));
+        final sendButton = tester.getRect(find.byTooltip('Send message'));
+        expect(navigation.top - replyField.bottom, greaterThanOrEqualTo(24));
+        expect(sendButton.bottom, lessThanOrEqualTo(navigation.top - 24));
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 }
 
 Future<void> _pump(WidgetTester tester, Widget child) async {

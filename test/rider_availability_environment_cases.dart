@@ -98,16 +98,17 @@ void registerRiderAvailabilityEnvironmentCases() {
     expect(harness.repository.saveCalls, 0);
   });
 
-  test('initial environment refresh does not prompt for permission', () async {
+  test('startup defers location refresh and permission until going online', () async {
     final harness = await _Harness.create(
       locationState: RiderLocationState.permissionDenied,
     );
     addTearDown(harness.dispose);
 
-    expect(harness.location.refreshCalls, 1);
+    expect(harness.location.refreshCalls, 0);
     expect(harness.location.permissionRequestCalls, 0);
 
     await harness.availability.setOnline(true);
+    expect(harness.location.refreshCalls, 1);
     expect(harness.location.permissionRequestCalls, 1);
   });
 }

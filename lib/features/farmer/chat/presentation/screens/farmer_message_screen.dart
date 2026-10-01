@@ -122,7 +122,8 @@ class _FarmerMessageScreenState extends State<FarmerMessageScreen>
   @override
   Widget build(BuildContext context) {
     final selected = _selectedThread;
-    final bottomClearance = 108.0 + MediaQuery.viewPaddingOf(context).bottom;
+    // Keep the entire reply control clear of the navigation bar and its shadow.
+    final bottomClearance = 144.0 + MediaQuery.viewPaddingOf(context).bottom;
     return PopScope<void>(
       canPop: !widget.isActive || selected == null,
       onPopInvokedWithResult: (didPop, _) {

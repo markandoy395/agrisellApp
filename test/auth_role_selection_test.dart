@@ -3,6 +3,7 @@ import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
+import 'package:agresell_app/features/buyer/home/presentation/widgets/home/buyer_home_categories.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/screens/farmer_sign_up_screen.dart';
 import 'package:agresell_app/features/shared/widgets/navigation/custom_bottom_nav_bar.dart';
 import 'package:agresell_app/features/rider/profile/presentation/screens/rider_sign_up_screen.dart';
@@ -94,7 +95,7 @@ void main() {
       findsWidgets,
     );
     expect(find.text('Search in AgriSell'), findsOneWidget);
-    expect(find.text('Categories'), findsOneWidget);
+    expect(find.byType(BuyerHomeCategories), findsOneWidget);
     expect(find.text('Add new products'), findsNothing);
   });
 

@@ -92,7 +92,7 @@ void main() {
     expect(image.image, isA<ResizeImage>());
     final provider = image.image as ResizeImage;
     expect(provider.width, 600);
-    expect(provider.height, 462);
+    expect(provider.height, (HomeProductCard.imageHeight * 3).ceil());
     expect(tester.takeException(), isNull);
   });
 }

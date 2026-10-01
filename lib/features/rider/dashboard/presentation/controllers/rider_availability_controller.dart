@@ -90,7 +90,7 @@ class RiderAvailabilityController extends ChangeNotifier {
     // Connectivity and work status are enough to load dashboard data and
     // preview requests. Location is requested by actions that actually need
     // it (for example going online, accepting, or opening the map).
-    await refreshEnvironment(refreshLocation: true);
+    await refreshEnvironment();
   }
 
   Future<void> refreshEnvironment({bool refreshLocation = false}) async {

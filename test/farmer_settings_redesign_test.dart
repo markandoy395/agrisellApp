@@ -53,12 +53,12 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text('100%'), findsOneWidget);
         await tester.scrollUntilVisible(
-          find.text('Log out'),
+          find.text('Logout'),
           150,
           scrollable: scrollable,
         );
         expect(find.text('Switch account'), findsOneWidget);
-        expect(find.text('Log out'), findsOneWidget);
+        expect(find.text('Logout'), findsOneWidget);
         expect(tester.takeException(), isNull);
         await tester.tap(find.byTooltip('Close settings'));
         await tester.pumpAndSettle();

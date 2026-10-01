@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:agresell_app/features/shared/support/data/support_ticket_repository.dart';
 import 'package:agresell_app/features/shared/support/domain/support_message.dart';
@@ -157,6 +158,21 @@ void main() {
   });
 
   group('Controllers', () {
+    test('missing support schema shows a customer-friendly error', () async {
+      final controller = SupportTicketsController(
+        repository: _MissingSchemaSupportTicketRepository(),
+      );
+
+      await controller.loadTickets();
+
+      expect(controller.tickets, isEmpty);
+      expect(
+        controller.errorMessage,
+        'Customer support is temporarily unavailable. Please try again later.',
+      );
+      controller.dispose();
+    });
+
     test('SupportTicketsController loads and filters tickets', () async {
       final repository = InMemorySupportTicketRepository(
         seedTickets: [
@@ -259,6 +275,29 @@ void main() {
   });
 
   group('Widget Tests', () {
+    testWidgets('SupportCenterScreen hides database details when unavailable', (
+      tester,
+    ) async {
+      final controller = SupportTicketsController(
+        repository: _MissingSchemaSupportTicketRepository(),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(home: SupportCenterScreen(controller: controller)),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(
+          'Customer support is temporarily unavailable. Please try again later.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.textContaining('PostgrestException'), findsNothing);
+      expect(find.textContaining('public.support_tickets'), findsNothing);
+      controller.dispose();
+    });
+
     testWidgets('SupportCenterScreen displays tickets and filter chips', (tester) async {
       final repository = InMemorySupportTicketRepository(
         seedTickets: [
@@ -413,4 +452,15 @@ void main() {
       expect(messages.last.body, 'Thank you, please expedite.');
     });
   });
+}
+
+class _MissingSchemaSupportTicketRepository
+    extends InMemorySupportTicketRepository {
+  @override
+  Future<List<SupportTicket>> getMyTickets() async {
+    throw const PostgrestException(
+      message: "Could not find the table 'public.support_tickets'",
+      code: 'PGRST205',
+    );
+  }
 }

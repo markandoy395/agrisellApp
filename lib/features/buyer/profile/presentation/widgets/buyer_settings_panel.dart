@@ -210,7 +210,7 @@ class BuyerSettingsPanel extends StatelessWidget {
                   ),
                   _action(
                     Icons.logout_rounded,
-                    'Log out',
+                    'Logout',
                     onLogout,
                     destructive: true,
                   ),

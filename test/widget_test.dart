@@ -200,14 +200,14 @@ void main() {
     });
     tester.view.physicalSize = const Size(320, 568);
     await _pumpAuthScreen(tester, const HomeScreen());
-    final compactContext = tester.element(find.text('Categories'));
+    final compactContext = tester.element(find.text('Show all'));
     final compactScaler = MediaQuery.textScalerOf(compactContext);
     expect(compactScaler.scale(12), 12);
     expect(compactScaler.scale(15), closeTo(13.95, 0.001));
     expect(tester.takeException(), isNull);
     tester.view.physicalSize = const Size(430, 932);
     await tester.pumpAndSettle();
-    final largeContext = tester.element(find.text('Categories'));
+    final largeContext = tester.element(find.text('Show all'));
     final largeScaler = MediaQuery.textScalerOf(largeContext);
     expect(largeScaler.scale(12), 12);
     expect(largeScaler.scale(15), 15);
@@ -217,7 +217,7 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(430, 932));
     addTearDown(() => tester.binding.setSurfaceSize(null));
     await _pumpAuthScreen(tester, const HomeScreen());
-    expect(find.text('Categories'), findsOneWidget);
+    expect(find.text('Show all'), findsOneWidget);
     await tester.tap(find.text('Farmers'));
     await tester.pumpAndSettle();
     expect(find.text('0 farmers found'), findsOneWidget);
@@ -257,28 +257,31 @@ void main() {
     await _pumpScreen(tester, const HomeScreen());
     await _pumpUntilFound(tester, find.text('Account'));
     await tester.tap(find.text('Account'));
-    await _pumpUntilFound(tester, find.text('My Orders').hitTestable());
+    await _pumpUntilFound(tester, find.text('My orders').hitTestable());
     expect(find.text('Test Account'), findsAtLeastNWidgets(1));
-    expect(find.text('My Orders'), findsOneWidget);
-    expect(find.text('My Profile'), findsOneWidget);
+    expect(find.text('My orders'), findsOneWidget);
+    expect(find.text('Personal information'), findsOneWidget);
     expect(find.text('Edit Profile'), findsNothing);
     expect(find.text('Logout'), findsNothing);
     await tester.tap(find.bySemanticsLabel('Settings').hitTestable());
+    await tester.pumpAndSettle();
     await _pumpUntilFound(tester, find.text('Edit buyer profile'));
     await tester.tap(find.text('Edit buyer profile'));
-    await _pumpUntilFound(tester, find.text('Save'));
-    expect(find.byIcon(Icons.edit_rounded), findsOneWidget);
+    await tester.pumpAndSettle();
+    await _pumpUntilFound(tester, find.text('Save changes'));
+    expect(find.text('Edit Profile'), findsOneWidget);
     expect(find.byType(TextField), findsNWidgets(5));
-    expect(find.text('First Name'), findsOneWidget);
-    expect(find.text('Last Name'), findsOneWidget);
-    expect(find.text('Name Extension (Optional)'), findsOneWidget);
-    expect(find.text('Phone Number'), findsOneWidget);
-    expect(find.text('Date of Birth'), findsOneWidget);
+    expect(find.text('First name'), findsOneWidget);
+    expect(find.text('Last name'), findsOneWidget);
+    expect(find.text('Name extension'), findsOneWidget);
+    expect(find.text('Phone number'), findsOneWidget);
+    expect(find.text('Date of birth'), findsOneWidget);
     expect(find.text('Email'), findsOneWidget);
     expect(find.text('Cancel'), findsOneWidget);
-    expect(find.text('Save'), findsOneWidget);
+    expect(find.text('Save changes'), findsOneWidget);
     await tester.enterText(find.byType(TextField).first, 'DROP TABLE users');
-    await tester.tap(find.text('Save'));
+    await _ensureVisibleCentered(tester, find.text('Save changes'));
+    await tester.tap(find.text('Save changes'));
     await _pumpUntilFound(
       tester,
       find.text('Remove unsafe command-like text from First Name.'),
@@ -287,16 +290,22 @@ void main() {
       find.text('Remove unsafe command-like text from First Name.'),
       findsOneWidget,
     );
-    expect(find.text('Save'), findsOneWidget);
+    expect(find.text('Save changes'), findsOneWidget);
     await tester.enterText(find.byType(TextField).first, 'New');
-    await tester.tap(find.text('Save'));
+    await _ensureVisibleCentered(tester, find.text('Save changes'));
+    await tester.tap(find.text('Save changes'));
+    await tester.pumpAndSettle();
     await _pumpUntilFound(tester, find.text('New Account'));
     expect(find.text('New Account'), findsAtLeastNWidgets(1));
     await tester.tap(find.byTooltip('Close settings'));
-    await tester.pump(const Duration(milliseconds: 350));
+    await tester.pumpAndSettle();
     expect(find.text('August 1, 2024'), findsNothing);
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, 500));
+    await tester.pumpAndSettle();
     await tester.tap(find.bySemanticsLabel('Settings').hitTestable());
+    await tester.pumpAndSettle();
     await _pumpUntilFound(tester, find.text('Logout'));
+    await _ensureVisibleCentered(tester, find.text('Logout'));
     await tester.tap(find.text('Logout'));
     await _pumpUntilFound(
       tester,
@@ -312,22 +321,26 @@ void main() {
     await _pumpScreen(tester, const HomeScreen());
     await _pumpUntilFound(tester, find.text('Account'));
     await tester.tap(find.text('Account'));
-    await _pumpUntilFound(tester, find.text('My Orders').hitTestable());
+    await _pumpUntilFound(tester, find.text('My orders').hitTestable());
     await tester.tap(find.bySemanticsLabel('Settings').hitTestable());
+    await tester.pumpAndSettle();
     await _pumpUntilFound(tester, find.text('Edit buyer profile'));
     expect(find.text('Settings'), findsOneWidget);
     expect(find.text('Edit buyer profile'), findsOneWidget);
     expect(find.text('Switch account'), findsOneWidget);
     expect(find.text('Logout'), findsOneWidget);
     await tester.tap(find.text('Edit buyer profile'));
-    await _pumpUntilFound(tester, find.text('Save'));
+    await tester.pumpAndSettle();
+    await _pumpUntilFound(tester, find.text('Save changes'));
     expect(find.byType(TextField), findsNWidgets(5));
+    await _ensureVisibleCentered(tester, find.text('Cancel'));
     await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
     await _pumpUntilFound(tester, find.text('Edit buyer profile'));
     expect(find.text('Edit buyer profile'), findsOneWidget);
     await tester.tap(find.byTooltip('Close settings'));
     await tester.pump(const Duration(milliseconds: 350));
-    expect(find.text('My Orders'), findsOneWidget);
+    expect(find.text('My orders'), findsOneWidget);
   });
   testWidgets('farmer me tab shows dashboard and edit profile flow', (
     tester,
@@ -339,36 +352,46 @@ void main() {
       tester,
       const FarmerHomeScreen(initialNavIndex: FarmerHomeScreen.profileNavIndex),
     );
-    await _pumpUntilFound(tester, find.text('My history'));
+    await _pumpUntilFound(tester, find.text('My orders'));
     expect(find.byType(CustomBottomNavBar), findsOneWidget);
     expect(find.text('Test Account'), findsAtLeastNWidgets(1));
     expect(
-      find.textContaining('Sales statistics will appear after the backend'),
+      find.text('Payouts & Disbursements'),
       findsOneWidget,
     );
-    expect(find.text('My history'), findsOneWidget);
+    expect(find.text('My orders'), findsOneWidget);
     expect(find.text('To Ship'), findsOneWidget);
-    expect(find.text('My Profile'), findsOneWidget);
+    expect(find.text('Personal information'), findsOneWidget);
     expect(find.text('Edit Profile'), findsNothing);
     expect(find.text('Switch Account'), findsNothing);
     expect(find.text('Logout'), findsNothing);
     await tester.tap(find.byTooltip('Settings'));
+    await tester.pumpAndSettle();
     await _pumpUntilFound(tester, find.text('Edit farmer profile'));
     await tester.tap(find.text('Edit farmer profile'));
-    await _pumpUntilFound(tester, find.text('Save'));
+    await tester.pumpAndSettle();
+    await _pumpUntilFound(tester, find.text('Save changes'));
     expect(find.byType(CustomBottomNavBar), findsOneWidget);
     expect(find.byType(TextField), findsNWidgets(5));
-    expect(find.text('First Name'), findsOneWidget);
-    expect(find.text('Last Name'), findsOneWidget);
-    expect(find.text('Name Extension (Optional)'), findsOneWidget);
-    expect(find.text('Phone Number'), findsOneWidget);
-    expect(find.text('Date of Birth'), findsOneWidget);
+    expect(find.text('First name'), findsOneWidget);
+    expect(find.text('Last name'), findsOneWidget);
+    expect(find.text('Name extension'), findsOneWidget);
+    expect(find.text('Phone number'), findsOneWidget);
+    expect(find.text('Date of birth'), findsOneWidget);
     expect(find.text('Email'), findsOneWidget);
     expect(find.text('Switch Account'), findsNothing);
     expect(find.text('Logout'), findsNothing);
     await tester.enterText(find.byType(TextField).first, 'Farm');
-    await tester.tap(find.text('Save'));
+    await _ensureVisibleCentered(tester, find.text('Save changes'));
+    await tester.tap(find.text('Save changes'));
+    await tester.pumpAndSettle();
     await _pumpUntilFound(tester, find.text('Farm Account'));
+    await tester.scrollUntilVisible(
+      find.text('Switch account'),
+      100,
+      scrollable: find.byType(Scrollable).last,
+    );
+    await tester.pumpAndSettle();
     expect(find.text('Farm Account'), findsAtLeastNWidgets(1));
     expect(find.text('Switch account'), findsOneWidget);
     expect(find.text('Logout'), findsOneWidget);
@@ -422,4 +445,9 @@ Future<void> _startProfileSession(AuthRole role, String email) async {
     AuthSessionService.instance.clearMemoryForTesting();
     AuthRegistrationService.instance.clearForTesting();
   });
+}
+
+Future<void> _ensureVisibleCentered(WidgetTester tester, Finder finder) async {
+  await Scrollable.ensureVisible(tester.element(finder), alignment: 0.5);
+  await tester.pumpAndSettle();
 }

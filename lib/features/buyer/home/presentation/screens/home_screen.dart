@@ -166,7 +166,8 @@ class _HomeScreenState extends State<HomeScreen> {
           onUnreadCountChanged: _setNotificationUnreadCount,
         ),
       ),
-      HomeScreen.profileNavIndex => const _KeepAliveTab(child: ProfileScreen()),
+      HomeScreen.profileNavIndex =>
+          const _KeepAliveTab(child: ProfileScreen(showSettingsIcon: true)),
       _ => const SizedBox.shrink(),
     };
   }

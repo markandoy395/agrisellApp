@@ -198,7 +198,7 @@ class _FarmerHomeScreenState extends State<FarmerHomeScreen> {
         ),
       ),
       FarmerHomeScreen.profileNavIndex => const _FarmerKeepAliveTab(
-        child: FarmerProfileScreen(),
+        child: FarmerProfileScreen(showSettingsIcon: true),
       ),
       _ => const SizedBox.shrink(),
     };

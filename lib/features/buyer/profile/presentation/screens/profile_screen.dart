@@ -73,12 +73,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.dispose();
   }
 
-  void _openEditProfile() {
-    setState(() => _mode = _BuyerProfileMode.edit);
+  bool _returnToSettings = false;
+
+  void _openEditProfile({bool returnToSettings = false}) {
+    setState(() {
+      _returnToSettings = returnToSettings;
+      _mode = _BuyerProfileMode.edit;
+    });
   }
 
   void _cancelEditProfile() {
     setState(() => _mode = _BuyerProfileMode.overview);
+    if (_returnToSettings) {
+      unawaited(_openSettings());
+    }
   }
 
   Future<void> _saveProfile(UserProfile profile) async {
@@ -90,6 +98,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _mode = _BuyerProfileMode.overview;
       });
       _showMessage('Profile saved.');
+      if (_returnToSettings) {
+        unawaited(_openSettings());
+      }
     } on UserProfileSaveException catch (error) {
       if (mounted) _showMessage(error.message);
     }
@@ -193,7 +204,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           onBack: () => Navigator.of(sheetContext).pop(),
           onEditProfile: () {
             Navigator.of(sheetContext).pop();
-            _openEditProfile();
+            _openEditProfile(returnToSettings: true);
           },
           onSafety: () {
             Navigator.of(sheetContext).pop();

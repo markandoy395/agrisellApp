@@ -153,7 +153,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
                       const SliverToBoxAdapter(
                         child: _FarmerDashboardEmptyState(
                           message:
-                              'Your products will appear here once you add them.',
+                              'Products from the backend will appear here.',
                         ),
                       )
                     else if (visibleProducts.isEmpty)

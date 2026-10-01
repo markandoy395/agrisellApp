@@ -134,6 +134,30 @@ class _SupportTicketDetailScreenState extends State<SupportTicketDetailScreen> {
                           color: AgrisellColors.forestGreen,
                         ),
                       )
+                    : _controller.errorMessage != null && messages.isEmpty
+                    ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _controller.errorMessage!,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: AgrisellColors.mutedText,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              OutlinedButton(
+                                onPressed: _controller.loadMessages,
+                                child: const Text('Try Again'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
                     : RefreshIndicator(
                         color: AgrisellColors.forestGreen,
                         onRefresh: _controller.loadMessages,

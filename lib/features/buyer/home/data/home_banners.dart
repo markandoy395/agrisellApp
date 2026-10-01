@@ -11,6 +11,6 @@ final List<HomeBanner> homeBanners = <HomeBanner>[
     subtitle: 'Discount of',
     title: 'VEGETABLE\nPRODUCT',
     expiryLabel: 'Aug 31, 2026',
-    expiresAt: DateTime(2026, 9, 1),
+    expiresAt: DateTime(2030, 9, 1),
   ),
 ];

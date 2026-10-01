@@ -7,6 +7,7 @@ import 'package:agresell_app/features/shared/support/data/support_ticket_reposit
 import 'package:agresell_app/features/shared/support/data/supabase_support_ticket_repository.dart';
 import 'package:agresell_app/features/shared/support/domain/support_message.dart';
 import 'package:agresell_app/features/shared/support/domain/support_ticket.dart';
+import 'package:agresell_app/features/shared/support/presentation/controllers/support_error_message.dart';
 
 class SupportTicketDetailController extends ChangeNotifier {
   SupportTicketDetailController({
@@ -37,7 +38,10 @@ class SupportTicketDetailController extends ChangeNotifier {
     try {
       _messages = await _repository.getTicketMessages(_ticket.ticketId);
     } catch (e) {
-      _errorMessage = 'Could not load messages: $e';
+      _errorMessage = supportErrorMessage(
+        e,
+        fallback: 'Could not load messages. Please try again.',
+      );
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -76,7 +80,10 @@ class SupportTicketDetailController extends ChangeNotifier {
 
       return true;
     } catch (e) {
-      _errorMessage = 'Failed to send message: $e';
+      _errorMessage = supportErrorMessage(
+        e,
+        fallback: 'Could not send your message. Please try again.',
+      );
       return false;
     } finally {
       _isSending = false;

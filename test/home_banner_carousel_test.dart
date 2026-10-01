@@ -76,7 +76,7 @@ void main() {
         subtitle: 'Savings on',
         title: 'FRUIT\nPRODUCT',
         expiryLabel: 'Sep 30, 2026',
-        expiresAt: DateTime(2026, 10, 1),
+        expiresAt: DateTime(2030, 10, 1),
       ),
     ];
 
@@ -138,7 +138,7 @@ void main() {
       subtitle: 'Farm-wide sale',
       title: '1000 PRODUCTS',
       expiryLabel: 'Sep 30, 2026',
-      expiresAt: DateTime(2026, 10, 1),
+      expiresAt: DateTime(2030, 10, 1),
     );
 
     await tester.pumpWidget(

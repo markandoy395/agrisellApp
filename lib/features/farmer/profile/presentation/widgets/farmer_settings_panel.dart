@@ -240,7 +240,7 @@ class FarmerSettingsPanel extends StatelessWidget {
                   ),
                   _action(
                     Icons.logout_rounded,
-                    'Log out',
+                    'Logout',
                     'Sign out of this device',
                     onLogout,
                     destructive: true,

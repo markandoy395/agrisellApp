@@ -51,12 +51,15 @@ class _CheckoutOrderSummaryPanel extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Text(
-                  'Order Summary & Discounts',
-                  style: TextStyle(
-                    color: AgrisellColors.brandBlack,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
+                const Expanded(
+                  child: Text(
+                    'Order Summary & Discounts',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: AgrisellColors.brandBlack,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ],
@@ -161,16 +164,19 @@ class _SummaryRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: isTotal
-                ? AgrisellColors.brandBlack
-                : AgrisellColors.mutedText,
-            fontSize: isTotal ? 13 : 12,
-            fontWeight: isTotal ? FontWeight.w800 : FontWeight.w500,
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: isTotal
+                  ? AgrisellColors.brandBlack
+                  : AgrisellColors.mutedText,
+              fontSize: isTotal ? 13 : 12,
+              fontWeight: isTotal ? FontWeight.w800 : FontWeight.w500,
+            ),
           ),
         ),
+        const SizedBox(width: 8),
         Text(
           value,
           style: TextStyle(

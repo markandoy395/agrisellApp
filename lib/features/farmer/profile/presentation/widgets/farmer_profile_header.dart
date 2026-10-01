@@ -202,18 +202,22 @@ class _NavButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Tooltip(
     message: tooltip,
-    child: InkWell(
-      onTap: onPressed,
-      borderRadius: BorderRadius.circular(13),
-      child: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: FarmerProfileStyle.mint,
-          borderRadius: BorderRadius.circular(13),
-          border: Border.all(color: FarmerProfileStyle.borderSubtle, width: 1),
+    child: Semantics(
+      button: true,
+      label: tooltip,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(13),
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: FarmerProfileStyle.mint,
+            borderRadius: BorderRadius.circular(13),
+            border: Border.all(color: FarmerProfileStyle.borderSubtle, width: 1),
+          ),
+          child: Icon(icon, color: FarmerProfileStyle.green, size: 20),
         ),
-        child: Icon(icon, color: FarmerProfileStyle.green, size: 20),
       ),
     ),
   );

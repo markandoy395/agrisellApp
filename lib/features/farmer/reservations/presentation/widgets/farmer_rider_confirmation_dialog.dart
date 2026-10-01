@@ -243,6 +243,7 @@ Future<bool> showFarmerRiderConfirmationDialog(
                 style: OutlinedButton.styleFrom(
                   foregroundColor: _green,
                   minimumSize: const Size(double.infinity, 48),
+                  maximumSize: Size.infinite,
                   side: const BorderSide(color: _green),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -259,6 +260,7 @@ Future<bool> showFarmerRiderConfirmationDialog(
                   backgroundColor: _green,
                   foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 48),
+                  maximumSize: Size.infinite,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 12,

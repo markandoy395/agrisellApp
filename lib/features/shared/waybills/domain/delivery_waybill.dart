@@ -1,5 +1,3 @@
-import 'package:agresell_app/features/farmer/reservations/domain/farmer_rider_request.dart';
-import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_payment.dart';
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
 
@@ -76,7 +74,7 @@ class DeliveryWaybill {
     PlacedOrder order, {
     String? courierName,
     String? courierContact,
-    FarmerRiderRequest? riderRequest,
+    dynamic riderRequest,
     String? farmerContact,
     String? pickupAddress,
   }) {
@@ -132,7 +130,7 @@ class DeliveryWaybill {
   }
 
   factory DeliveryWaybill.fromRiderDelivery(
-    DeliveryRequest request, {
+    dynamic request, {
     required String riderName,
     required String riderContact,
   }) {

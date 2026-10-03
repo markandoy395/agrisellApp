@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/rider/presentation/styles/rider_status_pills_styles.dart';
 import 'package:flutter/material.dart';
 
 /// A small, color-configurable label for rider availability or delivery state.
@@ -21,10 +22,7 @@ class RiderStatusPill extends StatelessWidget {
       label: label,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(14),
-        ),
+        decoration: RiderStatusPillsStyles.containerDecoration(backgroundColor),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -37,12 +35,7 @@ class RiderStatusPill extends StatelessWidget {
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: foregroundColor,
-                  fontSize: 12,
-                  height: 1,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: RiderStatusPillsStyles.labelText(foregroundColor),
               ),
             ),
           ],

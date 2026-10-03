@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/features/buyer/profile/presentation/widgets/shipping_address_form.dart';
@@ -51,7 +52,7 @@ class ShippingAddressEditorContent extends StatelessWidget {
           const SizedBox(height: 6),
           const Text(
             'Complete your address. We will capture your delivery GPS location when you save.',
-            style: TextStyle(fontSize: 12),
+            style: SharedPresentationStyles.caption,
           ),
           const SizedBox(height: 14),
           ShippingAddressForm(

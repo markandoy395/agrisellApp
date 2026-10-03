@@ -5,7 +5,7 @@ import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/core/services/push_notification_service.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/features/buyer/profile/presentation/screens/profile_screen.dart';
 import 'package:agresell_app/features/shared/chat/data/marketplace_messaging_repository.dart';
 import 'package:agresell_app/features/shared/chat/data/marketplace_messaging_repository_factory.dart';
 import 'package:agresell_app/features/shared/products/data/home_product_repository.dart';
@@ -23,8 +23,10 @@ import 'package:agresell_app/features/shared/orders/presentation/screens/notific
 import 'package:agresell_app/features/shared/orders/data/home_notification_badge_loader.dart';
 import 'package:agresell_app/features/shared/orders/domain/home_notification.dart';
 import 'package:agresell_app/features/buyer/orders/presentation/screens/order_tracking_screen.dart';
-import 'package:agresell_app/features/buyer/profile/presentation/screens/profile_screen.dart';
+import 'package:agresell_app/features/buyer/home/presentation/styles/home_screen_styles.dart';
+
 part 'home_screen_messaging.dart';
+part 'home_screen_tabs.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -117,17 +119,17 @@ class _HomeScreenState extends State<HomeScreen> {
     return BuyerResponsiveText(
       child: Scaffold(
         extendBody: true,
-        backgroundColor: AgrisellColors.homeBackground,
+        backgroundColor: HomeScreenStyles.scaffoldBackground,
         bottomNavigationBar: CustomBottomNavBar(
           selectedIndex: _activeNavIndex,
           items: homeBottomNavItems,
           badgeCounts: _badgeCounts,
-          background: AgrisellColors.surface,
-          activeBackground: AgrisellColors.authGreen,
-          activeIconColor: AgrisellColors.surface,
-          inactiveIconColor: AgrisellColors.brandBlack,
-          inactiveLabelColor: AgrisellColors.brandBlack,
-          shadowColor: AgrisellColors.brandBlack.withValues(alpha: 0.16),
+          background: HomeScreenStyles.navBarBackground,
+          activeBackground: HomeScreenStyles.navBarActiveBackground,
+          activeIconColor: HomeScreenStyles.navBarActiveIconColor,
+          inactiveIconColor: HomeScreenStyles.navBarInactiveIconColor,
+          inactiveLabelColor: HomeScreenStyles.navBarInactiveLabelColor,
+          shadowColor: HomeScreenStyles.navBarShadowColor,
           onItemSelected: _selectTab,
         ),
         body: PageView.builder(
@@ -139,99 +141,5 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
-  }
-
-  Widget _buildTab(BuildContext context, int index) {
-    return switch (index) {
-      HomeScreen.homeNavIndex => _KeepAliveTab(
-        child: HomeDashboardContent(
-          catalogController: _productCatalogController,
-          onProductTap: _openProduct,
-        ),
-      ),
-      HomeScreen.messageNavIndex => _KeepAliveTab(
-        child: BuyerMessageScreen(
-          isActive: _activeNavIndex == HomeScreen.messageNavIndex,
-          repository: widget.messagingRepository,
-          onUnreadCountChanged: _setMessageUnreadCount,
-          chatBottomPadding: MediaQuery.paddingOf(context).bottom + 8,
-        ),
-      ),
-      HomeScreen.farmerNavIndex => const _KeepAliveTab(child: FarmerScreen()),
-      HomeScreen.notificationNavIndex => _KeepAliveTab(
-        child: NotificationScreen(
-          role: AuthRole.buyer,
-          userId: AuthSessionService.instance.currentAccount?.id,
-          onNotificationSelected: _openNotification,
-          onUnreadCountChanged: _setNotificationUnreadCount,
-        ),
-      ),
-      HomeScreen.profileNavIndex =>
-          const _KeepAliveTab(child: ProfileScreen(showSettingsIcon: true)),
-      _ => const SizedBox.shrink(),
-    };
-  }
-
-  void _openNotification(HomeNotification notification) {
-    switch (notification.destination) {
-      case HomeNotificationDestination.orders ||
-          HomeNotificationDestination.deliveries:
-        unawaited(
-          Navigator.of(context).push(
-            agrisellPageRoute<void>(
-              builder: (_) => const OrderTrackingScreen(),
-            ),
-          ),
-        );
-        return;
-      case HomeNotificationDestination.messages:
-        unawaited(_selectTab(HomeScreen.messageNavIndex));
-        return;
-      case HomeNotificationDestination.products:
-        unawaited(_selectTab(HomeScreen.homeNavIndex));
-        return;
-      case HomeNotificationDestination.account:
-        unawaited(_selectTab(HomeScreen.profileNavIndex));
-        return;
-      case HomeNotificationDestination.none:
-        break;
-    }
-  }
-
-  void _openProduct(
-    HomeProduct product,
-    HomeProductBrowseController browseController,
-  ) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => ProductDetailScreen(
-          product: product,
-          catalogController: _productCatalogController,
-          isSaved: browseController.isSaved,
-          onSavedToggle: browseController.toggleSaved,
-        ),
-      ),
-    );
-  }
-}
-
-class _KeepAliveTab extends StatefulWidget {
-  const _KeepAliveTab({required this.child});
-
-  final Widget child;
-
-  @override
-  State<_KeepAliveTab> createState() => _KeepAliveTabState();
-}
-
-class _KeepAliveTabState extends State<_KeepAliveTab>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    return widget.child;
   }
 }

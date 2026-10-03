@@ -1,7 +1,7 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/app_dropdown_style.dart';
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_input_style.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_registration.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_draft.dart';
@@ -21,7 +21,7 @@ class RiderSignUpVehicleStep extends StatelessWidget {
       children: [
         const Text(
           'Add the vehicle type and plate number shown in the final ERD.',
-          style: TextStyle(fontSize: 12, color: AgrisellColors.mutedText),
+          style: SharedPresentationStyles.mutedCaption,
         ),
         const SizedBox(height: 12),
         DropdownButtonFormField<RiderVehicleType>(

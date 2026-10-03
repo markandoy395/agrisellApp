@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/reserve_header_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/constants/agrisell_assets.dart';
@@ -31,17 +32,7 @@ class ReserveHeader extends StatelessWidget {
         horizontalPadding,
         14,
       ),
-      decoration: BoxDecoration(
-        color: AgrisellColors.authGreen,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(22)),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.16),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
+      decoration: ReserveHeaderStyles.containerDecoration,
       child: Row(
         children: [
           Expanded(
@@ -80,43 +71,13 @@ class _ReserveSearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 46,
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(30),
-      ),
+      decoration: ReserveHeaderStyles.containerDecoration2,
       child: TextField(
         controller: controller,
         onChanged: onChanged,
         textInputAction: TextInputAction.search,
-        style: const TextStyle(fontSize: 13, color: AgrisellColors.brandBlack),
-        decoration: InputDecoration(
-          hintText: 'Search reservations',
-          hintStyle: TextStyle(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.58),
-            fontSize: 13,
-          ),
-          prefixIcon: const Padding(
-            padding: EdgeInsets.only(left: 12, right: 8),
-            child: HomeAssetIcon(
-              asset: AgrisellAssets.iconSearch,
-              size: 23,
-              color: AgrisellColors.brandBlack,
-            ),
-          ),
-          prefixIconConstraints: const BoxConstraints(minWidth: 43),
-          suffixIcon: controller.text.isEmpty
-              ? null
-              : IconButton(
-                  tooltip: 'Clear search',
-                  onPressed: () {
-                    controller.clear();
-                    onChanged('');
-                  },
-                  icon: const Icon(Icons.close_rounded, size: 20),
-                ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 13),
-        ),
+        style: ReserveHeaderStyles.textStyle,
+        decoration: ReserveHeaderStyles.inputDecoration(controller, onChanged),
       ),
     );
   }

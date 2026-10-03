@@ -1,6 +1,6 @@
+import 'package:agresell_app/features/farmer/products/presentation/styles/farm_creation_dialog_styles.dart';
+import 'package:agresell_app/features/farmer/products/presentation/styles/farmer_restock_dialog_styles.dart';
 import 'package:flutter/material.dart';
-
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 Future<String?> showFarmCreationDialog(BuildContext context) {
   return showDialog<String>(
@@ -36,10 +36,7 @@ class _FarmCreationDialogState extends State<_FarmCreationDialog> {
           controller: _controller,
           autofocus: true,
           textInputAction: TextInputAction.done,
-          decoration: const InputDecoration(
-            labelText: 'Farm name',
-            hintText: 'Enter your farm name',
-          ),
+          decoration: FarmCreationDialogStyles.inputDecoration,
           validator: (value) => value == null || value.trim().isEmpty
               ? 'Enter your farm name.'
               : null,
@@ -50,10 +47,7 @@ class _FarmCreationDialogState extends State<_FarmCreationDialog> {
         TextButton(onPressed: _cancel, child: const Text('Cancel')),
         FilledButton(
           onPressed: _createFarm,
-          style: FilledButton.styleFrom(
-            backgroundColor: AgrisellColors.authGreen,
-            foregroundColor: AgrisellColors.surface,
-          ),
+          style: FarmerRestockDialogStyles.confirmButtonStyle,
           child: const Text('Create'),
         ),
       ],

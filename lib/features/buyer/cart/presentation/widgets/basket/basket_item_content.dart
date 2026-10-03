@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/buyer/cart/presentation/styles/basket_item_content_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -19,12 +21,7 @@ class BasketItemDetails extends StatelessWidget {
           item.productName,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: AgrisellColors.brandBlack,
-            fontSize: 15,
-            height: 1.15,
-            fontWeight: FontWeight.w800,
-          ),
+          style: BasketItemContentStyles.textStyle,
         ),
         const SizedBox(height: 7),
         Wrap(
@@ -34,23 +31,13 @@ class BasketItemDetails extends StatelessWidget {
             if (item.hasSale)
               Text(
                 item.originalPriceLabel!,
-                style: const TextStyle(
-                  color: Colors.red,
-                  fontSize: 12,
-                  decoration: TextDecoration.lineThrough,
-                  decorationColor: Colors.red,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: SharedPresentationStyles.originalPrice,
               ),
             if (item.hasSale)
-              const Text('→', style: TextStyle(color: AgrisellColors.mutedText)),
+              const Text('→', style: SharedPresentationStyles.mutedText),
             Text(
               '${item.priceLabel} ${item.unit}',
-              style: const TextStyle(
-                color: AgrisellColors.authGreen,
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-              ),
+              style: SharedPresentationStyles.greenBodyExtraBold,
             ),
           ],
         ),
@@ -83,11 +70,7 @@ class _InfoLine extends StatelessWidget {
             text,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: AgrisellColors.mutedText,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
+            style: SharedPresentationStyles.mutedCaptionMedium,
           ),
         ),
       ],
@@ -115,20 +98,11 @@ class BasketItemSummary extends StatelessWidget {
           child: Text.rich(
             TextSpan(
               text: 'Subtotal\n',
-              style: const TextStyle(
-                color: AgrisellColors.mutedText,
-                fontSize: 12,
-                height: 1.3,
-                fontWeight: FontWeight.w600,
-              ),
+              style: SharedPresentationStyles.mutedCaptionSemiboldLoose,
               children: [
                 TextSpan(
                   text: formatBasketPeso(item.pricePerKg * item.quantity),
-                  style: const TextStyle(
-                    color: AgrisellColors.authGreen,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: SharedPresentationStyles.greenTitleExtraBold,
                 ),
               ],
             ),
@@ -139,11 +113,7 @@ class BasketItemSummary extends StatelessWidget {
           children: [
             const Text(
               'Quantity',
-              style: TextStyle(
-                color: AgrisellColors.mutedText,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
+              style: SharedPresentationStyles.mutedCaptionSemibold,
             ),
             const SizedBox(height: 4),
             QuantityStepper(

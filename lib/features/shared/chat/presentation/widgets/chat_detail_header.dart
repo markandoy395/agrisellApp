@@ -1,26 +1,10 @@
+export 'package:agresell_app/features/shared/chat/presentation/styles/chat_detail_header_styles.dart';
+import 'package:agresell_app/features/shared/chat/presentation/styles/chat_detail_header_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/chat/presentation/models/chat_participant_data.dart';
 import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_avatar.dart';
-
-class ChatDetailHeaderStyle {
-  const ChatDetailHeaderStyle({
-    required this.padding,
-    required this.decoration,
-    required this.avatarStyle,
-    required this.titleStyle,
-    required this.subtitleStyle,
-    this.subtitleSpacing = 0,
-  });
-
-  final EdgeInsets padding;
-  final Decoration decoration;
-  final ChatAvatarStyle avatarStyle;
-  final TextStyle titleStyle;
-  final TextStyle subtitleStyle;
-  final double subtitleSpacing;
-}
 
 class ChatDetailHeader extends StatelessWidget {
   const ChatDetailHeader({

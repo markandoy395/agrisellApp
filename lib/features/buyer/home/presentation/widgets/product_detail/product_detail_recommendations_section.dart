@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/buyer/home/presentation/styles/product_detail_recommendations_section_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -76,11 +78,8 @@ class _RecommendationState extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.fromLTRB(14, 18, 14, 0),
     child: DecoratedBox(
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AgrisellColors.borderLine),
-      ),
+      decoration:
+          ProductDetailRecommendationsSectionStyles.decoratedBoxDecoration,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
         child: Row(
@@ -96,11 +95,7 @@ class _RecommendationState extends StatelessWidget {
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(
-                  color: AgrisellColors.headingGreen,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: SharedPresentationStyles.headingCaptionBold,
               ),
             ),
             if (actionLabel != null)

@@ -1,6 +1,6 @@
+import 'package:agresell_app/features/buyer/home/presentation/styles/farmer_profile_card_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/buyer/home/domain/farmer_profile.dart';
 import 'package:agresell_app/features/buyer/home/presentation/controllers/farmer_follow_controller.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/farmer_avatar.dart';
@@ -31,19 +31,7 @@ class FarmerProfileCard extends StatelessWidget {
     return SizedBox(
       height: height,
       child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AgrisellColors.authGreen,
-          borderRadius: const BorderRadius.vertical(
-            bottom: Radius.circular(18),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AgrisellColors.brandBlack.withValues(alpha: 0.18),
-              blurRadius: 14,
-              offset: const Offset(0, 7),
-            ),
-          ],
-        ),
+        decoration: FarmerProfileCardStyles.decoratedBoxDecoration,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(11, 6, 11, 6),
           child: Row(
@@ -99,11 +87,7 @@ class _FarmerProfileText extends StatelessWidget {
               child: Text(
                 '${farmer.followerCount} followers',
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: AgrisellColors.surface.withValues(alpha: 0.88),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: FarmerProfileCardStyles.textStyle,
               ),
             ),
           ],
@@ -174,19 +158,7 @@ class _ProfileActionButton extends StatelessWidget {
         onPressed: onTap,
         icon: Icon(icon, size: 16),
         label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AgrisellColors.surface,
-          side: const BorderSide(color: AgrisellColors.surface, width: 1.4),
-          shape: const StadiumBorder(),
-          padding: const EdgeInsets.symmetric(horizontal: 7),
-          minimumSize: Size.zero,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          textStyle: const TextStyle(
-            fontSize: 12,
-            height: 1,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        style: FarmerProfileCardStyles.outlinedButtonStyle,
       ),
     );
   }

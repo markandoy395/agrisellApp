@@ -19,17 +19,7 @@ class _OrderStatusTabs extends StatelessWidget {
         10,
       ),
       child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AgrisellColors.surface,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: AgrisellColors.brandBlack.withValues(alpha: 0.08),
-              blurRadius: 14,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
+        decoration: OrderStatusTabsStyles.decoratedBoxDecoration,
         child: Padding(
           padding: const EdgeInsets.all(4),
           child: TabBar(
@@ -39,20 +29,11 @@ class _OrderStatusTabs extends StatelessWidget {
             dividerColor: Colors.transparent,
             indicatorSize: TabBarIndicatorSize.tab,
             labelPadding: const EdgeInsets.symmetric(horizontal: 2),
-            indicator: BoxDecoration(
-              color: AgrisellColors.authGreen,
-              borderRadius: BorderRadius.circular(8),
-            ),
+            indicator: OrderStatusTabsStyles.tabBarDecoration,
             labelColor: AgrisellColors.surface,
             unselectedLabelColor: AgrisellColors.brandBlack,
-            labelStyle: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-            ),
-            unselectedLabelStyle: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
+            labelStyle: SharedPresentationStyles.captionBold,
+            unselectedLabelStyle: SharedPresentationStyles.captionSemibold,
             tabs: [
               for (final filter in _orderTrackingTabs)
                 SizedBox(width: 82, height: 38, child: Tab(text: filter.label)),

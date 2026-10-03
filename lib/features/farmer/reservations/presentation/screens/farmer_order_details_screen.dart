@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/farmer_order_details_screen_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -37,7 +39,7 @@ class FarmerOrderDetailsScreen extends StatelessWidget {
       surfaceTintColor: AgrisellColors.surface,
       title: const Text(
         'Order Details',
-        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+        style: SharedPresentationStyles.titleExtraBold,
       ),
       actions: [
         IconButton(
@@ -77,29 +79,16 @@ class FarmerOrderDetailsScreen extends StatelessWidget {
                   icon: const Icon(Icons.receipt_long_rounded, size: 18),
                   label: const Text(
                     'Print / Download Delivery Waybill',
-                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                    style: FarmerOrderDetailsScreenStyles
+                        .printDownloadDeliveryWaybillText,
                   ),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AgrisellColors.authGreen,
-                    backgroundColor: AgrisellColors.surface,
-                    side: const BorderSide(
-                      color: AgrisellColors.authGreen,
-                      width: 1.2,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
+                  style: FarmerOrderDetailsScreenStyles.outlinedButtonStyle,
                 ),
               ),
               const SizedBox(height: 18),
               const Text(
                 'Fulfillment',
-                style: TextStyle(
-                  color: AgrisellColors.headingGreen,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: SharedPresentationStyles.headingTitleExtraBold,
               ),
               const SizedBox(height: 8),
               FarmerOrderWorkflowCard(
@@ -124,9 +113,10 @@ class FarmerOrderDetailsScreen extends StatelessWidget {
     final currentOrder = _currentOrder;
     final riderRequest = riderController.requestFor(currentOrder.id);
     final courierLocation = riderRequest != null
-        ? [riderRequest.riderBarangay, riderRequest.riderMunicipality]
-            .where((s) => s.isNotEmpty)
-            .join(', ')
+        ? [
+            riderRequest.riderBarangay,
+            riderRequest.riderMunicipality,
+          ].where((s) => s.isNotEmpty).join(', ')
         : null;
     final waybill = DeliveryWaybill.fromFarmerOrder(
       currentOrder,

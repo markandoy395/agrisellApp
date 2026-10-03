@@ -1,9 +1,9 @@
+import 'package:agresell_app/features/shared/widgets/profile/profile_date_of_birth_row_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/profile_birth_date.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_edit_row_shell.dart';
-import 'package:agresell_app/features/shared/widgets/profile/profile_text_styles.dart';
 
 class ProfileDateOfBirthRow extends StatelessWidget {
   const ProfileDateOfBirthRow({
@@ -95,7 +95,7 @@ class _DateSelectPill<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = ProfileTextStyles.infoValue(context).copyWith(height: 1);
+    final textStyle = ProfileDateOfBirthRowStyles.buttonStyle(context);
     var selectedLabel = placeholder;
     for (final option in options) {
       if (option.value == value) {

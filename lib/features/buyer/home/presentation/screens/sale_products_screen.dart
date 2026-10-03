@@ -1,9 +1,12 @@
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/product_detail_screen.dart';
+import 'package:agresell_app/features/buyer/home/presentation/styles/sale_products_styles.dart';
+import 'package:agresell_app/features/buyer/home/presentation/widgets/home/sale_products_slivers.dart';
 import 'package:agresell_app/features/shared/products/data/home_product_repository.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_grid.dart';
@@ -96,7 +99,7 @@ class _SaleProductsScreenState extends State<SaleProductsScreen> {
 
   void _openProduct(HomeProduct product) {
     Navigator.of(context).push(
-      MaterialPageRoute<void>(
+      agrisellMaterialPageRoute<void>(
         builder: (_) => ProductDetailScreen(
           product: product,
           productRepository: widget.productRepository,
@@ -117,7 +120,7 @@ class _SaleProductsScreenState extends State<SaleProductsScreen> {
           widget.title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+          style: SaleProductsStyles.appBarTitleStyle,
         ),
       ),
       body: RefreshIndicator(
@@ -128,38 +131,8 @@ class _SaleProductsScreenState extends State<SaleProductsScreen> {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-              sliver: SliverToBoxAdapter(
-                child: TextField(
-                  key: const ValueKey('sale-products-search'),
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search sale products',
-                    prefixIcon: const Icon(Icons.search_rounded),
-                    filled: true,
-                    fillColor: AgrisellColors.surface,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(18),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
-              sliver: SliverToBoxAdapter(
-                child: Text(
-                  '${products.length} ${products.length == 1 ? 'product' : 'products'} on sale',
-                  style: const TextStyle(
-                    color: AgrisellColors.mutedText,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
+            SaleProductsSearchSliver(controller: _searchController),
+            SaleProductsCountSliver(count: products.length),
             if (_isLoading)
               const SliverFillRemaining(
                 hasScrollBody: false,
@@ -170,33 +143,16 @@ class _SaleProductsScreenState extends State<SaleProductsScreen> {
                 ),
               )
             else if (products.isEmpty)
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(28),
-                    child: Text(
-                      _loadFailed
-                          ? 'Sale products could not be loaded. Pull down to try again.'
-                          : 'No eligible sale products are available. The campaign may have ended.',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: AgrisellColors.mutedText,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                ),
-              )
+              SaleProductsEmptySliver(loadFailed: _loadFailed)
             else
               SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: SaleProductsStyles.gridPadding,
                 sliver: HomeProductGrid(
                   products: products,
                   onProductTap: _openProduct,
                 ),
               ),
-            const SliverToBoxAdapter(child: SizedBox(height: 28)),
+            const SliverToBoxAdapter(child: SaleProductsStyles.bottomSpacer),
           ],
         ),
       ),

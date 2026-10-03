@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/shared/support/presentation/styles/support_ticket_card_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -48,18 +49,10 @@ class SupportTicketCard extends StatelessWidget {
                       horizontal: 8,
                       vertical: 3,
                     ),
-                    decoration: BoxDecoration(
-                      color: AgrisellColors.searchBackground,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
+                    decoration: SupportTicketCardStyles.containerDecoration,
                     child: Text(
                       ticket.ticketNumber,
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: AgrisellColors.mutedText,
-                      ),
+                      style: SupportTicketCardStyles.textStyle,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -72,11 +65,7 @@ class SupportTicketCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     ticket.category.label,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AgrisellColors.mutedText,
-                    ),
+                    style: SupportTicketCardStyles.textStyle2,
                   ),
                   const Spacer(),
                   // Status Pill
@@ -85,17 +74,12 @@ class SupportTicketCard extends StatelessWidget {
                       horizontal: 10,
                       vertical: 4,
                     ),
-                    decoration: BoxDecoration(
-                      color: ticket.status.backgroundColor,
-                      borderRadius: BorderRadius.circular(20),
+                    decoration: SupportTicketCardStyles.containerDecoration2(
+                      ticket,
                     ),
                     child: Text(
                       ticket.status.label,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: ticket.status.textColor,
-                      ),
+                      style: SupportTicketCardStyles.textStyle3(ticket),
                     ),
                   ),
                 ],
@@ -105,12 +89,7 @@ class SupportTicketCard extends StatelessWidget {
               // Subject Title
               Text(
                 ticket.subject,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: AgrisellColors.headingGreen,
-                  height: 1.3,
-                ),
+                style: SupportTicketCardStyles.textStyle4,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -120,11 +99,7 @@ class SupportTicketCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   ticket.lastMessage!,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AgrisellColors.mutedText,
-                    height: 1.35,
-                  ),
+                  style: SupportTicketCardStyles.textStyle5,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -139,9 +114,8 @@ class SupportTicketCard extends StatelessWidget {
                       horizontal: 8,
                       vertical: 2,
                     ),
-                    decoration: BoxDecoration(
-                      color: ticket.priority.backgroundColor,
-                      borderRadius: BorderRadius.circular(6),
+                    decoration: SupportTicketCardStyles.containerDecoration3(
+                      ticket,
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -154,11 +128,7 @@ class SupportTicketCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           ticket.priority.label,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: ticket.priority.textColor,
-                          ),
+                          style: SupportTicketCardStyles.textStyle6(ticket),
                         ),
                       ],
                     ),
@@ -172,11 +142,7 @@ class SupportTicketCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     _formatTimeAgo(ticket.updatedAt),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AgrisellColors.mutedText.withValues(alpha: 0.8),
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: SupportTicketCardStyles.textStyle7,
                   ),
                   const SizedBox(width: 6),
                   const Icon(

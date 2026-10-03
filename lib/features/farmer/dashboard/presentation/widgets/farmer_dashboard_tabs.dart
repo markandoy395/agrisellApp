@@ -1,5 +1,7 @@
 part of 'package:agresell_app/features/farmer/dashboard/presentation/screens/farmer_dashboard_screen.dart';
 
+enum _FarmerDashboardTab { products, categories }
+
 class _FarmerDashboardTabs extends StatelessWidget {
   const _FarmerDashboardTabs({
     required this.activeTab,
@@ -13,17 +15,7 @@ class _FarmerDashboardTabs extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 40,
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(21)),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      decoration: FarmerDashboardTabsStyles.containerDecoration,
       child: Row(
         children: [
           _FarmerDashboardTabButton(
@@ -77,12 +69,7 @@ class _FarmerDashboardTabButton extends StatelessWidget {
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: textColor,
-                fontSize: 13,
-                height: 1,
-                fontWeight: FontWeight.w800,
-              ),
+              style: FarmerDashboardTabsStyles.labelText(textColor),
             ),
           ),
         ),

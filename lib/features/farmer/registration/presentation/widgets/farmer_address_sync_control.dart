@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/features/farmer/registration/presentation/controllers/farmer_signup_controllers.dart';
@@ -28,7 +29,7 @@ class _FarmerAddressSyncControlState extends State<FarmerAddressSyncControl> {
         const Expanded(
           child: Text(
             'Same as farmer address',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+            style: SharedPresentationStyles.captionMedium,
           ),
         ),
         Transform.scale(

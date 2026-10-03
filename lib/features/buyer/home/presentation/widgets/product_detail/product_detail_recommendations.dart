@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/buyer/home/presentation/styles/product_detail_recommendations_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -32,11 +34,7 @@ class ProductDetailRecommendations extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 14),
             child: Text(
               'Recommended for you',
-              style: TextStyle(
-                color: AgrisellColors.headingGreen,
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-              ),
+              style: SharedPresentationStyles.headingSubtitleExtraBold,
             ),
           ),
           const SizedBox(height: 10),
@@ -86,9 +84,8 @@ class _RecommendationCard extends StatelessWidget {
           borderRadius: radius,
           child: Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              borderRadius: radius,
-              border: Border.all(color: AgrisellColors.borderLine),
+            decoration: ProductDetailRecommendationsStyles.containerDecoration(
+              radius,
             ),
             child: Row(
               children: [
@@ -111,11 +108,7 @@ class _RecommendationCard extends StatelessWidget {
                         product.name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AgrisellColors.headingGreen,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: SharedPresentationStyles.headingBodyBold,
                       ),
                       const SizedBox(height: 5),
                       Container(
@@ -123,17 +116,12 @@ class _RecommendationCard extends StatelessWidget {
                           horizontal: 7,
                           vertical: 3,
                         ),
-                        decoration: BoxDecoration(
-                          color: AgrisellColors.forestSoft,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                        decoration: ProductDetailRecommendationsStyles
+                            .containerDecoration2,
                         child: const Text(
                           'Available',
-                          style: TextStyle(
-                            color: AgrisellColors.authGreen,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style:
+                              ProductDetailRecommendationsStyles.availableText,
                         ),
                       ),
                       const SizedBox(height: 7),
@@ -141,11 +129,7 @@ class _RecommendationCard extends StatelessWidget {
                         '${product.price} ${product.unit}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AgrisellColors.authGreen,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                        ),
+                        style: SharedPresentationStyles.greenCaptionExtraBold,
                       ),
                     ],
                   ),

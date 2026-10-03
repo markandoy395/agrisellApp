@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/shared/widgets/profile/account_font_size_control_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/services/app_font_size_controller.dart';
@@ -13,10 +14,7 @@ class AccountFontSizeControl extends StatelessWidget {
       final controller = AppFontSizeController.instance;
       final stepper = Container(
         height: 38,
-        decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFFE0EAEB)),
-          borderRadius: BorderRadius.circular(8),
-        ),
+        decoration: AccountFontSizeControlStyles.containerDecoration,
         clipBehavior: Clip.antiAlias,
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -35,11 +33,7 @@ class AccountFontSizeControl extends StatelessWidget {
               child: Text(
                 controller.percentageLabel,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: AccountProfileStyle.ink,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: AccountFontSizeControlStyles.textStyle,
               ),
             ),
             _stepButton(
@@ -59,18 +53,7 @@ class AccountFontSizeControl extends StatelessWidget {
             Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFE8F5EE), Color(0xFFD1EDDF)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(11),
-                border: Border.all(
-                  color: AccountProfileStyle.borderSubtle,
-                  width: 1,
-                ),
-              ),
+              decoration: AccountFontSizeControlStyles.containerDecoration2,
               child: const Icon(
                 Icons.text_fields_rounded,
                 color: AccountProfileStyle.green,
@@ -84,12 +67,7 @@ class AccountFontSizeControl extends StatelessWidget {
                 fit: BoxFit.scaleDown,
                 child: Text(
                   'Font size',
-                  style: TextStyle(
-                    color: AccountProfileStyle.ink,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.1,
-                  ),
+                  style: AccountFontSizeControlStyles.fontSizeText,
                 ),
               ),
             ),

@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/features/shared/location/data/psgc_address_matching.dart';
 import 'package:agresell_app/features/shared/location/data/psgc_address_service.dart';
+import 'package:agresell_app/features/shared/location/presentation/styles/psgc_address_styles.dart';
 import 'package:agresell_app/features/shared/location/presentation/widgets/address_autocomplete_field.dart';
 
 class PsgcAddressFields extends StatefulWidget {
@@ -66,19 +67,16 @@ class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
   }
 
   List<PsgcAddressOption> get _filteredLocalities {
-    final selected = _exact(_provinces, widget.provinceController.text);
+    final selected = exactPsgcOption(_provinces, widget.provinceController.text);
     if (selected == null) return _localities;
     final matches = _localities
-        .where((option) => _belongsToProvince(option, selected))
+        .where((option) => psgcBelongsToProvince(option, selected))
         .toList(growable: false);
-    // Some PSGC responses omit the province name. Keep the city selector
-    // usable instead of rendering an empty menu while preserving the selected
-    // province when the farmer chooses a municipality.
     return matches.isEmpty ? _localities : matches;
   }
 
   void _provinceChanged(String value) {
-    final match = _exact(_provinces, value);
+    final match = exactPsgcOption(_provinces, value);
     if (match != null && match.region != _region) {
       setState(() => _region = match.region);
     }
@@ -86,7 +84,7 @@ class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
   }
 
   void _cityChanged(String value) {
-    final match = _exact(_filteredLocalities, value);
+    final match = exactPsgcOption(_filteredLocalities, value);
     if (match != null) unawaited(_selectLocality(match, clearBarangay: false));
     widget.onChanged();
   }
@@ -96,8 +94,8 @@ class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
     bool clearBarangay = true,
   }) async {
     final selectedProvince = widget.provinceController.text.trim();
-    final province = _exact(_provinces, selectedProvince);
-    if (province != null && !_belongsToProvince(option, province)) {
+    final province = exactPsgcOption(_provinces, selectedProvince);
+    if (province != null && !psgcBelongsToProvince(option, province)) {
       widget.cityController.clear();
       widget.barangayController.clear();
       widget.onChanged();
@@ -179,13 +177,10 @@ class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
       ),
       if (_region.isNotEmpty)
         Padding(
-          padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+          padding: PsgcAddressStyles.regionPadding,
           child: Text(
             'Region: $_region',
-            style: const TextStyle(
-              color: AgrisellColors.mutedText,
-              fontSize: 12,
-            ),
+            style: PsgcAddressStyles.regionText,
           ),
         ),
     ],
@@ -193,29 +188,5 @@ class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
 
   Widget _signupIcon(IconData icon) =>
       widget.leadingIconBuilder?.call(icon) ??
-      Icon(icon, color: AgrisellColors.mutedText);
-}
-
-PsgcAddressOption? _exact(List<PsgcAddressOption> values, String text) {
-  final query = text.trim().toLowerCase();
-  for (final option in values) {
-    if (option.name.toLowerCase() == query) return option;
-  }
-  return null;
-}
-
-bool _belongsToProvince(
-  PsgcAddressOption locality,
-  PsgcAddressOption province,
-) {
-  if (locality.province.toLowerCase() == province.name.toLowerCase()) {
-    return true;
-  }
-  if (locality.provinceCode.isNotEmpty &&
-      locality.provinceCode == province.code) {
-    return true;
-  }
-  return locality.code.length >= 4 &&
-      province.code.length >= 4 &&
-      locality.code.substring(0, 4) == province.code.substring(0, 4);
+      Icon(icon, color: PsgcAddressStyles.iconColor);
 }

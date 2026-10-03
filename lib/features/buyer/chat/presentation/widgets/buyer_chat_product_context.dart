@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -14,11 +15,7 @@ class BuyerChatProductContext extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AgrisellColors.borderLine),
-      ),
+      decoration: SharedPresentationStyles.borderedSurface,
       child: Row(
         children: [
           ChatAvatar(
@@ -32,7 +29,7 @@ class BuyerChatProductContext extends StatelessWidget {
               diameter: 44,
               backgroundColor: AgrisellColors.fieldFill,
               foregroundColor: AgrisellColors.headingGreen,
-              textStyle: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+              textStyle: SharedPresentationStyles.titleBold,
             ),
           ),
           const SizedBox(width: 10),
@@ -42,20 +39,13 @@ class BuyerChatProductContext extends StatelessWidget {
               children: [
                 const Text(
                   'Talking about',
-                  style: TextStyle(
-                    color: AgrisellColors.mutedText,
-                    fontSize: 12,
-                  ),
+                  style: SharedPresentationStyles.mutedCaption,
                 ),
                 Text(
                   thread.contextLabel,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AgrisellColors.headingGreen,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: SharedPresentationStyles.headingBodyBold,
                 ),
               ],
             ),

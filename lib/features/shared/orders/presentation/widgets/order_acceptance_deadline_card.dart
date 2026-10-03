@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/shared/orders/presentation/styles/order_acceptance_deadline_card_styles.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -103,11 +104,7 @@ class _OrderAcceptanceDeadlineCardState
                 title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: foreground,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: OrderAcceptanceDeadlineCardStyles.titleText(foreground),
               ),
             ),
             Tooltip(

@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/farmer/profile/presentation/styles/farmer_history_card_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/farmer/profile/domain/farmer_history_section.dart';
@@ -22,17 +23,16 @@ class FarmerHistoryCard extends StatelessWidget {
                 onTap: () => _openHistory(context),
                 borderRadius: BorderRadius.circular(8),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 4,
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         'View all',
-                        style: TextStyle(
-                          color: FarmerProfileStyle.green,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: FarmerHistoryCardStyles.viewAllText,
                       ),
                       const SizedBox(width: 2),
                       const Icon(
@@ -122,29 +122,14 @@ class HistoryShortcut extends StatelessWidget {
             Container(
               width: 60,
               height: 58,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFE8F5EE), Color(0xFFD1EDDF)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: FarmerProfileStyle.borderSubtle,
-                  width: 1,
-                ),
-              ),
+              decoration: FarmerHistoryCardStyles.containerDecoration,
               child: Icon(icon, color: FarmerProfileStyle.green, size: 28),
             ),
             const SizedBox(height: 7),
             Text(
               label,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: FarmerProfileStyle.ink,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
+              style: FarmerHistoryCardStyles.labelText,
             ),
           ],
         ),

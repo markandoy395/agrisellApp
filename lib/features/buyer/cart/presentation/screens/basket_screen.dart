@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
+import 'package:agresell_app/features/buyer/cart/presentation/styles/basket_screen_states_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
@@ -29,7 +31,7 @@ class _BasketScreenState extends State<BasketScreen> {
 
   void _openMessages() {
     Navigator.of(context).push(
-      MaterialPageRoute<void>(
+      agrisellMaterialPageRoute<void>(
         builder: (_) =>
             const HomeScreen(initialNavIndex: HomeScreen.messageNavIndex),
       ),
@@ -40,7 +42,7 @@ class _BasketScreenState extends State<BasketScreen> {
     if (await Navigator.of(context).maybePop()) return;
     if (!mounted) return;
     await Navigator.of(context).pushReplacement(
-      MaterialPageRoute<void>(builder: (_) => const HomeScreen()),
+      agrisellMaterialPageRoute<void>(builder: (_) => const HomeScreen()),
     );
   }
 

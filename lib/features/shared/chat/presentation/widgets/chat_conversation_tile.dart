@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/shared/chat/presentation/styles/chat_conversation_tile_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -30,11 +31,7 @@ class ChatConversationTile extends StatelessWidget {
           onTap: onTap,
           child: Container(
             padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-            decoration: const BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: AgrisellColors.borderLine),
-              ),
-            ),
+            decoration: ChatConversationTileStyles.containerDecoration,
             child: Row(
               children: [
                 ChatAvatar(
@@ -43,10 +40,8 @@ class ChatConversationTile extends StatelessWidget {
                     diameter: 46,
                     backgroundColor: AgrisellColors.statusGreenBackground,
                     foregroundColor: AgrisellColors.authGreen,
-                    textStyle: TextStyle(
-                      fontSize: 13,
-                      height: avatarTextHeight,
-                      fontWeight: FontWeight.w800,
+                    textStyle: ChatConversationTileStyles.textStyle(
+                      avatarTextHeight,
                     ),
                   ),
                 ),
@@ -80,25 +75,14 @@ class _ConversationSummary extends StatelessWidget {
         data.participant.name,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: TextStyle(
-          color: AgrisellColors.headingGreen,
-          fontSize: 14,
-          fontWeight: hasUnread ? FontWeight.w800 : FontWeight.w700,
-        ),
+        style: ChatConversationTileStyles.textStyle2(hasUnread),
       ),
       const SizedBox(height: 3),
       Text(
         data.previewText,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: TextStyle(
-          color: hasUnread
-              ? AgrisellColors.brandBlack
-              : AgrisellColors.mutedText,
-          fontSize: 12,
-          height: 1.2,
-          fontWeight: hasUnread ? FontWeight.w700 : FontWeight.w500,
-        ),
+        style: ChatConversationTileStyles.textStyle3(hasUnread),
       ),
     ],
   );
@@ -121,13 +105,7 @@ class _ConversationMeta extends StatelessWidget {
           data.timeLabel,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: hasUnread
-                ? AgrisellColors.authGreen
-                : AgrisellColors.mutedText,
-            fontSize: 12,
-            fontWeight: hasUnread ? FontWeight.w700 : FontWeight.w500,
-          ),
+          style: ChatConversationTileStyles.textStyle4(hasUnread),
         ),
         const SizedBox(height: 8),
         if (hasUnread)

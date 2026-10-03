@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/farmer_order_payment_panel_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -19,11 +21,7 @@ class FarmerOrderPaymentPanel extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: colors.background,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: colors.foreground.withValues(alpha: 0.3)),
-      ),
+      decoration: FarmerOrderPaymentPanelStyles.containerDecoration(colors),
       child: Row(
         children: [
           Icon(
@@ -40,20 +38,12 @@ class FarmerOrderPaymentPanel extends StatelessWidget {
               children: [
                 Text(
                   payment.method.label,
-                  style: TextStyle(
-                    color: colors.foreground,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: FarmerOrderPaymentPanelStyles.textStyle(colors),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   payment.status.label,
-                  style: TextStyle(
-                    color: colors.foreground,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: FarmerOrderPaymentPanelStyles.textStyle2(colors),
                 ),
               ],
             ),
@@ -63,16 +53,10 @@ class FarmerOrderPaymentPanel extends StatelessWidget {
               height: 36,
               child: FilledButton(
                 onPressed: () => showFarmerGcashReviewSheet(context, order),
-                style: FilledButton.styleFrom(
-                  backgroundColor: AgrisellColors.authGreen,
-                  padding: const EdgeInsets.symmetric(horizontal: 11),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+                style: FarmerOrderPaymentPanelStyles.filledButtonStyle,
                 child: const Text(
                   'Review',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+                  style: SharedPresentationStyles.captionExtraBold,
                 ),
               ),
             ),
@@ -81,16 +65,10 @@ class FarmerOrderPaymentPanel extends StatelessWidget {
               height: 36,
               child: FilledButton(
                 onPressed: () => showFarmerGcashRefundSheet(context, order),
-                style: FilledButton.styleFrom(
-                  backgroundColor: AgrisellColors.statusPurpleText,
-                  padding: const EdgeInsets.symmetric(horizontal: 11),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+                style: FarmerOrderPaymentPanelStyles.filledButtonStyle2,
                 child: const Text(
                   'Refund',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+                  style: SharedPresentationStyles.captionExtraBold,
                 ),
               ),
             ),

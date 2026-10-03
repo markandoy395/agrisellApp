@@ -1,6 +1,6 @@
+import 'package:agresell_app/features/shared/location/presentation/styles/location_selector_controls_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
-
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 class LocationSelectorHeader extends StatelessWidget {
   const LocationSelectorHeader({
@@ -19,18 +19,13 @@ class LocationSelectorHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.fromLTRB(16, 8, 12, 12),
-    decoration: const BoxDecoration(
-      border: Border(bottom: BorderSide(color: AgrisellColors.borderLine)),
-    ),
+    decoration: LocationSelectorControlsStyles.containerDecoration,
     child: Column(
       children: [
         Container(
           width: 38,
           height: 4,
-          decoration: BoxDecoration(
-            color: AgrisellColors.deliveryGray,
-            borderRadius: BorderRadius.circular(4),
-          ),
+          decoration: LocationSelectorControlsStyles.containerDecoration2,
         ),
         const SizedBox(height: 10),
         Row(
@@ -41,19 +36,12 @@ class LocationSelectorHeader extends StatelessWidget {
                 children: [
                   Text(
                     'Choose exact location',
-                    style: TextStyle(
-                      color: AgrisellColors.headingGreen,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: SharedPresentationStyles.headingTitleExtraBold,
                   ),
                   SizedBox(height: 2),
                   Text(
                     'Position the pin on the map to continue.',
-                    style: TextStyle(
-                      color: AgrisellColors.mutedText,
-                      fontSize: 12,
-                    ),
+                    style: SharedPresentationStyles.mutedCaption,
                   ),
                 ],
               ),
@@ -85,12 +73,7 @@ class LocationSelectorHeader extends StatelessWidget {
               selected: {centerPinMode},
               onSelectionChanged: (value) => onModeChanged(value.first),
               showSelectedIcon: false,
-              style: const ButtonStyle(
-                textStyle: WidgetStatePropertyAll(
-                  TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-                ),
-                visualDensity: VisualDensity.compact,
-              ),
+              style: LocationSelectorControlsStyles.buttonStyle,
             ),
           ),
         ],
@@ -127,31 +110,18 @@ class LocationSelectorDetails extends StatelessWidget {
         if (showFields)
           TextField(
             controller: addressController,
-            style: const TextStyle(fontSize: 12),
+            style: SharedPresentationStyles.caption,
             textCapitalization: TextCapitalization.words,
-            decoration: InputDecoration(
-              labelText: requiresWrittenAddress ? 'Written address' : 'Address',
-              hintText: requiresWrittenAddress
-                  ? 'Purok 5, Lianga, Surigao del Sur'
-                  : null,
-              helperText: requiresWrittenAddress
-                  ? 'Required. Use a place name, not latitude and longitude.'
-                  : 'Optional',
-              filled: true,
-              fillColor: AgrisellColors.searchBackground,
+            decoration: LocationSelectorControlsStyles.inputDecoration(
+              requiresWrittenAddress,
             ),
           ),
         if (showFields) const SizedBox(height: 6),
         if (showFields)
           TextField(
             controller: notesController,
-            style: const TextStyle(fontSize: 12),
-            decoration: const InputDecoration(
-              labelText: 'Landmark or notes',
-              hintText: 'Farm entrance, gate, roadside',
-              filled: true,
-              fillColor: AgrisellColors.searchBackground,
-            ),
+            style: SharedPresentationStyles.caption,
+            decoration: LocationSelectorControlsStyles.inputDecoration2,
           ),
         const SizedBox(height: 8),
         SizedBox(

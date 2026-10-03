@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/features/farmer/products/presentation/styles/farmer_product_edit_form_panel_styles.dart';
+import 'package:agresell_app/features/farmer/products/presentation/widgets/product_edit/product_edit_discount_banner.dart';
 import 'package:agresell_app/features/farmer/products/presentation/widgets/product_edit/product_edit_form_actions.dart';
 import 'package:agresell_app/features/farmer/products/presentation/widgets/product_edit/product_edit_rows.dart';
 import 'package:agresell_app/features/farmer/products/presentation/widgets/product_edit/product_edit_sale_status_row.dart';
 import 'package:agresell_app/features/farmer/products/presentation/widgets/product_edit/product_edit_status_button.dart';
-import 'package:agresell_app/features/shared/products/domain/product_sale_status.dart';
 import 'package:agresell_app/features/shared/products/domain/product_production_stage.dart';
+import 'package:agresell_app/features/shared/products/domain/product_sale_status.dart';
 
 class FarmerProductEditFormPanel extends StatelessWidget {
   const FarmerProductEditFormPanel({
@@ -67,175 +68,23 @@ class FarmerProductEditFormPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: const BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
+      decoration: FarmerProductEditFormPanelStyles.panelDecoration,
       child: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(25, 31, 25, 30 + bottomInset),
+        padding: FarmerProductEditFormPanelStyles.panelPadding(bottomInset),
         child: Column(
           children: [
-            if (activeSaleNotice != null) ...[
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: AgrisellColors.forestSoft,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: AgrisellColors.authGreen.withValues(alpha: 0.3),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.local_offer_rounded,
-                          color: AgrisellColors.authGreen,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                isFarmerDiscount
-                                    ? 'Active Product Promotion'
-                                    : 'Featured in Active Admin Sale',
-                                style: const TextStyle(
-                                  color: AgrisellColors.authGreen,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                activeSaleNotice!,
-                                style: const TextStyle(
-                                  color: AgrisellColors.brandBlack,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (isFarmerDiscount && onManageDiscount != null) ...[
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton.icon(
-                            onPressed: onManageDiscount,
-                            icon: const Icon(Icons.edit_outlined, size: 14),
-                            label: const Text('Edit Discount'),
-                            style: TextButton.styleFrom(
-                              foregroundColor: AgrisellColors.authGreen,
-                              visualDensity: VisualDensity.compact,
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
-                            ),
-                          ),
-                          if (onRemoveDiscount != null) ...[
-                            const SizedBox(width: 4),
-                            TextButton.icon(
-                              onPressed: onRemoveDiscount,
-                              icon: const Icon(Icons.delete_outline_rounded, size: 14),
-                              label: const Text('Remove'),
-                              style: TextButton.styleFrom(
-                                foregroundColor: AgrisellColors.statusRedText,
-                                visualDensity: VisualDensity.compact,
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-            ] else if (onManageDiscount != null) ...[
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: AgrisellColors.homeBackground,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: AgrisellColors.borderLine,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.local_offer_outlined,
-                      color: AgrisellColors.mutedText,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 10),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Product Discount',
-                            style: TextStyle(
-                              color: AgrisellColors.brandBlack,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          SizedBox(height: 2),
-                          Text(
-                            'No active promotion on this product.',
-                            style: TextStyle(
-                              color: AgrisellColors.mutedText,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    OutlinedButton(
-                      onPressed: onManageDiscount,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AgrisellColors.authGreen,
-                        side: const BorderSide(color: AgrisellColors.authGreen),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                      ),
-                      child: const Text(
-                        'Put on Sale',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
+            ProductEditDiscountBanner(
+              activeSaleNotice: activeSaleNotice,
+              isFarmerDiscount: isFarmerDiscount,
+              onManageDiscount: onManageDiscount,
+              onRemoveDiscount: onRemoveDiscount,
+            ),
             ProductEditNameRow(controller: nameController),
-            const SizedBox(height: 20),
+            FarmerProductEditFormPanelStyles.rowSpacing,
             ProductEditPriceRow(controller: priceController),
-            const SizedBox(height: 20),
+            FarmerProductEditFormPanelStyles.rowSpacing,
             ProductEditWeightRow(controller: weightController),
-            const SizedBox(height: 20),
+            FarmerProductEditFormPanelStyles.rowSpacing,
             ProductEditHarvestDateRow(
               day: day,
               month: month,
@@ -246,26 +95,26 @@ class FarmerProductEditFormPanel extends StatelessWidget {
               onMonthChanged: onMonthChanged,
               onYearChanged: onYearChanged,
             ),
-            const SizedBox(height: 20),
+            FarmerProductEditFormPanelStyles.rowSpacing,
             ProductEditCategoryRow(
               category: category,
               categories: categories,
               onChanged: onCategoryChanged,
             ),
-            const SizedBox(height: 20),
+            FarmerProductEditFormPanelStyles.rowSpacing,
             ProductEditProductionStageRow(
               value: productionStage,
               onChanged: onProductionStageChanged,
             ),
-            const SizedBox(height: 20),
+            FarmerProductEditFormPanelStyles.rowSpacing,
             ProductEditSaleStatusRow(
               value: saleStatus,
               productionStage: productionStage,
               onChanged: onSaleStatusChanged,
             ),
-            const SizedBox(height: 36),
+            FarmerProductEditFormPanelStyles.actionSpacing,
             ProductEditStatusButton(isSold: isSold, onTap: onStatusTap),
-            const SizedBox(height: 36),
+            FarmerProductEditFormPanelStyles.actionSpacing,
             ProductEditFormActions(onCancel: onCancel, onSave: onSave),
           ],
         ),

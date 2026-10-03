@@ -19,10 +19,7 @@ class CheckoutItemTile extends StatelessWidget {
                 Container(
                   width: 24,
                   height: 24,
-                  decoration: const BoxDecoration(
-                    color: AgrisellColors.forestSoft,
-                    shape: BoxShape.circle,
-                  ),
+                  decoration: SharedPresentationStyles.forestCircle,
                   child: const Icon(
                     Icons.storefront_outlined,
                     size: 14,
@@ -35,12 +32,7 @@ class CheckoutItemTile extends StatelessWidget {
                     item.sellerName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AgrisellColors.brandBlack,
-                      fontSize: 12,
-                      height: 1,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: CheckoutItemTileStyles.textStyle,
                   ),
                 ),
               ],
@@ -81,20 +73,12 @@ class _CheckoutItemDetails extends StatelessWidget {
           item.productName,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: AgrisellColors.brandBlack,
-            fontSize: 15,
-            height: 1.1,
-            fontWeight: FontWeight.w800,
-          ),
+          style: CheckoutItemTileStyles.textStyle2,
         ),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          decoration: BoxDecoration(
-            color: AgrisellColors.forestSoft,
-            borderRadius: BorderRadius.circular(7),
-          ),
+          decoration: CheckoutItemTileStyles.containerDecoration,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -109,12 +93,7 @@ class _CheckoutItemDetails extends StatelessWidget {
                   'Harvested ${item.harvestDate}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AgrisellColors.authGreen,
-                    fontSize: 12,
-                    height: 1,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: CheckoutItemTileStyles.textStyle3,
                 ),
               ),
             ],
@@ -127,20 +106,12 @@ class _CheckoutItemDetails extends StatelessWidget {
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-              decoration: BoxDecoration(
-                color: AgrisellColors.limeSoft,
-                borderRadius: BorderRadius.circular(6),
-              ),
+              decoration: CheckoutItemTileStyles.containerDecoration2,
               child: Text(
                 'Qty ${item.quantity}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AgrisellColors.forestDark,
-                  fontSize: 12,
-                  height: 1,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: CheckoutItemTileStyles.textStyle4,
               ),
             ),
           ],

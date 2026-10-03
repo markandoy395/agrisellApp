@@ -14,32 +14,18 @@ class _CheckoutPriceLine extends StatelessWidget {
         if (item.hasSale)
           Text(
             item.originalPriceLabel!,
-            style: const TextStyle(
-              color: Colors.red,
-              fontSize: 12,
-              decoration: TextDecoration.lineThrough,
-              decorationColor: Colors.red,
-              fontWeight: FontWeight.w600,
-            ),
+            style: SharedPresentationStyles.originalPrice,
           ),
         if (item.hasSale)
-          const Text('→', style: TextStyle(color: AgrisellColors.mutedText)),
+          const Text('→', style: SharedPresentationStyles.mutedText),
         Text.rich(
           TextSpan(
             text: item.priceLabel,
-            style: const TextStyle(
-              color: AgrisellColors.authGreen,
-              fontSize: 13,
-              height: 1,
-              fontWeight: FontWeight.w800,
-            ),
+            style: CheckoutItemHelpersStyles.textStyle,
             children: [
               TextSpan(
                 text: ' ${item.unit}',
-                style: const TextStyle(
-                  color: AgrisellColors.brandBlack,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: CheckoutItemHelpersStyles.textStyle2,
               ),
             ],
           ),

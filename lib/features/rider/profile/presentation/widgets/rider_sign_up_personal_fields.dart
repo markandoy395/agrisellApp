@@ -71,7 +71,7 @@ class _BirthDateField extends StatelessWidget {
             Expanded(
               child: Text(
                 value.isEmpty ? 'Select your date of birth' : value,
-                style: const TextStyle(fontSize: 13),
+                style: SharedPresentationStyles.body,
               ),
             ),
             const Icon(Icons.calendar_month_outlined),

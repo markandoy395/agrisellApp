@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/shared/location/presentation/styles/location_map_preview_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -38,10 +40,7 @@ class LocationMapPreview extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         child: Ink(
           height: 142,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AgrisellColors.borderLine),
-          ),
+          decoration: LocationMapPreviewStyles.inkDecoration,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(13),
             child: Stack(
@@ -85,10 +84,7 @@ class LocationMapPreview extends StatelessWidget {
                   right: 10,
                   bottom: 10,
                   child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: AgrisellColors.surface.withValues(alpha: .94),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    decoration: LocationMapPreviewStyles.decoratedBoxDecoration,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
@@ -105,7 +101,7 @@ class LocationMapPreview extends StatelessWidget {
                           Expanded(
                             child: Text(
                               hasLocation ? selectedLabel : emptyLabel,
-                              style: const TextStyle(fontSize: 12),
+                              style: SharedPresentationStyles.caption,
                             ),
                           ),
                         ],

@@ -17,10 +17,7 @@ class _FarmerLoadFailure extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(
-      color: AgrisellColors.surface,
-      borderRadius: BorderRadius.circular(18),
-    ),
+    decoration: FarmerScreenComponentsStyles.decoratedBoxDecoration,
     child: Padding(
       padding: const EdgeInsets.all(28),
       child: Column(
@@ -33,17 +30,13 @@ class _FarmerLoadFailure extends StatelessWidget {
           const SizedBox(height: 10),
           const Text(
             'Unable to load farmers',
-            style: TextStyle(
-              color: AgrisellColors.headingGreen,
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
-            ),
+            style: SharedPresentationStyles.headingTitleExtraBold,
           ),
           const SizedBox(height: 5),
           const Text(
             'Check your connection and make sure the farmer directory migration has been applied.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: AgrisellColors.mutedText, fontSize: 12),
+            style: SharedPresentationStyles.mutedCaption,
           ),
           const SizedBox(height: 12),
           TextButton(onPressed: onRetry, child: const Text('Try again')),
@@ -60,10 +53,7 @@ class _EmptyFarmerResults extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(
-      color: AgrisellColors.surface,
-      borderRadius: BorderRadius.circular(18),
-    ),
+    decoration: FarmerScreenComponentsStyles.decoratedBoxDecoration,
     child: Padding(
       padding: const EdgeInsets.all(28),
       child: Column(
@@ -76,17 +66,13 @@ class _EmptyFarmerResults extends StatelessWidget {
           const SizedBox(height: 10),
           const Text(
             'No farmers found',
-            style: TextStyle(
-              color: AgrisellColors.headingGreen,
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
-            ),
+            style: SharedPresentationStyles.headingTitleExtraBold,
           ),
           const SizedBox(height: 5),
           const Text(
             'Try a farmer name, location, or produce type.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: AgrisellColors.mutedText, fontSize: 12),
+            style: SharedPresentationStyles.mutedCaption,
           ),
           const SizedBox(height: 12),
           TextButton(onPressed: onClear, child: const Text('Clear search')),

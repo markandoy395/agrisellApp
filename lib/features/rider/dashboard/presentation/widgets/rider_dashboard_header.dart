@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/rider/dashboard/presentation/styles/rider_dashboard_header_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -37,13 +38,7 @@ class RiderDashboardHeader extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-            decoration: BoxDecoration(
-              color: AgrisellColors.surface.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: AgrisellColors.surface.withValues(alpha: 0.2),
-              ),
-            ),
+            decoration: RiderDashboardHeaderStyles.containerDecoration,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -55,11 +50,7 @@ class RiderDashboardHeader extends StatelessWidget {
                     statusLabel,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AgrisellColors.surface,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: RiderDashboardHeaderStyles.statuslabelText,
                   ),
                 ),
               ],
@@ -74,12 +65,7 @@ class RiderDashboardHeader extends StatelessWidget {
                     ? 'Notifications'
                     : '$unreadNotifications unread notifications',
                 onPressed: onOpenNotifications,
-                style: IconButton.styleFrom(
-                  foregroundColor: AgrisellColors.surface,
-                  backgroundColor: AgrisellColors.surface.withValues(
-                    alpha: 0.14,
-                  ),
-                ),
+                style: RiderDashboardHeaderStyles.iconButtonStyle,
                 icon: const Icon(Icons.notifications_none_rounded),
               ),
               if (unreadNotifications > 0)
@@ -93,19 +79,10 @@ class RiderDashboardHeader extends StatelessWidget {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: AgrisellColors.accentOrange,
-                      borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: AgrisellColors.authGreen),
-                    ),
+                    decoration: RiderDashboardHeaderStyles.containerDecoration2,
                     child: Text(
                       unreadNotifications > 9 ? '9+' : '$unreadNotifications',
-                      style: const TextStyle(
-                        color: AgrisellColors.brandBlack,
-                        fontSize: 12,
-                        height: 1,
-                        fontWeight: FontWeight.w800,
-                      ),
+                      style: RiderDashboardHeaderStyles.textStyle,
                     ),
                   ),
                 ),

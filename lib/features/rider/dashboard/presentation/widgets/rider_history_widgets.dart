@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/dashboard/presentation/styles/rider_history_widgets_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -28,11 +30,7 @@ class RiderHistoryEntryCard extends StatelessWidget {
                     entry.productName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AgrisellColors.headingGreen,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: SharedPresentationStyles.headingBodyExtraBold,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -42,21 +40,13 @@ class RiderHistoryEntryCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               '${entry.orderNumber} · ${formatRiderDateTime(entry.completedAt)}',
-              style: const TextStyle(
-                color: AgrisellColors.mutedText,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
+              style: SharedPresentationStyles.mutedCaptionSemibold,
             ),
             if (entry.quantityDescription.isNotEmpty) ...[
               const SizedBox(height: 4),
               Text(
                 entry.quantityDescription,
-                style: const TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: SharedPresentationStyles.mutedCaptionSemibold,
               ),
             ],
             const SizedBox(height: 10),
@@ -74,11 +64,7 @@ class RiderHistoryEntryCard extends StatelessWidget {
               children: [
                 Text(
                   formatRiderCurrency(entry.deliveryFee),
-                  style: const TextStyle(
-                    color: AgrisellColors.authGreen,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: SharedPresentationStyles.greenBodyExtraBold,
                 ),
                 const Spacer(),
                 if (entry.hasProof) ...[
@@ -98,11 +84,7 @@ class RiderHistoryEntryCard extends StatelessWidget {
                   const SizedBox(width: 3),
                   Text(
                     rating.toStringAsFixed(1),
-                    style: const TextStyle(
-                      color: AgrisellColors.headingGreen,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: RiderHistoryWidgetsStyles.textStyle,
                   ),
                 ],
               ],
@@ -131,12 +113,7 @@ class _LocationLine extends StatelessWidget {
           value,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: AgrisellColors.mutedText,
-            fontSize: 12,
-            height: 1.25,
-            fontWeight: FontWeight.w600,
-          ),
+          style: RiderHistoryWidgetsStyles.valueText,
         ),
       ),
     ],
@@ -158,19 +135,12 @@ class _HistoryStatusPill extends StatelessWidget {
       RiderHistoryStatus.disputed => AgrisellColors.statusRedText,
     };
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: RiderHistoryWidgetsStyles.decoratedBoxDecoration(color),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         child: Text(
           status.label,
-          style: TextStyle(
-            color: color,
-            fontSize: 12,
-            fontWeight: FontWeight.w800,
-          ),
+          style: RiderHistoryWidgetsStyles.textStyle2(color),
         ),
       ),
     );

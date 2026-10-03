@@ -21,6 +21,8 @@ import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket
 import 'package:agresell_app/features/farmer/registration/presentation/screens/farmer_sign_up_screen.dart';
 import 'package:agresell_app/features/rider/profile/presentation/screens/rider_sign_up_screen.dart';
 
+part 'login_screen_actions.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({
     this.initialMessage,
@@ -44,6 +46,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _password = TextEditingController();
   late bool _rememberMe;
   var _isLoggingIn = false;
+
+  void _updateUi(VoidCallback update) => setState(update);
 
   @override
   void initState() {
@@ -91,143 +95,5 @@ class _LoginScreenState extends State<LoginScreen> {
         },
       ),
     );
-  }
-
-  Future<void> _logIn() async {
-    final identifierError = LoginValidator.validateIdentifier(_identifier.text);
-    if (identifierError != null) {
-      _showMessage(identifierError);
-      return;
-    }
-    final passwordError = LoginValidator.validatePassword(_password.text);
-    if (passwordError != null) {
-      _showMessage(passwordError);
-      return;
-    }
-
-    setState(() => _isLoggingIn = true);
-    try {
-      if (AuthSessionService.instance.currentAccount != null) {
-        await BasketController.instance.flush();
-      }
-      final account = await AuthRegistrationService.instance.authenticate(
-        _identifier.text,
-        _password.text,
-      );
-      if (!mounted) return;
-      if (account == null) {
-        setState(() => _isLoggingIn = false);
-        _showMessage('Email or password is incorrect.');
-        return;
-      }
-
-      await _finishLogin(account);
-    } on AuthEmailNotVerified {
-      if (!mounted) return;
-      setState(() => _isLoggingIn = false);
-      await _resumeUnverifiedSignup();
-    } on AuthRegistrationException catch (error) {
-      if (!mounted) return;
-      setState(() => _isLoggingIn = false);
-      _showMessage(error.message);
-    } catch (_) {
-      if (!mounted) return;
-      setState(() => _isLoggingIn = false);
-      _showMessage(
-        'We could not load your account information. Please try again.',
-      );
-    }
-  }
-
-  Future<void> _resumeUnverifiedSignup() async {
-    final email = _identifier.text.trim().toLowerCase();
-    RegisteredAccount? account;
-    final verified = await Navigator.of(context).push<bool>(
-      agrisellPageRoute<bool>(
-        builder: (_) => OtpVerificationScreen(
-          destination: email,
-          title: 'Finish verifying your email',
-          onVerify: (otp) async {
-            account = await AuthRegistrationService.instance.verifyEmailOtp(
-              email: email,
-              otp: otp,
-            );
-          },
-          onResend: () =>
-              AuthRegistrationService.instance.resendSignupEmailOtp(email),
-        ),
-      ),
-    );
-    if (verified != true || account == null || !mounted) return;
-    try {
-      setState(() => _isLoggingIn = true);
-      await _finishLogin(account!);
-    } on AuthRegistrationException catch (error) {
-      if (!mounted) return;
-      setState(() => _isLoggingIn = false);
-      _showMessage(error.message);
-    }
-  }
-
-  Future<void> _finishLogin(RegisteredAccount account) async {
-    if (account.profilePending) {
-      setState(() => _isLoggingIn = false);
-      _navigateTo(switch (account.assignedRole) {
-        AuthRole.buyer => SignUpScreen(
-          role: AuthRole.buyer,
-          initialVerifiedEmail: account.email,
-        ),
-        AuthRole.farmer => FarmerSignUpScreen(
-          initialVerifiedEmail: account.email,
-        ),
-        AuthRole.rider => RiderSignUpScreen(
-          initialVerifiedEmail: account.email,
-        ),
-        _ => const RoleSelectionScreen.signUp(),
-      });
-      return;
-    }
-    final resolution = AuthRouteGuard.resolve(account);
-    if (account.assignedRole == null) {
-      await AuthSessionService.instance.clear(forgetAccount: false);
-      if (!mounted) return;
-      setState(() => _isLoggingIn = false);
-      _showMessage(
-        resolution.message ??
-            'Your account role is invalid. Please contact support.',
-      );
-      return;
-    }
-    await AuthSessionService.instance.start(account, rememberMe: _rememberMe);
-    if (!mounted) return;
-    TextInput.finishAutofillContext(shouldSave: true);
-    _navigateTo(AuthDashboardRouter.destinationFor(account));
-  }
-
-  Future<void> _loadRememberedIdentifier() async {
-    final identifier = await AuthSessionService.instance
-        .loadRememberedIdentifier();
-    if (!mounted || identifier == null || _identifier.text.isNotEmpty) return;
-    _identifier.text = identifier;
-    setState(() => _rememberMe = true);
-  }
-
-  void _navigateTo(Widget destination) {
-    Navigator.of(context).pushAndRemoveUntil(
-      agrisellPageRoute<void>(builder: (_) => destination),
-      (route) => false,
-    );
-  }
-
-  void _showForgotPasswordMessage() {
-    Navigator.of(context).push(
-      agrisellPageRoute<void>(builder: (_) => const ForgotPasswordScreen()),
-    );
-  }
-
-  void _showMessage(String message) {
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.clearSnackBars();
-    messenger.showAppSnackBar(SnackBar(content: Text(message)));
   }
 }

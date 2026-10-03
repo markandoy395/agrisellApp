@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/farmer_order_workflow_guidance_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -79,7 +80,7 @@ class FarmerOrderWorkflowGuidance extends StatelessWidget {
     };
     return Text(
       message,
-      style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w700),
+      style: FarmerOrderWorkflowGuidanceStyles.messageText(color),
     );
   }
 }

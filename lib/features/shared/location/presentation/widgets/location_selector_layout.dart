@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -82,7 +83,7 @@ class LocationSelectorLayout extends StatelessWidget {
             const MaterialBanner(
               content: Text(
                 'No internet connection. GPS and cached map tiles still work.',
-                style: TextStyle(fontSize: 12),
+                style: SharedPresentationStyles.caption,
               ),
               actions: [SizedBox.shrink()],
             ),

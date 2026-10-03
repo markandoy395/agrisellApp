@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/buyer/home/presentation/styles/product_detail_review_tile_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -30,20 +32,13 @@ class ProductDetailReviewTile extends StatelessWidget {
               review.reviewerName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AgrisellColors.brandBlack,
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-              ),
+              style: SharedPresentationStyles.inkBodyExtraBold,
             ),
           ),
           if (review.submittedAt case final submittedAt?)
             Text(
               _dateLabel(submittedAt),
-              style: const TextStyle(
-                color: AgrisellColors.mutedText,
-                fontSize: 12,
-              ),
+              style: SharedPresentationStyles.mutedCaption,
             ),
         ],
       ),
@@ -59,14 +54,7 @@ class ProductDetailReviewTile extends StatelessWidget {
       ),
       if (review.comment.isNotEmpty) ...[
         const SizedBox(height: 5),
-        Text(
-          review.comment,
-          style: const TextStyle(
-            color: AgrisellColors.brandBlack,
-            fontSize: 13,
-            height: 1.3,
-          ),
-        ),
+        Text(review.comment, style: ProductDetailReviewTileStyles.textStyle),
       ],
       if (review.moderationStatus != null ||
           (review.moderationNote != null &&
@@ -75,13 +63,7 @@ class ProductDetailReviewTile extends StatelessWidget {
         Container(
           key: const Key('review-moderation-banner'),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            color: AgrisellColors.statusBlueBackground,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: AgrisellColors.accentBlue.withValues(alpha: 0.3),
-            ),
-          ),
+          decoration: ProductDetailReviewTileStyles.containerDecoration,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -98,23 +80,12 @@ class ProductDetailReviewTile extends StatelessWidget {
                     if (review.moderationStatus case final status?)
                       Text(
                         _moderationStatusLabel(status),
-                        style: const TextStyle(
-                          color: AgrisellColors.statusBlueText,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: ProductDetailReviewTileStyles.textStyle2,
                       ),
                     if (review.moderationNote case final note?) ...[
                       if (review.moderationStatus != null)
                         const SizedBox(height: 2),
-                      Text(
-                        note,
-                        style: const TextStyle(
-                          color: AgrisellColors.headingGreenAlt,
-                          fontSize: 12,
-                          height: 1.25,
-                        ),
-                      ),
+                      Text(note, style: ProductDetailReviewTileStyles.noteText),
                     ],
                   ],
                 ),
@@ -129,16 +100,7 @@ class ProductDetailReviewTile extends StatelessWidget {
           key: const Key('review-admin-response-card'),
           width: double.infinity,
           padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: AgrisellColors.forestSoft.withValues(alpha: 0.65),
-            borderRadius: BorderRadius.circular(8),
-            border: const Border(
-              left: BorderSide(
-                color: AgrisellColors.authGreen,
-                width: 3.5,
-              ),
-            ),
-          ),
+          decoration: ProductDetailReviewTileStyles.containerDecoration2,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -152,31 +114,20 @@ class ProductDetailReviewTile extends StatelessWidget {
                   const SizedBox(width: 5),
                   const Text(
                     'Admin response',
-                    style: TextStyle(
-                      color: AgrisellColors.authGreen,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: SharedPresentationStyles.greenCaptionExtraBold,
                   ),
                   const Spacer(),
                   if (review.adminRespondedAt case final respondedAt?)
                     Text(
                       _dateLabel(respondedAt),
-                      style: const TextStyle(
-                        color: AgrisellColors.mutedText,
-                        fontSize: 12,
-                      ),
+                      style: SharedPresentationStyles.mutedCaption,
                     ),
                 ],
               ),
               const SizedBox(height: 4),
               Text(
                 adminResponse,
-                style: const TextStyle(
-                  color: AgrisellColors.brandBlack,
-                  fontSize: 13,
-                  height: 1.3,
-                ),
+                style: ProductDetailReviewTileStyles.textStyle,
               ),
             ],
           ),
@@ -185,12 +136,13 @@ class ProductDetailReviewTile extends StatelessWidget {
     ],
   );
 
-  String _moderationStatusLabel(String status) => switch (status.toLowerCase()) {
-    'resolved' => 'Moderation: Report resolved',
-    'dismissed' => 'Moderation: Report dismissed',
-    'open' => 'Moderation: Under review',
-    _ => 'Moderated review',
-  };
+  String _moderationStatusLabel(String status) =>
+      switch (status.toLowerCase()) {
+        'resolved' => 'Moderation: Report resolved',
+        'dismissed' => 'Moderation: Report dismissed',
+        'open' => 'Moderation: Under review',
+        _ => 'Moderated review',
+      };
 
   String _dateLabel(DateTime date) {
     final local = date.toLocal();

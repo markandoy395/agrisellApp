@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/buyer/home/presentation/styles/home_search_bar_content_styles.dart';
 import 'dart:async';
 import 'dart:math';
 
@@ -5,6 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/features/buyer/home/presentation/styles/home_search_bar_styles.dart';
+import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_search_filter_button.dart';
 
 class HomeSearchBar extends StatefulWidget {
   const HomeSearchBar({
@@ -97,28 +100,15 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: AgrisellColors.authGreen.withValues(alpha: 0.12),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.12),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
+      height: HomeSearchBarStyles.searchBarHeight,
+      decoration: HomeSearchBarStyles.searchBarDecoration,
       child: Row(
         children: [
           const SizedBox(width: 14),
           const Icon(
             Icons.search_rounded,
             color: AgrisellColors.authGreen,
-            size: 22,
+            size: HomeSearchBarStyles.searchIconSize,
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -127,29 +117,9 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
               controller: widget.controller,
               onChanged: widget.onChanged,
               textInputAction: TextInputAction.search,
-              style: const TextStyle(
-                color: AgrisellColors.brandBlack,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-              decoration: InputDecoration(
-                hint: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 220),
-                  child: Text(
-                    _currentHint,
-                    key: ValueKey(_currentHint),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                hintStyle: const TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w400,
-                ),
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(vertical: 12),
+              style: HomeSearchBarStyles.searchText,
+              decoration: HomeSearchBarContentStyles.inputDecoration(
+                _currentHint,
               ),
             ),
           ),
@@ -164,53 +134,16 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
                 },
                 tooltip: 'Clear product search',
                 visualDensity: VisualDensity.compact,
-                icon: const Icon(Icons.close_rounded, size: 19),
+                icon: const Icon(
+                  Icons.close_rounded,
+                  size: HomeSearchBarStyles.clearIconSize,
+                ),
               );
             },
           ),
-          Semantics(
-            button: true,
-            label: widget.activeFilterCount == 0
-                ? 'Open product filters'
-                : 'Open product filters, ${widget.activeFilterCount} active',
-            child: InkWell(
-              key: const ValueKey('home-product-filter-button'),
-              onTap: widget.onFilterTap,
-              borderRadius: BorderRadius.circular(16),
-              child: SizedBox(
-                width: 42,
-                height: 42,
-                child: Stack(
-                  alignment: Alignment.center,
-                  clipBehavior: Clip.none,
-                  children: [
-                    const Icon(
-                      Icons.tune_rounded,
-                      color: AgrisellColors.authGreen,
-                      size: 22,
-                    ),
-                    if (widget.activeFilterCount > 0)
-                      Positioned(
-                        right: 2,
-                        top: 1,
-                        child: CircleAvatar(
-                          radius: 8,
-                          backgroundColor: AgrisellColors.authGreen,
-                          child: Text(
-                            '${widget.activeFilterCount}',
-                            style: const TextStyle(
-                              color: AgrisellColors.surface,
-                              fontSize: 12,
-                              height: 1,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
+          HomeSearchFilterButton(
+            onTap: widget.onFilterTap,
+            activeFilterCount: widget.activeFilterCount,
           ),
           const SizedBox(width: 4),
         ],

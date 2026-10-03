@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_pickup_problem_dialog_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/app_dropdown_style.dart';
@@ -45,13 +46,13 @@ class _RiderPickupProblemDialogState extends State<RiderPickupProblemDialog> {
                 DropdownMenuItem(value: kind, child: Text(kind.label)),
             ],
             onChanged: (value) => setState(() => _kind = value ?? _kind),
-            decoration: const InputDecoration(labelText: 'Problem type'),
+            decoration: RiderPickupProblemDialogStyles.inputDecoration,
           ),
           TextField(
             controller: _notes,
             minLines: 2,
             maxLines: 4,
-            decoration: const InputDecoration(labelText: 'Notes'),
+            decoration: RiderPickupProblemDialogStyles.inputDecoration2,
           ),
         ],
       ),

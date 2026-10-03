@@ -34,6 +34,7 @@ import 'package:agresell_app/features/rider/deliveries/domain/delivery_payment_r
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_status_history.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_requirement.dart';
 import 'package:agresell_app/features/rider/deliveries/data/supabase_delivery_data_source.dart';
+import 'package:agresell_app/features/rider/deliveries/data/supabase_delivery_acceptance_failure_mapper.dart';
 import 'package:agresell_app/features/rider/deliveries/data/supabase_rider_evidence_uploader.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_registration.dart';
 import 'package:agresell_app/features/rider/safety/data/supabase_rider_incident_store.dart';
@@ -46,6 +47,7 @@ part 'in_memory_rider_delivery_status.dart';
 part 'in_memory_rider_delivery_status_event.dart';
 part 'in_memory_rider_delivery_completion.dart';
 part 'in_memory_rider_delivery_completion_validation.dart';
+part 'in_memory_rider_delivery_proof_validation.dart';
 part 'in_memory_rider_delivery_inspection.dart';
 part 'in_memory_rider_delivery_problems.dart';
 part 'in_memory_rider_pickup_confirmation.dart';
@@ -56,6 +58,7 @@ part 'supabase_rider_delivery_mapping.dart';
 part 'supabase_rider_delivery_workflow.dart';
 part 'supabase_rider_delivery_completion.dart';
 part 'supabase_rider_delivery_finalization.dart';
+part 'supabase_rider_delivery_records.dart';
 part 'supabase_rider_delivery_incidents.dart';
 part 'supabase_rider_delivery_evidence.dart';
 

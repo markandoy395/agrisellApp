@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/rider/dashboard/presentation/styles/rider_performance_summary_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -62,11 +63,7 @@ class RiderPerformanceSummary extends StatelessWidget {
               Expanded(
                 child: Text(
                   'Performance summary',
-                  style: TextStyle(
-                    color: AgrisellColors.headingGreen,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w900,
-                  ),
+                  style: RiderPerformanceSummaryStyles.performanceSummaryText,
                 ),
               ),
             ],
@@ -75,12 +72,8 @@ class RiderPerformanceSummary extends StatelessWidget {
           if (rows.isEmpty)
             const Text(
               'Performance data is not available yet.',
-              style: TextStyle(
-                color: AgrisellColors.mutedText,
-                fontSize: 12,
-                height: 1.35,
-                fontWeight: FontWeight.w600,
-              ),
+              style: RiderPerformanceSummaryStyles
+                  .performanceDataIsNotAvailableText,
             )
           else
             Wrap(
@@ -104,11 +97,7 @@ class _PerformanceChip extends StatelessWidget {
     label: '${item.label}: ${item.value}',
     child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: AgrisellColors.pageBackground,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AgrisellColors.borderLine),
-      ),
+      decoration: RiderPerformanceSummaryStyles.containerDecoration,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -116,12 +105,7 @@ class _PerformanceChip extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             '${item.label}: ${item.value}',
-            style: const TextStyle(
-              color: AgrisellColors.headingGreen,
-              fontSize: 12,
-              height: 1.1,
-              fontWeight: FontWeight.w800,
-            ),
+            style: RiderPerformanceSummaryStyles.textStyle,
           ),
         ],
       ),

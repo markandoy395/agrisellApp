@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
-import 'package:agresell_app/features/shared/products/domain/home_product.dart';
+import 'package:agresell_app/features/buyer/home/presentation/styles/product_detail_info_card_styles.dart';
+import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_facts.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_price_line.dart';
-import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_seller_card.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_quantity_selector.dart';
+import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_seller_card.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_unavailable_notice.dart';
+import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/features/shared/products/presentation/widgets/product_sale_status_badge.dart';
 
 class ProductInfoCard extends StatelessWidget {
@@ -29,19 +30,8 @@ class ProductInfoCard extends StatelessWidget {
     final description = product.description.trim();
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AgrisellColors.borderLine),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.06),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
+      padding: ProductDetailInfoCardStyles.cardPadding,
+      decoration: ProductDetailInfoCardStyles.cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -49,20 +39,15 @@ class ProductInfoCard extends StatelessWidget {
             product.name,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: AgrisellColors.headingGreen,
-              fontSize: 15,
-              height: 1.15,
-              fontWeight: FontWeight.w800,
-            ),
+            style: ProductDetailInfoCardStyles.nameStyle,
           ),
           const SizedBox(height: 8),
           ProductSaleStatusBadge(product: product, showCountdown: true),
           const SizedBox(height: 10),
-          _ProductFacts(product: product),
+          ProductDetailFacts(product: product),
           if (product.storageInstructions case final storage?) ...[
             const SizedBox(height: 8),
-            _StorageInstructions(text: storage),
+            ProductDetailStorageInstructions(text: storage),
           ],
           if (!product.canOrder) ...[
             const SizedBox(height: 12),
@@ -82,126 +67,19 @@ class ProductInfoCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 18),
-          const _SectionTitle(text: 'About Product'),
+          const ProductDetailSectionTitle(text: 'About Product'),
           const SizedBox(height: 6),
           Text(
             description.isEmpty
                 ? 'The farmer has not provided a product description yet.'
                 : description,
-            style: const TextStyle(
-              color: AgrisellColors.mutedText,
-              fontSize: 12,
-              height: 1.45,
-              fontWeight: FontWeight.w400,
-            ),
+            style: ProductDetailInfoCardStyles.descriptionStyle,
           ),
           const SizedBox(height: 16),
-          const _SectionTitle(text: 'Farmer'),
+          const ProductDetailSectionTitle(text: 'Farmer'),
           const SizedBox(height: 8),
           SellerCard(product: product),
         ],
-      ),
-    );
-  }
-}
-
-class _ProductFacts extends StatelessWidget {
-  const _ProductFacts({required this.product});
-
-  final HomeProduct product;
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 14,
-      runSpacing: 8,
-      children: [
-        _Fact(
-          icon: Icons.inventory_2_outlined,
-          text: product.availableQuantityLabel,
-        ),
-        _Fact(icon: Icons.calendar_today_outlined, text: product.harvestDate),
-        if (product.freshnessLabel case final freshness?)
-          _Fact(
-            icon: product.isNearFreshnessDeadline
-                ? Icons.warning_amber_rounded
-                : Icons.event_available_outlined,
-            text: freshness,
-          ),
-      ],
-    );
-  }
-}
-
-class _StorageInstructions extends StatelessWidget {
-  const _StorageInstructions({required this.text});
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const Icon(
-        Icons.thermostat_outlined,
-        color: AgrisellColors.authGreen,
-        size: 16,
-      ),
-      const SizedBox(width: 4),
-      Expanded(
-        child: Text(
-          'Storage: $text',
-          style: const TextStyle(
-            color: AgrisellColors.mutedText,
-            fontSize: 12,
-            height: 1.3,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-    ],
-  );
-}
-
-class _Fact extends StatelessWidget {
-  const _Fact({required this.icon, required this.text});
-
-  final IconData icon;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: AgrisellColors.authGreen, size: 16),
-        const SizedBox(width: 4),
-        Text(
-          text,
-          style: const TextStyle(
-            color: AgrisellColors.mutedText,
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle({required this.text});
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(
-        color: AgrisellColors.headingGreen,
-        fontSize: 14,
-        fontWeight: FontWeight.w800,
       ),
     );
   }

@@ -1,6 +1,7 @@
+import 'package:agresell_app/features/buyer/profile/presentation/styles/shipping_address_form_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/location/presentation/widgets/psgc_address_fields.dart';
 
 class ShippingAddressForm extends StatelessWidget {
@@ -48,10 +49,7 @@ class ShippingAddressForm extends StatelessWidget {
       TextField(
         controller: streetController,
         keyboardType: TextInputType.streetAddress,
-        decoration: const InputDecoration(
-          labelText: 'Complete address',
-          border: OutlineInputBorder(),
-        ),
+        decoration: ShippingAddressFormStyles.inputDecoration,
       ),
       const SizedBox(height: 10),
       PsgcAddressFields(
@@ -64,10 +62,7 @@ class ShippingAddressForm extends StatelessWidget {
       TextField(
         controller: postalCodeController,
         keyboardType: TextInputType.number,
-        decoration: const InputDecoration(
-          labelText: 'Postal code (optional)',
-          border: OutlineInputBorder(),
-        ),
+        decoration: ShippingAddressFormStyles.inputDecoration2,
       ),
       if (isGeocoding)
         const Padding(
@@ -80,19 +75,16 @@ class ShippingAddressForm extends StatelessWidget {
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
               SizedBox(width: 8),
-              Text('Locating address...', style: TextStyle(fontSize: 12)),
+              Text(
+                'Locating address...',
+                style: SharedPresentationStyles.caption,
+              ),
             ],
           ),
         ),
       if (error != null) ...[
         const SizedBox(height: 8),
-        Text(
-          error!,
-          style: const TextStyle(
-            fontSize: 12,
-            color: AgrisellColors.statusRedText,
-          ),
-        ),
+        Text(error!, style: SharedPresentationStyles.errorCaption),
       ],
       const SizedBox(height: 14),
       SizedBox(
@@ -115,10 +107,7 @@ class _RecipientField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => InputDecorator(
-    decoration: InputDecoration(
-      labelText: label,
-      border: const OutlineInputBorder(),
-    ),
-    child: Text(value, style: const TextStyle(fontSize: 13)),
+    decoration: ShippingAddressFormStyles.inputDecoration3(label),
+    child: Text(value, style: SharedPresentationStyles.body),
   );
 }

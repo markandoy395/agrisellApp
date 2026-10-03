@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/farmer/profile/presentation/styles/farmer_feedback_card_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -22,17 +24,7 @@ class FarmerFeedbackCard extends StatelessWidget {
     }
 
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.08),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
+      decoration: FarmerFeedbackCardStyles.decoratedBoxDecoration,
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
@@ -42,11 +34,7 @@ class FarmerFeedbackCard extends StatelessWidget {
               order.id,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AgrisellColors.mutedText,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-              ),
+              style: SharedPresentationStyles.mutedCaptionBold,
             ),
             const SizedBox(height: 8),
             for (var index = 0; index < reviews.length; index++) ...[
@@ -76,11 +64,7 @@ class _FeedbackEntry extends StatelessWidget {
     children: [
       Text(
         productName,
-        style: const TextStyle(
-          color: AgrisellColors.headingGreen,
-          fontSize: 14,
-          fontWeight: FontWeight.w800,
-        ),
+        style: SharedPresentationStyles.headingSubtitleExtraBold,
       ),
       const SizedBox(height: 5),
       Semantics(
@@ -100,14 +84,7 @@ class _FeedbackEntry extends StatelessWidget {
       ),
       if (feedback.comment.isNotEmpty) ...[
         const SizedBox(height: 6),
-        Text(
-          feedback.comment,
-          style: const TextStyle(
-            color: AgrisellColors.brandBlack,
-            fontSize: 12,
-            height: 1.35,
-          ),
-        ),
+        Text(feedback.comment, style: FarmerFeedbackCardStyles.textStyle2),
       ],
     ],
   );

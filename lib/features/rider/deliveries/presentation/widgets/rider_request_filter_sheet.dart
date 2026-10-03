@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_request_query.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_request_filter_sheet_styles.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_request_filter_choices.dart';
 
 Future<RiderRequestFilters?> showRiderRequestFilterSheet(
@@ -43,11 +44,8 @@ class _RiderRequestFilterSheetState extends State<_RiderRequestFilterSheet> {
   @override
   Widget build(BuildContext context) => SafeArea(
     child: Padding(
-      padding: EdgeInsets.fromLTRB(
-        18,
-        0,
-        18,
-        18 + MediaQuery.viewInsetsOf(context).bottom,
+      padding: RiderRequestFilterSheetStyles.sheetPadding(
+        MediaQuery.viewInsetsOf(context).bottom,
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -56,7 +54,7 @@ class _RiderRequestFilterSheetState extends State<_RiderRequestFilterSheet> {
           children: [
             const Text(
               'Filter nearby requests',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+              style: RiderRequestFilterSheetStyles.headerTitleStyle,
             ),
             CheckboxListTile(
               dense: true,
@@ -80,34 +78,24 @@ class _RiderRequestFilterSheetState extends State<_RiderRequestFilterSheet> {
               onChanged: (value) =>
                   setState(() => _perishable = value ?? false),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'Maximum pickup distance',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-            ),
-            Wrap(
-              spacing: 7,
-              children: [
-                for (final value in <double?>[null, 5, 10, 15])
-                  ChoiceChip(
-                    label: Text(value == null ? 'Any' : '${value.round()} km'),
-                    selected: _distance == value,
-                    onSelected: (_) => setState(() => _distance = value),
-                  ),
-              ],
+            RiderRequestFilterSheetStyles.sectionSpacing,
+            RiderDoubleFilterChoices(
+              label: 'Maximum pickup distance',
+              value: _distance,
+              values: const [5, 10, 15],
+              formatLabel: (val) => '${val.round()} km',
+              onChanged: (val) => setState(() => _distance = val),
             ),
             if (widget.categories.isNotEmpty) ...[
-              const SizedBox(height: 8),
+              RiderRequestFilterSheetStyles.sectionSpacing,
               DropdownButtonFormField<String?>(
                 dropdownColor: AppDropdownStyle.menuColor,
                 borderRadius: AppDropdownStyle.menuBorderRadius,
                 style: AppDropdownStyle.textStyle,
                 iconEnabledColor: AppDropdownStyle.iconColor,
                 initialValue: _category,
-                decoration: const InputDecoration(
-                  labelText: 'Product category',
-                  isDense: true,
-                ),
+                decoration:
+                    RiderRequestFilterSheetStyles.categoryInputDecoration,
                 items: [
                   const DropdownMenuItem(value: null, child: Text('Any')),
                   for (final category in widget.categories)
@@ -116,7 +104,7 @@ class _RiderRequestFilterSheetState extends State<_RiderRequestFilterSheet> {
                 onChanged: (value) => setState(() => _category = value),
               ),
             ],
-            const SizedBox(height: 8),
+            RiderRequestFilterSheetStyles.sectionSpacing,
             RiderMinuteFilterChoices(
               label: 'Pickup deadline within',
               value: _pickupMinutes,
@@ -129,39 +117,23 @@ class _RiderRequestFilterSheetState extends State<_RiderRequestFilterSheet> {
               values: const [60, 120, 240],
               onChanged: (value) => setState(() => _deliveryMinutes = value),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'Minimum estimated earning',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+            RiderRequestFilterSheetStyles.sectionSpacing,
+            RiderDoubleFilterChoices(
+              label: 'Minimum estimated earning',
+              value: _minimumFee,
+              values: const [100, 150, 200],
+              formatLabel: (val) => 'PHP ${val.round()}',
+              onChanged: (val) => setState(() => _minimumFee = val),
             ),
-            Wrap(
-              spacing: 7,
-              children: [
-                for (final value in <double?>[null, 100, 150, 200])
-                  ChoiceChip(
-                    label: Text(value == null ? 'Any' : 'PHP ${value.round()}'),
-                    selected: _minimumFee == value,
-                    onSelected: (_) => setState(() => _minimumFee = value),
-                  ),
-              ],
+            RiderRequestFilterSheetStyles.sectionSpacing,
+            RiderDoubleFilterChoices(
+              label: 'Maximum estimated earning',
+              value: _maximumFee,
+              values: const [150, 200, 250],
+              formatLabel: (val) => 'PHP ${val.round()}',
+              onChanged: (val) => setState(() => _maximumFee = val),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'Maximum estimated earning',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-            ),
-            Wrap(
-              spacing: 7,
-              children: [
-                for (final value in <double?>[null, 150, 200, 250])
-                  ChoiceChip(
-                    label: Text(value == null ? 'Any' : 'PHP ${value.round()}'),
-                    selected: _maximumFee == value,
-                    onSelected: (_) => setState(() => _maximumFee = value),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 14),
+            RiderRequestFilterSheetStyles.actionSpacing,
             Row(
               children: [
                 Expanded(
@@ -171,7 +143,7 @@ class _RiderRequestFilterSheetState extends State<_RiderRequestFilterSheet> {
                     child: const Text('Reset filters'),
                   ),
                 ),
-                const SizedBox(width: 8),
+                RiderRequestFilterSheetStyles.buttonSpacing,
                 Expanded(
                   child: FilledButton(
                     onPressed: () => Navigator.pop(

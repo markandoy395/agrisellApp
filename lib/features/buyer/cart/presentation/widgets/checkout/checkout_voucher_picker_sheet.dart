@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/buyer/cart/presentation/styles/checkout_voucher_picker_sheet_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/buyer/deals/data/buyer_deals_repository.dart';
@@ -46,8 +48,8 @@ class _CheckoutVoucherPickerSheetState
       final reasons = <int, String?>{};
 
       for (final v in vouchers) {
-        final applicableIds =
-            await widget.dealsRepository.loadApplicableCommodityIds(v.saleId);
+        final applicableIds = await widget.dealsRepository
+            .loadApplicableCommodityIds(v.saleId);
 
         final calculated = CheckoutVoucherService.calculateDiscount(
           items: widget.cartItems,
@@ -83,10 +85,7 @@ class _CheckoutVoucherPickerSheetState
       constraints: BoxConstraints(
         maxHeight: MediaQuery.sizeOf(context).height * 0.75,
       ),
-      decoration: const BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
+      decoration: CheckoutVoucherPickerSheetStyles.containerDecoration,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -95,10 +94,7 @@ class _CheckoutVoucherPickerSheetState
             child: Container(
               width: 40,
               height: 4,
-              decoration: BoxDecoration(
-                color: AgrisellColors.borderLine,
-                borderRadius: BorderRadius.circular(2),
-              ),
+              decoration: CheckoutVoucherPickerSheetStyles.containerDecoration2,
             ),
           ),
           Padding(
@@ -114,11 +110,7 @@ class _CheckoutVoucherPickerSheetState
                 const Expanded(
                   child: Text(
                     'Available Vouchers',
-                    style: TextStyle(
-                      color: AgrisellColors.brandBlack,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: SharedPresentationStyles.inkTitleExtraBold,
                   ),
                 ),
                 IconButton(
@@ -141,41 +133,39 @@ class _CheckoutVoucherPickerSheetState
                     ),
                   )
                 : _vouchers.isEmpty
-                    ? const Padding(
-                        padding: EdgeInsets.all(36),
-                        child: Center(
-                          child: Text(
-                            'No vouchers available right now.',
-                            style: TextStyle(
-                              color: AgrisellColors.mutedText,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      )
-                    : ListView.separated(
-                        padding: const EdgeInsets.all(16),
-                        shrinkWrap: true,
-                        itemCount: _vouchers.length,
-                        separatorBuilder: (_, _) => const SizedBox(height: 12),
-                        itemBuilder: (context, index) {
-                          final voucher = _vouchers[index];
-                          final savings = _savingsMap[voucher.saleId];
-                          final reason = _ineligibleReasonMap[voucher.saleId];
-                          final isEligible = savings != null && savings > 0;
-
-                          return VoucherCard(
-                            voucher: voucher,
-                            isEligibleForCart: isEligible,
-                            potentialSavings: savings,
-                            ineligibleReason: reason,
-                            onApply: () {
-                              widget.onSelectVoucher(voucher);
-                              Navigator.of(context).pop();
-                            },
-                          );
-                        },
+                ? const Padding(
+                    padding: EdgeInsets.all(36),
+                    child: Center(
+                      child: Text(
+                        'No vouchers available right now.',
+                        style: CheckoutVoucherPickerSheetStyles
+                            .noVouchersAvailableRightNowText,
                       ),
+                    ),
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.all(16),
+                    shrinkWrap: true,
+                    itemCount: _vouchers.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      final voucher = _vouchers[index];
+                      final savings = _savingsMap[voucher.saleId];
+                      final reason = _ineligibleReasonMap[voucher.saleId];
+                      final isEligible = savings != null && savings > 0;
+
+                      return VoucherCard(
+                        voucher: voucher,
+                        isEligibleForCart: isEligible,
+                        potentialSavings: savings,
+                        ineligibleReason: reason,
+                        onApply: () {
+                          widget.onSelectVoucher(voucher);
+                          Navigator.of(context).pop();
+                        },
+                      );
+                    },
+                  ),
           ),
           const SizedBox(height: 12),
         ],

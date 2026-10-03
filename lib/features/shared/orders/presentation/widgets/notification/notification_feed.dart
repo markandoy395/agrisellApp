@@ -1,6 +1,6 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/notification_date_group.dart';
 import 'package:agresell_app/features/shared/notifications/domain/notification_category.dart';
 import 'package:agresell_app/features/shared/notifications/presentation/widgets/notification_state_view.dart';
@@ -105,13 +105,6 @@ class _GroupHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.fromLTRB(4, 14, 4, 8),
-    child: Text(
-      label,
-      style: const TextStyle(
-        color: AgrisellColors.headingGreen,
-        fontSize: 13,
-        fontWeight: FontWeight.w800,
-      ),
-    ),
+    child: Text(label, style: SharedPresentationStyles.headingBodyExtraBold),
   );
 }

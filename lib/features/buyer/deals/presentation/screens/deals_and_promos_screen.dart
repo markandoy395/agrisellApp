@@ -1,8 +1,13 @@
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:flutter/material.dart';
+
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/buyer/deals/data/buyer_deals_repository.dart';
 import 'package:agresell_app/features/buyer/deals/domain/deal_voucher.dart';
-import 'package:agresell_app/features/buyer/deals/presentation/widgets/voucher_card.dart';
+import 'package:agresell_app/features/buyer/deals/presentation/styles/deals_and_promos_screen_styles.dart';
+import 'package:agresell_app/features/buyer/deals/presentation/widgets/deals_error_view.dart';
+import 'package:agresell_app/features/buyer/deals/presentation/widgets/deals_search_bar.dart';
+import 'package:agresell_app/features/buyer/deals/presentation/widgets/deals_voucher_list_view.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/sale_products_screen.dart';
 
 class DealsAndPromosScreen extends StatefulWidget {
@@ -69,14 +74,16 @@ class _DealsAndPromosScreenState extends State<DealsAndPromosScreen>
 
   List<DealVoucher> _filterDeals(List<DealVoucher> source) {
     if (_searchQuery.isEmpty) return source;
-    return source.where((deal) {
-      final name = deal.name.toLowerCase();
-      final code = deal.code?.toLowerCase() ?? '';
-      final farm = deal.farmName?.toLowerCase() ?? '';
-      return name.contains(_searchQuery) ||
-          code.contains(_searchQuery) ||
-          farm.contains(_searchQuery);
-    }).toList(growable: false);
+    return source
+        .where((deal) {
+          final name = deal.name.toLowerCase();
+          final code = deal.code?.toLowerCase() ?? '';
+          final farm = deal.farmName?.toLowerCase() ?? '';
+          return name.contains(_searchQuery) ||
+              code.contains(_searchQuery) ||
+              farm.contains(_searchQuery);
+        })
+        .toList(growable: false);
   }
 
   List<DealVoucher> get _vouchers =>
@@ -86,7 +93,7 @@ class _DealsAndPromosScreenState extends State<DealsAndPromosScreen>
 
   void _openShopProducts(DealVoucher voucher) {
     Navigator.of(context).push(
-      MaterialPageRoute<void>(
+      agrisellMaterialPageRoute<void>(
         builder: (_) => SaleProductsScreen(
           title: voucher.name,
           campaignSaleId: voucher.saleId,
@@ -107,39 +114,33 @@ class _DealsAndPromosScreenState extends State<DealsAndPromosScreen>
     return Scaffold(
       backgroundColor: AgrisellColors.homeBackground,
       appBar: AppBar(
-        backgroundColor: AgrisellColors.authGreen,
+        backgroundColor: DealsAndPromosScreenStyles.appBarBackground,
         foregroundColor: Colors.white,
-        elevation: 0,
+        elevation: DealsAndPromosScreenStyles.appBarElevation,
         title: Text(
           widget.isSelectingForCheckout
               ? 'Select Voucher'
               : 'Deals & Voucher Wallet',
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-          ),
+          style: DealsAndPromosScreenStyles.appBarTitleStyle,
         ),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(48),
+          preferredSize: DealsAndPromosScreenStyles.tabBarPreferredSize,
           child: Container(
             color: Colors.white,
             child: TabBar(
               controller: _tabController,
-              labelColor: AgrisellColors.authGreen,
-              unselectedLabelColor: AgrisellColors.mutedText,
-              indicatorColor: AgrisellColors.authGreen,
-              indicatorWeight: 3,
-              labelStyle: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-              ),
+              labelColor: DealsAndPromosScreenStyles.tabLabelColor,
+              unselectedLabelColor:
+                  DealsAndPromosScreenStyles.tabUnselectedLabelColor,
+              indicatorColor: DealsAndPromosScreenStyles.tabIndicatorColor,
+              indicatorWeight: DealsAndPromosScreenStyles.tabIndicatorWeight,
+              labelStyle: DealsAndPromosScreenStyles.tabLabelStyle,
               tabs: [
                 Tab(
-                  text: 'Vouchers & Codes (${_deals.where((d) => d.hasCode).length})',
+                  text:
+                      'Vouchers & Codes (${_deals.where((d) => d.hasCode).length})',
                 ),
-                Tab(
-                  text: 'All Deals (${_deals.length})',
-                ),
+                Tab(text: 'All Deals (${_deals.length})'),
               ],
             ),
           ),
@@ -147,54 +148,15 @@ class _DealsAndPromosScreenState extends State<DealsAndPromosScreen>
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search vouchers by name or code...',
-                hintStyle: const TextStyle(
-                  fontSize: 13,
-                  color: AgrisellColors.mutedText,
-                ),
-                prefixIcon: const Icon(
-                  Icons.search_rounded,
-                  color: AgrisellColors.mutedText,
-                ),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear_rounded, size: 18),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() => _searchQuery = '');
-                        },
-                      )
-                    : null,
-                filled: true,
-                fillColor: AgrisellColors.surface,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 10,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AgrisellColors.borderLine),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AgrisellColors.borderLine),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: AgrisellColors.authGreen,
-                    width: 1.5,
-                  ),
-                ),
-              ),
-              onChanged: (value) =>
-                  setState(() => _searchQuery = value.trim().toLowerCase()),
-            ),
+          DealsSearchBar(
+            controller: _searchController,
+            hasQuery: _searchQuery.isNotEmpty,
+            onChanged: (value) =>
+                setState(() => _searchQuery = value.trim().toLowerCase()),
+            onClear: () {
+              _searchController.clear();
+              setState(() => _searchQuery = '');
+            },
           ),
           Expanded(
             child: _isLoading
@@ -204,101 +166,33 @@ class _DealsAndPromosScreenState extends State<DealsAndPromosScreen>
                     ),
                   )
                 : _loadFailed
-                    ? Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text(
-                              'Unable to load deals.',
-                              style: TextStyle(
-                                color: AgrisellColors.mutedText,
-                                fontSize: 14,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            ElevatedButton(
-                              onPressed: _loadDeals,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AgrisellColors.authGreen,
-                                foregroundColor: Colors.white,
-                              ),
-                              child: const Text('Try Again'),
-                            ),
-                          ],
+                ? DealsErrorView(onRetry: _loadDeals)
+                : RefreshIndicator(
+                    onRefresh: _loadDeals,
+                    color: AgrisellColors.authGreen,
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        DealsVoucherListView(
+                          items: _vouchers,
+                          onShopProducts: _openShopProducts,
+                          onApply: widget.isSelectingForCheckout
+                              ? _applyVoucher
+                              : null,
                         ),
-                      )
-                    : RefreshIndicator(
-                        onRefresh: _loadDeals,
-                        color: AgrisellColors.authGreen,
-                        child: TabBarView(
-                          controller: _tabController,
-                          children: [
-                            _buildVouchersList(_vouchers),
-                            _buildVouchersList(_allDeals),
-                          ],
+                        DealsVoucherListView(
+                          items: _allDeals,
+                          onShopProducts: _openShopProducts,
+                          onApply: widget.isSelectingForCheckout
+                              ? _applyVoucher
+                              : null,
                         ),
-                      ),
+                      ],
+                    ),
+                  ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildVouchersList(List<DealVoucher> items) {
-    if (items.isEmpty) {
-      return ListView(
-        children: const [
-          SizedBox(height: 60),
-          Icon(
-            Icons.confirmation_number_outlined,
-            size: 56,
-            color: AgrisellColors.borderLine,
-          ),
-          SizedBox(height: 14),
-          Center(
-            child: Text(
-              'No active vouchers found',
-              style: TextStyle(
-                color: AgrisellColors.brandBlack,
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          SizedBox(height: 6),
-          Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 36),
-              child: Text(
-                'Check back soon! New promotional deals and vouchers are added regularly.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 13,
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-    }
-
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-      itemCount: items.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final voucher = items[index];
-        return VoucherCard(
-          voucher: voucher,
-          onShopProducts: voucher.productCount > 0
-              ? () => _openShopProducts(voucher)
-              : null,
-          onApply: widget.isSelectingForCheckout
-              ? () => _applyVoucher(voucher)
-              : null,
-        );
-      },
     );
   }
 }

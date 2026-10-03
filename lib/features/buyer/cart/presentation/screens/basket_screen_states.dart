@@ -5,10 +5,7 @@ class _DeliveryNote extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-    decoration: BoxDecoration(
-      color: AgrisellColors.limeSoft,
-      borderRadius: BorderRadius.circular(14),
-    ),
+    decoration: BasketScreenStatesStyles.containerDecoration,
     child: const Row(
       children: [
         Icon(
@@ -20,12 +17,7 @@ class _DeliveryNote extends StatelessWidget {
         Expanded(
           child: Text(
             'Confirm delivery and payment at checkout.',
-            style: TextStyle(
-              color: AgrisellColors.headingGreen,
-              fontSize: 12,
-              height: 1.25,
-              fontWeight: FontWeight.w600,
-            ),
+            style: BasketScreenStatesStyles.confirmDeliveryAndPaymentAtText,
           ),
         ),
       ],

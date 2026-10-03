@@ -1,6 +1,6 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/farmer/profile/presentation/styles/farmer_gcash_settings_widgets_styles.dart';
 import 'package:flutter/material.dart';
-
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 class FarmerGcashSettingsHeader extends StatelessWidget {
   const FarmerGcashSettingsHeader({required this.onClose, super.key});
@@ -13,11 +13,7 @@ class FarmerGcashSettingsHeader extends StatelessWidget {
       const Expanded(
         child: Text(
           'GCash payment details',
-          style: TextStyle(
-            color: AgrisellColors.headingGreen,
-            fontSize: 15,
-            fontWeight: FontWeight.w900,
-          ),
+          style: SharedPresentationStyles.headingTitleBlack,
         ),
       ),
       IconButton(
@@ -62,29 +58,14 @@ class _FarmerGcashSettingsFieldState extends State<FarmerGcashSettingsField> {
     enabled: widget.enabled,
     obscureText: widget.isPhone && _obscured,
     maxLength: widget.isPhone ? 20 : 80,
-    style: const TextStyle(fontSize: 13),
+    style: SharedPresentationStyles.body,
     onChanged: (_) => widget.onChanged(),
-    decoration: InputDecoration(
-      labelText: widget.label,
-      prefixIcon: Icon(widget.icon, size: 19),
-      suffixIcon: widget.isPhone
-          ? IconButton(
-              tooltip: _obscured ? 'Show GCash number' : 'Hide GCash number',
-              onPressed: () => setState(() => _obscured = !_obscured),
-              icon: Icon(
-                _obscured
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-                size: 19,
-              ),
-            )
-          : null,
-      filled: true,
-      fillColor: AgrisellColors.searchBackground,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide.none,
-      ),
+    decoration: FarmerGcashSettingsWidgetsStyles.inputDecoration(
+      widget.label,
+      widget.icon,
+      widget.isPhone,
+      _obscured,
+      () => setState(() => _obscured = !_obscured),
     ),
   );
 }

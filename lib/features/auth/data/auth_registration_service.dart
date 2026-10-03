@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/features/auth/data/auth_login_error_mapper.dart';
@@ -13,18 +14,23 @@ import 'package:agresell_app/features/farmer/registration/domain/farmer_signup_d
 
 export 'package:agresell_app/features/auth/data/auth_registration_exception.dart';
 
+part 'auth_registration_service_password.dart';
+part 'auth_registration_service_registration.dart';
+part 'auth_registration_service_verification.dart';
+
 class AuthRegistrationService {
   AuthRegistrationService._();
 
   static final AuthRegistrationService instance = AuthRegistrationService._();
 
   final LocalAuthRegistrationStore _local = LocalAuthRegistrationStore();
-  static const SupabaseAuthService _remote = SupabaseAuthService();
+  final SupabaseAuthService _remote = const SupabaseAuthService();
   RegisteredAccount? _remoteAccount;
   bool _localStoreEnabledForTesting = false;
   Future<bool> Function(String, String, AuthRole)? _emailStarterForTesting;
 
   bool get usesSupabase => AgrisellSupabase.isInitialized;
+  bool get localStoreEnabledForTesting => _localStoreEnabledForTesting;
 
   String? get currentRefreshToken =>
       usesSupabase ? _remote.currentRefreshToken : null;
@@ -61,180 +67,6 @@ class AuthRegistrationService {
     }
   }
 
-  Future<void> changePassword({
-    required String email,
-    required String currentPassword,
-    required String newPassword,
-  }) async {
-    if (newPassword.length < 8) {
-      throw const AuthRegistrationException(
-        'Use a password with at least 8 characters.',
-      );
-    }
-    if (!usesSupabase) {
-      _requireConfiguredBackend();
-      return _local.changePassword(
-        email: email,
-        currentPassword: currentPassword,
-        newPassword: newPassword,
-      );
-    }
-    try {
-      await _remote.changePassword(
-        email: email,
-        currentPassword: currentPassword,
-        newPassword: newPassword,
-      );
-    } on AuthException catch (error) {
-      throw AuthRegistrationException(error.message);
-    }
-  }
-
-  Future<RegisteredAccount> register(SignUpAccountData data, AuthRole role) =>
-      _register(data, role);
-
-  /// Starts the credentials-first signup flow and returns true when the user
-  /// must enter the Supabase signup OTP before adding profile information.
-  Future<bool> startEmailVerification({
-    required String email,
-    required String password,
-    required AuthRole role,
-  }) async {
-    final starter = _emailStarterForTesting;
-    if (starter != null) return starter(email, password, role);
-    if (!usesSupabase) {
-      _requireConfiguredBackend();
-      return false;
-    }
-    try {
-      return await _remote.startEmailVerification(
-        email: email,
-        password: password,
-        role: role,
-      );
-    } on AuthRegistrationException {
-      rethrow;
-    } on AuthException catch (error) {
-      throw AuthOtpErrorMapper.signUp(error);
-    } catch (_) {
-      throw const AuthRegistrationException(
-        'We could not send the email OTP. Please try again.',
-      );
-    }
-  }
-
-  Future<RegisteredAccount> registerFarmer(FarmerSignupData data) async {
-    if (!usesSupabase) {
-      _requireConfiguredBackend();
-      return _local.register(
-        SignUpAccountData(
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          password: data.password,
-          extensionName: data.suffix,
-          middleName: data.middleName,
-          phoneNumber: data.phoneNumber,
-          dateOfBirth: data.dateOfBirth,
-          gender: data.gender,
-        ),
-        AuthRole.farmer,
-      );
-    }
-    try {
-      _remoteAccount = await const FarmerRegistrationService().register(data);
-      return _remoteAccount!;
-    } on AuthRegistrationException {
-      rethrow;
-    } on AuthException catch (error) {
-      throw AuthOtpErrorMapper.signUp(error);
-    } catch (_) {
-      throw const AuthRegistrationException(
-        'Farmer registration could not be completed. Please try again.',
-      );
-    }
-  }
-
-  Future<RegisteredAccount> completeVerifiedBuyerRegistration(
-    SignUpAccountData data,
-  ) async {
-    if (!usesSupabase) {
-      _requireConfiguredBackend();
-      return _local.register(data, AuthRole.buyer);
-    }
-    try {
-      _remoteAccount = await _remote.completeVerifiedBuyerRegistration(data);
-      return _remoteAccount!;
-    } on AuthRegistrationException {
-      rethrow;
-    } on PostgrestException catch (error) {
-      throw AuthRegistrationException(error.message);
-    } catch (_) {
-      throw const AuthRegistrationException(
-        'Buyer registration could not be completed after verification.',
-      );
-    }
-  }
-
-  Future<RegisteredAccount> completeVerifiedFarmerRegistration(
-    FarmerSignupData data,
-  ) async {
-    if (!usesSupabase) {
-      throw const AuthRegistrationException(
-        'Email verification is temporarily unavailable. Please try again later.',
-      );
-    }
-    try {
-      _remoteAccount = await const FarmerRegistrationService()
-          .completeVerifiedRegistration(data);
-      return _remoteAccount!;
-    } on AuthRegistrationException {
-      rethrow;
-    } on PostgrestException catch (error) {
-      throw AuthRegistrationException(error.message);
-    } catch (_) {
-      throw const AuthRegistrationException(
-        'Farmer registration could not be completed after verification.',
-      );
-    }
-  }
-
-  Future<RegisteredAccount> registerRider(
-    SignUpAccountData data,
-    Map<String, Object?> application,
-  ) => _register(data, AuthRole.rider, riderApplication: application);
-
-  Future<RegisteredAccount> _register(
-    SignUpAccountData data,
-    AuthRole role, {
-    Map<String, Object?>? riderApplication,
-  }) async {
-    if (!usesSupabase) {
-      _requireConfiguredBackend();
-      return _local.register(
-        data,
-        role,
-        isRiderApplication: riderApplication != null,
-      );
-    }
-    try {
-      _remoteAccount = await _remote.register(
-        data,
-        role,
-        riderApplication: riderApplication,
-      );
-      return _remoteAccount!;
-    } on AuthRegistrationException {
-      rethrow;
-    } on AuthException catch (error) {
-      throw AuthOtpErrorMapper.signUp(error);
-    } catch (_) {
-      throw const AuthRegistrationException(
-        "We couldn't create your account right now. Please try again.",
-      );
-    }
-  }
-
   Future<RegisteredAccount?> loadCurrentAccount() async {
     if (!usesSupabase) return null;
     try {
@@ -251,163 +83,6 @@ class AuthRegistrationService {
     return _remoteAccount;
   }
 
-  Future<RegisteredAccount> verifyEmailOtp({
-    required String email,
-    required String otp,
-  }) async {
-    if (!usesSupabase) {
-      throw const AuthRegistrationException(
-        'Email verification is temporarily unavailable. Please try again later.',
-      );
-    }
-    try {
-      _remoteAccount = await _remote.verifyEmailOtp(email: email, otp: otp);
-      return _remoteAccount!;
-    } on AuthRegistrationException {
-      rethrow;
-    } on AuthException catch (error) {
-      throw AuthOtpErrorMapper.verification(error);
-    } catch (_) {
-      throw const AuthRegistrationException(
-        'We could not verify the email OTP. Please try again.',
-      );
-    }
-  }
-
-  Future<RegisteredAccount> verifySignupEmailOtp({
-    required String email,
-    required String otp,
-    required AuthRole role,
-  }) async {
-    final account = await verifyEmailOtp(email: email, otp: otp);
-    if (account.profilePending && account.assignedRole == role) return account;
-    await signOut();
-    throw const AuthRegistrationException(
-      'This email is already registered. Log in or use another email.',
-    );
-  }
-
-  Future<void> resendSignupEmailOtp(String email) async {
-    if (!usesSupabase) {
-      throw const AuthRegistrationException(
-        'Email verification is temporarily unavailable. Please try again later.',
-      );
-    }
-    try {
-      await _remote.resendSignupEmailOtp(email);
-    } on AuthException catch (error) {
-      throw AuthOtpErrorMapper.delivery(error);
-    } catch (_) {
-      throw const AuthRegistrationException(
-        'We could not resend the email OTP. Please try again.',
-      );
-    }
-  }
-
-  Future<void> requestPasswordReset(String email) async {
-    if (!usesSupabase) {
-      throw const AuthRegistrationException(
-        'Password reset is temporarily unavailable. Please try again later.',
-      );
-    }
-    try {
-      await _remote.requestPasswordReset(email);
-    } on AuthException catch (error) {
-      throw AuthRegistrationException(error.message);
-    } catch (_) {
-      throw const AuthRegistrationException(
-        'We could not send the password-reset OTP. Please try again.',
-      );
-    }
-  }
-
-  Future<void> verifyPasswordRecoveryOtp({
-    required String email,
-    required String otp,
-  }) async {
-    try {
-      await _remote.verifyPasswordRecoveryOtp(email: email, otp: otp);
-    } on AuthRegistrationException {
-      rethrow;
-    } on AuthException catch (error) {
-      throw AuthRegistrationException(error.message);
-    } catch (_) {
-      throw const AuthRegistrationException(
-        'We could not verify the password-reset OTP. Please try again.',
-      );
-    }
-  }
-
-  Future<void> completePasswordRecovery(String password) async {
-    if (!usesSupabase) {
-      throw const AuthRegistrationException(
-        'Password reset is temporarily unavailable. Please try again later.',
-      );
-    }
-    try {
-      await _remote.updatePasswordAfterRecovery(password);
-      await _remote.signOut();
-      _remoteAccount = null;
-    } on AuthException catch (error) {
-      throw AuthRegistrationException(error.message);
-    } catch (_) {
-      throw const AuthRegistrationException(
-        'We could not update your password. Please try again.',
-      );
-    }
-  }
-
-  Future<void> resendPasswordRecoveryOtp(String email) async {
-    try {
-      await _remote.resendPasswordRecoveryOtp(email);
-    } on AuthException catch (error) {
-      throw AuthRegistrationException(error.message);
-    } catch (_) {
-      throw const AuthRegistrationException(
-        'We could not resend the password-reset OTP. Please try again.',
-      );
-    }
-  }
-
-  Future<RegisteredAccount> saveBuyerShippingAddress(
-    RegisteredAccount account,
-    BuyerShippingAddress address,
-  ) async {
-    if (account.assignedRole != AuthRole.buyer) {
-      throw const AuthRegistrationException(
-        'Only buyers can set shipping addresses.',
-      );
-    }
-    if (!usesSupabase) {
-      final saved = _local.updateShippingAddress(
-        account.id,
-        address.address,
-        latitude: address.latitude,
-        longitude: address.longitude,
-      );
-      if (saved != null) return saved;
-      throw const AuthRegistrationException('Your account could not be found.');
-    }
-    try {
-      final savedAddress = await _remote.saveBuyerShippingAddress(address);
-      final saved = account.copyWith(
-        shippingAddress: savedAddress.address,
-        shippingLatitude: savedAddress.latitude,
-        shippingLongitude: savedAddress.longitude,
-      );
-      _remoteAccount = saved;
-      return saved;
-    } on AuthException catch (error) {
-      throw AuthRegistrationException(error.message);
-    } on PostgrestException catch (error) {
-      throw AuthRegistrationException(error.message);
-    } catch (_) {
-      throw const AuthRegistrationException(
-        'Your shipping address could not be saved. Please retry.',
-      );
-    }
-  }
-
   Future<void> signOut() async {
     if (usesSupabase) await _remote.signOut();
     _remoteAccount = null;
@@ -418,6 +93,14 @@ class AuthRegistrationService {
     _local.clear();
     _remoteAccount = null;
     _emailStarterForTesting = null;
+  }
+
+  @visibleForTesting
+  void setCurrentAccountForTesting(RegisteredAccount account) {
+    if (!_localStoreEnabledForTesting || usesSupabase) {
+      throw StateError('Account fixtures require local testing mode.');
+    }
+    _remoteAccount = account;
   }
 
   void setEmailStarterForTesting(

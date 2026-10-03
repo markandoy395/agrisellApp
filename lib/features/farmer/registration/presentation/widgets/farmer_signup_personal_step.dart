@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/farmer/registration/presentation/styles/farmer_signup_personal_step_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_input_style.dart';
 
@@ -33,10 +34,7 @@ class FarmerSignupPersonalStep extends StatelessWidget {
           Container(
             width: 42,
             height: 42,
-            decoration: BoxDecoration(
-              color: Colors.green.shade50,
-              shape: BoxShape.circle,
-            ),
+            decoration: FarmerSignupPersonalStepStyles.containerDecoration,
             child: const Icon(Icons.person_outline, color: Color(0xFF075239)),
           ),
           const SizedBox(width: 12),
@@ -46,15 +44,12 @@ class FarmerSignupPersonalStep extends StatelessWidget {
               children: [
                 Text(
                   'Personal information',
-                  style: TextStyle(
-                    color: Color(0xFF075239),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: FarmerSignupPersonalStepStyles.personalInformationText,
                 ),
                 Text(
                   'Tell us more about yourself.',
-                  style: TextStyle(fontSize: 12, color: Colors.blueGrey),
+                  style: FarmerSignupPersonalStepStyles
+                      .tellUsMoreAboutYourselfText,
                 ),
               ],
             ),

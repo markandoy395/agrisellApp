@@ -1,6 +1,6 @@
+import 'package:agresell_app/features/auth/presentation/styles/auth_button_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/responsive.dart';
 
 class AuthPrimaryButton extends StatelessWidget {
@@ -33,17 +33,10 @@ class AuthPrimaryButton extends StatelessWidget {
       height: 50,
       child: FilledButton(
         onPressed: isLoading ? null : onPressed,
-        style: FilledButton.styleFrom(
-          backgroundColor: AgrisellColors.authGreen,
-          foregroundColor: AgrisellColors.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(effectiveRadius),
-          ),
-          textStyle: TextStyle(
-            fontSize: fontSize ?? lerpDouble(12, 13, scale),
-            fontWeight: FontWeight.w600,
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+        style: AuthButtonStyles.filledButtonStyle(
+          effectiveRadius,
+          fontSize,
+          scale,
         ),
         child: isLoading
             ? const SizedBox(
@@ -67,16 +60,7 @@ class AuthPrimaryButton extends StatelessWidget {
 
     if (hasShadow) {
       return Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(effectiveRadius),
-          boxShadow: [
-            BoxShadow(
-              color: AgrisellColors.authGreen.withValues(alpha: 0.32),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
+        decoration: AuthButtonStyles.containerDecoration(effectiveRadius),
         child: button,
       );
     }
@@ -104,16 +88,7 @@ class AuthOutlinedButton extends StatelessWidget {
       height: 50,
       child: OutlinedButton(
         onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AgrisellColors.authGreen,
-          side: const BorderSide(color: AgrisellColors.authGreen, width: 2),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          textStyle: TextStyle(
-            fontSize: lerpDouble(12, 13, scale),
-            fontWeight: FontWeight.w600,
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-        ),
+        style: AuthButtonStyles.outlinedButtonStyle(scale),
         child: Text(label),
       ),
     );

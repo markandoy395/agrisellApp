@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/dashboard/presentation/styles/rider_ratings_widgets_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_rating_models.dart';
@@ -20,11 +22,7 @@ class RiderRatingsOverview extends StatelessWidget {
           children: [
             Text(
               summary.averageRating.toStringAsFixed(1),
-              style: const TextStyle(
-                color: AgrisellColors.headingGreen,
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-              ),
+              style: SharedPresentationStyles.headingTitleExtraBold,
             ),
             const SizedBox(width: 6),
             RatingStars(
@@ -40,11 +38,7 @@ class RiderRatingsOverview extends StatelessWidget {
               child: Text(
                 '${summary.totalRatings} ratings',
                 textAlign: TextAlign.end,
-                style: const TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: SharedPresentationStyles.mutedCaptionSemibold,
               ),
             ),
           ],
@@ -111,11 +105,7 @@ class RiderReviewList extends StatelessWidget {
                   Expanded(
                     child: Text(
                       review.reviewerDisplayName ?? review.reviewerRole.label,
-                      style: const TextStyle(
-                        color: AgrisellColors.headingGreen,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                      ),
+                      style: SharedPresentationStyles.headingBodyExtraBold,
                     ),
                   ),
                   RatingStars(
@@ -131,22 +121,13 @@ class RiderReviewList extends StatelessWidget {
               const SizedBox(height: 5),
               Text(
                 '${review.reviewerRole.label} Â· ${formatRiderDate(review.createdAt)}',
-                style: const TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: SharedPresentationStyles.mutedCaptionSemibold,
               ),
               if (review.comment?.trim().isNotEmpty ?? false) ...[
                 const SizedBox(height: 9),
                 Text(
                   review.comment!.trim(),
-                  style: const TextStyle(
-                    color: AgrisellColors.headingGreen,
-                    fontSize: 12,
-                    height: 1.35,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: RiderRatingsWidgetsStyles.textStyle,
                 ),
               ],
             ],

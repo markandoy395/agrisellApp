@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/farmer_rider_waiting_panel_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -11,13 +13,7 @@ class FarmerRiderWaitingPanel extends StatelessWidget {
       container: true,
       label: 'Waiting for an assigned rider. Choose an available local rider.',
       child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AgrisellColors.statusGreenBackground,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: AgrisellColors.authGreen.withValues(alpha: 0.28),
-          ),
-        ),
+        decoration: FarmerRiderWaitingPanelStyles.decoratedBoxDecoration,
         child: const Padding(
           padding: EdgeInsets.symmetric(horizontal: 11, vertical: 10),
           child: Row(
@@ -31,21 +27,12 @@ class FarmerRiderWaitingPanel extends StatelessWidget {
                   children: [
                     Text(
                       'Waiting for an assigned rider',
-                      style: TextStyle(
-                        color: AgrisellColors.headingGreen,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                      ),
+                      style: SharedPresentationStyles.headingBodyExtraBold,
                     ),
                     SizedBox(height: 3),
                     Text(
                       'Choose an eligible rider below. The order is assigned only after the rider accepts your request.',
-                      style: TextStyle(
-                        color: AgrisellColors.brandBlack,
-                        fontSize: 12,
-                        height: 1.35,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: FarmerRiderWaitingPanelStyles.textStyle,
                     ),
                   ],
                 ),
@@ -66,10 +53,7 @@ class _DispatchIcon extends StatelessWidget {
     return Container(
       width: 34,
       height: 34,
-      decoration: const BoxDecoration(
-        color: AgrisellColors.authGreen,
-        shape: BoxShape.circle,
-      ),
+      decoration: FarmerRiderWaitingPanelStyles.containerDecoration,
       alignment: Alignment.center,
       child: const Icon(
         Icons.local_shipping_outlined,

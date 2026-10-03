@@ -56,40 +56,19 @@ class _OrderFeedbackSheetState extends State<_OrderFeedbackSheet> {
               canRateProduct
                   ? 'How was this product?'
                   : 'How was your delivery?',
-              style: TextStyle(
-                color: AgrisellColors.brandBlack,
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-              ),
+              style: OrderFeedbackStyles.titleStyle,
             ),
             const SizedBox(height: 3),
             const Text(
               'Your feedback helps buyers and supports trusted farmers.',
-              style: TextStyle(color: AgrisellColors.mutedText, fontSize: 12),
+              style: OrderFeedbackStyles.subtitleStyle,
             ),
             const SizedBox(height: 7),
             if (canRateProduct) ...[
-              Semantics(
-                label: 'Selected rating: $_rating out of 5 stars',
-                child: Row(
-                  children: [
-                    for (var value = 1; value <= 5; value++)
-                      IconButton(
-                        visualDensity: VisualDensity.compact,
-                        tooltip: '$value star rating',
-                        onPressed: _submitting
-                            ? null
-                            : () => setState(() => _rating = value),
-                        icon: Icon(
-                          value <= _rating
-                              ? Icons.star_rounded
-                              : Icons.star_border_rounded,
-                          color: AgrisellColors.accentOrange,
-                          size: 28,
-                        ),
-                      ),
-                  ],
-                ),
+              _OrderFeedbackStarSelector(
+                rating: _rating,
+                enabled: !_submitting,
+                onRatingChanged: (value) => setState(() => _rating = value),
               ),
               const SizedBox(height: 8),
               TextField(
@@ -99,15 +78,10 @@ class _OrderFeedbackSheetState extends State<_OrderFeedbackSheet> {
                 minLines: 3,
                 maxLines: 4,
                 maxLength: 500,
-                style: const TextStyle(fontSize: 13),
-                decoration: InputDecoration(
+                style: OrderFeedbackStyles.commentInputStyle,
+                decoration: OrderFeedbackStyles.feedbackInputDecoration(
                   labelText: 'Comment (optional)',
                   hintText: 'Freshness, packaging, and seller service',
-                  filled: true,
-                  fillColor: AgrisellColors.searchBackground,
-                  border: _feedbackBorder(AgrisellColors.borderLine),
-                  enabledBorder: _feedbackBorder(AgrisellColors.borderLine),
-                  focusedBorder: _feedbackBorder(AgrisellColors.authGreen),
                 ),
               ),
             ],
@@ -116,33 +90,14 @@ class _OrderFeedbackSheetState extends State<_OrderFeedbackSheet> {
               const Divider(color: AgrisellColors.borderLine),
               const Text(
                 'Rate your rider',
-                style: TextStyle(
-                  color: AgrisellColors.brandBlack,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: OrderFeedbackStyles.titleStyle,
               ),
-              Semantics(
-                label: 'Selected rider rating: $_riderRating out of 5 stars',
-                child: Row(
-                  children: [
-                    for (var value = 1; value <= 5; value++)
-                      IconButton(
-                        visualDensity: VisualDensity.compact,
-                        tooltip: '$value star rider rating',
-                        onPressed: _submitting
-                            ? null
-                            : () => setState(() => _riderRating = value),
-                        icon: Icon(
-                          value <= _riderRating
-                              ? Icons.star_rounded
-                              : Icons.star_border_rounded,
-                          color: AgrisellColors.accentOrange,
-                          size: 28,
-                        ),
-                      ),
-                  ],
-                ),
+              _OrderFeedbackStarSelector(
+                rating: _riderRating,
+                enabled: !_submitting,
+                isRider: true,
+                onRatingChanged: (value) =>
+                    setState(() => _riderRating = value),
               ),
               TextField(
                 key: const ValueKey('rider-feedback-comment'),
@@ -151,28 +106,16 @@ class _OrderFeedbackSheetState extends State<_OrderFeedbackSheet> {
                 minLines: 2,
                 maxLines: 3,
                 maxLength: 500,
-                style: const TextStyle(fontSize: 13),
-                decoration: InputDecoration(
+                style: OrderFeedbackStyles.commentInputStyle,
+                decoration: OrderFeedbackStyles.feedbackInputDecoration(
                   labelText: 'Rider comment (optional)',
                   hintText: 'Delivery care, communication, and service',
-                  filled: true,
-                  fillColor: AgrisellColors.searchBackground,
-                  border: _feedbackBorder(AgrisellColors.borderLine),
-                  enabledBorder: _feedbackBorder(AgrisellColors.borderLine),
-                  focusedBorder: _feedbackBorder(AgrisellColors.authGreen),
                 ),
               ),
             ],
             if (_error case final message?) ...[
               const SizedBox(height: 4),
-              Text(
-                message,
-                style: const TextStyle(
-                  color: AgrisellColors.statusRedText,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              Text(message, style: OrderFeedbackStyles.errorTextStyle),
             ],
             const SizedBox(height: 12),
             SizedBox(
@@ -181,12 +124,7 @@ class _OrderFeedbackSheetState extends State<_OrderFeedbackSheet> {
               child: FilledButton.icon(
                 key: const ValueKey('submit-order-feedback'),
                 onPressed: _submitting ? null : _submitFeedback,
-                style: FilledButton.styleFrom(
-                  backgroundColor: AgrisellColors.authGreen,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+                style: OrderFeedbackStyles.submitButtonStyle,
                 icon: _submitting
                     ? const SizedBox.square(
                         dimension: 15,
@@ -198,10 +136,7 @@ class _OrderFeedbackSheetState extends State<_OrderFeedbackSheet> {
                     : const Icon(Icons.rate_review_outlined, size: 16),
                 label: Text(
                   _submitting ? 'Saving feedback…' : 'Submit feedback',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: OrderFeedbackStyles.submitButtonTextStyle,
                 ),
               ),
             ),
@@ -210,11 +145,6 @@ class _OrderFeedbackSheetState extends State<_OrderFeedbackSheet> {
       ),
     );
   }
-
-  OutlineInputBorder _feedbackBorder(Color color) => OutlineInputBorder(
-    borderRadius: BorderRadius.circular(9),
-    borderSide: BorderSide(color: color),
-  );
 
   Future<void> _submitFeedback() async {
     final messenger = ScaffoldMessenger.of(context);

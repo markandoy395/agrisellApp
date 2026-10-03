@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/features/auth/presentation/auth_page_gate.dart';
+
+Route<T> agrisellMaterialPageRoute<T>({required WidgetBuilder builder}) =>
+    MaterialPageRoute<T>(
+      builder: (context) => AuthPageGate(child: builder(context)),
+    );
 
 Route<T> agrisellPageRoute<T>({
   required WidgetBuilder builder,
@@ -9,7 +15,7 @@ Route<T> agrisellPageRoute<T>({
   return PageRouteBuilder<T>(
     transitionDuration: duration,
     reverseTransitionDuration: reverseDuration,
-    pageBuilder: (context, _, _) => builder(context),
+    pageBuilder: (context, _, _) => AuthPageGate(child: builder(context)),
     transitionsBuilder: (context, animation, _, child) {
       return _AgrisellRouteTransition(
         animation: animation,

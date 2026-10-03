@@ -78,12 +78,7 @@ class RiderDeliveryRequestCardContent extends StatelessWidget {
                   request.productName,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AgrisellColors.headingGreen,
-                    fontSize: 14,
-                    height: 1.15,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: RiderDeliveryRequestCardContentStyles.textStyle,
                 ),
                 const SizedBox(height: 5),
                 Text('Order ${request.orderNumber}', style: _metaStyle),
@@ -150,24 +145,11 @@ class RiderDeliveryRequestCardContent extends StatelessWidget {
   );
 }
 
-const _metaStyle = TextStyle(
-  color: AgrisellColors.mutedText,
-  fontSize: 12,
-  fontWeight: FontWeight.w600,
-);
+const _metaStyle = SharedPresentationStyles.mutedCaptionSemibold;
 
-final _outlinedStyle = OutlinedButton.styleFrom(
-  foregroundColor: AgrisellColors.authGreen,
-  side: const BorderSide(color: AgrisellColors.authGreen),
-  minimumSize: const Size.fromHeight(38),
-  textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-);
+final _outlinedStyle = RiderDeliveryRequestCardContentStyles.buttonStyle;
 
-final _filledStyle = FilledButton.styleFrom(
-  backgroundColor: AgrisellColors.authGreen,
-  minimumSize: const Size.fromHeight(38),
-  textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-);
+final _filledStyle = RiderDeliveryRequestCardContentStyles.buttonStyle2;
 
 String _vehicleSummary(DeliveryRequest request) {
   final vehicles = request.requiredVehicleTypes.isEmpty

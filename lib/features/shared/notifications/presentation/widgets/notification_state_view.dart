@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/shared/notifications/presentation/styles/notification_state_view_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -31,11 +33,7 @@ class NotificationStateView extends StatelessWidget {
           child: Container(
             constraints: const BoxConstraints(maxWidth: 360),
             padding: const EdgeInsets.all(22),
-            decoration: BoxDecoration(
-              color: AgrisellColors.surface,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: AgrisellColors.borderLine),
-            ),
+            decoration: NotificationStateViewStyles.containerDecoration,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -43,10 +41,7 @@ class NotificationStateView extends StatelessWidget {
                   width: 52,
                   height: 52,
                   alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: AgrisellColors.forestSoft,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  decoration: NotificationStateViewStyles.containerDecoration2,
                   child: isLoading
                       ? const SizedBox(
                           width: 24,
@@ -62,23 +57,14 @@ class NotificationStateView extends StatelessWidget {
                 Text(
                   title,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: AgrisellColors.headingGreen,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: SharedPresentationStyles.headingTitleExtraBold,
                 ),
                 if (message case final text? when text.trim().isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Text(
                     text,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: AgrisellColors.mutedText,
-                      fontSize: 12,
-                      height: 1.4,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: NotificationStateViewStyles.textText,
                   ),
                 ],
                 if (hasAction) ...[

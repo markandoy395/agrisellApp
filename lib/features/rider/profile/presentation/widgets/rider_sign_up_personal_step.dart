@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/profile/presentation/styles/rider_sign_up_personal_step_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -25,7 +27,7 @@ class RiderSignUpPersonalStep extends StatelessWidget {
       children: [
         const Text(
           'Tell us who you are. Your profile picture is optional for now.',
-          style: TextStyle(fontSize: 12, color: AgrisellColors.mutedText),
+          style: SharedPresentationStyles.mutedCaption,
         ),
         const SizedBox(height: 12),
         RiderSignUpDocumentTile(
@@ -105,10 +107,7 @@ class _RiderGenderChoice extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Gender',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-          ),
+          const Text('Gender', style: SharedPresentationStyles.captionSemibold),
           const SizedBox(height: 6),
           Row(
             children: [
@@ -120,13 +119,7 @@ class _RiderGenderChoice extends StatelessWidget {
           if (error != null)
             Padding(
               padding: const EdgeInsets.only(top: 4, left: 4),
-              child: Text(
-                error,
-                style: const TextStyle(
-                  color: AgrisellColors.statusRedText,
-                  fontSize: 12,
-                ),
-              ),
+              child: Text(error, style: SharedPresentationStyles.errorCaption),
             ),
         ],
       ),
@@ -146,16 +139,8 @@ class _RiderGenderChoice extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 160),
           height: 38,
-          decoration: BoxDecoration(
-            color: isSelected
-                ? AgrisellColors.authGreen.withValues(alpha: 0.1)
-                : AgrisellColors.fieldFill,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: isSelected
-                  ? AgrisellColors.authGreen
-                  : AgrisellColors.borderLine,
-            ),
+          decoration: RiderSignUpPersonalStepStyles.animatedContainerDecoration(
+            isSelected,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -168,7 +153,7 @@ class _RiderGenderChoice extends StatelessWidget {
                 size: 17,
               ),
               const SizedBox(width: 6),
-              Text(value, style: const TextStyle(fontSize: 12)),
+              Text(value, style: SharedPresentationStyles.caption),
             ],
           ),
         ),

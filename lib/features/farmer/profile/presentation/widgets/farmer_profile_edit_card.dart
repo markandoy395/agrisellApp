@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/farmer/profile/presentation/styles/farmer_profile_edit_card_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'farmer_profile_style.dart';
@@ -107,21 +108,15 @@ class _FarmerProfileEditCardState extends State<FarmerProfileEditCard> {
               children: [
                 const Text(
                   'Personal information',
-                  style: TextStyle(
-                    color: FarmerProfileStyle.ink,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: FarmerProfileEditCardStyles.personalInformationText,
                 ),
                 const SizedBox(height: 3),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Update your account details.',
-                    style: const TextStyle(
-                      color: FarmerProfileStyle.muted,
-                      fontSize: 15,
-                    ),
+                    style: FarmerProfileEditCardStyles
+                        .updateYourAccountDetailsText,
                   ),
                 ),
                 const SizedBox(height: 16),

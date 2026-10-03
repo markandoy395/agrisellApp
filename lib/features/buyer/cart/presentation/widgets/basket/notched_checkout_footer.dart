@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/buyer/cart/presentation/styles/notched_checkout_footer_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -56,21 +58,10 @@ class NotchedCheckoutFooter extends StatelessWidget {
                         height: 54,
                         child: ElevatedButton(
                           onPressed: enabled ? onActionTap : null,
-                          style: ElevatedButton.styleFrom(
-                            elevation: enabled ? 2 : 0,
-                            shadowColor: AgrisellColors.forestDark.withValues(
-                              alpha: 0.24,
-                            ),
-                            backgroundColor: AgrisellColors.authGreen,
-                            disabledBackgroundColor:
-                                AgrisellColors.deliveryGray,
-                            foregroundColor: AgrisellColors.surface,
-                            disabledForegroundColor: AgrisellColors.mutedText,
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
+                          style:
+                              NotchedCheckoutFooterStyles.elevatedButtonStyle(
+                                enabled,
+                              ),
                           child: FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Row(
@@ -79,10 +70,7 @@ class NotchedCheckoutFooter extends StatelessWidget {
                                 Text(
                                   actionLabel,
                                   maxLines: 1,
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w800,
-                                  ),
+                                  style: SharedPresentationStyles.bodyExtraBold,
                                 ),
                                 const SizedBox(width: 6),
                                 const Icon(

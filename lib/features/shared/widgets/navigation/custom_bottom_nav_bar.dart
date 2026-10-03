@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/shared/widgets/navigation/custom_bottom_nav_bar_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -84,18 +85,8 @@ class CustomBottomNavBar extends StatelessWidget {
           child: Container(
             height: height,
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(
-                color: AgrisellColors.brandBlack.withValues(alpha: 0.06),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: shadowColor,
-                  blurRadius: 18,
-                  offset: const Offset(0, 6),
-                ),
-              ],
+            decoration: CustomBottomNavBarStyles.containerDecoration(
+              shadowColor,
             ),
             child: Row(
               children: [

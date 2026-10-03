@@ -2,12 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/shared/support/domain/support_ticket.dart';
 import 'package:agresell_app/features/shared/support/presentation/controllers/support_tickets_controller.dart';
 import 'package:agresell_app/features/shared/support/presentation/screens/create_support_ticket_screen.dart';
 import 'package:agresell_app/features/shared/support/presentation/screens/support_ticket_detail_screen.dart';
+import 'package:agresell_app/features/shared/support/presentation/styles/support_center_styles.dart';
+import 'package:agresell_app/features/shared/support/presentation/widgets/support_center_empty_state.dart';
+import 'package:agresell_app/features/shared/support/presentation/widgets/support_center_error_state.dart';
+import 'package:agresell_app/features/shared/support/presentation/widgets/support_center_header.dart';
 import 'package:agresell_app/features/shared/support/presentation/widgets/support_ticket_card.dart';
 
 class SupportCenterScreen extends StatefulWidget {
@@ -79,14 +82,14 @@ class _SupportCenterScreenState extends State<SupportCenterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AgrisellColors.homeBackground,
+      backgroundColor: SupportCenterStyles.screenBackground,
       appBar: AppBar(
         title: const Text(
           'Customer Support',
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+          style: SupportCenterStyles.appBarTitleStyle,
         ),
-        backgroundColor: AgrisellColors.surface,
-        foregroundColor: AgrisellColors.headingGreen,
+        backgroundColor: SupportCenterStyles.appBarBackground,
+        foregroundColor: SupportCenterStyles.appBarForeground,
         elevation: 0,
         actions: [
           IconButton(
@@ -97,12 +100,12 @@ class _SupportCenterScreenState extends State<SupportCenterScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AgrisellColors.forestGreen,
-        foregroundColor: Colors.white,
+        backgroundColor: SupportCenterStyles.fabBackground,
+        foregroundColor: SupportCenterStyles.fabForeground,
         icon: const Icon(Icons.add_comment_rounded),
         label: const Text(
           'Open Ticket',
-          style: TextStyle(fontWeight: FontWeight.w700),
+          style: SupportCenterStyles.fabTextStyle,
         ),
         onPressed: () => _openCreateTicket(),
       ),
@@ -111,13 +114,15 @@ class _SupportCenterScreenState extends State<SupportCenterScreen> {
         builder: (context, _) {
           return Column(
             children: [
-              // Search & Filter Header
-              _buildHeader(),
-
-              // Ticket List or States
+              SupportCenterHeader(
+                searchController: _searchController,
+                selectedFilter: _controller.filter,
+                onSearchChanged: _controller.setSearch,
+                onFilterChanged: _controller.setFilter,
+              ),
               Expanded(
                 child: RefreshIndicator(
-                  color: AgrisellColors.forestGreen,
+                  color: SupportCenterStyles.indicatorColor,
                   onRefresh: _controller.loadTickets,
                   child: _buildBody(),
                 ),
@@ -129,126 +134,19 @@ class _SupportCenterScreenState extends State<SupportCenterScreen> {
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
-      color: AgrisellColors.surface,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-      child: Column(
-        children: [
-          // Search Input
-          TextField(
-            controller: _searchController,
-            onChanged: _controller.setSearch,
-            decoration: InputDecoration(
-              hintText: 'Search tickets by subject, #ID, or category...',
-              hintStyle: const TextStyle(
-                fontSize: 13,
-                color: AgrisellColors.mutedText,
-              ),
-              prefixIcon: const Icon(
-                Icons.search_rounded,
-                size: 20,
-                color: AgrisellColors.mutedText,
-              ),
-              suffixIcon: _searchController.text.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(Icons.clear_rounded, size: 18),
-                      onPressed: () {
-                        _searchController.clear();
-                        _controller.setSearch('');
-                      },
-                    )
-                  : null,
-              filled: true,
-              fillColor: AgrisellColors.searchBackground,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 10,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-
-          // Status Filter Chips
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _filterChip('all', 'All Tickets'),
-                const SizedBox(width: 8),
-                _filterChip('open', 'Active / In Progress'),
-                const SizedBox(width: 8),
-                _filterChip('resolved', 'Resolved / Closed'),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _filterChip(String filterKey, String label) {
-    final isSelected = _controller.filter == filterKey;
-    return ChoiceChip(
-      showCheckmark: false,
-      label: Text(label),
-      selected: isSelected,
-      selectedColor: AgrisellColors.forestGreen,
-      backgroundColor: AgrisellColors.searchBackground,
-      labelStyle: TextStyle(
-        fontSize: 12,
-        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-        color: isSelected ? Colors.white : AgrisellColors.headingGreen,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-        side: BorderSide(
-          color: isSelected
-              ? AgrisellColors.forestGreen
-              : AgrisellColors.borderLine,
-        ),
-      ),
-      onSelected: (_) => _controller.setFilter(filterKey),
-    );
-  }
-
   Widget _buildBody() {
     if (_controller.isLoading && _controller.tickets.isEmpty) {
       return const Center(
-        child: CircularProgressIndicator(color: AgrisellColors.forestGreen),
+        child: CircularProgressIndicator(
+          color: SupportCenterStyles.indicatorColor,
+        ),
       );
     }
 
     if (_controller.errorMessage != null && _controller.tickets.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.error_outline_rounded,
-                size: 48,
-                color: AgrisellColors.unavailableRed,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                _controller.errorMessage!,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14, color: AgrisellColors.mutedText),
-              ),
-              const SizedBox(height: 16),
-              OutlinedButton(
-                onPressed: _controller.loadTickets,
-                child: const Text('Try Again'),
-              ),
-            ],
-          ),
-        ),
+      return SupportCenterErrorState(
+        errorMessage: _controller.errorMessage!,
+        onRetry: _controller.loadTickets,
       );
     }
 
@@ -258,72 +156,15 @@ class _SupportCenterScreenState extends State<SupportCenterScreen> {
       final isSearchingOrFiltering =
           _controller.search.isNotEmpty || _controller.filter != 'all';
 
-      return Center(
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  color: AgrisellColors.forestSoft,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.support_agent_rounded,
-                  size: 38,
-                  color: AgrisellColors.forestGreen,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                isSearchingOrFiltering
-                    ? 'No matching tickets found'
-                    : 'No support tickets opened yet',
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: AgrisellColors.headingGreen,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                isSearchingOrFiltering
-                    ? 'Try adjusting your search terms or filter tab.'
-                    : 'Have an inquiry or issue regarding orders, payments, or safety? We are ready to help.',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: AgrisellColors.mutedText,
-                  height: 1.4,
-                ),
-              ),
-              if (!isSearchingOrFiltering) ...[
-                const SizedBox(height: 20),
-                FilledButton.icon(
-                  onPressed: () => _openCreateTicket(),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AgrisellColors.forestGreen,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  icon: const Icon(Icons.add_rounded),
-                  label: const Text('Open Your First Ticket'),
-                ),
-              ],
-            ],
-          ),
-        ),
+      return SupportCenterEmptyState(
+        isSearchingOrFiltering: isSearchingOrFiltering,
+        onOpenCreateTicket: () => _openCreateTicket(),
       );
     }
 
     return ListView.builder(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.only(top: 8, bottom: 88),
+      padding: SupportCenterStyles.listPadding,
       itemCount: filtered.length,
       itemBuilder: (context, index) {
         final ticket = filtered[index];

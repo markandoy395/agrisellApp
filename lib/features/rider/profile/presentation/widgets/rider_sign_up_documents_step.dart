@@ -1,6 +1,6 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_registration.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_draft.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_validator.dart';
@@ -26,7 +26,7 @@ class RiderSignUpDocumentsStep extends StatelessWidget {
       children: [
         const Text(
           'Upload clear credentials so Agrisell can verify your identity and vehicle.',
-          style: TextStyle(fontSize: 12, color: AgrisellColors.mutedText),
+          style: SharedPresentationStyles.mutedCaption,
         ),
         const SizedBox(height: 12),
         RiderSignUpTextField(

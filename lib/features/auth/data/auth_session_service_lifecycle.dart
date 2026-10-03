@@ -79,6 +79,7 @@ extension AuthSessionServiceLifecycle on AuthSessionService {
     _currentAccountId = null;
     _currentAccountRemembered = false;
     _clearAccountState();
+    _notifySessionChanged();
     if (signOut && AuthRegistrationService.instance.usesSupabase) {
       await AuthRegistrationService.instance.signOut();
     }
@@ -95,5 +96,6 @@ extension AuthSessionServiceLifecycle on AuthSessionService {
     _currentAccountId = null;
     _currentAccountRemembered = false;
     _clearAccountState();
+    _notifySessionChanged();
   }
 }

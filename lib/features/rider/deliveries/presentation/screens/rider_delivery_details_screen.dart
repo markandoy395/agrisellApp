@@ -1,4 +1,6 @@
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_details_status_styles.dart';
 import 'dart:async';
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -34,11 +36,13 @@ import 'package:agresell_app/features/rider/deliveries/presentation/widgets/ride
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_evidence_view.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_request_detail_sections.dart';
 import 'package:agresell_app/features/shared/waybills/presentation/widgets/delivery_waybill_sheet.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_details_styles.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/utils/rider_delivery_waybill_extension.dart';
 
 part 'rider_delivery_details_acceptance.dart';
 part 'rider_delivery_details_status.dart';
 part 'rider_delivery_details_content.dart';
+part 'rider_delivery_details_route.dart';
 part 'rider_delivery_details_safety.dart';
 
 class RiderDeliveryDetailsScreen extends StatefulWidget {

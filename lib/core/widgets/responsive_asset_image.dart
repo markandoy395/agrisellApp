@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/services/authenticated_storage_image.dart';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -99,7 +100,7 @@ class ResponsiveAssetImage extends StatelessWidget {
 
     final imageUrl = this.imageUrl;
     if (imageUrl != null) {
-      return Image.network(
+      return authenticatedNetworkImage(
         imageUrl,
         width: width,
         height: height,

@@ -1,7 +1,8 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/farmer_order_cancellation_dialog_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/app_dropdown_style.dart';
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 const farmerOrderCancellationReasons = <String>[
   'Out of stock',
@@ -20,7 +21,7 @@ Future<String?> showFarmerOrderCancellationDialog(BuildContext context) {
       builder: (context, setDialogState) => AlertDialog(
         title: const Text(
           'Cancel Order?',
-          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+          style: SharedPresentationStyles.titleExtraBold,
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -28,12 +29,12 @@ Future<String?> showFarmerOrderCancellationDialog(BuildContext context) {
           children: [
             const Text(
               'This action cannot be undone.',
-              style: TextStyle(fontSize: 12),
+              style: SharedPresentationStyles.caption,
             ),
             const SizedBox(height: 14),
             const Text(
               'Cancellation Reason:',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+              style: SharedPresentationStyles.captionBold,
             ),
             const SizedBox(height: 6),
             DropdownButtonFormField<String>(
@@ -44,14 +45,7 @@ Future<String?> showFarmerOrderCancellationDialog(BuildContext context) {
               key: const ValueKey('farmer-cancellation-reason'),
               initialValue: selectedReason,
               isExpanded: true,
-              decoration: const InputDecoration(
-                hintText: 'Select reason',
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-              ),
+              decoration: FarmerOrderCancellationDialogStyles.inputDecoration,
               items: farmerOrderCancellationReasons
                   .map(
                     (reason) => DropdownMenuItem<String>(
@@ -59,7 +53,7 @@ Future<String?> showFarmerOrderCancellationDialog(BuildContext context) {
                       child: Text(
                         reason,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 12),
+                        style: SharedPresentationStyles.caption,
                       ),
                     ),
                   )
@@ -79,10 +73,7 @@ Future<String?> showFarmerOrderCancellationDialog(BuildContext context) {
             onPressed: selectedReason == null
                 ? null
                 : () => Navigator.of(context).pop(selectedReason),
-            style: FilledButton.styleFrom(
-              backgroundColor: AgrisellColors.statusRedText,
-              foregroundColor: AgrisellColors.surface,
-            ),
+            style: FarmerOrderCancellationDialogStyles.filledButtonStyle,
             child: const Text('Cancel Order'),
           ),
         ],

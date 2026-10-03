@@ -1,12 +1,13 @@
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/buyer/chat/presentation/buyer_conversation_launcher.dart';
 import 'package:agresell_app/features/buyer/home/domain/farmer_profile.dart';
 import 'package:agresell_app/features/buyer/home/presentation/controllers/farmer_follow_controller.dart';
+import 'package:agresell_app/features/buyer/home/presentation/styles/farmer_shop_styles.dart';
 import 'package:agresell_app/features/shared/products/data/home_product_repository.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/common/buyer_responsive_text.dart';
@@ -15,6 +16,7 @@ import 'package:agresell_app/features/buyer/home/presentation/widgets/farmer_sho
 import 'package:agresell_app/features/buyer/home/presentation/widgets/farmer_shop/farmer_shop_header.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/farmer_shop/farmer_shop_tabs.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/product_detail_screen.dart';
+
 part 'farmer_shop_screen_actions.dart';
 part 'farmer_shop_screen_loading.dart';
 
@@ -94,37 +96,18 @@ class _FarmerShopScreenState extends State<FarmerShopScreen> {
         product.category.toLowerCase().contains(query);
   }
 
-  void _openProduct(HomeProduct product) {
-    if (!product.isAvailable) {
-      ScaffoldMessenger.of(context).showAppSnackBar(
-        const SnackBar(content: Text('This product is unavailable.')),
-      );
-      return;
-    }
-
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => ProductDetailScreen(
-          product: product,
-          productRepository: widget.productRepository,
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    final width = size.width;
-    final headerHeight = (size.height * 0.28).clamp(188.0, 226.0);
-    final profileHeight = width < 380 ? 84.0 : 78.0;
-    final profileTop = headerHeight - 28;
-    final contentTop = profileTop + profileHeight + 6;
+    final headerHeight = FarmerShopStyles.headerHeight(size);
+    final profileHeight = FarmerShopStyles.profileHeight(size.width);
+    final profileTop = FarmerShopStyles.profileTop(headerHeight);
+    final contentTop = FarmerShopStyles.contentTop(profileTop, profileHeight);
 
     return BuyerResponsiveText(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: AgrisellColors.homeBackground,
+        backgroundColor: FarmerShopStyles.backgroundColor,
         body: Stack(
           children: [
             Positioned(
@@ -200,19 +183,5 @@ class _FarmerShopScreenState extends State<FarmerShopScreen> {
         ),
       ),
     );
-  }
-
-  void _handleMenuAction(FarmerShopMenuAction action) {
-    switch (action) {
-      case FarmerShopMenuAction.viewAllProducts:
-        setState(() {
-          _activeTab = FarmerShopTab.products;
-          _selectedCategory = null;
-          _searchQuery = '';
-          _searchController.clear();
-        });
-      case FarmerShopMenuAction.messageFarmer:
-        _openChat();
-    }
   }
 }

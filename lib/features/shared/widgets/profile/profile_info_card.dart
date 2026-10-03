@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/shared/widgets/profile/profile_info_card_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -55,16 +56,7 @@ class ProfileInfoCard extends StatelessWidget {
                         height: 36,
                         child: OutlinedButton(
                           onPressed: onEditProfile,
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: AgrisellColors.authGreen,
-                            side: const BorderSide(
-                              color: AgrisellColors.authGreen,
-                              width: 1.4,
-                            ),
-                            shape: const StadiumBorder(),
-                            padding: EdgeInsets.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
+                          style: ProfileInfoCardStyles.outlinedButtonStyle,
                           child: Text(
                             'Edit Profile',
                             style: ProfileTextStyles.editButton(context),

@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/farmer/registration/presentation/styles/farmer_signup_gender_choice_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -18,14 +20,7 @@ class FarmerSignupGenderChoice extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Gender',
-          style: TextStyle(
-            color: Color(0xFF075239),
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
+        const Text('Gender', style: FarmerSignupGenderChoiceStyles.genderText),
         const SizedBox(height: 8),
         Row(
           children: [
@@ -54,27 +49,17 @@ class FarmerSignupGenderChoice extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 160),
           height: 48,
-          decoration: BoxDecoration(
-            color: isSelected
-                ? AgrisellColors.authGreen.withValues(alpha: 0.06)
-                : AgrisellColors.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isSelected
-                  ? AgrisellColors.authGreen
-                  : AgrisellColors.borderLine,
-            ),
-          ),
+          decoration:
+              FarmerSignupGenderChoiceStyles.animatedContainerDecoration(
+                isSelected,
+              ),
           child: Row(
             children: [
               const SizedBox(width: 8),
               Container(
                 width: 32,
                 height: 32,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFEDF8F0),
-                  shape: BoxShape.circle,
-                ),
+                decoration: FarmerSignupGenderChoiceStyles.containerDecoration,
                 child: Icon(
                   value == 'Male' ? Icons.male_rounded : Icons.female_rounded,
                   color: AgrisellColors.authGreen,
@@ -83,7 +68,7 @@ class FarmerSignupGenderChoice extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Expanded(
-                child: Text(value, style: const TextStyle(fontSize: 13)),
+                child: Text(value, style: SharedPresentationStyles.body),
               ),
               Icon(
                 isSelected

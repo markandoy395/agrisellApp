@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -53,11 +54,7 @@ class RiderProfileOverview extends StatelessWidget {
                   children: [
                     Text(
                       profile.fullName,
-                      style: const TextStyle(
-                        color: AgrisellColors.headingGreen,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                      ),
+                      style: SharedPresentationStyles.headingTitleExtraBold,
                     ),
                     const SizedBox(height: 5),
                     const ProfileFollowStats(

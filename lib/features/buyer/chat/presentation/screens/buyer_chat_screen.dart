@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/buyer/chat/presentation/styles/buyer_chat_screen_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -80,23 +82,15 @@ class _BuyerChatScreenState extends State<BuyerChatScreen> {
                 14,
                 10,
               ),
-              decoration: const BoxDecoration(color: AgrisellColors.authGreen),
+              decoration: BuyerChatScreenStyles.chatDetailHeaderStyleDecoration,
               avatarStyle: const ChatAvatarStyle(
                 diameter: 40,
                 backgroundColor: AgrisellColors.surface,
                 foregroundColor: AgrisellColors.authGreen,
-                textStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+                textStyle: SharedPresentationStyles.bodyExtraBold,
               ),
-              titleStyle: const TextStyle(
-                color: AgrisellColors.surface,
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-              ),
-              subtitleStyle: const TextStyle(
-                color: AgrisellColors.surface,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
+              titleStyle: BuyerChatScreenStyles.textStyle,
+              subtitleStyle: BuyerChatScreenStyles.textStyle2,
             ),
           ),
           Expanded(
@@ -168,22 +162,10 @@ class _BuyerChatScreenState extends State<BuyerChatScreen> {
             isSending: controller.isSending(widget.thread.id),
             style: ChatMessageComposerStyle(
               padding: EdgeInsets.fromLTRB(12, 8, 12, composerBottomPadding),
-              decoration: const BoxDecoration(color: AgrisellColors.surface),
+              decoration:
+                  BuyerChatScreenStyles.chatMessageComposerStyleDecoration,
               hintText: 'Write a message',
-              inputDecoration: InputDecoration(
-                hintStyle: const TextStyle(fontSize: 13),
-                isDense: true,
-                filled: true,
-                fillColor: AgrisellColors.fieldFill,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 11,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(22),
-                  borderSide: BorderSide.none,
-                ),
-              ),
+              inputDecoration: BuyerChatScreenStyles.inputDecoration,
             ),
           ),
         ],

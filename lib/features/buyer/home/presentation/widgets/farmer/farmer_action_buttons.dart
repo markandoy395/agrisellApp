@@ -1,10 +1,10 @@
+import 'package:agresell_app/features/buyer/home/presentation/styles/farmer_action_buttons_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/buyer/home/domain/farmer_profile.dart';
 import 'package:agresell_app/features/buyer/home/presentation/controllers/farmer_follow_controller.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/farmer/farmer_follow_button.dart';
-import 'package:agresell_app/features/buyer/home/presentation/widgets/farmer/farmer_text_styles.dart';
 
 class FarmerActions extends StatelessWidget {
   const FarmerActions({
@@ -77,29 +77,12 @@ class _FarmerActionButton extends StatelessWidget {
       child: isPrimary
           ? FilledButton(
               onPressed: onPressed,
-              style: FilledButton.styleFrom(
-                backgroundColor: AgrisellColors.authGreen,
-                foregroundColor: AgrisellColors.surface,
-                shape: const StadiumBorder(),
-                padding: EdgeInsets.zero,
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
+              style: FarmerActionButtonsStyles.filledButtonStyle,
               child: child,
             )
           : OutlinedButton(
               onPressed: onPressed,
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AgrisellColors.authGreen,
-                side: const BorderSide(
-                  color: AgrisellColors.authGreen,
-                  width: 1.2,
-                ),
-                shape: const StadiumBorder(),
-                padding: EdgeInsets.zero,
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
+              style: FarmerActionButtonsStyles.outlinedButtonStyle,
               child: child,
             ),
     );
@@ -129,7 +112,7 @@ class _ActionLabel extends StatelessWidget {
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: FarmerTextStyles.actionLabel(context).copyWith(color: color),
+            style: FarmerActionButtonsStyles.labelText(context, color),
           ),
         ),
       ],

@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_map_unavailable_card_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -31,11 +33,7 @@ class RiderMapUnavailableCard extends StatelessWidget {
     return Semantics(
       liveRegion: true,
       child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AgrisellColors.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AgrisellColors.borderLine),
-        ),
+        decoration: SharedPresentationStyles.borderedSurface,
         child: Padding(
           padding: const EdgeInsets.all(18),
           child: Column(
@@ -45,10 +43,7 @@ class RiderMapUnavailableCard extends StatelessWidget {
                 width: 54,
                 height: 54,
                 alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: AgrisellColors.statusBlueBackground,
-                  borderRadius: BorderRadius.circular(16),
-                ),
+                decoration: RiderMapUnavailableCardStyles.containerDecoration,
                 child: const Icon(
                   Icons.map_outlined,
                   color: AgrisellColors.statusBlueText,
@@ -59,22 +54,13 @@ class RiderMapUnavailableCard extends StatelessWidget {
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: AgrisellColors.headingGreen,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: RiderMapUnavailableCardStyles.titleText,
               ),
               const SizedBox(height: 6),
               Text(
                 message,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 12,
-                  height: 1.35,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: SharedPresentationStyles.mutedCaptionMediumLoose,
               ),
               if (hasPrimaryAction) ...[
                 const SizedBox(height: 16),
@@ -82,13 +68,7 @@ class RiderMapUnavailableCard extends StatelessWidget {
                   onPressed: onPrimaryAction,
                   icon: const Icon(Icons.refresh_rounded, size: 17),
                   label: Text(primaryActionLabel!),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AgrisellColors.forestGreen,
-                    textStyle: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+                  style: RiderMapUnavailableCardStyles.filledButtonStyle,
                 ),
               ],
               if (hasSecondaryAction) ...[
@@ -97,11 +77,7 @@ class RiderMapUnavailableCard extends StatelessWidget {
                   onPressed: onSecondaryAction,
                   child: Text(
                     secondaryActionLabel!,
-                    style: const TextStyle(
-                      color: AgrisellColors.forestGreen,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: RiderMapUnavailableCardStyles.textStyle,
                   ),
                 ),
               ],

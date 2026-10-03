@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/shared/products/presentation/styles/home_categories_card_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -18,17 +20,7 @@ class HomeCategoriesCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.1),
-            blurRadius: 14,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
+      decoration: HomeCategoriesCardStyles.containerDecoration,
       child: Column(
         children: [
           _CategoryHeader(
@@ -43,10 +35,7 @@ class HomeCategoriesCard extends StatelessWidget {
                     child: Text(
                       'Categories from the backend will appear here.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AgrisellColors.mutedText,
-                        fontSize: 12,
-                      ),
+                      style: SharedPresentationStyles.mutedCaption,
                     ),
                   )
                 : Row(
@@ -94,24 +83,12 @@ class _CategoryHeader extends StatelessWidget {
               'Categories',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: AgrisellColors.surface,
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-              ),
+              style: HomeCategoriesCardStyles.categoriesText,
             ),
           ),
           TextButton(
             onPressed: onAllSelected,
-            style: TextButton.styleFrom(
-              minimumSize: const Size(0, 34),
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              foregroundColor: AgrisellColors.surface,
-              textStyle: TextStyle(
-                fontSize: 12,
-                fontWeight: allSelected ? FontWeight.w800 : FontWeight.w600,
-              ),
-            ),
+            style: HomeCategoriesCardStyles.textButtonStyle(allSelected),
             child: Text(allSelected ? 'Showing all' : 'View all'),
           ),
         ],
@@ -152,18 +129,10 @@ class _CategoryTile extends StatelessWidget {
                 width: iconSize,
                 height: iconSize,
                 padding: EdgeInsets.all(iconSize * 0.2),
-                decoration: BoxDecoration(
-                  color: selected
-                      ? AgrisellColors.forestSoft
-                      : AgrisellColors.homeBackground,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: selected
-                        ? AgrisellColors.authGreen
-                        : Colors.transparent,
-                    width: 2,
-                  ),
-                ),
+                decoration:
+                    HomeCategoriesCardStyles.animatedContainerDecoration(
+                      selected,
+                    ),
                 child: ResponsiveAssetImage(
                   asset: category.asset,
                   fit: BoxFit.contain,
@@ -176,14 +145,7 @@ class _CategoryTile extends StatelessWidget {
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: selected
-                      ? AgrisellColors.authGreen
-                      : AgrisellColors.brandBlack,
-                  fontSize: 12,
-                  height: 1.05,
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                ),
+                style: HomeCategoriesCardStyles.textStyle(selected),
               ),
             ],
           ),

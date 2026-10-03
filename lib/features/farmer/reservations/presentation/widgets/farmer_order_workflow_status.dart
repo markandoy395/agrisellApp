@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/farmer_order_workflow_status_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -34,25 +35,15 @@ class FarmerOrderWorkflowStatus extends StatelessWidget {
         : Icons.task_alt_rounded;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
-      decoration: BoxDecoration(
-        color: isExpired
-            ? AgrisellColors.statusRedBackground
-            : AgrisellColors.statusGreenBackground,
-        borderRadius: BorderRadius.circular(999),
+      decoration: FarmerOrderWorkflowStatusStyles.containerDecoration(
+        isExpired,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: color),
           const SizedBox(width: 5),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
+          Text(label, style: FarmerOrderWorkflowStatusStyles.labelText(color)),
         ],
       ),
     );

@@ -1,3 +1,6 @@
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_route_panel_details_styles.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_route_panel_content_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -9,9 +12,11 @@ import 'package:agresell_app/features/rider/deliveries/domain/rider_route_plan.d
 import 'package:agresell_app/features/rider/deliveries/domain/rider_location_quality.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_location_controller.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_route_controller.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_route_panel_styles.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_directions_sheet.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
 
+part 'rider_next_maneuver_card.dart';
 part 'rider_route_panel_details.dart';
 part 'rider_route_panel_helpers.dart';
 
@@ -59,9 +64,8 @@ class RiderRoutePanel extends StatelessWidget {
                         child: DropdownButton<String>(
                           dropdownColor: AppDropdownStyle.menuColor,
                           borderRadius: AppDropdownStyle.menuBorderRadius,
-                          style: AppDropdownStyle.textStyle.copyWith(
-                            fontSize: 12,
-                          ),
+                          style:
+                              RiderRoutePanelContentStyles.dropdownButtonStyle,
                           iconEnabledColor: AppDropdownStyle.iconColor,
                           isDense: true,
                           isExpanded: true,
@@ -74,7 +78,7 @@ class RiderRoutePanel extends StatelessWidget {
                                 child: Text(
                                   request.productName,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(fontSize: 12),
+                                  style: SharedPresentationStyles.caption,
                                 ),
                               ),
                           ],
@@ -97,10 +101,7 @@ class RiderRoutePanel extends StatelessWidget {
                             : 'Navigating to ${_routeDestination(selected, route?.destinationKey ?? '', selected.pickupLocation.address)}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: SharedPresentationStyles.captionBold,
                       ),
               ),
               if (route != null)

@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/shared/orders/presentation/styles/notification_content_widgets_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -19,26 +21,13 @@ class NotificationHeader extends StatelessWidget {
         width < 380 ? 18 : 24,
         16,
       ),
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.08),
-            blurRadius: 14,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      decoration: NotificationContentWidgetsStyles.containerDecoration,
       child: Row(
         children: [
           Container(
             width: 38,
             height: 38,
-            decoration: BoxDecoration(
-              color: AgrisellColors.forestSoft,
-              borderRadius: BorderRadius.circular(12),
-            ),
+            decoration: NotificationContentWidgetsStyles.containerDecoration2,
             child: const Icon(
               Icons.notifications_none_rounded,
               color: AgrisellColors.authGreen,
@@ -52,21 +41,13 @@ class NotificationHeader extends StatelessWidget {
               children: [
                 const Text(
                   'Notification',
-                  style: TextStyle(
-                    color: AgrisellColors.headingGreen,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: SharedPresentationStyles.headingTitleExtraBold,
                 ),
                 Text(
                   unreadCount == 0
                       ? 'You are all caught up'
                       : '$unreadCount unread update${unreadCount == 1 ? '' : 's'}',
-                  style: const TextStyle(
-                    color: AgrisellColors.mutedText,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: SharedPresentationStyles.mutedCaptionMedium,
                 ),
               ],
             ),
@@ -99,11 +80,7 @@ class OrderUpdatesBar extends StatelessWidget {
           Expanded(
             child: Text(
               'Order Updates',
-              style: const TextStyle(
-                color: AgrisellColors.headingGreen,
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-              ),
+              style: SharedPresentationStyles.headingBodyBold,
             ),
           ),
           TextButton(

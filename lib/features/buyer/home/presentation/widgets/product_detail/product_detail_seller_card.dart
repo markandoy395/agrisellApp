@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/buyer/home/presentation/styles/product_detail_seller_card_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/constants/agrisell_routes.dart';
@@ -38,9 +39,8 @@ class SellerCard extends StatelessWidget {
                 },
           child: Container(
             padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-            decoration: BoxDecoration(
-              borderRadius: borderRadius,
-              border: Border.all(color: AgrisellColors.borderLine),
+            decoration: ProductDetailSellerCardStyles.containerDecoration(
+              borderRadius,
             ),
             child: Row(
               children: [
@@ -97,24 +97,14 @@ class _SellerText extends StatelessWidget {
           product.sellerName,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: AgrisellColors.brandBlack,
-            fontSize: 13,
-            height: 1.05,
-            fontWeight: FontWeight.w800,
-          ),
+          style: ProductDetailSellerCardStyles.textStyle,
         ),
         const SizedBox(height: 2),
         Text(
           product.sellerLocation,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: AgrisellColors.brandBlack,
-            fontSize: 12,
-            height: 1.05,
-            fontWeight: FontWeight.w500,
-          ),
+          style: ProductDetailSellerCardStyles.textStyle2,
         ),
       ],
     );

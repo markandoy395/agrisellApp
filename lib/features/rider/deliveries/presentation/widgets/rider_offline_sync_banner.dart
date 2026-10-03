@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_offline_sync_banner_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -29,11 +31,7 @@ class RiderOfflineSyncBanner extends StatelessWidget {
         width: double.infinity,
         margin: const EdgeInsets.fromLTRB(14, 8, 14, 0),
         padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
-        decoration: BoxDecoration(
-          color: AgrisellColors.surface,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AgrisellColors.borderLine),
-        ),
+        decoration: RiderOfflineSyncBannerStyles.containerDecoration,
         child: Row(
           children: [
             Icon(_iconFor(state), size: 18, color: AgrisellColors.authGreen),
@@ -41,24 +39,16 @@ class RiderOfflineSyncBanner extends StatelessWidget {
             Expanded(
               child: Text(
                 _description(state, pending),
-                style: const TextStyle(
-                  color: AgrisellColors.headingGreen,
-                  fontSize: 12,
-                  height: 1.25,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: RiderOfflineSyncBannerStyles.textStyle,
               ),
             ),
             if (action != null)
               TextButton(
                 onPressed: () => action(),
-                style: TextButton.styleFrom(
-                  minimumSize: const Size(0, 38),
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                ),
+                style: RiderOfflineSyncBannerStyles.textButtonStyle,
                 child: Text(
                   state == RiderOfflineSyncState.failed ? 'Retry' : 'Sync',
-                  style: const TextStyle(fontSize: 12),
+                  style: SharedPresentationStyles.caption,
                 ),
               ),
           ],

@@ -41,15 +41,9 @@ class _DeliveryRouteTracker extends StatelessWidget {
             status == PlacedOrderStatus.delivered);
 
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AgrisellColors.forestSoft,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: AgrisellColors.authGreen.withValues(alpha: 0.15),
-        ),
-      ),
+      decoration: DeliveryRouteTrackerStyles.containerDecoration,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+        padding: const EdgeInsets.all(10),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -69,7 +63,9 @@ class _DeliveryRouteTracker extends StatelessWidget {
                         left: lineLeft,
                         top: 16,
                         width: lineWidth,
-                        child: const _RouteLine(color: AgrisellColors.deliveryGray),
+                        child: const _RouteLine(
+                          color: AgrisellColors.deliveryGray,
+                        ),
                       ),
                       Positioned(
                         left: lineLeft,
@@ -97,161 +93,9 @@ class _DeliveryRouteTracker extends StatelessWidget {
             ),
 
             // Live GPS & ETA Window Bar
-            if (isTrackingAvailable && order != null) ...[
-              const SizedBox(height: 10),
-              const Divider(height: 1, color: AgrisellColors.borderLine),
-              const SizedBox(height: 8),
-              InkWell(
-                onTap: () => showDeliveryTrackingSheet(context, order: order!),
-                borderRadius: BorderRadius.circular(10),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: AgrisellColors.authGreen.withValues(alpha: 0.12),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.location_on_rounded,
-                          size: 16,
-                          color: AgrisellColors.authGreen,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              status == PlacedOrderStatus.shipping
-                                  ? 'Rider en route • Live GPS active'
-                                  : (status == PlacedOrderStatus.readyForPickup
-                                      ? 'Awaiting pickup • Live Map available'
-                                      : 'Delivered • View route summary'),
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: AgrisellColors.brandBlack,
-                              ),
-                            ),
-                            const SizedBox(height: 1),
-                            Text(
-                              status == PlacedOrderStatus.shipping
-                                  ? 'ETA: ~15 mins (2.4 km) • ~28 km/h'
-                                  : 'Tap to inspect live map & checkpoints',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: AgrisellColors.mutedText,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: AgrisellColors.authGreen,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.map_rounded, size: 13, color: Colors.white),
-                            SizedBox(width: 4),
-                            Text(
-                              'Live Map',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+            if (isTrackingAvailable && order != null)
+              _DeliveryRouteGpsBar(status: status, order: order!),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _RouteStep {
-  const _RouteStep({required this.label, required this.icon});
-
-  final String label;
-  final IconData icon;
-}
-
-class _RouteLine extends StatelessWidget {
-  const _RouteLine({required this.color});
-
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: const SizedBox(height: 6),
-    );
-  }
-}
-
-class _RouteStop extends StatelessWidget {
-  const _RouteStop({
-    required this.step,
-    required this.isActive,
-    required this.color,
-  });
-
-  final _RouteStep step;
-  final bool isActive;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final foreground = isActive
-        ? AgrisellColors.surface
-        : AgrisellColors.mutedText;
-    final background = isActive ? color : AgrisellColors.surface;
-
-    return Tooltip(
-      message: step.label,
-      excludeFromSemantics: true,
-      child: Semantics(
-        label: '${step.label}${isActive ? ', reached' : ', upcoming'}',
-        excludeSemantics: true,
-        child: Container(
-          width: 38,
-          height: 38,
-          decoration: BoxDecoration(
-            color: background,
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: isActive ? color : AgrisellColors.deliveryGray,
-              width: 2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AgrisellColors.brandBlack.withValues(alpha: 0.07),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Icon(step.icon, color: foreground, size: 19),
         ),
       ),
     );

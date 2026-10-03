@@ -1,6 +1,5 @@
+import 'package:agresell_app/core/widgets/image_loading_skeleton_styles.dart';
 import 'package:flutter/material.dart';
-
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 class ImageLoadingSkeleton extends StatefulWidget {
   const ImageLoadingSkeleton({super.key});
@@ -35,17 +34,7 @@ class _ImageLoadingSkeletonState extends State<ImageLoadingSkeleton>
       builder: (context, child) {
         final offset = _controller.value * 4 - 2;
         return DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment(offset, 0),
-              end: Alignment(offset + 1, 0),
-              colors: const [
-                AgrisellColors.searchBackground,
-                AgrisellColors.borderLine,
-                AgrisellColors.searchBackground,
-              ],
-            ),
-          ),
+          decoration: ImageLoadingSkeletonStyles.decoratedBoxDecoration(offset),
         );
       },
     );

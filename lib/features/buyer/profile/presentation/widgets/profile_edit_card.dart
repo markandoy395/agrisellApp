@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/buyer/profile/presentation/styles/profile_edit_card_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/models/user_profile.dart';
@@ -106,23 +107,14 @@ class _ProfileEditCardState extends State<ProfileEditCard> {
               children: [
                 const Text(
                   'Personal information',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    color: BuyerProfileStyle.ink,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: ProfileEditCardStyles.personalInformationText,
                 ),
                 const SizedBox(height: 3),
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Update your account details.',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      color: BuyerProfileStyle.muted,
-                      fontSize: 15,
-                    ),
+                    style: ProfileEditCardStyles.updateYourAccountDetailsText,
                   ),
                 ),
                 const SizedBox(height: 16),

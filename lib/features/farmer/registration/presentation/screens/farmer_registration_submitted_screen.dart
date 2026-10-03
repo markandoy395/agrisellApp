@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/farmer/registration/presentation/styles/farmer_registration_submitted_screen_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -31,26 +33,18 @@ class FarmerRegistrationSubmittedScreen extends StatelessWidget {
                 const Text(
                   'Farmer registration submitted',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: AgrisellColors.headingGreen,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: SharedPresentationStyles.headingTitleExtraBold,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Reference: $reference',
-                  style: const TextStyle(fontSize: 12),
+                  style: SharedPresentationStyles.caption,
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   'Your farm and identity details were submitted. Please wait for admin confirmation before selling products.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AgrisellColors.mutedText,
-                    height: 1.35,
-                  ),
+                  style: FarmerRegistrationSubmittedScreenStyles.textStyle,
                 ),
                 const SizedBox(height: 22),
                 SizedBox(

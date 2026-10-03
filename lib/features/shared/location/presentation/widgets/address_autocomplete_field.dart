@@ -1,7 +1,7 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/shared/location/presentation/styles/address_autocomplete_field_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
-import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/shared/location/data/psgc_address_service.dart';
 
 class AddressAutocompleteField extends StatefulWidget {
@@ -83,27 +83,15 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
               ? null
               : Text(
                   '${widget.label} (select or type)',
-                  style: const TextStyle(fontSize: 12),
+                  style: SharedPresentationStyles.caption,
                 ),
-          textStyle: TextStyle(
-            fontSize: widget.externalLabel != null ? 14 : 12,
+          textStyle: AddressAutocompleteFieldStyles.textStyle(
+            widget.externalLabel,
           ),
           inputDecorationTheme:
               widget.decorationTheme ??
-              InputDecorationTheme(
-                isDense: true,
-                filled: true,
-                fillColor: AgrisellColors.fieldFill,
-                floatingLabelStyle: AgrisellTheme.floatingInputLabelStyle,
-                constraints: const BoxConstraints.tightFor(height: 56),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-          menuStyle: const MenuStyle(
-            backgroundColor: WidgetStatePropertyAll(AgrisellColors.surface),
-          ),
+              AddressAutocompleteFieldStyles.inputTheme,
+          menuStyle: SharedPresentationStyles.dropdownMenu,
           dropdownMenuEntries: widget.options
               .map(
                 (option) => DropdownMenuEntry<PsgcAddressOption>(
@@ -113,7 +101,7 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
                     option.province.isEmpty
                         ? option.name
                         : '${option.name} — ${option.province}',
-                    style: const TextStyle(fontSize: 12),
+                    style: SharedPresentationStyles.caption,
                   ),
                 ),
               )

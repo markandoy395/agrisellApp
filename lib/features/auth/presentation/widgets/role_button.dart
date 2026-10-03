@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/auth/presentation/styles/role_button_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -25,26 +27,13 @@ class RoleButton extends StatelessWidget {
       height: 72,
       child: FilledButton(
         onPressed: isLoading ? null : onPressed,
-        style: FilledButton.styleFrom(
-          backgroundColor: AgrisellColors.authBackground,
-          disabledBackgroundColor: AgrisellColors.authBackground,
-          foregroundColor: AgrisellColors.authGreen,
-          disabledForegroundColor: AgrisellColors.authGreen,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          side: const BorderSide(color: AgrisellColors.forestSoft, width: 1.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-        ),
+        style: RoleButtonStyles.filledButtonStyle,
         child: Row(
           children: [
             Container(
               width: 52,
               height: 52,
-              decoration: const BoxDecoration(
-                color: AgrisellColors.limeSoft,
-                shape: BoxShape.circle,
-              ),
+              decoration: RoleButtonStyles.containerDecoration,
               child: Icon(icon, size: 29, color: AgrisellColors.authGreen),
             ),
             const SizedBox(width: 14),
@@ -53,22 +42,12 @@ class RoleButton extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      color: AgrisellColors.authGreen,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+                  Text(label, style: RoleButtonStyles.labelText),
                   Text(
                     description,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AgrisellColors.mutedText,
-                      fontSize: 13,
-                    ),
+                    style: RoleButtonStyles.descriptionText,
                   ),
                 ],
               ),
@@ -76,10 +55,7 @@ class RoleButton extends StatelessWidget {
             Container(
               width: 42,
               height: 42,
-              decoration: const BoxDecoration(
-                color: AgrisellColors.forestSoft,
-                shape: BoxShape.circle,
-              ),
+              decoration: SharedPresentationStyles.forestCircle,
               child: isLoading
                   ? const Padding(
                       padding: EdgeInsets.all(12),

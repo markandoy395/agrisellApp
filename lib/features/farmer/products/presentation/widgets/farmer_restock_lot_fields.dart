@@ -1,6 +1,7 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/farmer/products/presentation/styles/farmer_restock_lot_fields_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/products/domain/product_inventory_lot.dart';
 
 class FarmerRestockLotFields extends StatelessWidget {
@@ -50,11 +51,7 @@ class FarmerRestockLotFields extends StatelessWidget {
         const SizedBox(height: 6),
         Text(
           dateType.guidance,
-          style: const TextStyle(
-            color: AgrisellColors.mutedText,
-            fontSize: 12,
-            height: 1.25,
-          ),
+          style: SharedPresentationStyles.mutedCaptionCompact,
         ),
         if (dateType != ProductInventoryDateType.nonPerishable) ...[
           const SizedBox(height: 12),
@@ -114,14 +111,8 @@ class _FieldLabel extends StatelessWidget {
   final String text;
 
   @override
-  Widget build(BuildContext context) => Text(
-    text,
-    style: const TextStyle(
-      color: AgrisellColors.headingGreen,
-      fontSize: 12,
-      fontWeight: FontWeight.w700,
-    ),
-  );
+  Widget build(BuildContext context) =>
+      Text(text, style: SharedPresentationStyles.headingCaptionBold);
 }
 
 class _DateButton extends StatelessWidget {
@@ -153,39 +144,18 @@ class _DateButton extends StatelessWidget {
           onPressed: onPressed,
           icon: const Icon(Icons.calendar_month_outlined, size: 18),
           label: Text(value == null ? 'Select date' : _displayDate(value!)),
-          style: OutlinedButton.styleFrom(
-            alignment: Alignment.centerLeft,
-            foregroundColor: AgrisellColors.authGreen,
-            side: BorderSide(
-              color: errorText == null
-                  ? AgrisellColors.borderLine
-                  : AgrisellColors.statusRedText,
-            ),
-          ),
+          style: FarmerRestockLotFieldsStyles.outlinedButtonStyle(errorText),
         ),
       ),
       if (errorText != null) ...[
         const SizedBox(height: 5),
-        Text(
-          errorText!,
-          style: const TextStyle(
-            color: AgrisellColors.statusRedText,
-            fontSize: 12,
-          ),
-        ),
+        Text(errorText!, style: SharedPresentationStyles.errorCaption),
       ],
     ],
   );
 }
 
 InputDecoration _decoration({String? hintText, String? errorText}) =>
-    InputDecoration(
-      isDense: true,
-      filled: true,
-      fillColor: AgrisellColors.searchBackground,
-      hintText: hintText,
-      errorText: errorText,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-    );
+    FarmerRestockLotFieldsStyles.inputDecoration(hintText, errorText);
 
 String _displayDate(DateTime date) => '${date.month}/${date.day}/${date.year}';

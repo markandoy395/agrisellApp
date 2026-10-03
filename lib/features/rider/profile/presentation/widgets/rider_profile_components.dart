@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/profile/presentation/styles/rider_profile_components_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_rating_models.dart';
@@ -43,23 +45,9 @@ class _Metric extends StatelessWidget {
   Widget build(BuildContext context) => Expanded(
     child: Column(
       children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: AgrisellColors.authGreen,
-            fontSize: 15,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
+        Text(value, style: SharedPresentationStyles.greenTitleExtraBold),
         const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(
-            color: AgrisellColors.mutedText,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        Text(label, style: SharedPresentationStyles.mutedCaptionSemibold),
       ],
     ),
   );
@@ -80,14 +68,7 @@ class RiderProfileInformationCard extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            color: AgrisellColors.headingGreen,
-            fontSize: 14,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
+        Text(title, style: SharedPresentationStyles.headingSubtitleExtraBold),
         const SizedBox(height: 10),
         for (final row in rows) row,
       ],
@@ -110,14 +91,7 @@ class RiderProfileInfoRow extends StatelessWidget {
         Icon(icon, color: AgrisellColors.mutedText, size: 17),
         const SizedBox(width: 8),
         Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontSize: 12,
-              height: 1.25,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          child: Text(value, style: RiderProfileComponentsStyles.valueText),
         ),
       ],
     ),
@@ -142,10 +116,7 @@ class RiderProfileAction extends StatelessWidget {
   Widget build(BuildContext context) => ListTile(
     contentPadding: EdgeInsets.zero,
     leading: Icon(icon, color: color, size: 20),
-    title: Text(
-      label,
-      style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w700),
-    ),
+    title: Text(label, style: RiderProfileComponentsStyles.labelText(color)),
     trailing: Icon(Icons.chevron_right_rounded, color: color),
     onTap: onTap,
   );

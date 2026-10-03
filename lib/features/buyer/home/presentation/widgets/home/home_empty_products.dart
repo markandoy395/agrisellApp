@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/buyer/home/presentation/styles/home_empty_products_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -26,10 +28,7 @@ class HomeEmptyProducts extends StatelessWidget {
           Container(
             width: 58,
             height: 58,
-            decoration: const BoxDecoration(
-              color: AgrisellColors.forestSoft,
-              shape: BoxShape.circle,
-            ),
+            decoration: SharedPresentationStyles.forestCircle,
             child: const Icon(
               Icons.search_off_rounded,
               color: AgrisellColors.authGreen,
@@ -37,42 +36,22 @@ class HomeEmptyProducts extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Text(
-            title,
-            style: TextStyle(
-              color: AgrisellColors.headingGreen,
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
+          Text(title, style: HomeEmptyProductsStyles.titleText),
           const SizedBox(height: 5),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AgrisellColors.mutedText,
-              fontSize: 12,
-              height: 1.35,
-            ),
+            style: HomeEmptyProductsStyles.messageText,
           ),
           const SizedBox(height: 14),
           SizedBox(
             height: 36,
             child: OutlinedButton(
               onPressed: onReset,
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AgrisellColors.authGreen,
-                side: const BorderSide(color: AgrisellColors.authGreen),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
+              style: HomeEmptyProductsStyles.outlinedButtonStyle,
               child: Text(
                 actionLabel,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: SharedPresentationStyles.captionBold,
               ),
             ),
           ),

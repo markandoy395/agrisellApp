@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/buyer/profile/presentation/styles/order_status_item_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/features/buyer/profile/presentation/widgets/buyer_profile_style.dart';
@@ -48,18 +49,7 @@ class OrderStatusItem extends StatelessWidget {
                     Container(
                       width: compact ? 44 : 50,
                       height: compact ? 42 : 48,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFE8F5EE), Color(0xFFD1EDDF)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(13),
-                        border: Border.all(
-                          color: BuyerProfileStyle.borderSubtle,
-                          width: 1,
-                        ),
-                      ),
+                      decoration: OrderStatusItemStyles.containerDecoration,
                       child: Icon(
                         icon,
                         color: BuyerProfileStyle.green,
@@ -81,12 +71,7 @@ class OrderStatusItem extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    color: BuyerProfileStyle.ink,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: OrderStatusItemStyles.labelText,
                 ),
               ],
             ),

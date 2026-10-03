@@ -1,6 +1,6 @@
+import 'package:agresell_app/features/rider/chat/presentation/styles/rider_chat_messages_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/chat/domain/rider_communication_models.dart';
 import 'package:agresell_app/features/rider/chat/presentation/controllers/rider_messages_controller.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_state_cards.dart';
@@ -66,14 +66,8 @@ class RiderMessageBubble extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 270),
         child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: sentByRider
-                ? AgrisellColors.authGreen
-                : AgrisellColors.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: sentByRider
-                ? null
-                : Border.all(color: AgrisellColors.borderLine),
+          decoration: RiderChatMessagesStyles.decoratedBoxDecoration(
+            sentByRider,
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -82,23 +76,12 @@ class RiderMessageBubble extends StatelessWidget {
               children: [
                 Text(
                   riderMessageText(message),
-                  style: TextStyle(
-                    color: sentByRider
-                        ? AgrisellColors.surface
-                        : AgrisellColors.headingGreen,
-                    fontSize: 12,
-                    height: 1.25,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: RiderChatMessagesStyles.textStyle(sentByRider),
                 ),
                 if (sentByRider)
                   Text(
                     _statusLabel(message),
-                    style: const TextStyle(
-                      color: AgrisellColors.surface,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: RiderChatMessagesStyles.textStyle2,
                   ),
                 if (onRetry != null)
                   TextButton(

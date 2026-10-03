@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
-import 'package:agresell_app/features/rider/profile/domain/rider_address.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
+import 'package:agresell_app/features/rider/profile/presentation/styles/rider_profile_edit_styles.dart';
+import 'package:agresell_app/features/rider/profile/presentation/utils/rider_profile_location_coordinator.dart';
+import 'package:agresell_app/features/rider/profile/presentation/utils/rider_profile_save_coordinator.dart';
+import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_profile_edit_actions.dart';
+import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_profile_edit_form_fields.dart';
+import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_profile_edit_header.dart';
 import 'package:agresell_app/features/shared/location/data/gps_location_gateway.dart';
-import 'package:agresell_app/features/shared/location/presentation/widgets/psgc_address_fields.dart';
-import 'package:agresell_app/features/shared/widgets/profile/phone_number_sync_control.dart';
 
 Future<RiderProfile?> showRiderProfileEditDialog(
   BuildContext context,
@@ -86,150 +87,55 @@ class _RiderProfileEditSheetState extends State<_RiderProfileEditSheet> {
   Widget build(BuildContext context) => SizedBox(
     height: MediaQuery.sizeOf(context).height * .92,
     child: Padding(
-      padding: EdgeInsets.fromLTRB(
-        16,
-        12,
-        16,
-        16 + MediaQuery.viewInsetsOf(context).bottom,
-      ),
+      padding: RiderProfileEditStyles.sheetPadding(context),
       child: Column(
         children: [
-          Container(
-            width: 36,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AgrisellColors.borderLine,
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          const SizedBox(height: 12),
-          const Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Edit rider profile',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Use your official Philippine address. We will capture your exact GPS location when you save.',
-              style: TextStyle(fontSize: 12, color: AgrisellColors.mutedText),
-            ),
-          ),
-          const SizedBox(height: 12),
+          const RiderProfileEditHeader(),
+          RiderProfileEditStyles.spacingLarge,
           Expanded(
             child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _field('First name', _firstName, TextInputType.name),
-                  _field('Last name', _lastName, TextInputType.name),
-                  _field('Contact number', _contact, TextInputType.phone),
-                  PhoneNumberSyncControl(controller: _contact),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Official address',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
-                  ),
-                  _field(
-                    'House, building, street, or sitio',
-                    _street,
-                    TextInputType.streetAddress,
-                  ),
-                  PsgcAddressFields(
-                    provinceController: _province,
-                    cityController: _city,
-                    barangayController: _barangay,
-                    onChanged: () => setState(() {}),
-                  ),
-                  _field(
-                    'Postal code (optional)',
-                    _postal,
-                    TextInputType.number,
-                  ),
-                  if (widget.profile.vehicleType.requiresLicense)
-                    _field('License number', _license, TextInputType.text),
-                  if (widget.profile.vehicleType.requiresPlate)
-                    _field('Vehicle plate number', _plate, TextInputType.text),
-                  if (_error != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Text(
-                        _error!,
-                        style: const TextStyle(
-                          color: AgrisellColors.statusRedText,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                ],
+              child: RiderProfileEditFormFields(
+                profile: widget.profile,
+                firstNameController: _firstName,
+                lastNameController: _lastName,
+                contactController: _contact,
+                streetController: _street,
+                provinceController: _province,
+                cityController: _city,
+                barangayController: _barangay,
+                postalController: _postal,
+                licenseController: _license,
+                plateController: _plate,
+                error: _error,
+                onPsgcChanged: () => setState(() {}),
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(38),
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: FilledButton(
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size.fromHeight(38),
-                  ),
-                  onPressed: _isSaving ? null : _save,
-                  child: _isSaving
-                      ? const SizedBox.square(
-                          dimension: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('Save changes'),
-                ),
-              ),
-            ],
+          RiderProfileEditStyles.spacingLarge,
+          RiderProfileEditActions(
+            isSaving: _isSaving,
+            onCancel: () => Navigator.pop(context),
+            onSave: _save,
           ),
         ],
       ),
     ),
   );
 
-  Widget _field(
-    String label,
-    TextEditingController controller,
-    TextInputType type,
-  ) => Padding(
-    padding: const EdgeInsets.only(bottom: 8),
-    child: TextField(
-      controller: controller,
-      keyboardType: type,
-      decoration: InputDecoration(labelText: label),
-    ),
-  );
-
   Future<void> _save() async {
-    final completeAddress = RiderAddress.isComplete(
-      addressLine: _street.text,
-      barangay: _barangay.text,
-      cityMunicipality: _city.text,
+    final isValid = RiderProfileSaveCoordinator.validate(
+      profile: widget.profile,
+      firstName: _firstName.text,
+      lastName: _lastName.text,
+      contact: _contact.text,
+      license: _license.text,
+      plate: _plate.text,
+      street: _street.text,
       province: _province.text,
+      city: _city.text,
+      barangay: _barangay.text,
     );
-    final required = [
-      _firstName,
-      _lastName,
-      _contact,
-      if (widget.profile.vehicleType.requiresLicense) _license,
-      if (widget.profile.vehicleType.requiresPlate) _plate,
-    ];
-    if (required.any((item) => item.text.trim().isEmpty) || !completeAddress) {
+    if (!isValid) {
       setState(
         () => _error = 'Complete the rider details and official address.',
       );
@@ -240,33 +146,29 @@ class _RiderProfileEditSheetState extends State<_RiderProfileEditSheet> {
       _error = null;
     });
     try {
-      await _captureCurrentLocation();
+      final position =
+          await RiderProfileLocationCoordinator.captureCurrentLocation(
+            _gpsGateway,
+          );
+      _latitude = position.latitude;
+      _longitude = position.longitude;
       if (!mounted) return;
       Navigator.pop(
         context,
-        widget.profile.copyWith(
-          fullName: '${_firstName.text.trim()} ${_lastName.text.trim()}',
-          contactNumber: _contact.text.trim(),
-          licenseNumber: widget.profile.vehicleType.requiresLicense
-              ? _license.text.trim().toUpperCase()
-              : widget.profile.licenseNumber,
-          vehiclePlateNumber: widget.profile.vehicleType.requiresPlate
-              ? _plate.text.trim().toUpperCase()
-              : widget.profile.vehiclePlateNumber,
-          addressLine: _street.text.trim(),
-          barangay: _barangay.text.trim(),
-          cityMunicipality: _city.text.trim(),
-          province: _province.text.trim(),
-          postalCode: _postal.text.trim(),
-          address: RiderAddress.format(
-            addressLine: _street.text,
-            barangay: _barangay.text,
-            cityMunicipality: _city.text,
-            province: _province.text,
-            postalCode: _postal.text,
-          ),
-          gpsLatitude: _latitude,
-          gpsLongitude: _longitude,
+        RiderProfileSaveCoordinator.buildUpdatedProfile(
+          original: widget.profile,
+          firstName: _firstName.text,
+          lastName: _lastName.text,
+          contact: _contact.text,
+          license: _license.text,
+          plate: _plate.text,
+          street: _street.text,
+          province: _province.text,
+          city: _city.text,
+          barangay: _barangay.text,
+          postal: _postal.text,
+          latitude: _latitude,
+          longitude: _longitude,
         ),
       );
     } catch (error) {
@@ -278,40 +180,5 @@ class _RiderProfileEditSheetState extends State<_RiderProfileEditSheet> {
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
-  }
-
-  Future<void> _captureCurrentLocation() async {
-    if (!await _gpsGateway.isServiceEnabled()) {
-      await _gpsGateway.openLocationSettings();
-      throw Exception('Turn on location services, then try saving again.');
-    }
-    var permission = await _gpsGateway.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await _gpsGateway.requestPermission();
-    }
-    if (permission == LocationPermission.denied) {
-      throw Exception(
-        'Allow location access so we can capture your exact location.',
-      );
-    }
-    if (permission == LocationPermission.deniedForever) {
-      await _gpsGateway.openAppSettings();
-      throw Exception(
-        'Allow location permission in app settings, then try saving again.',
-      );
-    }
-    if (await _gpsGateway.getAccuracyStatus() ==
-        LocationAccuracyStatus.reduced) {
-      await _gpsGateway.openAppSettings();
-      throw Exception('Enable precise location, then try saving again.');
-    }
-    final position = await _gpsGateway.currentPosition(
-      settings: const LocationSettings(
-        accuracy: LocationAccuracy.bestForNavigation,
-        timeLimit: Duration(seconds: 15),
-      ),
-    );
-    _latitude = position.latitude;
-    _longitude = position.longitude;
   }
 }

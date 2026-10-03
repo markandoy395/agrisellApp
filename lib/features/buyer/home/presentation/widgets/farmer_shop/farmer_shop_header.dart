@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/buyer/home/presentation/styles/farmer_shop_header_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -43,9 +44,7 @@ class FarmerShopHeader extends StatelessWidget {
             filterQuality: FilterQuality.medium,
           ),
           DecoratedBox(
-            decoration: BoxDecoration(
-              color: AgrisellColors.brandBlack.withValues(alpha: 0.22),
-            ),
+            decoration: FarmerShopHeaderStyles.decoratedBoxDecoration,
           ),
           SafeArea(
             bottom: false,
@@ -103,12 +102,7 @@ class FarmerShopHeader extends StatelessWidget {
                       child: Container(
                         width: 38,
                         height: 38,
-                        decoration: BoxDecoration(
-                          color: AgrisellColors.brandBlack.withValues(
-                            alpha: 0.42,
-                          ),
-                          shape: BoxShape.circle,
-                        ),
+                        decoration: FarmerShopHeaderStyles.containerDecoration,
                         child: const Icon(
                           Icons.more_vert_rounded,
                           color: AgrisellColors.surface,
@@ -138,40 +132,14 @@ class _ShopSearchField extends StatelessWidget {
     return SizedBox(
       height: 38,
       child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AgrisellColors.brandBlack.withValues(alpha: 0.42),
-          borderRadius: BorderRadius.circular(22),
-        ),
+        decoration: FarmerShopHeaderStyles.decoratedBoxDecoration2,
         child: TextField(
           controller: controller,
           onChanged: onChanged,
           textInputAction: TextInputAction.search,
-          style: const TextStyle(
-            color: AgrisellColors.surface,
-            fontSize: 12,
-            height: 1.1,
-          ),
+          style: FarmerShopHeaderStyles.textStyle,
           cursorColor: AgrisellColors.surface,
-          decoration: InputDecoration(
-            hintText: 'Search in shop',
-            hintStyle: TextStyle(
-              color: AgrisellColors.surface.withValues(alpha: 0.72),
-              fontSize: 12,
-              height: 1.1,
-            ),
-            border: InputBorder.none,
-            isDense: true,
-            contentPadding: const EdgeInsets.fromLTRB(14, 10, 6, 8),
-            suffixIconConstraints: const BoxConstraints.tightFor(
-              width: 38,
-              height: 38,
-            ),
-            suffixIcon: Icon(
-              Icons.search_rounded,
-              color: AgrisellColors.surface.withValues(alpha: 0.9),
-              size: 19,
-            ),
-          ),
+          decoration: FarmerShopHeaderStyles.inputDecoration,
         ),
       ),
     );

@@ -1,6 +1,7 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_acceptance_dialog_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_acceptance.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
 
@@ -38,7 +39,7 @@ class _RiderAcceptanceDialogState extends State<_RiderAcceptanceDialog> {
     child: AlertDialog(
       title: const Text(
         'Accept this delivery?',
-        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+        style: SharedPresentationStyles.titleExtraBold,
       ),
       content: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 420),
@@ -62,7 +63,7 @@ class _RiderAcceptanceDialogState extends State<_RiderAcceptanceDialog> {
               const Text(
                 'The server will recheck your eligibility and reserve the '
                 'delivery before confirming.',
-                style: TextStyle(fontSize: 12, height: 1.35),
+                style: RiderAcceptanceDialogStyles.textStyle,
               ),
               if (_processing) ...[
                 const SizedBox(height: 14),
@@ -80,10 +81,7 @@ class _RiderAcceptanceDialogState extends State<_RiderAcceptanceDialog> {
                       Expanded(
                         child: Text(
                           'Securing this delivery...',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                          ),
+                          style: SharedPresentationStyles.captionBold,
                         ),
                       ),
                     ],
@@ -96,12 +94,7 @@ class _RiderAcceptanceDialogState extends State<_RiderAcceptanceDialog> {
                   liveRegion: true,
                   child: Text(
                     _failure!.message ?? 'The delivery could not be accepted.',
-                    style: const TextStyle(
-                      color: AgrisellColors.statusRedText,
-                      fontSize: 12,
-                      height: 1.35,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: RiderAcceptanceDialogStyles.textStyle2,
                   ),
                 ),
               ],
@@ -158,25 +151,9 @@ class _SummaryLine extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: AgrisellColors.mutedText,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        Text(label, style: SharedPresentationStyles.mutedCaptionSemibold),
         const SizedBox(height: 2),
-        Text(
-          value,
-          style: TextStyle(
-            color: emphasized
-                ? AgrisellColors.authGreen
-                : AgrisellColors.headingGreen,
-            fontSize: emphasized ? 14 : 13,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
+        Text(value, style: RiderAcceptanceDialogStyles.valueText(emphasized)),
       ],
     ),
   );

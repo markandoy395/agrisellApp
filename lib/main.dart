@@ -1,3 +1,4 @@
+import 'package:agresell_app/main_styles.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -16,7 +17,9 @@ import 'package:agresell_app/core/widgets/app_font_size_scope.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/auth/presentation/auth_dashboard_router.dart';
 import 'package:agresell_app/features/auth/presentation/auth_role_gate.dart';
+import 'package:agresell_app/features/auth/presentation/auth_navigation_scope.dart';
 import 'package:agresell_app/features/auth/presentation/screens/splash_screen.dart';
+import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:agresell_app/features/buyer/home/domain/farmer_profile.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/screens/basket_screen.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/screens/checkout_screen.dart';
@@ -62,18 +65,23 @@ class AgrisellApp extends StatelessWidget {
   const AgrisellApp({this.supabaseInitialization, super.key});
 
   final Future<bool>? supabaseInitialization;
+  static final _navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: _navigatorKey,
       title: 'AgriSell App',
       debugShowCheckedModeBanner: false,
       theme: AgrisellTheme.light,
       builder: (context, child) {
-        return AppFontSizeScope(
-          child: DefaultTextStyle.merge(
-            style: const TextStyle(fontFamily: AgrisellTheme.fontFamily),
-            child: SystemUiScope(child: child ?? const SizedBox.shrink()),
+        return AuthNavigationScope(
+          navigatorKey: _navigatorKey,
+          child: AppFontSizeScope(
+            child: DefaultTextStyle.merge(
+              style: MainStyles.textStyle,
+              child: SystemUiScope(child: child ?? const SizedBox.shrink()),
+            ),
           ),
         );
       },
@@ -100,6 +108,8 @@ class AgrisellApp extends StatelessWidget {
         ),
       },
       onGenerateRoute: _onGenerateRoute,
+      onUnknownRoute: (_) =>
+          agrisellPageRoute<void>(builder: (_) => const LoginScreen()),
       home: SplashScreen(supabaseInitialization: supabaseInitialization),
     );
   }

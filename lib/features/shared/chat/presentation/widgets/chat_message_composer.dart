@@ -1,26 +1,7 @@
+export 'package:agresell_app/features/shared/chat/presentation/styles/chat_message_composer_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/shared/chat/presentation/styles/chat_message_composer_styles.dart';
 import 'package:flutter/material.dart';
-
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
-
-class ChatMessageComposerStyle {
-  const ChatMessageComposerStyle({
-    required this.padding,
-    required this.decoration,
-    required this.hintText,
-    required this.inputDecoration,
-    this.minLines = 1,
-    this.maxLines = 1,
-    this.sendButtonSize,
-  });
-
-  final EdgeInsets padding;
-  final Decoration decoration;
-  final String hintText;
-  final InputDecoration inputDecoration;
-  final int minLines;
-  final int maxLines;
-  final Size? sendButtonSize;
-}
 
 class ChatMessageComposer extends StatelessWidget {
   const ChatMessageComposer({
@@ -51,11 +32,8 @@ class ChatMessageComposer extends StatelessWidget {
               maxLength: 1000,
               onSubmitted: (_) => onSend(),
               textInputAction: TextInputAction.send,
-              style: const TextStyle(fontSize: 13),
-              decoration: style.inputDecoration.copyWith(
-                hintText: style.hintText,
-                counterText: '',
-              ),
+              style: SharedPresentationStyles.body,
+              decoration: ChatMessageComposerStyles.textFieldStyle(style),
             ),
           ),
           const SizedBox(width: 8),
@@ -81,11 +59,7 @@ class _SendButton extends StatelessWidget {
       onPressed: onPressed,
       tooltip: 'Send message',
       icon: Icon(Icons.send_rounded, size: size == null ? 20 : 19),
-      style: IconButton.styleFrom(
-        backgroundColor: AgrisellColors.authGreen,
-        disabledBackgroundColor: AgrisellColors.mutedText,
-        foregroundColor: AgrisellColors.surface,
-      ),
+      style: ChatMessageComposerStyles.iconButtonStyle,
     );
     if (size == null) return button;
     return SizedBox(width: size!.width, height: size!.height, child: button);

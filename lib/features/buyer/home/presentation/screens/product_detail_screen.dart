@@ -1,14 +1,12 @@
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
 import 'package:agresell_app/core/constants/agrisell_routes.dart';
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
-import 'package:agresell_app/features/shared/products/data/home_product_repository.dart';
-import 'package:agresell_app/features/shared/products/domain/home_product.dart';
-import 'package:agresell_app/features/shared/products/presentation/controllers/home_product_catalog_controller.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_controller.dart';
+import 'package:agresell_app/features/buyer/home/presentation/styles/product_detail_styles.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/common/buyer_responsive_text.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_action_bar.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_bottom_bar.dart';
@@ -16,6 +14,11 @@ import 'package:agresell_app/features/buyer/home/presentation/widgets/product_de
 import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_recommendations_section.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_detail_reviews.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/product_detail/product_image_header.dart';
+import 'package:agresell_app/features/shared/products/data/home_product_repository.dart';
+import 'package:agresell_app/features/shared/products/domain/home_product.dart';
+import 'package:agresell_app/features/shared/products/presentation/controllers/home_product_catalog_controller.dart';
+
+part 'product_detail_screen_actions.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({
@@ -57,63 +60,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
   }
 
-  void _addToBasket() {
-    if (!widget.product.canOrder) {
-      _showUnavailableMessage();
-      return;
-    }
-    _basketController.addProduct(widget.product, quantity: _quantity.value);
-    _showAddedFeedback.value = true;
-
-    _addedFeedbackTimer?.cancel();
-    _addedFeedbackTimer = Timer(const Duration(milliseconds: 900), () {
-      if (mounted) {
-        _showAddedFeedback.value = false;
-      }
-    });
-  }
-
-  void _buyNow() {
-    if (!widget.product.canOrder) {
-      _showUnavailableMessage();
-      return;
-    }
-
-    _basketController.addProduct(widget.product, quantity: _quantity.value);
-    Navigator.of(context).pushNamed(AgrisellRoutes.checkout);
-  }
-
-  void _showUnavailableMessage() {
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.clearSnackBars();
-    messenger.showAppSnackBar(
-      SnackBar(
-        content: Text('${widget.product.name} is not accepting orders now.'),
-      ),
-    );
-  }
-
-  void _incrementQuantity() {
-    if (_quantity.value < 99) _quantity.value++;
-  }
-
-  void _decrementQuantity() {
-    if (_quantity.value > 1) _quantity.value--;
-  }
-
-  void _openProduct(HomeProduct product) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => ProductDetailScreen(
-          product: product,
-          catalogController: _catalogController,
-          isSaved: widget.isSaved,
-          onSavedToggle: widget.onSavedToggle,
-        ),
-      ),
-    );
-  }
-
   @override
   void dispose() {
     _addedFeedbackTimer?.cancel();
@@ -126,10 +72,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final imageHeight = (width * 0.62).clamp(210.0, 285.0);
+    final imageHeight = ProductDetailStyles.imageHeight(width);
+
     return BuyerResponsiveText(
       child: Scaffold(
-        backgroundColor: AgrisellColors.pageBackground,
+        backgroundColor: ProductDetailStyles.backgroundColor,
         bottomNavigationBar: ValueListenableBuilder<bool>(
           valueListenable: _showAddedFeedback,
           builder: (context, showAddedFeedback, _) {
@@ -167,7 +114,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
               ),
               SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: ProductDetailStyles.imagePadding,
                 sliver: SliverToBoxAdapter(
                   child: ProductImageHeader(
                     product: widget.product,
@@ -176,7 +123,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ),
               ),
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                padding: ProductDetailStyles.sectionPadding,
                 sliver: SliverToBoxAdapter(
                   child: ValueListenableBuilder<int>(
                     valueListenable: _quantity,
@@ -195,7 +142,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                  padding: ProductDetailStyles.sectionPadding,
                   child: ProductDetailReviews(product: widget.product),
                 ),
               ),
@@ -206,7 +153,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   onProductSelected: _openProduct,
                 ),
               ),
-              const SliverToBoxAdapter(child: SizedBox(height: 24)),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: ProductDetailStyles.bottomSpacerHeight),
+              ),
             ],
           ),
         ),

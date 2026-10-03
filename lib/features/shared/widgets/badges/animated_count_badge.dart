@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/shared/widgets/badges/animated_count_badge_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -32,28 +33,15 @@ class AnimatedCountBadge extends StatelessWidget {
       constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
       padding: const EdgeInsets.symmetric(horizontal: 4),
       alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(9),
-        border: Border.all(color: borderColor, width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.16),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
+      decoration: AnimatedCountBadgeStyles.containerDecoration(
+        backgroundColor,
+        borderColor,
       ),
       child: Text(
         label,
         maxLines: 1,
         textAlign: TextAlign.center,
-        style: TextStyle(
-          color: foregroundColor,
-          fontSize: 12,
-          height: 1,
-          fontWeight: FontWeight.w700,
-        ),
+        style: AnimatedCountBadgeStyles.labelText(foregroundColor),
       ),
     ),
   );

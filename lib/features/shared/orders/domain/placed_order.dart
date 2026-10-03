@@ -1,109 +1,11 @@
-import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_dispute.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_feedback.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_payment.dart';
+import 'package:agresell_app/features/shared/orders/domain/placed_order_item.dart';
+import 'package:agresell_app/features/shared/orders/domain/placed_order_status.dart';
 
-enum PlacedOrderStatus {
-  toPay,
-  toShip,
-  preparing,
-  readyForPickup,
-  shipping,
-  delivered,
-  cancelled,
-}
-
-extension PlacedOrderStatusLabel on PlacedOrderStatus {
-  String get label {
-    return switch (this) {
-      PlacedOrderStatus.toPay => 'To Pay',
-      PlacedOrderStatus.toShip => 'Awaiting farmer acceptance',
-      PlacedOrderStatus.preparing => 'Farmer is preparing your order',
-      PlacedOrderStatus.readyForPickup => 'Ready for rider pickup',
-      PlacedOrderStatus.shipping => 'Shipping',
-      PlacedOrderStatus.delivered => 'Completed',
-      PlacedOrderStatus.cancelled => 'Cancelled',
-    };
-  }
-
-  bool get canCancel {
-    return switch (this) {
-      PlacedOrderStatus.toPay || PlacedOrderStatus.toShip => true,
-      PlacedOrderStatus.preparing ||
-      PlacedOrderStatus.readyForPickup ||
-      PlacedOrderStatus.shipping ||
-      PlacedOrderStatus.delivered ||
-      PlacedOrderStatus.cancelled => false,
-    };
-  }
-
-  bool get canFarmerCancel {
-    return switch (this) {
-      PlacedOrderStatus.toPay ||
-      PlacedOrderStatus.toShip ||
-      PlacedOrderStatus.preparing ||
-      PlacedOrderStatus.readyForPickup => true,
-      PlacedOrderStatus.shipping ||
-      PlacedOrderStatus.delivered ||
-      PlacedOrderStatus.cancelled => false,
-    };
-  }
-
-  bool get canLeaveFeedback {
-    return this == PlacedOrderStatus.delivered;
-  }
-}
-
-class PlacedOrderItem {
-  const PlacedOrderItem({
-    required this.productId,
-    required this.productName,
-    required this.image,
-    required this.sellerName,
-    required this.pricePerKg,
-    required this.unit,
-    required this.quantity,
-    this.imageUrl,
-    this.feedback,
-  });
-
-  factory PlacedOrderItem.fromBasketItem(BasketCartItem item) {
-    return PlacedOrderItem(
-      productId: item.productId,
-      productName: item.productName,
-      image: item.image,
-      imageUrl: item.imageUrl,
-      sellerName: item.sellerName,
-      pricePerKg: item.pricePerKg,
-      unit: item.unit,
-      quantity: item.quantity,
-    );
-  }
-
-  final String productId;
-  final String productName;
-  final String image;
-  final String? imageUrl;
-  final String sellerName;
-  final double pricePerKg;
-  final String unit;
-  final int quantity;
-  final OrderFeedback? feedback;
-
-  double get total => pricePerKg * quantity;
-
-  PlacedOrderItem copyWith({OrderFeedback? feedback}) => PlacedOrderItem(
-    productId: productId,
-    productName: productName,
-    image: image,
-    imageUrl: imageUrl,
-    sellerName: sellerName,
-    pricePerKg: pricePerKg,
-    unit: unit,
-    quantity: quantity,
-    feedback: feedback ?? this.feedback,
-  );
-}
+export 'package:agresell_app/features/shared/orders/domain/placed_order_item.dart';
+export 'package:agresell_app/features/shared/orders/domain/placed_order_status.dart';
 
 class PlacedOrder {
   const PlacedOrder({

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/notification_date_label.dart';
 import 'package:agresell_app/features/rider/chat/domain/rider_notification.dart';
 import 'package:agresell_app/features/rider/chat/presentation/rider_notification_presentation.dart';
+import 'package:agresell_app/features/rider/chat/presentation/styles/rider_notification_card_styles.dart';
+import 'package:agresell_app/features/rider/chat/presentation/widgets/rider_notification_card_actions.dart';
 import 'package:agresell_app/features/rider/chat/presentation/widgets/rider_notification_style.dart';
 
 class RiderNotificationCard extends StatefulWidget {
@@ -53,53 +54,53 @@ class _RiderNotificationCardState extends State<RiderNotificationCard> {
   @override
   Widget build(BuildContext context) {
     final style = riderNotificationStyleFor(widget.notification.type);
+    final isRead = widget.notification.isRead;
     return Semantics(
       button: true,
       label:
-          '${widget.notification.title}, ${widget.notification.isRead ? 'read' : 'unread'}',
+          '${widget.notification.title}, ${isRead ? 'read' : 'unread'}',
       hint: 'Opens the related update',
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        decoration: BoxDecoration(
-          color: widget.notification.isRead
-              ? AgrisellColors.surface
-              : style.color.withValues(alpha: 0.07),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: widget.notification.isRead
-                ? AgrisellColors.borderLine
-                : style.color,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AgrisellColors.brandBlack.withValues(alpha: 0.055),
-              blurRadius: 12,
-              offset: const Offset(0, 5),
-            ),
-          ],
+        decoration: RiderNotificationCardStyles.cardDecoration(
+          isRead: isRead,
+          styleColor: style.color,
         ),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(
+              RiderNotificationCardStyles.borderRadiusValue,
+            ),
             onTap: widget.onTap,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 6, 12),
+              padding: RiderNotificationCardStyles.padding,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: style.color.withValues(alpha: 0.13),
-                      borderRadius: BorderRadius.circular(13),
+                    width: RiderNotificationCardStyles.iconContainerSize,
+                    height: RiderNotificationCardStyles.iconContainerSize,
+                    decoration: RiderNotificationCardStyles.iconDecoration(
+                      style.color,
                     ),
-                    child: Icon(style.icon, color: style.color, size: 21),
+                    child: Icon(
+                      style.icon,
+                      color: style.color,
+                      size: RiderNotificationCardStyles.iconSize,
+                    ),
                   ),
                   const SizedBox(width: 11),
                   Expanded(child: _content(style)),
-                  _actions(),
+                  RiderNotificationCardActions(
+                    notification: widget.notification,
+                    onToggleRead: widget.onToggleRead,
+                    onDelete: widget.onDelete,
+                    isExpandable: _isExpandable,
+                    isExpanded: _isExpanded,
+                    onToggleExpand: () =>
+                        setState(() => _isExpanded = !_isExpanded),
+                  ),
                 ],
               ),
             ),
@@ -119,23 +120,17 @@ class _RiderNotificationCardState extends State<RiderNotificationCard> {
               widget.notification.title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: AgrisellColors.headingGreen,
-                fontSize: 13,
-                height: 1.25,
-                fontWeight: widget.notification.isRead
-                    ? FontWeight.w700
-                    : FontWeight.w800,
+              style: RiderNotificationCardStyles.titleStyle(
+                widget.notification.isRead,
               ),
             ),
           ),
           if (!widget.notification.isRead)
             Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: style.color,
-                shape: BoxShape.circle,
+              width: RiderNotificationCardStyles.unreadDotSize,
+              height: RiderNotificationCardStyles.unreadDotSize,
+              decoration: RiderNotificationCardStyles.unreadDotDecoration(
+                style.color,
               ),
             ),
         ],
@@ -146,19 +141,11 @@ class _RiderNotificationCardState extends State<RiderNotificationCard> {
         children: [
           Text(
             widget.notification.type.label,
-            style: TextStyle(
-              color: style.color,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-            ),
+            style: RiderNotificationCardStyles.typeLabelStyle(style.color),
           ),
           Text(
             NotificationDateLabel.format(widget.notification.createdAt),
-            style: const TextStyle(
-              color: AgrisellColors.mutedText,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
+            style: RiderNotificationCardStyles.dateLabelStyle,
           ),
         ],
       ),
@@ -170,56 +157,9 @@ class _RiderNotificationCardState extends State<RiderNotificationCard> {
           _displayedMessage,
           maxLines: _isExpanded ? null : 2,
           overflow: _isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: AgrisellColors.brandBlack,
-            fontSize: 12,
-            height: 1.35,
-          ),
+          style: RiderNotificationCardStyles.messageStyle,
         ),
       ),
-    ],
-  );
-
-  Widget _actions() => Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      PopupMenuButton<_RiderNotificationAction>(
-        tooltip: 'Options for ${widget.notification.title}',
-        onSelected: (action) {
-          if (action == _RiderNotificationAction.toggleRead) widget.onToggleRead();
-          if (action == _RiderNotificationAction.delete) widget.onDelete?.call();
-        },
-        itemBuilder: (_) => [
-          PopupMenuItem(
-            value: _RiderNotificationAction.toggleRead,
-            child: Text(widget.notification.isRead ? 'Mark as unread' : 'Mark as read'),
-          ),
-          if (widget.onDelete != null)
-            const PopupMenuItem(
-              value: _RiderNotificationAction.delete,
-              child: Text('Delete'),
-            ),
-        ],
-        icon: const Icon(Icons.more_vert_rounded, size: 20),
-      ),
-      if (_isExpandable)
-        IconButton(
-          key: const Key('rider_notification_expand_button'),
-          tooltip: _isExpanded ? 'Collapse notification' : 'Expand notification',
-          onPressed: () => setState(() => _isExpanded = !_isExpanded),
-          visualDensity: VisualDensity.compact,
-          icon: AnimatedRotation(
-            turns: _isExpanded ? 0.5 : 0,
-            duration: const Duration(milliseconds: 180),
-            child: const Icon(
-              Icons.keyboard_arrow_down,
-              size: 24,
-              color: AgrisellColors.mutedText,
-            ),
-          ),
-        ),
     ],
   );
 }
-
-enum _RiderNotificationAction { toggleRead, delete }

@@ -22,32 +22,12 @@ class _FarmerAddProductButton extends StatelessWidget {
             height: 38,
             child: FilledButton(
               onPressed: isEnabled ? onPressed : null,
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(190, 38),
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                backgroundColor: AgrisellColors.authGreen,
-                foregroundColor: AgrisellColors.surface,
-                disabledBackgroundColor: AgrisellColors.brandBlack.withValues(
-                  alpha: 0.16,
-                ),
-                disabledForegroundColor: AgrisellColors.brandBlack.withValues(
-                  alpha: 0.56,
-                ),
-                elevation: 5,
-                shadowColor: AgrisellColors.brandBlack.withValues(alpha: 0.25),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(22),
-                ),
-              ),
+              style: FarmerAddProductButtonStyles.filledButtonStyle,
               child: const Text(
                 'Add new products',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 13,
-                  height: 1,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: FarmerAddProductButtonStyles.addNewProductsText,
               ),
             ),
           ),
@@ -57,7 +37,7 @@ class _FarmerAddProductButton extends StatelessWidget {
               child: Text(
                 'Product posting is available after verification.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                style: SharedPresentationStyles.captionMedium,
               ),
             ),
         ],

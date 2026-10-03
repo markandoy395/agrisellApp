@@ -1,6 +1,6 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_request_details.dart';
@@ -18,11 +18,7 @@ class RiderDeliveryRequestOverview extends StatelessWidget {
       children: [
         Text(
           request.productName,
-          style: const TextStyle(
-            color: AgrisellColors.headingGreen,
-            fontSize: 15,
-            fontWeight: FontWeight.w800,
-          ),
+          style: SharedPresentationStyles.headingTitleExtraBold,
         ),
         const SizedBox(height: 12),
         RiderRequestDetailLine(
@@ -71,11 +67,6 @@ class _Instruction extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Text(
     '$label: $value',
-    style: const TextStyle(
-      color: AgrisellColors.mutedText,
-      fontSize: 12,
-      height: 1.3,
-      fontWeight: FontWeight.w600,
-    ),
+    style: SharedPresentationStyles.mutedCaptionSemiboldLoose,
   );
 }

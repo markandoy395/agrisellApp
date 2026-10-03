@@ -1,8 +1,17 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
-enum FarmerQuickDestination { products, messages, reservations, discounts, payouts, reviews, account }
+enum FarmerQuickDestination {
+  products,
+  messages,
+  reservations,
+  discounts,
+  payouts,
+  reviews,
+  account,
+}
 
 Future<FarmerQuickDestination?> showFarmerQuickMenu(
   BuildContext context, {
@@ -23,11 +32,7 @@ Future<FarmerQuickDestination?> showFarmerQuickMenu(
               padding: EdgeInsets.fromLTRB(12, 0, 12, 6),
               child: Text(
                 'Quick access',
-                style: TextStyle(
-                  color: AgrisellColors.headingGreen,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: SharedPresentationStyles.headingTitleExtraBold,
               ),
             ),
             for (final destination in FarmerQuickDestination.values)
@@ -43,10 +48,7 @@ Future<FarmerQuickDestination?> showFarmerQuickMenu(
                 ),
                 title: Text(
                   destination.label,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: SharedPresentationStyles.bodyBold,
                 ),
                 onTap: () => Navigator.of(context).pop(destination),
               ),

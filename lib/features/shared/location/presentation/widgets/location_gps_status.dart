@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/shared/location/presentation/styles/location_gps_status_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -64,11 +66,7 @@ class LocationGpsStatus extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-      decoration: BoxDecoration(
-        color: AgrisellColors.forestSoft,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AgrisellColors.borderLine),
-      ),
+      decoration: LocationGpsStatusStyles.containerDecoration,
       child: Row(
         children: [
           Icon(icon, size: 19, color: AgrisellColors.authGreen),
@@ -77,20 +75,8 @@ class LocationGpsStatus extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                Text(
-                  message,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AgrisellColors.mutedText,
-                  ),
-                ),
+                Text(title, style: SharedPresentationStyles.captionBold),
+                Text(message, style: SharedPresentationStyles.mutedCaption),
               ],
             ),
           ),

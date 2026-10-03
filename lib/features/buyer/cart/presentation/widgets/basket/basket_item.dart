@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/buyer/cart/presentation/styles/basket_item_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/constants/agrisell_assets.dart';
@@ -46,23 +48,7 @@ class BasketItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 180),
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: item.isSelected
-              ? AgrisellColors.authGreen.withValues(alpha: 0.5)
-              : AgrisellColors.borderLine,
-          width: item.isSelected ? 1.4 : 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.05),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
+      decoration: BasketItemStyles.animatedContainerDecoration(item),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 12, 10, 12),
         child: Column(
@@ -152,11 +138,7 @@ class _SellerRow extends StatelessWidget {
                           item.sellerName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AgrisellColors.headingGreen,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                          ),
+                          style: SharedPresentationStyles.headingBodyExtraBold,
                         ),
                       ),
                       const Icon(

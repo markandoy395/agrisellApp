@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/presentation/styles/rider_state_cards_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -100,11 +102,7 @@ class _RiderStateCard extends StatelessWidget {
     return Semantics(
       liveRegion: isLoading,
       child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AgrisellColors.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AgrisellColors.borderLine),
-        ),
+        decoration: SharedPresentationStyles.borderedSurface,
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -115,22 +113,13 @@ class _RiderStateCard extends StatelessWidget {
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: AgrisellColors.headingGreen,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: RiderStateCardsStyles.titleText,
               ),
               const SizedBox(height: 6),
               Text(
                 message,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 12,
-                  height: 1.35,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: SharedPresentationStyles.mutedCaptionMediumLoose,
               ),
               if (hasAction) ...[
                 const SizedBox(height: 14),
@@ -138,14 +127,7 @@ class _RiderStateCard extends StatelessWidget {
                   onPressed: onAction,
                   icon: const Icon(Icons.refresh_rounded, size: 17),
                   label: Text(actionLabel!),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: accentColor,
-                    side: BorderSide(color: accentColor),
-                    textStyle: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+                  style: RiderStateCardsStyles.outlinedButtonStyle(accentColor),
                 ),
               ],
             ],
@@ -173,10 +155,7 @@ class _StateIcon extends StatelessWidget {
       width: 52,
       height: 52,
       alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: RiderStateCardsStyles.containerDecoration(color),
       child: isLoading
           ? SizedBox(
               width: 23,

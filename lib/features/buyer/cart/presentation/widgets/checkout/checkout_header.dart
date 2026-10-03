@@ -20,17 +20,7 @@ class _CheckoutHeader extends StatelessWidget {
         horizontalPadding,
         14,
       ),
-      decoration: BoxDecoration(
-        color: AgrisellColors.authGreen,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(22)),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.16),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
+      decoration: CheckoutHeaderStyles.containerDecoration,
       child: Row(
         children: [
           _HeaderCircleButton(
@@ -48,12 +38,7 @@ class _CheckoutHeader extends StatelessWidget {
               'Checkout',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: AgrisellColors.surface,
-                fontSize: 15,
-                height: 1,
-                fontWeight: FontWeight.w800,
-              ),
+              style: CheckoutHeaderStyles.checkoutText,
             ),
           ),
           _HeaderChatButton(onTap: onMessagesTap),

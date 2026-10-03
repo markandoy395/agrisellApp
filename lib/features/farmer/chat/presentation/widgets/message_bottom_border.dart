@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/farmer/chat/presentation/styles/message_bottom_border_styles.dart';
 import 'package:flutter/material.dart';
 
 class MessageBottomBorder extends StatelessWidget {
@@ -20,9 +21,9 @@ class MessageBottomBorder extends StatelessWidget {
       bottom: 0,
       height: borderWidth,
       child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(radius)),
+        decoration: MessageBottomBorderStyles.decoratedBoxDecoration(
+          color,
+          radius,
         ),
       ),
     );

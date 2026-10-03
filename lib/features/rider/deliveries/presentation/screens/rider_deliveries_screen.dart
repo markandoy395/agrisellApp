@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -49,7 +50,7 @@ class RiderDeliveriesScreen extends StatelessWidget {
             const TabBar(
               labelColor: AgrisellColors.authGreen,
               unselectedLabelColor: AgrisellColors.mutedText,
-              labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+              labelStyle: SharedPresentationStyles.captionExtraBold,
               tabs: [
                 Tab(text: 'Requests'),
                 Tab(text: 'Active'),

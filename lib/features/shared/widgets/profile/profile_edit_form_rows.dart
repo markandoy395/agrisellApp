@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/shared/widgets/profile/profile_edit_form_rows_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -42,11 +43,7 @@ class ProfileEditFieldRow extends StatelessWidget {
                 textAlignVertical: TextAlignVertical.center,
                 style: ProfileTextStyles.infoValue(context),
                 cursorColor: AgrisellColors.authGreen,
-                decoration: const InputDecoration(
-                  isDense: true,
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.zero,
-                ),
+                decoration: ProfileEditFormRowsStyles.inputDecoration,
               ),
             ),
             if (trailing != null) ...[const SizedBox(width: 8), trailing!],

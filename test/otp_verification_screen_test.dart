@@ -5,6 +5,69 @@ import 'package:agresell_app/features/auth/data/auth_registration_exception.dart
 import 'package:agresell_app/features/auth/presentation/widgets/otp_verification_screen.dart';
 
 void main() {
+  testWidgets('help sheets retain navigation and support details', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: OtpVerificationScreen(
+          destination: 'buyer@example.com',
+          onVerify: (_) async {},
+        ),
+      ),
+    );
+    await tester.tap(
+      find.text('I no longer have access to this email address.'),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Lost Access to Your Email?'), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Contact support'));
+    await tester.pumpAndSettle();
+    expect(find.text('Need Help Signing In?'), findsOneWidget);
+    expect(find.text('support@agrisell.com'), findsOneWidget);
+    expect(find.text('+63 900 123 4567 (Mon-Fri 8AM-5PM)'), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Close'));
+    await tester.pumpAndSettle();
+    expect(find.text('Need Help Signing In?'), findsNothing);
+    expect(find.byType(OtpVerificationScreen), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('successful verification returns true', (tester) async {
+    bool? result;
+    String? verifiedCode;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => TextButton(
+            onPressed: () async {
+              result = await Navigator.of(context).push<bool>(
+                MaterialPageRoute(
+                  builder: (_) => OtpVerificationScreen(
+                    destination: 'buyer@example.com',
+                    onVerify: (code) async => verifiedCode = code,
+                  ),
+                ),
+              );
+            },
+            child: const Text('Open OTP'),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Open OTP'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), '123456');
+    await tester.tap(find.widgetWithText(FilledButton, 'Verify'));
+    await tester.pumpAndSettle();
+    expect(verifiedCode, '123456');
+    expect(result, isTrue);
+  });
+
   testWidgets('uses six digits and locks after five invalid attempts', (
     tester,
   ) async {

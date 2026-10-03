@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_confirmation_form_styles.dart';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -5,6 +6,8 @@ import 'package:flutter/material.dart';
 import '../../../deliveries/domain/delivery_completion.dart';
 import '../../../deliveries/domain/delivery_status_update.dart';
 import '../../../../rider/presentation/widgets/rider_page_widgets.dart';
+import 'rider_delivery_confirmation_cards.dart';
+import '../styles/rider_delivery_confirmation_styles.dart';
 import 'rider_delivery_evidence_capture.dart';
 
 class RiderDeliveryConfirmationForm extends StatelessWidget {
@@ -56,112 +59,51 @@ class RiderDeliveryConfirmationForm extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      RiderSurfaceCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Required delivery proof',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: 6),
-            for (final method in configuration.requiredMethods)
-              Padding(
-                padding: const EdgeInsets.only(top: 3),
-                child: Text(
-                  '• ${method.label}',
-                  style: const TextStyle(fontSize: 12),
-                ),
-              ),
-            if (!configuration.requiredMethods.contains(
-              DeliveryConfirmationMethod.handoverPhoto,
-            ))
-              const Padding(
-                padding: EdgeInsets.only(top: 3),
-                child: Text(
-                  'â€¢ Delivery evidence photo',
-                  style: TextStyle(fontSize: 12),
-                ),
-              ),
-          ],
-        ),
-      ),
-      const SizedBox(height: 12),
+      RiderDeliveryRequiredProofCard(configuration: configuration),
+      const SizedBox(height: RiderDeliveryConfirmationStyles.spacing12),
       if (_requires(DeliveryConfirmationMethod.confirmationCode)) ...[
         TextField(
           controller: codeController,
           obscureText: true,
           keyboardType: TextInputType.number,
-          decoration: const InputDecoration(
-            labelText: 'Delivery confirmation code',
-            helperText: 'The code is validated securely and is never logged.',
-          ),
+          decoration: RiderDeliveryConfirmationFormStyles.inputDecoration,
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: RiderDeliveryConfirmationStyles.spacing10),
       ],
       if (_requires(DeliveryConfirmationMethod.qrCode)) ...[
         TextField(
           controller: qrController,
           obscureText: true,
-          decoration: const InputDecoration(labelText: 'QR code value'),
+          decoration: RiderDeliveryConfirmationFormStyles.inputDecoration2,
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: RiderDeliveryConfirmationStyles.spacing10),
       ],
       if (_requires(DeliveryConfirmationMethod.recipientName)) ...[
-        RiderSurfaceCard(
-          child: Row(
-            children: [
-              const Icon(Icons.person_outline, size: 20),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Recipient name',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                    Text(
-                      recipientName,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const Text(
-                      'From the buyer information',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
+        RiderDeliveryRecipientCard(recipientName: recipientName),
+        const SizedBox(height: RiderDeliveryConfirmationStyles.spacing10),
       ],
       if (_requires(DeliveryConfirmationMethod.deliveryNotes)) ...[
         TextField(
           controller: notesController,
           maxLines: 3,
-          decoration: const InputDecoration(labelText: 'Delivery notes'),
+          decoration: RiderDeliveryConfirmationFormStyles.inputDecoration3,
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: RiderDeliveryConfirmationStyles.spacing10),
       ],
       if (_requires(DeliveryConfirmationMethod.buyerConfirmation))
         CheckboxListTile(
-          contentPadding: EdgeInsets.zero,
+          contentPadding: RiderDeliveryConfirmationStyles.checkboxPadding,
           value: buyerConfirmed,
           onChanged: isSubmitting
               ? null
               : (value) => onBuyerConfirmed(value ?? false),
           title: const Text(
             'Buyer confirms the product was received',
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+            style: RiderDeliveryConfirmationStyles.buyerConfirmationTitle,
           ),
         ),
       if (_requires(DeliveryConfirmationMethod.buyerSignature))
-        _ProofButton(
+        RiderDeliveryProofButton(
           label: signatureCaptured
               ? 'Buyer signature captured'
               : 'Capture buyer signature',
@@ -169,7 +111,7 @@ class RiderDeliveryConfirmationForm extends StatelessWidget {
           complete: signatureCaptured,
           onPressed: isSubmitting ? null : onCaptureSignature,
         ),
-      const SizedBox(height: 8),
+      const SizedBox(height: RiderDeliveryConfirmationStyles.spacing8),
       RiderDeliveryEvidenceCapture(
         captured: photoCaptured,
         previewBytes: photoPreviewBytes,
@@ -178,10 +120,10 @@ class RiderDeliveryConfirmationForm extends StatelessWidget {
         enabled: !isSubmitting,
         onCapture: onCapturePhoto,
       ),
-      const SizedBox(height: 12),
+      const SizedBox(height: RiderDeliveryConfirmationStyles.spacing12),
       if (cashCollectionSection case final section?) ...[
         section,
-        const SizedBox(height: 12),
+        const SizedBox(height: RiderDeliveryConfirmationStyles.spacing12),
       ],
       RiderSurfaceCard(
         child: Text(
@@ -190,38 +132,17 @@ class RiderDeliveryConfirmationForm extends StatelessWidget {
               : 'GPS: ${location!.latitude.toStringAsFixed(5)}, '
                     '${location!.longitude.toStringAsFixed(5)} '
                     '(±${location!.accuracyMeters.toStringAsFixed(0)} m)',
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+          style: RiderDeliveryConfirmationStyles.gpsText,
         ),
       ),
-      const SizedBox(height: 14),
+      const SizedBox(height: RiderDeliveryConfirmationStyles.spacing14),
       SizedBox(
-        height: 38,
+        height: RiderDeliveryConfirmationStyles.submitButtonHeight,
         child: FilledButton(
           onPressed: isSubmitting ? null : onSubmit,
           child: Text(isSubmitting ? 'Confirming...' : 'Complete delivery'),
         ),
       ),
     ],
-  );
-}
-
-class _ProofButton extends StatelessWidget {
-  const _ProofButton({
-    required this.label,
-    required this.icon,
-    required this.complete,
-    required this.onPressed,
-  });
-
-  final String label;
-  final IconData icon;
-  final bool complete;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) => OutlinedButton.icon(
-    onPressed: onPressed,
-    icon: Icon(complete ? Icons.check_circle_outline : icon, size: 18),
-    label: Text(label),
   );
 }

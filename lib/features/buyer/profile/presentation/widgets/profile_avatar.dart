@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/buyer/profile/presentation/styles/profile_avatar_styles.dart';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -70,21 +71,7 @@ class ProfileAvatar extends StatelessWidget {
                   child: Container(
                     width: 26,
                     height: 26,
-                    decoration: BoxDecoration(
-                      color: AgrisellColors.forestDark,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: AgrisellColors.surface,
-                        width: 2,
-                      ),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x330B0B0B),
-                          blurRadius: 5,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
+                    decoration: ProfileAvatarStyles.containerDecoration,
                     child: const Icon(
                       Icons.edit_rounded,
                       size: 14,

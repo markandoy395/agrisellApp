@@ -20,17 +20,7 @@ class _CheckoutOrderSummaryPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
+      decoration: CheckoutOrderSummaryPanelStyles.decoratedBoxDecoration,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -40,10 +30,8 @@ class _CheckoutOrderSummaryPanel extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: AgrisellColors.forestSoft,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
+                  decoration:
+                      CheckoutOrderSummaryPanelStyles.containerDecoration,
                   child: const Icon(
                     Icons.receipt_long_outlined,
                     color: AgrisellColors.authGreen,
@@ -55,11 +43,8 @@ class _CheckoutOrderSummaryPanel extends StatelessWidget {
                   child: Text(
                     'Order Summary & Discounts',
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: AgrisellColors.brandBlack,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: CheckoutOrderSummaryPanelStyles
+                        .orderSummaryDiscountsText,
                   ),
                 ),
               ],
@@ -108,13 +93,8 @@ class _CheckoutOrderSummaryPanel extends StatelessWidget {
                   horizontal: 10,
                   vertical: 6,
                 ),
-                decoration: BoxDecoration(
-                  color: AgrisellColors.forestSoft,
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(
-                    color: AgrisellColors.authGreen.withValues(alpha: 0.2),
-                  ),
-                ),
+                decoration:
+                    CheckoutOrderSummaryPanelStyles.containerDecoration2,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -127,11 +107,7 @@ class _CheckoutOrderSummaryPanel extends StatelessWidget {
                     Flexible(
                       child: Text(
                         'You save ${formatBasketPeso(totalSavings)} on this order!',
-                        style: const TextStyle(
-                          color: AgrisellColors.authGreen,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: CheckoutOrderSummaryPanelStyles.textStyle,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -167,24 +143,13 @@ class _SummaryRow extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: TextStyle(
-              color: isTotal
-                  ? AgrisellColors.brandBlack
-                  : AgrisellColors.mutedText,
-              fontSize: isTotal ? 13 : 12,
-              fontWeight: isTotal ? FontWeight.w800 : FontWeight.w500,
-            ),
+            style: CheckoutOrderSummaryPanelStyles.labelText(isTotal),
           ),
         ),
         const SizedBox(width: 8),
         Text(
           value,
-          style: TextStyle(
-            color: valueColor ??
-                (isTotal ? AgrisellColors.authGreen : AgrisellColors.brandBlack),
-            fontSize: isTotal ? 16 : 12,
-            fontWeight: isTotal ? FontWeight.w800 : FontWeight.w600,
-          ),
+          style: CheckoutOrderSummaryPanelStyles.valueText(valueColor, isTotal),
         ),
       ],
     );

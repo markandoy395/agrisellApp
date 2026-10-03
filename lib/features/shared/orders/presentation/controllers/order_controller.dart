@@ -16,6 +16,7 @@ import 'package:agresell_app/features/shared/orders/data/order_repository.dart';
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
 
 part 'order_controller_mutations.dart';
+part 'order_controller_cancellations.dart';
 part 'order_controller_persistence.dart';
 part 'order_controller_placement.dart';
 part 'order_controller_reviews.dart';

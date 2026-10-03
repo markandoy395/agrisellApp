@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_problem_dialog_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/app_dropdown_style.dart';
@@ -43,13 +44,13 @@ Future<RiderDeliveryProblemDraft?> showRiderDeliveryProblemDialog(
                     DropdownMenuItem(value: item, child: Text(item.label)),
                 ],
                 onChanged: (value) => setDialogState(() => kind = value!),
-                decoration: const InputDecoration(labelText: 'Problem type'),
+                decoration: RiderDeliveryProblemDialogStyles.inputDecoration,
               ),
               TextField(
                 controller: notes,
                 minLines: 2,
                 maxLines: 4,
-                decoration: const InputDecoration(labelText: 'Notes'),
+                decoration: RiderDeliveryProblemDialogStyles.inputDecoration2,
               ),
               if (onCapturePhoto != null)
                 ListTile(

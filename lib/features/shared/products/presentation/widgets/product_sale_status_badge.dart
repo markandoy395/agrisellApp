@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/shared/products/presentation/styles/product_sale_status_badge_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -43,14 +45,7 @@ class ProductSaleStatusBadge extends StatelessWidget {
         ),
         if (countdown != null) ...[
           const SizedBox(height: 7),
-          Text(
-            countdown,
-            style: const TextStyle(
-              color: AgrisellColors.mutedText,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          Text(countdown, style: SharedPresentationStyles.mutedCaptionSemibold),
         ],
       ],
     );
@@ -136,9 +131,8 @@ class _StatusIcon extends StatelessWidget {
         child: Container(
           width: 30,
           height: 30,
-          decoration: BoxDecoration(
-            color: token.background,
-            borderRadius: BorderRadius.circular(9),
+          decoration: ProductSaleStatusBadgeStyles.containerDecoration(
+            token.background,
           ),
           child: Icon(token.icon, color: token.foreground, size: 17),
         ),
@@ -156,9 +150,8 @@ class _StatusChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
-      decoration: BoxDecoration(
-        color: token.background,
-        borderRadius: BorderRadius.circular(10),
+      decoration: ProductSaleStatusBadgeStyles.containerDecoration2(
+        token.background,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -170,11 +163,7 @@ class _StatusChip extends StatelessWidget {
               token.label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: token.foreground,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-              ),
+              style: ProductSaleStatusBadgeStyles.textStyle(token.foreground),
             ),
           ),
         ],

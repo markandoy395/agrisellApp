@@ -1,6 +1,6 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_card.dart';
 
@@ -42,19 +42,11 @@ class HomeSaleProductsSection extends StatelessWidget {
                     children: [
                       Text(
                         'Sale products',
-                        style: TextStyle(
-                          color: AgrisellColors.headingGreen,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                        ),
+                        style: SharedPresentationStyles.headingTitleExtraBold,
                       ),
                       Text(
                         'Limited-time prices selected for you',
-                        style: TextStyle(
-                          color: AgrisellColors.mutedText,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: SharedPresentationStyles.mutedCaptionMedium,
                       ),
                     ],
                   ),

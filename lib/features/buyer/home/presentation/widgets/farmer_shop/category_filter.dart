@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/buyer/home/presentation/styles/category_filter_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -24,7 +26,7 @@ class CategoryFilter extends StatelessWidget {
           child: Text(
             'Categories from the backend will appear here.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: AgrisellColors.mutedText, fontSize: 12),
+            style: SharedPresentationStyles.mutedCaption,
           ),
         ),
       );
@@ -74,26 +76,20 @@ class _CategoryRow extends StatelessWidget {
         child: Container(
           height: 62,
           padding: const EdgeInsets.symmetric(horizontal: 18),
-          decoration: BoxDecoration(
-            border: showDivider
-                ? const Border(
-                    bottom: BorderSide(color: AgrisellColors.dividerLine),
-                  )
-                : null,
-          ),
+          decoration: CategoryFilterStyles.containerDecoration(showDivider),
           child: Row(
             children: [
               Expanded(
                 child: Text(
                   category,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: foreground,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: CategoryFilterStyles.categoryText(foreground),
                 ),
               ),
-              Text('($count)', style: TextStyle(color: foreground)),
+              Text(
+                '($count)',
+                style: CategoryFilterStyles.textStyle(foreground),
+              ),
               const SizedBox(width: 8),
               Icon(Icons.chevron_right_rounded, color: foreground),
             ],

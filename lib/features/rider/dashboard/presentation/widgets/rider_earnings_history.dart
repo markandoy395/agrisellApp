@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/rider/dashboard/presentation/styles/rider_earnings_history_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -35,13 +37,7 @@ class RiderEarningsHistory extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   formatRiderCurrency(entry.netAmount),
-                  style: TextStyle(
-                    color: entry.netAmount < 0
-                        ? AgrisellColors.statusRedText
-                        : AgrisellColors.authGreen,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: RiderEarningsHistoryStyles.textStyle(entry),
                 ),
               ],
             ),
@@ -65,28 +61,20 @@ class _EntryDetails extends StatelessWidget {
         entry.description,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
-          color: AgrisellColors.headingGreen,
-          fontSize: 13,
-          fontWeight: FontWeight.w800,
-        ),
+        style: SharedPresentationStyles.headingBodyExtraBold,
       ),
       const SizedBox(height: 3),
       Text(
         '${entry.type.label} • ${entry.payoutStatus.label}'
         '${entry.orderNumber == null ? '' : ' • ${entry.orderNumber}'}',
-        style: const TextStyle(
-          color: AgrisellColors.mutedText,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
+        style: SharedPresentationStyles.mutedCaptionSemibold,
       ),
       if (entry.estimatedEarning != null) ...[
         const SizedBox(height: 3),
         Text(
           'Estimated ${formatRiderCurrency(entry.estimatedEarning!)} • '
           'Final ${formatRiderCurrency(entry.netAmount)}',
-          style: const TextStyle(color: AgrisellColors.mutedText, fontSize: 12),
+          style: SharedPresentationStyles.mutedCaption,
         ),
       ],
     ],
@@ -105,10 +93,7 @@ class _EntryIcon extends StatelessWidget {
         ? AgrisellColors.statusRedText
         : AgrisellColors.authGreen;
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(10),
-      ),
+      decoration: RiderEarningsHistoryStyles.decoratedBoxDecoration(color),
       child: Padding(
         padding: const EdgeInsets.all(7),
         child: Icon(

@@ -1,3 +1,6 @@
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
+import 'package:agresell_app/features/buyer/profile/presentation/styles/buyer_profile_content_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/models/user_profile.dart';
@@ -69,17 +72,7 @@ class BuyerProfileContent extends StatelessWidget {
         delay: const Duration(milliseconds: 240),
         offset: const Offset(0, 0.05),
         child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.06),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
+          decoration: BuyerProfileContentStyles.containerDecoration,
           child: ListTile(
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
@@ -87,10 +80,7 @@ class BuyerProfileContent extends StatelessWidget {
             ),
             leading: Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE8F5E9),
-                borderRadius: BorderRadius.circular(10),
-              ),
+              decoration: BuyerProfileContentStyles.containerDecoration2,
               child: const Icon(
                 Icons.confirmation_number_outlined,
                 color: Color(0xFF2E7D32),
@@ -99,17 +89,12 @@ class BuyerProfileContent extends StatelessWidget {
             ),
             title: const Text(
               'Voucher Wallet & Deals',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-              ),
+              style: SharedPresentationStyles.subtitleBold,
             ),
             subtitle: const Text(
               'Browse available vouchers and discounts',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.black54,
-              ),
+              style: BuyerProfileContentStyles
+                  .browseAvailableVouchersAndDiscountsText,
             ),
             trailing: const Icon(
               Icons.chevron_right_rounded,
@@ -117,7 +102,7 @@ class BuyerProfileContent extends StatelessWidget {
             ),
             onTap: () {
               Navigator.of(context).push(
-                MaterialPageRoute<void>(
+                agrisellMaterialPageRoute<void>(
                   builder: (_) => const DealsAndPromosScreen(),
                 ),
               );

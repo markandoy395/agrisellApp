@@ -1,7 +1,7 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/app_dropdown_style.dart';
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_input_style.dart';
 import 'package:agresell_app/features/rider/profile/data/logistics_company_repository.dart';
 import 'package:agresell_app/features/rider/profile/domain/logistics_company.dart';
@@ -106,7 +106,7 @@ class _RiderLogisticsCompanySelectorState
           const SizedBox(height: 5),
           const Text(
             'Only active partners are shown. Your selection is verified when the application is submitted.',
-            style: TextStyle(fontSize: 12, color: AgrisellColors.mutedText),
+            style: SharedPresentationStyles.mutedCaption,
           ),
         ],
       );
@@ -116,16 +116,12 @@ class _RiderLogisticsCompanySelectorState
   Widget _message(String text, {required VoidCallback retry}) => Container(
     width: double.infinity,
     padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: AgrisellColors.fieldFill,
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: AgrisellColors.borderLine),
-    ),
+    decoration: SharedPresentationStyles.borderedField,
     child: Row(
       children: [
         const Icon(Icons.local_shipping_outlined, size: 18),
         const SizedBox(width: 9),
-        Expanded(child: Text(text, style: const TextStyle(fontSize: 12))),
+        Expanded(child: Text(text, style: SharedPresentationStyles.caption)),
         IconButton(
           tooltip: 'Retry',
           onPressed: retry,

@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/buyer_message_sheet_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -25,10 +27,7 @@ class BuyerMessageSheet extends StatelessWidget {
               child: Container(
                 width: 44,
                 height: 4,
-                decoration: BoxDecoration(
-                  color: AgrisellColors.borderLine,
-                  borderRadius: BorderRadius.circular(999),
-                ),
+                decoration: BuyerMessageSheetStyles.containerDecoration,
               ),
             ),
             const SizedBox(height: 16),
@@ -50,18 +49,10 @@ class BuyerMessageSheet extends StatelessWidget {
               minLines: 1,
               maxLines: 3,
               textInputAction: TextInputAction.send,
-              decoration: InputDecoration(
-                hintText: 'Write a message',
-                contentPadding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
-                suffixIcon: IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.send_rounded),
-                  color: AgrisellColors.authGreen,
-                  tooltip: 'Send message',
-                ),
-                border: _messageBorder(AgrisellColors.borderLine),
-                enabledBorder: _messageBorder(AgrisellColors.borderLine),
-                focusedBorder: _messageBorder(AgrisellColors.authGreen),
+              decoration: BuyerMessageSheetStyles.inputDecoration(
+                context,
+                _messageBorder(AgrisellColors.borderLine),
+                _messageBorder(AgrisellColors.authGreen),
               ),
             ),
           ],
@@ -92,11 +83,7 @@ class _BuyerMessageHeader extends StatelessWidget {
           backgroundColor: AgrisellColors.statusGreenBackground,
           child: Text(
             order.buyerName.characters.first.toUpperCase(),
-            style: const TextStyle(
-              color: AgrisellColors.authGreen,
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
-            ),
+            style: SharedPresentationStyles.greenTitleExtraBold,
           ),
         ),
         const SizedBox(width: 11),
@@ -108,24 +95,14 @@ class _BuyerMessageHeader extends StatelessWidget {
                 order.buyerName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AgrisellColors.headingGreen,
-                  fontSize: 15,
-                  height: 1.1,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: BuyerMessageSheetStyles.textStyle,
               ),
               const SizedBox(height: 3),
               Text(
                 order.contactNumber,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 12,
-                  height: 1.1,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: BuyerMessageSheetStyles.textStyle2,
               ),
             ],
           ),

@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_cash_collection_card_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/app_dropdown_style.dart';
@@ -33,27 +35,27 @@ class RiderCashCollectionCard extends StatelessWidget {
       children: [
         const Text(
           'Cash on delivery',
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+          style: SharedPresentationStyles.subtitleExtraBold,
         ),
         const SizedBox(height: 5),
         Text(
           'Collect ${requirement.currencyCode} '
           '${requirement.amountToCollect.toStringAsFixed(2)}',
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+          style: SharedPresentationStyles.bodyExtraBold,
         ),
         const SizedBox(height: 4),
         Text(
           requirement.remittanceRequired
               ? 'Remittance required after collection.'
               : 'No Rider remittance is required.',
-          style: const TextStyle(fontSize: 12),
+          style: SharedPresentationStyles.caption,
         ),
         if (requirement.riderCashResponsibility.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Text(
               requirement.riderCashResponsibility,
-              style: const TextStyle(fontSize: 12),
+              style: SharedPresentationStyles.caption,
             ),
           ),
         if (requirement.paymentNotes.isNotEmpty)
@@ -61,7 +63,7 @@ class RiderCashCollectionCard extends StatelessWidget {
             padding: const EdgeInsets.only(top: 4),
             child: Text(
               requirement.paymentNotes,
-              style: const TextStyle(fontSize: 12),
+              style: SharedPresentationStyles.caption,
             ),
           ),
         if (requirement.hasAuthorizedException)
@@ -69,7 +71,7 @@ class RiderCashCollectionCard extends StatelessWidget {
             padding: EdgeInsets.only(top: 8),
             child: Text(
               'A server-authorized payment exception permits completion.',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+              style: SharedPresentationStyles.captionBold,
             ),
           )
         else ...[
@@ -78,7 +80,7 @@ class RiderCashCollectionCard extends StatelessWidget {
             controller: amountController,
             enabled: enabled,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(labelText: 'Amount received'),
+            decoration: RiderCashCollectionCardStyles.inputDecoration,
           ),
           Material(
             type: MaterialType.transparency,
@@ -90,7 +92,7 @@ class RiderCashCollectionCard extends StatelessWidget {
                   : null,
               title: const Text(
                 'I confirm the cash was collected',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                style: SharedPresentationStyles.bodyBold,
               ),
             ),
           ),
@@ -101,9 +103,7 @@ class RiderCashCollectionCard extends StatelessWidget {
             iconEnabledColor: AppDropdownStyle.iconColor,
             initialValue: issue,
             isExpanded: true,
-            decoration: const InputDecoration(
-              labelText: 'Payment issue (optional)',
-            ),
+            decoration: RiderCashCollectionCardStyles.inputDecoration2,
             items: [
               const DropdownMenuItem(
                 value: null,
@@ -131,7 +131,7 @@ class RiderCashCollectionCard extends StatelessWidget {
               controller: notesController,
               enabled: enabled,
               maxLines: 2,
-              decoration: const InputDecoration(labelText: 'Payment notes'),
+              decoration: RiderCashCollectionCardStyles.inputDecoration3,
             ),
           ],
         ],

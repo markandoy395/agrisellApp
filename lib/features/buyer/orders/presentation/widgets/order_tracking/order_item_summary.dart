@@ -14,12 +14,7 @@ class _OrderItemSummary extends StatelessWidget {
           item.productName,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: AgrisellColors.brandBlack,
-            fontSize: 14,
-            height: 1.12,
-            fontWeight: FontWeight.w800,
-          ),
+          style: OrderItemSummaryStyles.textStyle,
         ),
         const SizedBox(height: 7),
         Row(
@@ -35,11 +30,7 @@ class _OrderItemSummary extends StatelessWidget {
                 item.sellerName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: SharedPresentationStyles.mutedCaptionSemibold,
               ),
             ),
           ],
@@ -73,11 +64,7 @@ class _OrderQuantityBadge extends StatelessWidget {
       label: 'Quantity $quantity',
       child: DecoratedBox(
         key: const ValueKey('to-ship-quantity-counter'),
-        decoration: BoxDecoration(
-          color: AgrisellColors.surface,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AgrisellColors.borderLine),
-        ),
+        decoration: OrderItemSummaryStyles.decoratedBoxDecoration,
         child: SizedBox(
           height: 28,
           child: Row(
@@ -98,12 +85,7 @@ class _OrderQuantityBadge extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: AgrisellColors.brandBlack,
-                    fontSize: 12,
-                    height: 1,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: OrderItemSummaryStyles.textStyle2,
                 ),
               ),
               const SizedBox(
@@ -137,12 +119,7 @@ class _MetricChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
-      decoration: BoxDecoration(
-        color: isPrimary
-            ? AgrisellColors.limeSoft
-            : AgrisellColors.homeBackground,
-        borderRadius: BorderRadius.circular(999),
-      ),
+      decoration: OrderItemSummaryStyles.containerDecoration(isPrimary),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -154,17 +131,7 @@ class _MetricChip extends StatelessWidget {
                 : AgrisellColors.mutedText,
           ),
           const SizedBox(width: 5),
-          Text(
-            label,
-            style: TextStyle(
-              color: isPrimary
-                  ? AgrisellColors.authGreen
-                  : AgrisellColors.brandBlack,
-              fontSize: 12,
-              height: 1,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+          Text(label, style: OrderItemSummaryStyles.labelText(isPrimary)),
         ],
       ),
     );

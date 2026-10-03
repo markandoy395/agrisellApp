@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/buyer/home/presentation/styles/product_detail_reviews_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -39,17 +41,7 @@ class _ProductDetailReviewsState extends State<ProductDetailReviews> {
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(
-      color: AgrisellColors.surface,
-      borderRadius: BorderRadius.circular(14),
-      boxShadow: [
-        BoxShadow(
-          color: AgrisellColors.brandBlack.withValues(alpha: 0.06),
-          blurRadius: 14,
-          offset: const Offset(0, 5),
-        ),
-      ],
-    ),
+    decoration: ProductDetailReviewsStyles.decoratedBoxDecoration,
     child: Padding(
       padding: const EdgeInsets.all(14),
       child: FutureBuilder<ProductReviewSummary>(
@@ -95,16 +87,12 @@ class _ReviewSummaryHeader extends StatelessWidget {
           children: [
             Text(
               'Buyer feedback',
-              style: TextStyle(
-                color: AgrisellColors.headingGreen,
-                fontSize: 15,
-                fontWeight: FontWeight.w900,
-              ),
+              style: SharedPresentationStyles.headingTitleBlack,
             ),
             SizedBox(height: 2),
             Text(
               'Ratings from completed orders',
-              style: TextStyle(color: AgrisellColors.mutedText, fontSize: 12),
+              style: SharedPresentationStyles.mutedCaption,
             ),
           ],
         ),
@@ -112,10 +100,7 @@ class _ReviewSummaryHeader extends StatelessWidget {
       if (data.reviewCount > 0)
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
-          decoration: BoxDecoration(
-            color: AgrisellColors.statusOrangeBackground,
-            borderRadius: BorderRadius.circular(999),
-          ),
+          decoration: ProductDetailReviewsStyles.containerDecoration,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -127,11 +112,7 @@ class _ReviewSummaryHeader extends StatelessWidget {
               const SizedBox(width: 3),
               Text(
                 '${data.averageRating.toStringAsFixed(1)} (${data.reviewCount})',
-                style: const TextStyle(
-                  color: AgrisellColors.statusOrangeText,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: ProductDetailReviewsStyles.textStyle,
               ),
             ],
           ),
@@ -157,7 +138,7 @@ class _NoReviewsState extends StatelessWidget {
         Expanded(
           child: Text(
             'No verified buyer reviews yet.',
-            style: TextStyle(color: AgrisellColors.mutedText, fontSize: 12),
+            style: SharedPresentationStyles.mutedCaption,
           ),
         ),
       ],
@@ -191,7 +172,7 @@ class _ReviewErrorState extends StatelessWidget {
       const Expanded(
         child: Text(
           'Buyer feedback could not be loaded.',
-          style: TextStyle(color: AgrisellColors.mutedText, fontSize: 12),
+          style: SharedPresentationStyles.mutedCaption,
         ),
       ),
       TextButton(onPressed: onRetry, child: const Text('Retry')),

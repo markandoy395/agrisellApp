@@ -1,6 +1,6 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_state_cards.dart';
 
@@ -34,11 +34,7 @@ Widget riderRequestDataNotice(RiderDeliveryController controller) => Column(
           padding: EdgeInsets.all(10),
           child: Text(
             'Delivery backend unavailable. No local requests are generated.',
-            style: TextStyle(
-              color: AgrisellColors.mutedText,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
+            style: SharedPresentationStyles.mutedCaptionSemibold,
           ),
         ),
       ),

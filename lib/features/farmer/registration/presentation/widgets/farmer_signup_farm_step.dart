@@ -1,7 +1,7 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_input_style.dart';
 import 'package:agresell_app/features/farmer/registration/domain/farmer_registration_choices.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/controllers/farmer_signup_controllers.dart';
@@ -31,12 +31,12 @@ class FarmerSignupFarmStep extends StatelessWidget {
     children: [
       const Text(
         'Farm information',
-        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+        style: SharedPresentationStyles.subtitleBold,
       ),
       const SizedBox(height: 6),
       const Text(
         'At least one farm is required to sell on Agrisell.',
-        style: TextStyle(fontSize: 12),
+        style: SharedPresentationStyles.caption,
       ),
       const SizedBox(height: 12),
       FarmerSignupField(
@@ -60,10 +60,7 @@ class FarmerSignupFarmStep extends StatelessWidget {
           padding: const EdgeInsets.only(left: 4, bottom: 8),
           child: Text(
             errors['farmLocation']!,
-            style: const TextStyle(
-              color: AgrisellColors.statusRedText,
-              fontSize: 12,
-            ),
+            style: SharedPresentationStyles.errorCaption,
           ),
         ),
       FarmerAddressSyncControl(controllers: controllers, onSynced: onChanged),
@@ -158,9 +155,6 @@ class _FarmStepError extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(left: 4, bottom: 8),
-    child: Text(
-      message,
-      style: const TextStyle(color: AgrisellColors.statusRedText, fontSize: 12),
-    ),
+    child: Text(message, style: SharedPresentationStyles.errorCaption),
   );
 }

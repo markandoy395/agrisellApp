@@ -9,14 +9,10 @@ class _ReservationLoadingState extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         CircularProgressIndicator(),
-        SizedBox(height: 12),
+        FarmerReserveStyles.spacingLarge,
         Text(
           'Loading reservations',
-          style: TextStyle(
-            color: AgrisellColors.headingGreen,
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-          ),
+          style: FarmerReserveStyles.loadingTitleStyle,
         ),
       ],
     ),
@@ -31,31 +27,27 @@ class _ReservationLoadFailure extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Center(
     child: Padding(
-      padding: const EdgeInsets.all(28),
+      padding: FarmerReserveStyles.errorPadding,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           const Icon(
             Icons.cloud_off_rounded,
-            color: AgrisellColors.authGreen,
+            color: FarmerReserveStyles.emptyIconColor,
             size: 38,
           ),
-          const SizedBox(height: 10),
+          FarmerReserveStyles.spacingMedium,
           const Text(
             'Unable to load reservations',
-            style: TextStyle(
-              color: AgrisellColors.headingGreen,
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
-            ),
+            style: FarmerReserveStyles.errorTitleStyle,
           ),
-          const SizedBox(height: 5),
+          FarmerReserveStyles.spacingSmall,
           const Text(
             'Check your connection and try again.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: AgrisellColors.mutedText, fontSize: 12),
+            style: FarmerReserveStyles.errorSubtitleStyle,
           ),
-          const SizedBox(height: 12),
+          FarmerReserveStyles.spacingLarge,
           TextButton(onPressed: onRetry, child: const Text('Try again')),
         ],
       ),
@@ -70,30 +62,26 @@ class _EmptyReservations extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(24, 34, 24, 24),
+    padding: FarmerReserveStyles.emptyPadding,
     child: Column(
       children: [
         const Icon(
           Icons.receipt_long_outlined,
-          color: AgrisellColors.authGreen,
+          color: FarmerReserveStyles.emptyIconColor,
           size: 34,
         ),
-        const SizedBox(height: 10),
+        FarmerReserveStyles.spacingMedium,
         Text(
           hasSearch ? 'No matching reservations' : 'No reservations',
-          style: const TextStyle(
-            color: AgrisellColors.headingGreen,
-            fontSize: 14,
-            fontWeight: FontWeight.w800,
-          ),
+          style: FarmerReserveStyles.emptyTitleStyle,
         ),
-        const SizedBox(height: 5),
+        FarmerReserveStyles.spacingSmall,
         Text(
           hasSearch
               ? 'Try a different order number, product, or delivery address.'
               : 'Buyer reservations returned by the backend will appear here.',
           textAlign: TextAlign.center,
-          style: const TextStyle(color: AgrisellColors.mutedText, fontSize: 12),
+          style: FarmerReserveStyles.emptySubtitleStyle,
         ),
       ],
     ),

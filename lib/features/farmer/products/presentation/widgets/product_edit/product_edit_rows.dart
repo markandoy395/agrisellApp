@@ -1,6 +1,7 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/farmer/products/presentation/styles/product_edit_rows_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/farmer/products/domain/product_edit_options.dart';
 import 'package:agresell_app/features/farmer/products/presentation/widgets/product_edit/product_edit_form_fields.dart';
 import 'package:agresell_app/features/shared/products/domain/product_availability_date_rules.dart';
@@ -109,26 +110,13 @@ class ProductEditHarvestDateRow extends StatelessWidget {
                     ? 'Select date'
                     : '${ProductEditOptions.months[selectedDate.month - 1]} '
                           '${selectedDate.day}, ${selectedDate.year}',
-                style: const TextStyle(fontSize: 12),
+                style: SharedPresentationStyles.caption,
               ),
-              style: OutlinedButton.styleFrom(
-                alignment: Alignment.centerLeft,
-                foregroundColor: AgrisellColors.authGreen,
-                side: const BorderSide(color: AgrisellColors.borderLine),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
+              style: ProductEditRowsStyles.outlinedButtonStyle,
             ),
           ),
           const SizedBox(height: 5),
-          Text(
-            window.guidance,
-            style: const TextStyle(
-              color: AgrisellColors.mutedText,
-              fontSize: 12,
-            ),
-          ),
+          Text(window.guidance, style: SharedPresentationStyles.mutedCaption),
         ],
       ),
     );

@@ -1,6 +1,5 @@
+import 'package:agresell_app/features/rider/presentation/styles/rider_page_widgets_styles.dart';
 import 'package:flutter/material.dart';
-
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 class RiderPageHeader extends StatelessWidget {
   const RiderPageHeader({
@@ -20,39 +19,21 @@ class RiderPageHeader extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(18, topInset + 14, 18, 18),
-      decoration: const BoxDecoration(
-        color: AgrisellColors.authGreen,
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(22)),
-      ),
+      decoration: RiderPageWidgetsStyles.containerDecoration,
       child: Row(
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    color: AgrisellColors.surface,
-                    fontSize: 15,
-                    height: 1.1,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
+                Text(title, style: RiderPageWidgetsStyles.titleText),
                 if (subtitle case final value?) ...[
                   const SizedBox(height: 4),
                   Text(
                     value,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      color: AgrisellColors.surface.withValues(alpha: 0.9),
-                      fontSize: 15,
-                      height: 1.2,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: RiderPageWidgetsStyles.valueText,
                   ),
                 ],
               ],
@@ -78,18 +59,7 @@ class RiderSurfaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AgrisellColors.borderLine),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.07),
-            blurRadius: 12,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
+      decoration: RiderPageWidgetsStyles.decoratedBoxDecoration,
       child: Padding(padding: padding, child: child),
     );
   }
@@ -105,17 +75,7 @@ class RiderSectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(
-          child: Text(
-            title,
-            style: const TextStyle(
-              color: AgrisellColors.headingGreen,
-              fontSize: 14,
-              height: 1.1,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
+        Expanded(child: Text(title, style: RiderPageWidgetsStyles.titleText2)),
         ?action,
       ],
     );

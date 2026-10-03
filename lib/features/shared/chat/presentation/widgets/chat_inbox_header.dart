@@ -1,6 +1,6 @@
+import 'package:agresell_app/features/shared/chat/presentation/styles/chat_inbox_header_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
-
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 class ChatInboxHeader extends StatelessWidget {
   const ChatInboxHeader({
@@ -30,59 +30,21 @@ class ChatInboxHeader extends StatelessWidget {
         horizontalPadding,
         14,
       ),
-      decoration: const BoxDecoration(
-        color: AgrisellColors.surface,
-        border: Border(bottom: BorderSide(color: AgrisellColors.borderLine)),
-      ),
+      decoration: ChatInboxHeaderStyles.containerDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: AgrisellColors.headingGreen,
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
+          Text(title, style: SharedPresentationStyles.headingTitleExtraBold),
           const SizedBox(height: 10),
           TextField(
             controller: controller,
             onChanged: onQueryChanged,
             textInputAction: TextInputAction.search,
-            style: const TextStyle(
-              color: AgrisellColors.brandBlack,
-              fontSize: 13,
-            ),
-            decoration: InputDecoration(
-              hintText: searchHint,
-              hintStyle: const TextStyle(
-                color: AgrisellColors.mutedText,
-                fontSize: 13,
-              ),
-              prefixIcon: const Icon(Icons.search_rounded, size: 21),
-              suffixIcon: ValueListenableBuilder<TextEditingValue>(
-                valueListenable: controller,
-                builder: (context, value, _) {
-                  if (value.text.isEmpty) return const SizedBox.shrink();
-                  return IconButton(
-                    onPressed: () {
-                      controller.clear();
-                      onQueryChanged('');
-                    },
-                    tooltip: 'Clear search',
-                    icon: const Icon(Icons.close_rounded, size: 20),
-                  );
-                },
-              ),
-              filled: true,
-              fillColor: AgrisellColors.fieldFill,
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(vertical: 11),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(22),
-                borderSide: BorderSide.none,
-              ),
+            style: ChatInboxHeaderStyles.textStyle,
+            decoration: ChatInboxHeaderStyles.inputDecoration(
+              searchHint,
+              controller,
+              onQueryChanged,
             ),
           ),
         ],

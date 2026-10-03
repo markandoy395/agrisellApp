@@ -1,53 +1,6 @@
+export 'package:agresell_app/features/farmer/profile/presentation/styles/farmer_farm_form_styles.dart';
+import 'package:agresell_app/features/farmer/profile/presentation/styles/farmer_farm_form_styles.dart';
 import 'package:flutter/material.dart';
-import 'farmer_profile_style.dart';
-
-abstract final class FarmerFarmFormStyle {
-  static const borderColor = Color(0xFFCBD3E2);
-  static final border = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(8),
-    borderSide: const BorderSide(color: borderColor),
-  );
-  static final decoration = InputDecorationTheme(
-    filled: true,
-    fillColor: Colors.white,
-    isDense: true,
-    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-    border: border,
-    enabledBorder: border,
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: FarmerProfileStyle.green, width: 1.5),
-    ),
-  );
-
-  static Widget label(String text, IconData icon, {bool required = true}) =>
-      Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: const Color(0xFF18783E), size: 22),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(text: text),
-                  if (required)
-                    const TextSpan(
-                      text: ' *',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                ],
-              ),
-              style: const TextStyle(
-                color: FarmerProfileStyle.ink,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      );
-}
 
 class FarmerFarmField extends StatelessWidget {
   const FarmerFarmField({
@@ -83,10 +36,9 @@ class FarmerFarmField extends StatelessWidget {
             key: ValueKey('farm-$label'),
             controller: controller,
             keyboardType: keyboardType,
-            style: const TextStyle(fontSize: 14, color: FarmerProfileStyle.ink),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: const TextStyle(color: Color(0xFF8999B3)),
+            style: FarmerFarmFormStyles.textStyle3,
+            decoration: FarmerFarmFormStyles.inputDecoration(
+              hint,
             ).applyDefaults(FarmerFarmFormStyle.decoration),
           ),
         );

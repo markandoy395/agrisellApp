@@ -3,7 +3,7 @@ part of 'rider_delivery_details_screen.dart';
 extension _RiderDeliveryDetailsStatus on _RiderDeliveryDetailsScreenState {
   Future<void> _openDeliveryConfirmation() async {
     final completed = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
+      agrisellMaterialPageRoute(
         builder: (_) => RiderDeliveryConfirmationScreen(
           request: _request,
           riderId: widget.riderId,
@@ -21,7 +21,7 @@ extension _RiderDeliveryDetailsStatus on _RiderDeliveryDetailsScreenState {
 
   Future<void> _openPickupConfirmation() async {
     final completed = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
+      agrisellMaterialPageRoute(
         builder: (_) => RiderPickupConfirmationScreen(
           request: _request,
           riderId: widget.riderId,
@@ -101,9 +101,7 @@ extension _RiderDeliveryDetailsStatus on _RiderDeliveryDetailsScreenState {
         content: TextField(
           controller: controller,
           maxLines: 3,
-          decoration: const InputDecoration(
-            labelText: 'Describe the location problem',
-          ),
+          decoration: RiderDeliveryDetailsStatusStyles.inputDecoration,
         ),
         actions: [
           TextButton(

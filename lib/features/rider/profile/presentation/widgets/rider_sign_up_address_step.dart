@@ -1,6 +1,6 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_input_style.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_address.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_validator.dart';
@@ -41,7 +41,7 @@ class _RiderSignUpAddressStepState extends State<RiderSignUpAddressStep> {
       children: [
         const Text(
           'Enter your official address by province, city or municipality, and barangay. We will capture your exact GPS location when you continue.',
-          style: TextStyle(fontSize: 12, color: AgrisellColors.mutedText),
+          style: SharedPresentationStyles.mutedCaption,
         ),
         const SizedBox(height: 12),
         _field(

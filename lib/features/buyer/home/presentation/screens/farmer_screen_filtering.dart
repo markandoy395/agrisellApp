@@ -73,11 +73,7 @@ extension _FarmerScreenFiltering on _FarmerScreenState {
             children: [
               const Text(
                 'Sort farmers by',
-                style: TextStyle(
-                  color: AgrisellColors.headingGreen,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: SharedPresentationStyles.headingTitleExtraBold,
               ),
               const SizedBox(height: 8),
               for (final option in _FarmerSort.values)

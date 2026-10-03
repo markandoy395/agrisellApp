@@ -1,6 +1,6 @@
+import 'package:agresell_app/features/buyer/home/presentation/styles/farmer_shop_content_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/farmer_shop/category_filter.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/farmer_shop/farmer_product_grid.dart';
@@ -38,11 +38,7 @@ class FarmerShopContent extends StatelessWidget {
 
     return Container(
       clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        border: Border.all(color: AgrisellColors.borderLine),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
-      ),
+      decoration: FarmerShopContentStyles.containerDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -50,12 +46,7 @@ class FarmerShopContent extends StatelessWidget {
           Expanded(
             child: Container(
               clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                color: AgrisellColors.homeBackground,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(18),
-                ),
-              ),
+              decoration: FarmerShopContentStyles.containerDecoration2,
               child: CustomScrollView(
                 physics: const BouncingScrollPhysics(),
                 slivers: [

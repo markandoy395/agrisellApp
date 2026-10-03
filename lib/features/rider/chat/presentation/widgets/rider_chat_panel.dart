@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
@@ -151,19 +152,11 @@ class RiderConversationHeader extends StatelessWidget {
               children: [
                 Text(
                   conversation.participantLabel,
-                  style: const TextStyle(
-                    color: AgrisellColors.headingGreen,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: SharedPresentationStyles.headingTitleExtraBold,
                 ),
                 Text(
                   '${conversation.party.label} • In-app delivery chat',
-                  style: const TextStyle(
-                    color: AgrisellColors.mutedText,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: SharedPresentationStyles.mutedCaptionSemibold,
                 ),
               ],
             ),

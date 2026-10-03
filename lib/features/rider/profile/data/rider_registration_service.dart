@@ -1,10 +1,14 @@
 import 'dart:collection';
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
+
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
+import 'package:agresell_app/features/rider/deliveries/domain/rider_location.dart';
+import 'package:agresell_app/features/rider/profile/data/rider_registration_exceptions.dart';
 import 'package:agresell_app/features/rider/profile/data/rider_registration_payload.dart';
 import 'package:agresell_app/features/rider/profile/data/rider_repository.dart';
 import 'package:agresell_app/features/rider/profile/data/rider_repository_exception.dart';
@@ -16,22 +20,13 @@ import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_registration_validator.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_draft.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_vehicle.dart';
-import 'package:agresell_app/features/rider/deliveries/domain/rider_location.dart';
+
+export 'package:agresell_app/features/rider/profile/data/rider_registration_exceptions.dart';
+
 part 'rider_registration_service_remote.dart';
 part 'rider_registration_service_documents.dart';
 part 'rider_profile_entity_mapper.dart';
-
-class RiderRegistrationException implements Exception {
-  const RiderRegistrationException(this.message);
-  final String message;
-  @override
-  String toString() => message;
-}
-
-class RiderEmailOtpRequired extends RiderRegistrationException {
-  const RiderEmailOtpRequired(String email)
-    : super('Enter the OTP sent to $email to finish your Rider sign-up.');
-}
+part 'rider_registration_service_profile_updater.dart';
 
 class RiderRegistrationService extends ChangeNotifier {
   RiderRegistrationService._();
@@ -45,6 +40,7 @@ class RiderRegistrationService extends ChangeNotifier {
   List<RiderDocument> _currentDocuments = const [];
   RiderLocation? _currentLocation;
   Future<RiderProfile?>? _loadRequest;
+
   RiderRepository get _repository =>
       _remoteRepository ??= RiderRepositoryImpl();
   List<RiderProfile> get registeredProfiles => _profilesView;
@@ -53,6 +49,7 @@ class RiderRegistrationService extends ChangeNotifier {
   List<RiderDocument> get currentDocuments =>
       List.unmodifiable(_currentDocuments);
   RiderLocation? get currentLocation => _currentLocation;
+
   RiderProfile updateCurrentProfile(RiderProfile profile) {
     final index = _profiles.indexWhere((item) => item.email == profile.email);
     if (index < 0) {
@@ -64,55 +61,8 @@ class RiderRegistrationService extends ChangeNotifier {
     return profile;
   }
 
-  Future<RiderProfile> saveCurrentProfile(RiderProfile profile) async {
-    if (!AgrisellSupabase.isInitialized) return updateCurrentProfile(profile);
-    final rider = _currentRider;
-    final vehicle = _currentVehicle;
-    if (rider == null || vehicle == null) {
-      throw const RiderRegistrationException('Rider profile is unavailable.');
-    }
-    try {
-      _currentRider = await _repository.updateRider(
-        rider.copyWith(
-          fullName: profile.fullName,
-          firstName: profile.firstName,
-          lastName: profile.lastName,
-          contactNumber: profile.contactNumber,
-          licenseNumber: profile.licenseNumber,
-          locationLabel: profile.address,
-          addressLine: profile.addressLine,
-          barangay: profile.barangay,
-          cityMunicipality: profile.cityMunicipality,
-          province: profile.province,
-          postalCode: profile.postalCode,
-          gpsLatitude: profile.gpsLatitude,
-          gpsLongitude: profile.gpsLongitude,
-        ),
-      );
-      _currentVehicle = await _repository.updateVehicle(
-        vehicle.copyWith(
-          plateNumber: profile.vehicleType.requiresPlate
-              ? profile.vehiclePlateNumber
-              : vehicle.plateNumber,
-        ),
-      );
-      final license = _currentDocuments
-          .where(
-            (item) => item.documentType == RiderDocumentType.driversLicense,
-          )
-          .firstOrNull;
-      if (profile.vehicleType.requiresLicense &&
-          license != null &&
-          profile.licenseNumber != license.documentNumber) {
-        await _repository.saveRiderDocumentRecord(
-          license.copyWith(documentNumber: profile.licenseNumber),
-        );
-      }
-      return (await _loadRemoteProfile(force: true))!;
-    } on RiderRepositoryException catch (error) {
-      throw RiderRegistrationException(error.message);
-    }
-  }
+  Future<RiderProfile> saveCurrentProfile(RiderProfile profile) =>
+      _saveCurrentProfile(profile);
 
   void selectProfile(String emailAddress) {
     final email = emailAddress.trim().toLowerCase();

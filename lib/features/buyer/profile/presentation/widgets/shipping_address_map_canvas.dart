@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -142,7 +143,7 @@ class _AddressBubble extends StatelessWidget {
         address.isEmpty ? 'Move the map to place your delivery pin.' : address,
         maxLines: 3,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontSize: 13),
+        style: SharedPresentationStyles.body,
       ),
     ),
   );
@@ -157,13 +158,7 @@ class _ErrorMessage extends StatelessWidget {
     borderRadius: BorderRadius.circular(8),
     child: Padding(
       padding: const EdgeInsets.all(10),
-      child: Text(
-        message,
-        style: const TextStyle(
-          fontSize: 12,
-          color: AgrisellColors.statusRedText,
-        ),
-      ),
+      child: Text(message, style: SharedPresentationStyles.errorCaption),
     ),
   );
 }

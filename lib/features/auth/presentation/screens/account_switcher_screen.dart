@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -40,7 +41,7 @@ class _AccountSwitcherScreenState extends State<AccountSwitcherScreen> {
         automaticallyImplyLeading: widget.allowBack,
         title: const Text(
           'Switch account',
-          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+          style: SharedPresentationStyles.titleBold,
         ),
         backgroundColor: AgrisellColors.surface,
         foregroundColor: AgrisellColors.headingGreen,

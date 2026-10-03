@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/safety/presentation/styles/rider_safety_sheet_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -14,24 +16,14 @@ Future<RiderSafetyActionType?> showRiderSafetySheet(BuildContext context) {
         children: [
           const Text(
             'Safety & emergency',
-            style: TextStyle(
-              color: AgrisellColors.headingGreen,
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
-            ),
+            style: SharedPresentationStyles.headingTitleExtraBold,
           ),
           const SizedBox(height: 8),
           for (final type in RiderSafetyActionType.values)
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: Icon(_icon(type), color: _color(type)),
-              title: Text(
-                type.label,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+              title: Text(type.label, style: SharedPresentationStyles.bodyBold),
               onTap: () => Navigator.of(context).pop(type),
             ),
         ],
@@ -55,7 +47,7 @@ Future<String?> showRiderSafetyReasonDialog(
         minLines: 2,
         maxLines: 4,
         autofocus: true,
-        decoration: const InputDecoration(labelText: 'Describe the issue'),
+        decoration: RiderSafetySheetStyles.inputDecoration,
       ),
       actions: [
         TextButton(

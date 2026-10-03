@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_manual_arrival_dialog_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/app_dropdown_style.dart';
@@ -56,7 +58,7 @@ class _RiderManualArrivalDialogState extends State<RiderManualArrivalDialog> {
           '${widget.location.longitude.toStringAsFixed(5)} · '
           '±${widget.location.accuracyMeters.toStringAsFixed(0)} m · '
           '${widget.location.timestamp?.toLocal() ?? 'timestamp unavailable'}',
-          style: const TextStyle(fontSize: 12),
+          style: SharedPresentationStyles.caption,
         ),
         const SizedBox(height: 10),
         DropdownButtonFormField<String>(
@@ -65,7 +67,7 @@ class _RiderManualArrivalDialogState extends State<RiderManualArrivalDialog> {
           style: AppDropdownStyle.textStyle,
           iconEnabledColor: AppDropdownStyle.iconColor,
           initialValue: _reason,
-          decoration: const InputDecoration(labelText: 'Reason'),
+          decoration: RiderManualArrivalDialogStyles.inputDecoration,
           items: [
             for (final entry in RiderManualArrivalDialog.reasons.entries)
               DropdownMenuItem(value: entry.key, child: Text(entry.value)),
@@ -78,11 +80,8 @@ class _RiderManualArrivalDialogState extends State<RiderManualArrivalDialog> {
           onChanged: (_) => setState(() {}),
           minLines: 2,
           maxLines: 3,
-          style: const TextStyle(fontSize: 12),
-          decoration: const InputDecoration(
-            labelText: 'Notes',
-            hintText: 'Describe the access or location problem',
-          ),
+          style: SharedPresentationStyles.caption,
+          decoration: RiderManualArrivalDialogStyles.inputDecoration2,
         ),
       ],
     ),

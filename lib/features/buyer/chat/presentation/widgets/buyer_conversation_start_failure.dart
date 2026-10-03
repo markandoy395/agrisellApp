@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -29,11 +30,7 @@ class BuyerConversationStartFailure extends StatelessWidget {
         style: const ChatContentStateStyle(
           padding: EdgeInsets.all(24),
           iconSize: 36,
-          titleStyle: TextStyle(
-            color: AgrisellColors.headingGreen,
-            fontSize: 15,
-            fontWeight: FontWeight.w800,
-          ),
+          titleStyle: SharedPresentationStyles.headingTitleExtraBold,
           titleMessageSpacing: 6,
           actionSpacing: 14,
         ),

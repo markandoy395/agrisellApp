@@ -118,69 +118,6 @@ extension _FarmerSignUpActions on _FarmerSignUpScreenState {
     });
   }
 
-  Future<void> _captureFarmLocation() async {
-    return _captureFarmLocationRequest ??= _captureFarmLocationOnce()
-        .whenComplete(() => _captureFarmLocationRequest = null);
-  }
-
-  Future<void> _captureFarmLocationOnce() async {
-    if (_isCapturingLocation) return;
-    _refresh(() => _isCapturingLocation = true);
-    try {
-      if (!await _gpsGateway.isServiceEnabled()) {
-        await _gpsGateway.openLocationSettings();
-        _validateFarmLocationSilently();
-        return;
-      }
-
-      var permission = await _gpsGateway.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await _gpsGateway.requestPermission();
-      }
-      if (permission == LocationPermission.denied) {
-        _validateFarmLocationSilently();
-        return;
-      }
-      if (permission == LocationPermission.deniedForever) {
-        await _gpsGateway.openAppSettings();
-        _validateFarmLocationSilently();
-        return;
-      }
-      if (await _gpsGateway.getAccuracyStatus() ==
-          LocationAccuracyStatus.reduced) {
-        await _gpsGateway.openAppSettings();
-        _validateFarmLocationSilently();
-        return;
-      }
-
-      final position = await _gpsGateway.currentPosition(
-        settings: const LocationSettings(
-          accuracy: LocationAccuracy.bestForNavigation,
-          timeLimit: Duration(seconds: 15),
-        ),
-      );
-      if (!mounted) return;
-      _refresh(() {
-        _controllers.setFarmCoordinates(
-          latitudeValue: position.latitude,
-          longitudeValue: position.longitude,
-        );
-        _validateCurrent(showEmpty: false);
-      });
-    } on TimeoutException {
-      _validateFarmLocationSilently();
-    } catch (_) {
-      _validateFarmLocationSilently();
-    } finally {
-      if (mounted) _refresh(() => _isCapturingLocation = false);
-    }
-  }
-
-  void _validateFarmLocationSilently() {
-    if (!mounted) return;
-    _refresh(() => _validateCurrent(showEmpty: false));
-  }
-
   Future<void> _pickImage({required bool profile}) async {
     final image = await ImagePicker().pickImage(
       source: ImageSource.gallery,
@@ -233,26 +170,8 @@ extension _FarmerSignUpActions on _FarmerSignUpScreenState {
   }
 
   Future<void> _confirmDiscard() async {
-    final discard = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Discard registration?'),
-        content: const Text(
-          'Your entered Farmer registration details will be lost.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Keep editing'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Discard'),
-          ),
-        ],
-      ),
-    );
-    if (discard == true && mounted) {
+    final discard = await FarmerDiscardDialog.show(context);
+    if (discard && mounted) {
       Navigator.of(context).pushReplacement(
         agrisellPageRoute<void>(
           builder: (_) => const RoleSelectionScreen.signUp(),

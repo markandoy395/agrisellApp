@@ -31,10 +31,7 @@ class _CompactActionButton extends StatelessWidget {
         final shape = RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         );
-        final textStyle = const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-        );
+        final textStyle = SharedPresentationStyles.captionBold;
         final child = Row(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
@@ -52,12 +49,10 @@ class _CompactActionButton extends StatelessWidget {
             message: label,
             child: FilledButton(
               onPressed: onPressed,
-              style: FilledButton.styleFrom(
-                backgroundColor: AgrisellColors.authGreen,
-                foregroundColor: AgrisellColors.surface,
-                padding: padding,
-                textStyle: textStyle,
-                shape: shape,
+              style: CompactOrderActionButtonStyles.filledButtonStyle(
+                padding,
+                textStyle,
+                shape,
               ),
               child: child,
             ),
@@ -68,12 +63,11 @@ class _CompactActionButton extends StatelessWidget {
           message: label,
           child: OutlinedButton(
             onPressed: onPressed,
-            style: OutlinedButton.styleFrom(
-              foregroundColor: color,
-              side: BorderSide(color: color.withValues(alpha: 0.5)),
-              padding: padding,
-              textStyle: textStyle,
-              shape: shape,
+            style: CompactOrderActionButtonStyles.outlinedButtonStyle(
+              color,
+              padding,
+              textStyle,
+              shape,
             ),
             child: child,
           ),

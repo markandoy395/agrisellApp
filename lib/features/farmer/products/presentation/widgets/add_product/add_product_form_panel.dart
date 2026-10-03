@@ -28,45 +28,23 @@ class _FormPanel extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(18, 20, 18, 24),
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.06),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
+      decoration: AddProductFormPanelStyles.containerDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
             'Add a new product',
-            style: TextStyle(
-              color: AgrisellColors.headingGreen,
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
-            ),
+            style: SharedPresentationStyles.headingTitleExtraBold,
           ),
           const SizedBox(height: 5),
           const Text(
             'Complete the details buyers need before publishing.',
-            style: TextStyle(
-              color: AgrisellColors.mutedText,
-              fontSize: 12,
-              height: 1.3,
-            ),
+            style: SharedPresentationStyles.mutedCaptionRelaxed,
           ),
           const SizedBox(height: 5),
           const Text(
             '* Required fields',
-            style: TextStyle(
-              color: AgrisellColors.statusRedText,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
+            style: SharedPresentationStyles.errorCaptionSemibold,
           ),
           const SizedBox(height: 22),
           const _FormSectionTitle(
@@ -105,19 +83,10 @@ class _FormPanel extends StatelessWidget {
                   height: 38,
                   child: OutlinedButton(
                     onPressed: onCancel,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AgrisellColors.authGreen,
-                      side: const BorderSide(color: AgrisellColors.authGreen),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
+                    style: AddProductFormPanelStyles.outlinedButtonStyle,
                     child: const Text(
                       'Cancel',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: SharedPresentationStyles.bodyBold,
                     ),
                   ),
                 ),
@@ -128,20 +97,11 @@ class _FormPanel extends StatelessWidget {
                   height: 38,
                   child: FilledButton.icon(
                     onPressed: onPublish,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AgrisellColors.authGreen,
-                      foregroundColor: AgrisellColors.surface,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
+                    style: AddProductFormPanelStyles.filledButtonStyle,
                     icon: const Icon(Icons.publish_rounded, size: 17),
                     label: const Text(
                       'Publish Product',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                      ),
+                      style: SharedPresentationStyles.captionExtraBold,
                     ),
                   ),
                 ),
@@ -166,14 +126,7 @@ class _FormSectionTitle extends StatelessWidget {
       children: [
         Icon(icon, color: AgrisellColors.authGreen, size: 18),
         const SizedBox(width: 8),
-        Text(
-          title,
-          style: const TextStyle(
-            color: AgrisellColors.headingGreen,
-            fontSize: 14,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
+        Text(title, style: SharedPresentationStyles.headingSubtitleExtraBold),
       ],
     );
   }

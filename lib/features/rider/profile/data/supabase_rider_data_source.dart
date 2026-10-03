@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:agresell_app/core/services/authenticated_storage_image.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 

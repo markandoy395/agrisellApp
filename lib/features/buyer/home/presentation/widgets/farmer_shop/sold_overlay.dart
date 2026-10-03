@@ -1,6 +1,5 @@
+import 'package:agresell_app/features/buyer/home/presentation/styles/sold_overlay_styles.dart';
 import 'package:flutter/material.dart';
-
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 class SoldOverlay extends StatelessWidget {
   const SoldOverlay({super.key});
@@ -10,9 +9,7 @@ class SoldOverlay extends StatelessWidget {
     return Positioned.fill(
       child: IgnorePointer(
         child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.18),
-          ),
+          decoration: SoldOverlayStyles.decoratedBoxDecoration,
           child: LayoutBuilder(
             builder: (context, constraints) {
               final width = constraints.maxWidth;
@@ -33,35 +30,14 @@ class SoldOverlay extends StatelessWidget {
                         children: [
                           Text(
                             'SOLD',
-                            style: TextStyle(
-                              fontSize: fontSize,
-                              height: 1,
-                              letterSpacing: 0,
-                              fontWeight: FontWeight.w900,
-                              foreground: Paint()
-                                ..style = PaintingStyle.stroke
-                                ..strokeWidth = strokeWidth
-                                ..color = AgrisellColors.brandBlack,
+                            style: SoldOverlayStyles.soldText(
+                              fontSize,
+                              strokeWidth,
                             ),
                           ),
                           Text(
                             'SOLD',
-                            style: TextStyle(
-                              color: AgrisellColors.surface,
-                              fontSize: fontSize,
-                              height: 1,
-                              letterSpacing: 0,
-                              fontWeight: FontWeight.w900,
-                              shadows: [
-                                Shadow(
-                                  color: AgrisellColors.brandBlack.withValues(
-                                    alpha: 0.6,
-                                  ),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
+                            style: SoldOverlayStyles.soldText2(fontSize),
                           ),
                         ],
                       ),

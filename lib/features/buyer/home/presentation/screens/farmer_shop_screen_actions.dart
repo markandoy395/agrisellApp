@@ -18,4 +18,36 @@ extension _FarmerShopScreenActions on _FarmerShopScreenState {
       ),
     );
   }
+
+  void _openProduct(HomeProduct product) {
+    if (!product.isAvailable) {
+      ScaffoldMessenger.of(context).showAppSnackBar(
+        const SnackBar(content: Text('This product is unavailable.')),
+      );
+      return;
+    }
+
+    Navigator.of(context).push(
+      agrisellMaterialPageRoute<void>(
+        builder: (_) => ProductDetailScreen(
+          product: product,
+          productRepository: widget.productRepository,
+        ),
+      ),
+    );
+  }
+
+  void _handleMenuAction(FarmerShopMenuAction action) {
+    switch (action) {
+      case FarmerShopMenuAction.viewAllProducts:
+        _updateUi(() {
+          _activeTab = FarmerShopTab.products;
+          _selectedCategory = null;
+          _searchQuery = '';
+          _searchController.clear();
+        });
+      case FarmerShopMenuAction.messageFarmer:
+        _openChat();
+    }
+  }
 }

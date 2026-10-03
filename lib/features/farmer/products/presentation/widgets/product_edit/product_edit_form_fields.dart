@@ -1,7 +1,8 @@
+import 'package:agresell_app/features/farmer/products/presentation/styles/product_edit_form_fields_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/app_dropdown_style.dart';
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 class ProductEditInputRow extends StatelessWidget {
   const ProductEditInputRow({
@@ -27,12 +28,7 @@ class ProductEditInputRow extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.right,
-            style: const TextStyle(
-              color: AgrisellColors.brandBlack,
-              fontSize: 12,
-              height: 1,
-              fontWeight: FontWeight.w500,
-            ),
+            style: ProductEditFormFieldsStyles.labelText,
           ),
         ),
         const SizedBox(width: 13),
@@ -69,29 +65,10 @@ class ProductEditRoundedTextField extends StatelessWidget {
         readOnly: readOnly,
         keyboardType: keyboardType,
         textInputAction: textInputAction,
-        style: const TextStyle(fontSize: 12, height: 1),
-        decoration: InputDecoration(
-          isDense: true,
-          filled: true,
-          fillColor: AgrisellColors.fieldFill,
-          prefixText: prefixText,
-          suffixText: suffixText,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 8,
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(18),
-            borderSide: BorderSide.none,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(18),
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(18),
-            borderSide: const BorderSide(color: AgrisellColors.authGreen),
-          ),
+        style: ProductEditFormFieldsStyles.textStyle,
+        decoration: ProductEditFormFieldsStyles.inputDecoration(
+          prefixText,
+          suffixText,
         ),
       ),
     );
@@ -119,37 +96,17 @@ class ProductEditCompactDropdown extends StatelessWidget {
       child: DropdownButtonFormField<String>(
         dropdownColor: AppDropdownStyle.menuColor,
         borderRadius: AppDropdownStyle.menuBorderRadius,
-        style: AppDropdownStyle.textStyle.copyWith(fontSize: 12),
+        style: ProductEditFormFieldsStyles.dropdownButtonFormFieldStyle,
         iconEnabledColor: AppDropdownStyle.iconColor,
         initialValue: value,
         isExpanded: true,
         icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 17),
-        decoration: InputDecoration(
-          isDense: true,
-          filled: true,
-          fillColor: AgrisellColors.surface,
-          contentPadding: const EdgeInsets.fromLTRB(11, 4, 5, 4),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(17),
-            borderSide: const BorderSide(color: AgrisellColors.authGreen),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(17),
-            borderSide: const BorderSide(color: AgrisellColors.authGreen),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(17),
-            borderSide: const BorderSide(
-              color: AgrisellColors.authGreen,
-              width: 1.4,
-            ),
-          ),
-        ),
+        decoration: ProductEditFormFieldsStyles.inputDecoration2,
         hint: Text(
           hint,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 12, height: 1),
+          style: ProductEditFormFieldsStyles.textStyle,
         ),
         selectedItemBuilder: (context) {
           return [
@@ -160,7 +117,7 @@ class ProductEditCompactDropdown extends StatelessWidget {
                   item,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 12, height: 1),
+                  style: ProductEditFormFieldsStyles.textStyle,
                 ),
               ),
           ];
@@ -173,7 +130,7 @@ class ProductEditCompactDropdown extends StatelessWidget {
                 item,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 12),
+                style: SharedPresentationStyles.caption,
               ),
             ),
         ],

@@ -16,17 +16,7 @@ class _EmptyOrderState extends StatelessWidget {
             Container(
               width: 74,
               height: 74,
-              decoration: BoxDecoration(
-                color: AgrisellColors.surface,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: AgrisellColors.brandBlack.withValues(alpha: 0.08),
-                    blurRadius: 16,
-                    offset: const Offset(0, 7),
-                  ),
-                ],
-              ),
+              decoration: EmptyOrderStateStyles.containerDecoration,
               child: Icon(
                 filter.icon,
                 color: AgrisellColors.authGreen,
@@ -37,22 +27,13 @@ class _EmptyOrderState extends StatelessWidget {
             Text(
               'No ${filter.label.toLowerCase()} orders',
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AgrisellColors.brandBlack,
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-              ),
+              style: SharedPresentationStyles.inkTitleExtraBold,
             ),
             const SizedBox(height: 6),
             const Text(
               'Checked-out harvests will appear here as their delivery status changes.',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: AgrisellColors.mutedText,
-                fontSize: 12,
-                height: 1.35,
-                fontWeight: FontWeight.w500,
-              ),
+              style: SharedPresentationStyles.mutedCaptionMediumLoose,
             ),
           ],
         ),

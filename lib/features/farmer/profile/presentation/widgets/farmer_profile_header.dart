@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+
 import 'package:agresell_app/core/models/user_profile.dart';
+import '../styles/farmer_profile_header_styles.dart';
+import 'farmer_profile_avatar.dart';
+import 'farmer_profile_hero_pattern_painter.dart';
+import 'farmer_profile_nav_button.dart';
+import 'farmer_profile_stat_pill.dart';
 import 'farmer_profile_style.dart';
 
 class FarmerProfileHeader extends StatelessWidget {
@@ -28,30 +34,25 @@ class FarmerProfileHeader extends StatelessWidget {
     children: [
       // ── Top bar: back + title + settings ──────────────────────────────
       Padding(
-        padding: const EdgeInsets.fromLTRB(4, 0, 4, 14),
+        padding: FarmerProfileHeaderStyles.topBarPadding,
         child: Row(
           children: [
             if (onBack != null) ...[
-              _NavButton(
+              FarmerProfileNavButton(
                 tooltip: 'Back',
                 onPressed: onBack!,
                 icon: Icons.arrow_back_ios_new_rounded,
               ),
-              const SizedBox(width: 12),
+              FarmerProfileHeaderStyles.spacingNavButton,
             ],
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
-                  color: FarmerProfileStyle.ink,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.5,
-                ),
+                style: FarmerProfileHeaderStyles.titleStyle,
               ),
             ),
             if (onSettingsTap != null)
-              _NavButton(
+              FarmerProfileNavButton(
                 tooltip: 'Settings',
                 onPressed: onSettingsTap!,
                 icon: Icons.tune_rounded,
@@ -62,27 +63,29 @@ class FarmerProfileHeader extends StatelessWidget {
 
       // ── Hero banner ───────────────────────────────────────────────────
       ClipRRect(
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: FarmerProfileHeaderStyles.bannerRadius,
         child: Container(
-          decoration: const BoxDecoration(
-            gradient: FarmerProfileStyle.heroGradient,
-          ),
+          decoration: FarmerProfileHeaderStyles.heroBannerDecoration,
           child: Stack(
             children: [
               // Decorative background pattern
-              Positioned.fill(child: CustomPaint(painter: _HeroPatternPainter())),
+              const Positioned.fill(
+                child: CustomPaint(
+                  painter: FarmerProfileHeroPatternPainter(),
+                ),
+              ),
               // Content
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                padding: FarmerProfileHeaderStyles.bannerPadding,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     // Avatar
-                    _HeroAvatar(
+                    FarmerProfileAvatar(
                       name: profile.headerName,
                       isVerified: isVerified,
                     ),
-                    const SizedBox(width: 14),
+                    FarmerProfileHeaderStyles.spacingAvatar,
                     // Name + stats
                     Expanded(
                       child: Column(
@@ -90,23 +93,15 @@ class FarmerProfileHeader extends StatelessWidget {
                         children: [
                           Text(
                             profile.headerName,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.3,
-                              height: 1.2,
-                            ),
+                            style: FarmerProfileHeaderStyles.nameStyle,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
                           if (isVerified) ...[
-                            const SizedBox(height: 6),
+                            FarmerProfileHeaderStyles.spacingVerifiedBadge,
                             GlassChip(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
-                              ),
+                              padding:
+                                  FarmerProfileHeaderStyles.verifiedBadgePadding,
                               child: FittedBox(
                                 fit: BoxFit.scaleDown,
                                 child: Row(
@@ -114,24 +109,23 @@ class FarmerProfileHeader extends StatelessWidget {
                                   children: [
                                     const Icon(
                                       Icons.verified_rounded,
-                                      color: Color(0xFF6FFAB3),
-                                      size: 13,
+                                      color:
+                                          FarmerProfileHeaderStyles.verifiedIconColor,
+                                      size:
+                                          FarmerProfileHeaderStyles.verifiedIconSize,
                                     ),
-                                    const SizedBox(width: 5),
+                                    FarmerProfileHeaderStyles.spacingVerifiedText,
                                     Text(
                                       'Verified Farmer',
-                                      style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.9),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                      style:
+                                          FarmerProfileHeaderStyles.verifiedTextStyle,
                                     ),
                                   ],
                                 ),
                               ),
                             ),
                           ],
-                          const SizedBox(height: 8),
+                          FarmerProfileHeaderStyles.spacingStats,
                           // Follower chips
                           Semantics(
                             label:
@@ -154,14 +148,16 @@ class FarmerProfileHeader extends StatelessWidget {
                                   ),
                                 ),
                                 Wrap(
-                                  spacing: 6,
-                                  runSpacing: 4,
+                                  spacing:
+                                      FarmerProfileHeaderStyles.pillWrapSpacing,
+                                  runSpacing:
+                                      FarmerProfileHeaderStyles.pillWrapRunSpacing,
                                   children: [
-                                    _StatPill(
+                                    FarmerProfileStatPill(
                                       value: followingCount,
                                       label: 'Following',
                                     ),
-                                    _StatPill(
+                                    FarmerProfileStatPill(
                                       value: followerCount,
                                       label: followerCount == 1
                                           ? 'Follower'
@@ -185,200 +181,3 @@ class FarmerProfileHeader extends StatelessWidget {
     ],
   );
 }
-
-// ── Sub-widgets ──────────────────────────────────────────────────────────────
-
-class _NavButton extends StatelessWidget {
-  const _NavButton({
-    required this.tooltip,
-    required this.onPressed,
-    required this.icon,
-  });
-
-  final String tooltip;
-  final VoidCallback onPressed;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) => Tooltip(
-    message: tooltip,
-    child: Semantics(
-      button: true,
-      label: tooltip,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(13),
-        child: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: FarmerProfileStyle.mint,
-            borderRadius: BorderRadius.circular(13),
-            border: Border.all(color: FarmerProfileStyle.borderSubtle, width: 1),
-          ),
-          child: Icon(icon, color: FarmerProfileStyle.green, size: 20),
-        ),
-      ),
-    ),
-  );
-}
-
-class _HeroAvatar extends StatelessWidget {
-  const _HeroAvatar({required this.name, required this.isVerified});
-
-  final String name;
-  final bool isVerified;
-
-  @override
-  Widget build(BuildContext context) => Semantics(
-    image: true,
-    label: '$name profile avatar',
-    child: Stack(
-      clipBehavior: Clip.none,
-      children: [
-        // Glow ring
-        Container(
-          width: 88,
-          height: 88,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.25),
-              width: 2.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF0E6B43).withValues(alpha: 0.6),
-                blurRadius: 20,
-                spreadRadius: 2,
-              ),
-            ],
-          ),
-          child: Container(
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: [Color(0xFF1A7A52), Color(0xFF0E5C38)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: const Icon(
-              Icons.person_rounded,
-              color: Color(0xFFB8F0D6),
-              size: 52,
-            ),
-          ),
-        ),
-        if (isVerified)
-          Positioned(
-            right: -2,
-            bottom: 2,
-            child: Semantics(
-              label: 'Verified',
-              child: Container(
-                width: 26,
-                height: 26,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF1BB871), Color(0xFF08683F)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2.5),
-                ),
-                child: const Icon(
-                  Icons.check_rounded,
-                  color: Colors.white,
-                  size: 15,
-                ),
-              ),
-            ),
-          ),
-      ],
-    ),
-  );
-}
-
-class _StatPill extends StatelessWidget {
-  const _StatPill({required this.value, required this.label});
-
-  final int value;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) => GlassChip(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    child: RichText(
-      text: TextSpan(
-        children: [
-          TextSpan(
-            text: '$value ',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          TextSpan(
-            text: label,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.7),
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-// ── Background decoration painter ────────────────────────────────────────────
-
-class _HeroPatternPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.white.withValues(alpha: 0.04);
-
-    // Large blurred circle — top-right
-    canvas.drawCircle(
-      Offset(size.width + 10, -20),
-      110,
-      paint..maskFilter = const MaskFilter.blur(BlurStyle.normal, 30),
-    );
-
-    // Leaf shape — bottom-left
-    final leaf = Paint()..color = Colors.white.withValues(alpha: 0.055);
-    final path1 = Path()
-      ..moveTo(-20, size.height + 10)
-      ..quadraticBezierTo(30, size.height - 60, 90, size.height - 20)
-      ..quadraticBezierTo(50, size.height + 30, -20, size.height + 10)
-      ..close();
-    canvas.drawPath(path1, leaf);
-
-    // Leaf shape — bottom-right
-    final path2 = Path()
-      ..moveTo(size.width - 60, size.height + 8)
-      ..quadraticBezierTo(
-        size.width - 20,
-        size.height - 50,
-        size.width + 20,
-        size.height - 30,
-      )
-      ..quadraticBezierTo(
-        size.width + 10,
-        size.height + 20,
-        size.width - 60,
-        size.height + 8,
-      )
-      ..close();
-    canvas.drawPath(path2, leaf);
-  }
-
-  @override
-  bool shouldRepaint(covariant _HeroPatternPainter oldDelegate) => false;
-}
-
-

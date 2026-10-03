@@ -1,21 +1,9 @@
+export 'package:agresell_app/features/shared/chat/presentation/styles/chat_avatar_styles.dart';
+import 'package:agresell_app/features/shared/chat/presentation/styles/chat_avatar_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 import 'package:agresell_app/features/shared/chat/presentation/models/chat_participant_data.dart';
-
-class ChatAvatarStyle {
-  const ChatAvatarStyle({
-    required this.diameter,
-    required this.backgroundColor,
-    required this.foregroundColor,
-    required this.textStyle,
-  });
-
-  final double diameter;
-  final Color backgroundColor;
-  final Color foregroundColor;
-  final TextStyle textStyle;
-}
 
 class ChatAvatar extends StatelessWidget {
   const ChatAvatar({required this.participant, required this.style, super.key});
@@ -45,7 +33,7 @@ class ChatAvatar extends StatelessWidget {
         participant.initials,
         maxLines: 1,
         overflow: TextOverflow.clip,
-        style: style.textStyle.copyWith(color: style.foregroundColor),
+        style: ChatAvatarStyles.textStyle(style),
       ),
     );
   }

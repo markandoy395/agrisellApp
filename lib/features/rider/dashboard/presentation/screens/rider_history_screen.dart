@@ -13,10 +13,12 @@ import 'package:agresell_app/features/rider/presentation/widgets/rider_state_car
 import 'package:agresell_app/features/rider/reporting/rider_financial_exporter.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/screens/rider_history_details_screen.dart';
+import 'package:agresell_app/features/rider/dashboard/presentation/styles/rider_history_styles.dart';
 import 'package:agresell_app/features/shared/reporting/widgets/export_report_sheet.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 
 part 'rider_history_filters.dart';
+part 'rider_history_content.dart';
 
 class RiderHistoryScreen extends StatefulWidget {
   const RiderHistoryScreen({
@@ -110,41 +112,34 @@ class _RiderHistoryScreenState extends State<RiderHistoryScreen> {
               ?widget.deliveryController,
             ]),
             builder: (context, _) => ListView(
-              padding: const EdgeInsets.all(14),
+              padding: RiderHistoryStyles.listPadding,
               children: [
                 TextField(
                   controller: _searchController,
                   onChanged: (_) => setState(() {}),
                   textInputAction: TextInputAction.search,
-                  decoration: InputDecoration(
-                    hintText:
-                        'Search order, product, participant, location, or payment',
-                    prefixIcon: const Icon(Icons.search_rounded),
-                    filled: true,
-                    fillColor: AgrisellColors.surface,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
+                  decoration: RiderHistoryStyles.searchInputDecoration,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: RiderHistoryStyles.spacing12),
                 RiderHistoryFilterChips(
                   selected: _filter,
                   onChanged: (value) => setState(() => _filter = value),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: RiderHistoryStyles.spacing8),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: OutlinedButton.icon(
                     onPressed: _selectDateRange,
-                    icon: const Icon(Icons.date_range_outlined, size: 18),
+                    icon: const Icon(
+                      Icons.date_range_outlined,
+                      size: RiderHistoryStyles.dateFilterIconSize,
+                    ),
                     label: Text(
                       _dateRange == null ? 'Filter by date' : 'Date selected',
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: RiderHistoryStyles.spacing16),
                 ..._content(),
               ],
             ),
@@ -154,71 +149,6 @@ class _RiderHistoryScreenState extends State<RiderHistoryScreen> {
     ),
   );
 
-  List<Widget> _content() {
-    if (widget.deliveryController != null) return _historyContent();
-    return switch (_controller.historyState) {
-      RiderAnalyticsLoadState.idle || RiderAnalyticsLoadState.loading => const [
-        RiderLoadingStateCard(
-          title: 'Loading delivery history',
-          message: 'Retrieving closed delivery records.',
-        ),
-      ],
-      RiderAnalyticsLoadState.error => [
-        RiderErrorStateCard(
-          title: 'History unavailable',
-          message: _controller.historyError ?? 'Please try again.',
-          retryLabel: 'Retry',
-          onRetry: () => unawaited(_load()),
-        ),
-      ],
-      RiderAnalyticsLoadState.ready => _historyContent(),
-    };
-  }
-
-  List<Widget> _historyContent() {
-    final query = _searchController.text;
-    final localRecords = widget.deliveryController?.completionHistory
-        .map(RiderDeliveryHistoryEntry.fromCompletion)
-        .toList();
-    final records =
-        (localRecords ?? _controller.history)
-            .where(
-              (record) =>
-                  (_filter == null || record.status == _filter) &&
-                  (_dateRange == null ||
-                      (!record.completedAt.isBefore(_dateRange!.start) &&
-                          record.completedAt.isBefore(
-                            _dateRange!.end.add(const Duration(days: 1)),
-                          ))) &&
-                  record.matchesSearch(query),
-            )
-            .toList()
-          ..sort((a, b) => b.completedAt.compareTo(a.completedAt));
-    if (records.isEmpty) {
-      return [
-        RiderEmptyStateCard(
-          title: 'No deliveries found',
-          message: query.trim().isEmpty && _filter == null
-              ? 'Delivery date, locations, product details, fees, status, and ratings will appear here.'
-              : 'Try a different search term or delivery status.',
-          icon: Icons.history_rounded,
-        ),
-      ];
-    }
-    return [
-      for (final record in records) ...[
-        RiderHistoryEntryCard(
-          entry: record,
-          onTap: () => Navigator.of(context).push(
-            agrisellPageRoute<void>(
-              builder: (_) => RiderHistoryDetailsScreen(entry: record),
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-      ],
-    ];
-  }
 
   Future<void> _load() => _controller.loadHistory(riderId: widget.riderId);
 

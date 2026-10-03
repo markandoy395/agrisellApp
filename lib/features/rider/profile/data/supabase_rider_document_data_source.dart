@@ -26,9 +26,11 @@ mixin _SupabaseRiderDocumentDataSourceMixin implements RiderRemoteDataSource {
   }
 
   @override
-  Future<String> createSignedUrl(String path) => _client.storage
-      .from(SupabaseRiderDataSource.bucket)
-      .createSignedUrl(path, 15 * 60);
+  Future<String> createSignedUrl(String path) => Future.value(
+    authenticatedStorageUrl(
+      _client.storage.from(SupabaseRiderDataSource.bucket).getPublicUrl(path),
+    ),
+  );
 
   @override
   Future<RiderDocument> createDocument(RiderDocument document) async {

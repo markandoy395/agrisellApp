@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_cancel_dialog_styles.dart';
 import 'package:flutter/material.dart';
 
 Future<String?> showRiderCancellationReasonDialog(BuildContext context) async {
@@ -11,10 +12,7 @@ Future<String?> showRiderCancellationReasonDialog(BuildContext context) async {
         autofocus: true,
         minLines: 2,
         maxLines: 4,
-        decoration: const InputDecoration(
-          labelText: 'Cancellation reason',
-          hintText: 'Explain why this delivery must be cancelled',
-        ),
+        decoration: RiderDeliveryCancelDialogStyles.inputDecoration,
       ),
       actions: [
         TextButton(

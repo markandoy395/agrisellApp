@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/auth/presentation/styles/login_page_layout_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -88,10 +89,7 @@ class LoginPageLayout extends StatelessWidget {
                       child: IconButton(
                         tooltip: 'Back',
                         onPressed: onBack,
-                        style: IconButton.styleFrom(
-                          backgroundColor: AgrisellColors.forestSoft,
-                          foregroundColor: AgrisellColors.headingGreen,
-                        ),
+                        style: LoginPageLayoutStyles.iconButtonStyle,
                         icon: const Icon(Icons.arrow_back_rounded),
                       ),
                     ),
@@ -102,19 +100,7 @@ class LoginPageLayout extends StatelessWidget {
                 child: Container(
                   width: double.infinity,
                   height: effectiveCardHeight.clamp(0, size.height).toDouble(),
-                  decoration: BoxDecoration(
-                    color: AgrisellColors.surface,
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(34),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AgrisellColors.brandBlack.withValues(alpha: .09),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
+                  decoration: LoginPageLayoutStyles.containerDecoration,
                   child: Builder(
                     builder: (context) {
                       final padding = EdgeInsets.fromLTRB(
@@ -139,12 +125,7 @@ class LoginPageLayout extends StatelessWidget {
                               title,
                               style:
                                   titleStyle ??
-                                  TextStyle(
-                                    color: titleColor,
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.15,
-                                  ),
+                                  LoginPageLayoutStyles.titleText(titleColor),
                             ),
                             if (subtitleWidget != null)
                               subtitleWidget!
@@ -153,10 +134,7 @@ class LoginPageLayout extends StatelessWidget {
                               const SizedBox(height: 2),
                               Text(
                                 subtitle!,
-                                style: const TextStyle(
-                                  color: AgrisellColors.mutedText,
-                                  fontSize: 14,
-                                ),
+                                style: LoginPageLayoutStyles.textStyle,
                               ),
                               const SizedBox(height: 22),
                             ] else

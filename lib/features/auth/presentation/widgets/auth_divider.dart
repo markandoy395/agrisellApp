@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/auth/presentation/styles/auth_divider_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -23,11 +24,7 @@ class AuthDivider extends StatelessWidget {
             child: Text(
               text,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: AgrisellColors.brandBlack,
-                fontSize: lerpDouble(12, 14, scale),
-                fontWeight: FontWeight.w400,
-              ),
+              style: AuthDividerStyles.textText(scale),
             ),
           ),
         ),

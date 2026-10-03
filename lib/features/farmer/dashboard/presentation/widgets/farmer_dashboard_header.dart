@@ -69,45 +69,15 @@ class _FarmerSearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 42,
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.13),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
+      decoration: FarmerDashboardHeaderStyles.containerDecoration,
       child: TextField(
         controller: controller,
         onChanged: onChanged,
         textInputAction: TextInputAction.search,
-        style: const TextStyle(
-          color: AgrisellColors.brandBlack,
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-        ),
-        decoration: InputDecoration(
-          hintText: 'Search products',
-          hintStyle: TextStyle(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.55),
-            fontSize: 12,
-          ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 11),
-          prefixIcon: const Icon(Icons.search_rounded, size: 21),
-          suffixIcon: controller.text.isEmpty
-              ? null
-              : IconButton(
-                  tooltip: 'Clear search',
-                  onPressed: () {
-                    controller.clear();
-                    onChanged('');
-                  },
-                  icon: const Icon(Icons.close_rounded, size: 19),
-                ),
+        style: FarmerDashboardHeaderStyles.textStyle,
+        decoration: FarmerDashboardHeaderStyles.inputDecoration(
+          controller,
+          onChanged,
         ),
       ),
     );

@@ -6,6 +6,99 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  testWidgets(
+    'hides empty and expired banners and renders compact promotions',
+    (tester) async {
+      final controller = PageController();
+      addTearDown(controller.dispose);
+      final expired = HomeBanner(
+        image: homeBanners.first.image,
+        prefix: 'Old ',
+        highlight: '10%',
+        subtitle: 'Expired',
+        title: 'OLD PRODUCT',
+        expiryLabel: 'Expired',
+        expiresAt: DateTime(2000),
+      );
+      for (final banners in <List<HomeBanner>>[
+        [],
+        [expired],
+        [expired, homeBanners.first],
+      ]) {
+        await tester.pumpWidget(_carouselHost(controller, banners, width: 360));
+        await tester.pump();
+        expect(find.text('OLD PRODUCT'), findsNothing);
+        expect(
+          find.bySemanticsLabel('Banner 1 of 1'),
+          banners.length == 2 ? findsOneWidget : findsNothing,
+        );
+        expect(find.byType(PageView), findsNothing);
+        expect(tester.takeException(), isNull);
+      }
+    },
+  );
+
+  testWidgets(
+    'updates banner lists and replaces the supplied page controller',
+    (tester) async {
+      final firstController = PageController(viewportFraction: 0.78);
+      final replacementController = PageController(viewportFraction: 0.78);
+      addTearDown(firstController.dispose);
+      addTearDown(replacementController.dispose);
+      final banners = [homeBanners.first, homeBanners.first];
+      int? changedIndex;
+      await tester.pumpWidget(
+        _carouselHost(
+          firstController,
+          banners,
+          onPageChanged: (index) => changedIndex = index,
+        ),
+      );
+      await tester.pump();
+      firstController.jumpToPage(10001);
+      await tester.pumpAndSettle();
+      expect(changedIndex, 1);
+      expect(find.bySemanticsLabel('Banner 2 of 2'), findsOneWidget);
+
+      await tester.pumpWidget(_carouselHost(replacementController, banners));
+      await tester.pumpAndSettle();
+      expect(firstController.hasClients, isFalse);
+      expect(replacementController.page, 10000);
+      expect(find.bySemanticsLabel('Banner 1 of 2'), findsOneWidget);
+
+      await tester.pumpWidget(
+        _carouselHost(replacementController, [homeBanners.first]),
+      );
+      await tester.pump();
+      expect(find.byType(PageView), findsNothing);
+      expect(find.bySemanticsLabel('Banner 1 of 1'), findsOneWidget);
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump(const Duration(seconds: 20));
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('pauses auto-scroll in the background and resumes when active', (
+    tester,
+  ) async {
+    final controller = PageController(viewportFraction: 0.78);
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      _carouselHost(controller, [homeBanners.first, homeBanners.first]),
+    );
+    await tester.pump();
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    await tester.pump(const Duration(seconds: 10));
+    expect(find.bySemanticsLabel('Banner 1 of 2'), findsOneWidget);
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pump(const Duration(milliseconds: 700));
+    expect(find.bySemanticsLabel('Banner 2 of 2'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   test('treats the expiry timestamp as an exclusive deadline', () {
     final banner = HomeBanner(
       image: 'image',
@@ -166,3 +259,25 @@ void main() {
     expect(openedSaleId, 42);
   });
 }
+
+Widget _carouselHost(
+  PageController controller,
+  List<HomeBanner> banners, {
+  double width = 430,
+  ValueChanged<int>? onPageChanged,
+}) => MaterialApp(
+  theme: AgrisellTheme.light,
+  home: Scaffold(
+    body: Center(
+      child: SizedBox(
+        width: width,
+        child: HomeBannerCarousel(
+          controller: controller,
+          height: 206,
+          banners: banners,
+          onPageChanged: onPageChanged,
+        ),
+      ),
+    ),
+  ),
+);

@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/buyer/home/presentation/styles/farmer_card_details_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -19,11 +21,7 @@ class FarmerIdentity extends StatelessWidget {
           farmer.name,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: AgrisellColors.headingGreen,
-            fontSize: 15,
-            fontWeight: FontWeight.w800,
-          ),
+          style: SharedPresentationStyles.headingTitleExtraBold,
         ),
         const SizedBox(height: 3),
         Row(
@@ -39,11 +37,7 @@ class FarmerIdentity extends StatelessWidget {
                 farmer.location,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: SharedPresentationStyles.mutedCaptionMedium,
               ),
             ),
           ],
@@ -58,11 +52,7 @@ class FarmerIdentity extends StatelessWidget {
                 '${farmer.followerCount} followers',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: SharedPresentationStyles.mutedCaptionMedium,
               ),
             ),
           ],
@@ -81,28 +71,14 @@ class FarmerAvailabilityBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      decoration: BoxDecoration(
-        color: AgrisellColors.limeSoft,
-        borderRadius: BorderRadius.circular(10),
-      ),
+      decoration: FarmerCardDetailsStyles.containerDecoration,
       child: Column(
         children: [
           Text(
             '$availableProducts',
-            style: const TextStyle(
-              color: AgrisellColors.authGreen,
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
-            ),
+            style: SharedPresentationStyles.greenBodyExtraBold,
           ),
-          const Text(
-            'available',
-            style: TextStyle(
-              color: AgrisellColors.authGreen,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          const Text('available', style: FarmerCardDetailsStyles.availableText),
         ],
       ),
     );

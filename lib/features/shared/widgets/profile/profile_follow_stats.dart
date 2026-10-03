@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/shared/widgets/profile/profile_follow_stats_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -58,17 +60,13 @@ class _FollowStat extends StatelessWidget {
         children: [
           TextSpan(
             text: '${count < 0 ? 0 : count} ',
-            style: const TextStyle(fontWeight: FontWeight.w800),
+            style: SharedPresentationStyles.extraBold,
           ),
           TextSpan(text: label),
         ],
       ),
       maxLines: 1,
-      style: TextStyle(
-        color: foregroundColor,
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-      ),
+      style: ProfileFollowStatsStyles.textStyle(foregroundColor),
     );
   }
 }

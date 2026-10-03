@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -28,11 +29,7 @@ class RiderSignUpDocumentTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: AgrisellColors.fieldFill,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AgrisellColors.borderLine),
-      ),
+      decoration: SharedPresentationStyles.borderedField,
       child: Row(
         children: [
           _Preview(document: item),
@@ -43,26 +40,23 @@ class RiderSignUpDocumentTile extends StatelessWidget {
               children: [
                 Text(
                   '${type.label}${required ? '' : ' (optional)'}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: SharedPresentationStyles.captionBold,
                 ),
                 const SizedBox(height: 3),
                 Text(
                   item?.fileName ?? 'JPG, PNG, or WEBP up to 8 MB',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AgrisellColors.mutedText,
-                  ),
+                  style: SharedPresentationStyles.mutedCaption,
                 ),
                 if (item != null) ...[
                   const SizedBox(height: 5),
                   LinearProgressIndicator(value: item.progress, minHeight: 4),
                   const SizedBox(height: 3),
-                  Text(item.status.label, style: const TextStyle(fontSize: 12)),
+                  Text(
+                    item.status.label,
+                    style: SharedPresentationStyles.caption,
+                  ),
                 ],
               ],
             ),
@@ -131,7 +125,7 @@ Future<ImageSource?> showRiderDocumentSourceSheet(BuildContext context) =>
               leading: const Icon(Icons.camera_alt_outlined),
               title: const Text(
                 'Take a clear photo',
-                style: TextStyle(fontSize: 13),
+                style: SharedPresentationStyles.body,
               ),
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
@@ -139,7 +133,7 @@ Future<ImageSource?> showRiderDocumentSourceSheet(BuildContext context) =>
               leading: const Icon(Icons.photo_library_outlined),
               title: const Text(
                 'Choose from gallery',
-                style: TextStyle(fontSize: 13),
+                style: SharedPresentationStyles.body,
               ),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),

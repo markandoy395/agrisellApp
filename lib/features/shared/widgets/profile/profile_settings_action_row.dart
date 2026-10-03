@@ -1,7 +1,7 @@
+import 'package:agresell_app/features/shared/widgets/profile/profile_settings_action_row_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
-import 'package:agresell_app/features/shared/widgets/profile/profile_text_styles.dart';
 
 class ProfileSettingsActionRow extends StatelessWidget {
   const ProfileSettingsActionRow({
@@ -35,10 +35,10 @@ class ProfileSettingsActionRow extends StatelessWidget {
           child: Row(
             children: [
               DecoratedBox(
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                decoration:
+                    ProfileSettingsActionRowStyles.decoratedBoxDecoration(
+                      color,
+                    ),
                 child: SizedBox.square(
                   dimension: 34,
                   child: Icon(icon, color: color, size: 19),
@@ -53,12 +53,10 @@ class ProfileSettingsActionRow extends StatelessWidget {
                       title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: ProfileTextStyles.infoLabel(context).copyWith(
-                        color: isDestructive
-                            ? color
-                            : AgrisellColors.brandBlack,
-                        fontWeight: FontWeight.w700,
-                        height: 1.1,
+                      style: ProfileSettingsActionRowStyles.titleText(
+                        context,
+                        isDestructive,
+                        color,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -66,9 +64,9 @@ class ProfileSettingsActionRow extends StatelessWidget {
                       subtitle,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: ProfileTextStyles.profileDescription(
+                      style: ProfileSettingsActionRowStyles.subtitleText(
                         context,
-                      ).copyWith(fontSize: 12, height: 1.2),
+                      ),
                     ),
                   ],
                 ),

@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/auth/presentation/styles/login_form_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -37,12 +39,7 @@ class LoginForm extends StatelessWidget {
     );
     final forgotButton = TextButton(
       onPressed: onForgotPassword,
-      style: TextButton.styleFrom(
-        foregroundColor: AgrisellColors.authGreen,
-        minimumSize: const Size(0, 40),
-        padding: EdgeInsets.zero,
-        textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-      ),
+      style: LoginFormStyles.textButtonStyle,
       child: const Text('Forgot password?'),
     );
     return AutofillGroup(
@@ -98,13 +95,7 @@ class LoginForm extends StatelessWidget {
               Expanded(child: Divider(color: AgrisellColors.borderLine)),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 12),
-                child: Text(
-                  'OR',
-                  style: TextStyle(
-                    color: AgrisellColors.mutedText,
-                    fontSize: 12,
-                  ),
-                ),
+                child: Text('OR', style: SharedPresentationStyles.mutedCaption),
               ),
               Expanded(child: Divider(color: AgrisellColors.borderLine)),
             ],
@@ -118,19 +109,11 @@ class LoginForm extends StatelessWidget {
               children: [
                 const Text(
                   "Don't have an account?",
-                  style: TextStyle(fontSize: 13),
+                  style: SharedPresentationStyles.body,
                 ),
                 TextButton(
                   onPressed: onCreateAccount,
-                  style: TextButton.styleFrom(
-                    foregroundColor: AgrisellColors.authGreen,
-                    padding: EdgeInsets.zero,
-                    minimumSize: const Size(0, 40),
-                    textStyle: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  style: LoginFormStyles.textButtonStyle2,
                   child: const Text('Create account'),
                 ),
               ],

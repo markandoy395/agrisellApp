@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/profile/presentation/styles/rider_vehicle_screen_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
@@ -50,11 +52,8 @@ class _RiderVehicleScreenState extends State<RiderVehicleScreen> {
 
   Widget _row(String label, String value) => Card(
     child: ListTile(
-      title: Text(label, style: const TextStyle(fontSize: 12)),
-      subtitle: Text(
-        value,
-        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-      ),
+      title: Text(label, style: SharedPresentationStyles.caption),
+      subtitle: Text(value, style: SharedPresentationStyles.bodyBold),
     ),
   );
 
@@ -131,17 +130,14 @@ class _VehicleEditDialogState extends State<_VehicleEditDialog> {
                 padding: const EdgeInsets.only(bottom: 8),
                 child: TextField(
                   controller: _controllers[index],
-                  decoration: InputDecoration(labelText: _labels[index]),
+                  decoration: RiderVehicleScreenStyles.inputDecoration(
+                    _labels,
+                    index,
+                  ),
                 ),
               ),
           if (_error != null)
-            Text(
-              _error!,
-              style: const TextStyle(
-                fontSize: 12,
-                color: AgrisellColors.statusRedText,
-              ),
-            ),
+            Text(_error!, style: SharedPresentationStyles.errorCaption),
         ],
       ),
     ),

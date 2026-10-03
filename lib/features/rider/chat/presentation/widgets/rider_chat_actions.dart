@@ -1,6 +1,7 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/chat/presentation/styles/rider_chat_actions_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/chat/domain/rider_communication_models.dart';
 
 class RiderQuickReplyRow extends StatelessWidget {
@@ -28,10 +29,7 @@ class RiderQuickReplyRow extends StatelessWidget {
         return ActionChip(
           label: Text(reply.label),
           onPressed: enabled ? () => onSelected(reply.message) : null,
-          labelStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-          ),
+          labelStyle: SharedPresentationStyles.captionBold,
         );
       },
     ),
@@ -89,10 +87,7 @@ class _ActionButton extends StatelessWidget {
       onPressed: enabled ? onTap : null,
       icon: Icon(icon, size: 17),
       label: Text(label),
-      style: TextButton.styleFrom(
-        foregroundColor: AgrisellColors.authGreen,
-        textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-      ),
+      style: RiderChatActionsStyles.textButtonStyle,
     ),
   );
 }
@@ -105,14 +100,7 @@ class RiderMessageError extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.fromLTRB(14, 4, 14, 0),
-    child: Text(
-      message,
-      style: const TextStyle(
-        color: AgrisellColors.statusRedText,
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-      ),
-    ),
+    child: Text(message, style: SharedPresentationStyles.errorCaptionSemibold),
   );
 }
 

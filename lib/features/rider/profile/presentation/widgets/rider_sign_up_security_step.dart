@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -27,7 +28,7 @@ class RiderSignUpSecurityStep extends StatelessWidget {
       children: [
         const Text(
           'Enter your email and create a strong password. We will verify your email before asking for personal information.',
-          style: TextStyle(fontSize: 12, color: AgrisellColors.mutedText),
+          style: SharedPresentationStyles.mutedCaption,
         ),
         const SizedBox(height: 12),
         RiderSignUpTextField(
@@ -67,7 +68,7 @@ class RiderSignUpSecurityStep extends StatelessWidget {
           const SizedBox(height: 12),
           const Text(
             'Password requirements',
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+            style: SharedPresentationStyles.bodyExtraBold,
           ),
           const SizedBox(height: 5),
           for (final item in requirements)
@@ -78,10 +79,7 @@ class RiderSignUpSecurityStep extends StatelessWidget {
               padding: EdgeInsets.only(top: 6),
               child: Text(
                 'Password is too weak.',
-                style: TextStyle(
-                  color: AgrisellColors.statusRedText,
-                  fontSize: 12,
-                ),
+                style: SharedPresentationStyles.errorCaption,
               ),
             ),
         ],
@@ -89,7 +87,7 @@ class RiderSignUpSecurityStep extends StatelessWidget {
           const SizedBox(height: 10),
           const Text(
             'These credentials are locked for this registration.',
-            style: TextStyle(fontSize: 12, color: AgrisellColors.mutedText),
+            style: SharedPresentationStyles.mutedCaption,
           ),
         ],
       ],
@@ -127,7 +125,7 @@ class _RiderSignUpPasswordFieldState extends State<RiderSignUpPasswordField> {
     obscureText: _hidden,
     readOnly: widget.readOnly,
     onChanged: widget.onChanged,
-    style: const TextStyle(fontSize: 13),
+    style: SharedPresentationStyles.body,
     decoration: AuthInputStyle.decoration(
       label: widget.label,
       contentPadding: riderSignUpFieldContentPadding,
@@ -161,7 +159,7 @@ class _Requirement extends StatelessWidget {
               : AgrisellColors.mutedText,
         ),
         const SizedBox(width: 7),
-        Text(label, style: const TextStyle(fontSize: 12)),
+        Text(label, style: SharedPresentationStyles.caption),
       ],
     ),
   );

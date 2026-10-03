@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/rider/chat/presentation/styles/rider_conversation_list_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -79,23 +81,16 @@ class _ConversationCard extends StatelessWidget {
                               conversation.participantLabel,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: AgrisellColors.headingGreen,
-                                fontSize: 14,
-                                fontWeight: hasUnread
-                                    ? FontWeight.w800
-                                    : FontWeight.w700,
+                              style: RiderConversationListStyles.textStyle(
+                                hasUnread,
                               ),
                             ),
                           ),
                           if (conversation.lastActivity case final activity?)
                             Text(
                               _timeLabel(activity),
-                              style: const TextStyle(
-                                color: AgrisellColors.mutedText,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style:
+                                  SharedPresentationStyles.mutedCaptionSemibold,
                             ),
                         ],
                       ),
@@ -104,11 +99,7 @@ class _ConversationCard extends StatelessWidget {
                         conversation.lastMessagePreview ?? 'No messages yet',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AgrisellColors.mutedText,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: SharedPresentationStyles.mutedCaptionMedium,
                       ),
                     ],
                   ),
@@ -121,18 +112,11 @@ class _ConversationCard extends StatelessWidget {
                       horizontal: 5,
                       vertical: 3,
                     ),
-                    decoration: const BoxDecoration(
-                      color: AgrisellColors.authGreen,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
+                    decoration: RiderConversationListStyles.containerDecoration,
                     child: Text(
                       '${conversation.unreadCount}',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: AgrisellColors.surface,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: RiderConversationListStyles.textStyle2,
                     ),
                   ),
                 ],
@@ -160,10 +144,7 @@ class _PartyAvatar extends StatelessWidget {
     return Container(
       width: 40,
       height: 40,
-      decoration: const BoxDecoration(
-        color: AgrisellColors.forestSoft,
-        shape: BoxShape.circle,
-      ),
+      decoration: SharedPresentationStyles.forestCircle,
       child: Icon(icon, color: AgrisellColors.authGreen, size: 20),
     );
   }

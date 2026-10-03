@@ -36,7 +36,7 @@ extension _RiderDeliveryDetailsContent on _RiderDeliveryDetailsScreenState {
           ),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(14, 14, 14, 28),
+              padding: RiderDeliveryDetailsStyles.listPadding,
               children: isRequest
                   ? _requestContent()
                   : _activeContent(context, currentStatus),
@@ -49,29 +49,25 @@ extension _RiderDeliveryDetailsContent on _RiderDeliveryDetailsScreenState {
 
   List<Widget> _requestContent() => [
     RiderRequestDetailSections(request: _request),
-    const SizedBox(height: 12),
+    const SizedBox(height: RiderDeliveryDetailsStyles.spacing12),
     SizedBox(
       width: double.infinity,
-      height: 40,
+      height: RiderDeliveryDetailsStyles.waybillButtonHeight,
       child: OutlinedButton.icon(
         key: const Key('rider-request-waybill-button'),
         onPressed: _openWaybill,
-        icon: const Icon(Icons.receipt_long_rounded, size: 16),
+        icon: const Icon(
+          Icons.receipt_long_rounded,
+          size: RiderDeliveryDetailsStyles.waybillButtonIconSize,
+        ),
         label: const Text(
           'Print / Download Waybill',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+          style: RiderDeliveryDetailsStyles.waybillButtonText,
         ),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AgrisellColors.authGreen,
-          backgroundColor: AgrisellColors.surface,
-          side: const BorderSide(color: AgrisellColors.borderLine),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
+        style: RiderDeliveryDetailsStyles.waybillButtonStyle,
       ),
     ),
-    const SizedBox(height: 12),
+    const SizedBox(height: RiderDeliveryDetailsStyles.spacing12),
     RiderDeliveryActionPanel(
       request: _request,
       canAccept: widget.controller.canAcceptRequest(_request.id),
@@ -92,33 +88,33 @@ extension _RiderDeliveryDetailsContent on _RiderDeliveryDetailsScreenState {
         .firstOrNull;
     return [
       RiderDeliveryRequestOverview(request: _request),
-      const SizedBox(height: 12),
+      const SizedBox(height: RiderDeliveryDetailsStyles.spacing12),
       RiderDeliveryStatusSummary(
         status: currentStatus,
         accuracyMeters: widget.controller.currentRiderLocation?.accuracyMeters,
       ),
       if (widget.controller.deliveryWaitingStartedAt case final startedAt?) ...[
-        const SizedBox(height: 12),
+        const SizedBox(height: RiderDeliveryDetailsStyles.spacing12),
         RiderDeliveryWaitingSummary(
           startedAt: startedAt,
           instructions: _request.deliveryInstructions,
         ),
       ],
-      const SizedBox(height: 12),
+      const SizedBox(height: RiderDeliveryDetailsStyles.spacing12),
       RiderDeliveryProgressTimeline(
         currentStatus: currentStatus,
         events: widget.controller.statusEventsFor(_request.id),
       ),
       if (evidence != null) ...[
-        const SizedBox(height: 12),
+        const SizedBox(height: RiderDeliveryDetailsStyles.spacing12),
         RiderDeliveryEvidenceView(proof: evidence),
       ],
       if (widget.controller.problemReportFor(_request.id)
           case final report?) ...[
-        const SizedBox(height: 12),
+        const SizedBox(height: RiderDeliveryDetailsStyles.spacing12),
         RiderReportStatusCard(report: report),
       ],
-      const SizedBox(height: 12),
+      const SizedBox(height: RiderDeliveryDetailsStyles.spacing12),
       RiderSurfaceCard(
         child: RiderDeliveryQuickActions(
           onRoute: () => unawaited(_openGoogleMapsRoute()),
@@ -130,7 +126,7 @@ extension _RiderDeliveryDetailsContent on _RiderDeliveryDetailsScreenState {
           onWaybill: _openWaybill,
         ),
       ),
-      const SizedBox(height: 14),
+      const SizedBox(height: RiderDeliveryDetailsStyles.spacing14),
       RiderDeliveryActionPanel(
         request: _request,
         canAccept: false,
@@ -156,70 +152,6 @@ extension _RiderDeliveryDetailsContent on _RiderDeliveryDetailsScreenState {
     if (!opened && mounted) {
       _showMessage('No delivery conversation is available yet.');
     }
-  }
-
-  Future<void> _openGoogleMapsRoute() async {
-    final destination = _request.deliveryLocation;
-    if (!GoogleMapsRoute.hasValidDestination(destination)) {
-      _showMessage(
-        "The buyer's saved delivery coordinates are unavailable. "
-        'Update the delivery location before opening the route.',
-      );
-      return;
-    }
-
-    final locationController = widget.locationController;
-    if (locationController == null) {
-      _showMessage(
-        'Current rider GPS location is unavailable. Enable location services '
-        'and Precise Location, then try again.',
-      );
-      return;
-    }
-    final previousLocation = locationController.location;
-    await locationController.refresh(requestPermission: true);
-    if (!mounted) return;
-    final origin = locationController.location;
-    if (identical(origin, previousLocation) ||
-        locationController.state != RiderLocationState.ready) {
-      _showMessage(_googleMapsLocationError(locationController));
-      return;
-    }
-    widget.controller.updateCurrentRiderLocation(origin);
-    final route = GoogleMapsRoute.directionsUri(
-      origin: widget.controller.currentRiderLocation,
-      destination: destination,
-    );
-    if (route == null) {
-      _showMessage(_googleMapsLocationError(locationController));
-      return;
-    }
-    try {
-      if (!await _launchRoute(route) && mounted) {
-        _showMessage('Google Maps could not be opened. Please try again.');
-      }
-    } on Exception {
-      if (mounted) {
-        _showMessage('Google Maps could not be opened. Please try again.');
-      }
-    }
-  }
-
-  String _googleMapsLocationError(RiderLocationController controller) {
-    if (controller.errorMessage case final message?) return message;
-    return switch (controller.state) {
-      RiderLocationState.serviceDisabled =>
-        'Location services are off. Turn on GPS, then try again.',
-      RiderLocationState.permissionDenied =>
-        'Location permission is required to open the route.',
-      RiderLocationState.permissionDeniedForever =>
-        'Location permission is blocked. Allow it in app settings, then try again.',
-      RiderLocationState.approximateLocation =>
-        'Precise Location is required to use your current position as the route start.',
-      _ =>
-        'Current rider GPS location is unavailable. Enable location services '
-            'and Precise Location, then try again.',
-    };
   }
 
   void _openWaybill() {

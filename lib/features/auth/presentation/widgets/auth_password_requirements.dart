@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -26,7 +27,7 @@ class AuthPasswordRequirements extends StatelessWidget {
             children: [
               const Text(
                 'Password requirements',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                style: SharedPresentationStyles.bodyBold,
               ),
               const SizedBox(height: 5),
               for (var index = 0; index < requirements.length; index += 2)
@@ -91,7 +92,10 @@ class _RequirementItem extends StatelessWidget {
         ),
         const SizedBox(width: 5),
         Expanded(
-          child: Text(requirement.label, style: const TextStyle(fontSize: 12)),
+          child: Text(
+            requirement.label,
+            style: SharedPresentationStyles.caption,
+          ),
         ),
       ],
     );

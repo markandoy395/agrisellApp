@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_progress_timeline_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -41,11 +43,7 @@ class RiderDeliveryProgressTimeline extends StatelessWidget {
     return Semantics(
       label: 'Delivery progress: ${_stages[activeIndex].label}',
       child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AgrisellColors.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AgrisellColors.borderLine),
-        ),
+        decoration: SharedPresentationStyles.borderedSurface,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
           child: Column(
@@ -125,7 +123,10 @@ class _TimelineRow extends StatelessWidget {
               Container(
                 width: 22,
                 height: 22,
-                decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+                decoration:
+                    RiderDeliveryProgressTimelineStyles.containerDecoration(
+                      color,
+                    ),
                 child: Icon(
                   complete ? Icons.check_rounded : Icons.circle,
                   size: complete ? 15 : 8,
@@ -145,21 +146,15 @@ class _TimelineRow extends StatelessWidget {
               children: [
                 Text(
                   stage.label,
-                  style: TextStyle(
-                    color: complete || active
-                        ? AgrisellColors.headingGreen
-                        : AgrisellColors.mutedText,
-                    fontSize: 13,
-                    fontWeight: active ? FontWeight.w800 : FontWeight.w600,
+                  style: RiderDeliveryProgressTimelineStyles.textStyle(
+                    complete,
+                    active,
                   ),
                 ),
                 if (timestamp != null)
                   Text(
                     _eventDetail(event!, timestamp),
-                    style: const TextStyle(
-                      color: AgrisellColors.mutedText,
-                      fontSize: 12,
-                    ),
+                    style: SharedPresentationStyles.mutedCaption,
                   ),
               ],
             ),

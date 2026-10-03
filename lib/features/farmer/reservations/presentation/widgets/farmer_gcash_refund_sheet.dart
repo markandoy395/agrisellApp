@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/farmer_gcash_refund_sheet_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
@@ -58,11 +60,7 @@ class _FarmerGcashRefundSheetState extends State<_FarmerGcashRefundSheet> {
             const Expanded(
               child: Text(
                 'Record GCash refund',
-                style: TextStyle(
-                  color: AgrisellColors.headingGreen,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w900,
-                ),
+                style: SharedPresentationStyles.headingTitleBlack,
               ),
             ),
             IconButton(
@@ -74,27 +72,16 @@ class _FarmerGcashRefundSheetState extends State<_FarmerGcashRefundSheet> {
         ),
         const Text(
           'Send the refund in GCash first. Recording it here updates the buyer and preserves an audit reference.',
-          style: TextStyle(
-            color: AgrisellColors.mutedText,
-            fontSize: 12,
-            height: 1.35,
-          ),
+          style: SharedPresentationStyles.mutedCaptionLoose,
         ),
         const SizedBox(height: 12),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: AgrisellColors.statusPurpleBackground,
-            borderRadius: BorderRadius.circular(10),
-          ),
+          decoration: FarmerGcashRefundSheetStyles.containerDecoration,
           child: Text(
             'Refund amount: ${formatBasketPeso(widget.order.total)}',
-            style: const TextStyle(
-              color: AgrisellColors.statusPurpleText,
-              fontSize: 13,
-              fontWeight: FontWeight.w900,
-            ),
+            style: FarmerGcashRefundSheetStyles.textStyle,
           ),
         ),
         const SizedBox(height: 12),
@@ -104,19 +91,8 @@ class _FarmerGcashRefundSheetState extends State<_FarmerGcashRefundSheet> {
           enabled: !_saving,
           maxLength: 40,
           textCapitalization: TextCapitalization.characters,
-          style: const TextStyle(fontSize: 13),
-          decoration: InputDecoration(
-            labelText: 'Refund transaction reference',
-            hintText: 'Reference from the refund receipt',
-            errorText: _error,
-            prefixIcon: const Icon(Icons.receipt_long_outlined, size: 19),
-            filled: true,
-            fillColor: AgrisellColors.searchBackground,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
-            ),
-          ),
+          style: SharedPresentationStyles.body,
+          decoration: FarmerGcashRefundSheetStyles.inputDecoration(_error),
         ),
         const SizedBox(height: 10),
         SizedBox(
@@ -124,16 +100,11 @@ class _FarmerGcashRefundSheetState extends State<_FarmerGcashRefundSheet> {
           height: 38,
           child: FilledButton.icon(
             onPressed: _saving ? null : _submit,
-            style: FilledButton.styleFrom(
-              backgroundColor: AgrisellColors.statusPurpleText,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
+            style: FarmerGcashRefundSheetStyles.filledButtonStyle,
             icon: const Icon(Icons.task_alt_outlined, size: 17),
             label: Text(
               _saving ? 'Saving...' : 'Confirm refund completed',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+              style: SharedPresentationStyles.captionExtraBold,
             ),
           ),
         ),

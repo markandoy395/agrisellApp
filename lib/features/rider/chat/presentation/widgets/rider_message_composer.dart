@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/chat/presentation/styles/rider_message_composer_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -49,21 +51,8 @@ class _RiderMessageComposerState extends State<RiderMessageComposer> {
                 minLines: 1,
                 maxLines: 3,
                 textCapitalization: TextCapitalization.sentences,
-                style: const TextStyle(fontSize: 13),
-                decoration: InputDecoration(
-                  hintText: 'Write a delivery message',
-                  hintStyle: const TextStyle(fontSize: 12),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  filled: true,
-                  fillColor: AgrisellColors.fieldFill,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
+                style: SharedPresentationStyles.body,
+                decoration: RiderMessageComposerStyles.inputDecoration,
                 onSubmitted: (_) => _send(),
               ),
             ),
@@ -74,10 +63,7 @@ class _RiderMessageComposerState extends State<RiderMessageComposer> {
               child: IconButton.filled(
                 tooltip: 'Send message',
                 onPressed: widget.enabled && !widget.isSending ? _send : null,
-                style: IconButton.styleFrom(
-                  backgroundColor: AgrisellColors.authGreen,
-                  foregroundColor: AgrisellColors.surface,
-                ),
+                style: RiderMessageComposerStyles.iconButtonStyle,
                 icon: widget.isSending
                     ? const SizedBox(
                         width: 17,

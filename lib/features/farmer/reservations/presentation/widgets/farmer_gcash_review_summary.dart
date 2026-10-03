@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/farmer_gcash_review_summary_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -13,29 +15,18 @@ class FarmerGcashReviewSummary extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     width: double.infinity,
     padding: const EdgeInsets.all(13),
-    decoration: BoxDecoration(
-      color: AgrisellColors.forestSoft,
-      borderRadius: BorderRadius.circular(11),
-    ),
+    decoration: FarmerGcashReviewSummaryStyles.containerDecoration,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           'BUYER-SUBMITTED REFERENCE',
-          style: TextStyle(
-            color: AgrisellColors.mutedText,
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-          ),
+          style: SharedPresentationStyles.mutedCaptionBold,
         ),
         const SizedBox(height: 5),
         SelectableText(
           order.payment.transactionReference,
-          style: const TextStyle(
-            color: AgrisellColors.brandBlack,
-            fontSize: 15,
-            fontWeight: FontWeight.w900,
-          ),
+          style: FarmerGcashReviewSummaryStyles.textStyle,
         ),
         const SizedBox(height: 10),
         Row(
@@ -55,13 +46,7 @@ class FarmerGcashReviewSummary extends StatelessWidget {
                 order.payment.hasReceiptImage
                     ? 'Receipt image uploaded'
                     : 'No receipt image attached',
-                style: TextStyle(
-                  color: order.payment.hasReceiptImage
-                      ? AgrisellColors.statusGreenText
-                      : AgrisellColors.statusOrangeText,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: FarmerGcashReviewSummaryStyles.textStyle2(order),
               ),
             ),
           ],
@@ -72,20 +57,12 @@ class FarmerGcashReviewSummary extends StatelessWidget {
             const Expanded(
               child: Text(
                 'Expected amount',
-                style: TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: SharedPresentationStyles.mutedCaptionSemibold,
               ),
             ),
             Text(
               formatBasketPeso(order.total),
-              style: const TextStyle(
-                color: AgrisellColors.headingGreen,
-                fontSize: 14,
-                fontWeight: FontWeight.w900,
-              ),
+              style: FarmerGcashReviewSummaryStyles.textStyle3,
             ),
           ],
         ),

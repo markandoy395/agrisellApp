@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/rider/safety/presentation/styles/rider_safety_report_dialog_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/app_dropdown_style.dart';
@@ -48,15 +49,13 @@ Future<RiderSafetyReportDraft?> showRiderSafetyReportDialog(
                     DropdownMenuItem(value: item, child: Text(_label(item))),
                 ],
                 onChanged: (value) => setDialogState(() => category = value!),
-                decoration: const InputDecoration(labelText: 'Safety category'),
+                decoration: RiderSafetyReportDialogStyles.inputDecoration,
               ),
               TextField(
                 controller: description,
                 minLines: 2,
                 maxLines: 4,
-                decoration: const InputDecoration(
-                  labelText: 'Describe the concern',
-                ),
+                decoration: RiderSafetyReportDialogStyles.inputDecoration2,
               ),
               if (onCapturePhoto != null)
                 ListTile(

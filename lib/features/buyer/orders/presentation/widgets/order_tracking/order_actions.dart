@@ -145,10 +145,7 @@ class _StatusChip extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: colors.background,
-        borderRadius: BorderRadius.circular(999),
-      ),
+      decoration: OrderActionsStyles.containerDecoration(colors),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -161,12 +158,7 @@ class _StatusChip extends StatelessWidget {
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: colors.text,
-                  fontSize: 12,
-                  height: 1,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: OrderActionsStyles.labelText(colors),
               ),
             ),
           ),

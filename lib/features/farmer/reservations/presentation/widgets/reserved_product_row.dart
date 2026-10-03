@@ -1,6 +1,7 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/reserved_product_row_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/products/presentation/widgets/product_thumbnail.dart';
 import 'package:agresell_app/features/farmer/reservations/domain/farmer_reservation.dart';
 
@@ -65,19 +66,11 @@ class _ProductDetailLine extends StatelessWidget {
     return Text.rich(
       TextSpan(
         children: [
-          TextSpan(
-            text: '$label: ',
-            style: const TextStyle(fontWeight: FontWeight.w800),
-          ),
+          TextSpan(text: '$label: ', style: SharedPresentationStyles.extraBold),
           TextSpan(text: value),
         ],
       ),
-      style: const TextStyle(
-        color: AgrisellColors.brandBlack,
-        fontSize: 12,
-        height: 1.2,
-        fontWeight: FontWeight.w500,
-      ),
+      style: ReservedProductRowStyles.textStyle,
     );
   }
 }

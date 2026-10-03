@@ -1,8 +1,8 @@
+import 'package:agresell_app/features/shared/widgets/profile/font_size_settings_control_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/services/app_font_size_controller.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
-import 'package:agresell_app/features/shared/widgets/profile/profile_text_styles.dart';
 
 /// A shared display setting used by buyer, farmer, and rider accounts.
 class FontSizeSettingsControl extends StatelessWidget {
@@ -21,10 +21,8 @@ class FontSizeSettingsControl extends StatelessWidget {
             child: Row(
               children: [
                 DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: AgrisellColors.authGreen.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                  decoration:
+                      FontSizeSettingsControlStyles.decoratedBoxDecoration,
                   child: const SizedBox.square(
                     dimension: 34,
                     child: Icon(
@@ -41,18 +39,14 @@ class FontSizeSettingsControl extends StatelessWidget {
                     children: [
                       Text(
                         'Font size',
-                        style: ProfileTextStyles.infoLabel(context).copyWith(
-                          color: AgrisellColors.brandBlack,
-                          fontWeight: FontWeight.w700,
-                          height: 1.1,
+                        style: FontSizeSettingsControlStyles.fontSizeText(
+                          context,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         '${controller.displayLabel} (${controller.percentageLabel})',
-                        style: ProfileTextStyles.profileDescription(
-                          context,
-                        ).copyWith(fontSize: 12, height: 1.2),
+                        style: FontSizeSettingsControlStyles.textStyle(context),
                       ),
                     ],
                   ),

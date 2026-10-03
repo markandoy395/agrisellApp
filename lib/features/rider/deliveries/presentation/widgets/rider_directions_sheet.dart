@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -18,12 +19,15 @@ void showRiderDirectionsSheet(BuildContext context, RiderRoutePlan route) {
             dense: true,
             leading: CircleAvatar(
               backgroundColor: AgrisellColors.forestSoft,
-              child: Text('${index + 1}', style: const TextStyle(fontSize: 12)),
+              child: Text(
+                '${index + 1}',
+                style: SharedPresentationStyles.caption,
+              ),
             ),
-            title: Text(step.text, style: const TextStyle(fontSize: 13)),
+            title: Text(step.text, style: SharedPresentationStyles.body),
             subtitle: Text(
               '${step.distanceMeters.round()} m',
-              style: const TextStyle(fontSize: 12),
+              style: SharedPresentationStyles.caption,
             ),
           );
         },

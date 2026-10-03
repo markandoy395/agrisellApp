@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/auth/presentation/styles/auth_checkbox_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -34,7 +35,7 @@ class _AuthCheckboxState extends State<AuthCheckbox> {
       child: Text(
         widget.label,
         style: widget.compact
-            ? _labelStyle(scale).copyWith(fontSize: 12)
+            ? AuthCheckboxStyles.textStyle(_labelStyle(scale))
             : _labelStyle(scale),
       ),
     );
@@ -77,15 +78,9 @@ class _AuthPolicyCheckboxState extends State<AuthPolicyCheckbox> {
             text: 'I Agree with ',
             style: _labelStyle(scale),
             children: const [
-              TextSpan(
-                text: 'privacy',
-                style: TextStyle(color: AgrisellColors.authGreen),
-              ),
+              TextSpan(text: 'privacy', style: AuthCheckboxStyles.textStyle2),
               TextSpan(text: ' and '),
-              TextSpan(
-                text: 'policy',
-                style: TextStyle(color: AgrisellColors.authGreen),
-              ),
+              TextSpan(text: 'policy', style: AuthCheckboxStyles.textStyle2),
             ],
           ),
         ),
@@ -151,9 +146,5 @@ class _CheckboxRow extends StatelessWidget {
 }
 
 TextStyle _labelStyle(double scale) {
-  return TextStyle(
-    color: AgrisellColors.brandBlack,
-    fontSize: lerpDouble(12, 14, scale),
-    fontWeight: FontWeight.w400,
-  );
+  return AuthCheckboxStyles.textStyle3(scale);
 }

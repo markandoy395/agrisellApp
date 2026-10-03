@@ -1,3 +1,6 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/buyer/orders/presentation/styles/gcash_reference_retry_sheet_styles.dart';
+import 'package:agresell_app/features/buyer/orders/presentation/styles/order_feedback_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
@@ -59,11 +62,7 @@ class _GcashReferenceRetrySheetState extends State<_GcashReferenceRetrySheet> {
               const Expanded(
                 child: Text(
                   'Replace GCash reference',
-                  style: TextStyle(
-                    color: AgrisellColors.headingGreen,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w900,
-                  ),
+                  style: SharedPresentationStyles.headingTitleBlack,
                 ),
               ),
               IconButton(
@@ -75,10 +74,7 @@ class _GcashReferenceRetrySheetState extends State<_GcashReferenceRetrySheet> {
           ),
           Container(
             padding: const EdgeInsets.all(11),
-            decoration: BoxDecoration(
-              color: AgrisellColors.statusRedBackground,
-              borderRadius: BorderRadius.circular(10),
-            ),
+            decoration: GcashReferenceRetrySheetStyles.containerDecoration,
             child: const Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -91,11 +87,7 @@ class _GcashReferenceRetrySheetState extends State<_GcashReferenceRetrySheet> {
                 Expanded(
                   child: Text(
                     'The farmer could not match the previous reference. Copy the exact reference from your GCash receipt.',
-                    style: TextStyle(
-                      color: AgrisellColors.statusRedText,
-                      fontSize: 12,
-                      height: 1.3,
-                    ),
+                    style: GcashReferenceRetrySheetStyles.textStyle,
                   ),
                 ),
               ],
@@ -108,29 +100,12 @@ class _GcashReferenceRetrySheetState extends State<_GcashReferenceRetrySheet> {
             enabled: !_saving,
             maxLength: 17,
             keyboardType: TextInputType.number,
-            style: const TextStyle(fontSize: 13),
+            style: SharedPresentationStyles.body,
             onChanged: (_) => setState(() {}),
-            decoration: InputDecoration(
-              labelText: 'New GCash reference number',
-              helperText: 'Enter the 13-digit number from your receipt.',
-              helperMaxLines: 2,
-              prefixIcon: const Icon(Icons.receipt_long_outlined, size: 19),
-              filled: true,
-              fillColor: AgrisellColors.searchBackground,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
-              ),
-            ),
+            decoration: GcashReferenceRetrySheetStyles.inputDecoration,
           ),
           if (_error case final message?) ...[
-            Text(
-              message,
-              style: const TextStyle(
-                color: AgrisellColors.statusRedText,
-                fontSize: 12,
-              ),
-            ),
+            Text(message, style: SharedPresentationStyles.errorCaption),
             const SizedBox(height: 7),
           ],
           SizedBox(
@@ -138,19 +113,11 @@ class _GcashReferenceRetrySheetState extends State<_GcashReferenceRetrySheet> {
             height: 38,
             child: FilledButton.icon(
               onPressed: _saving || !_isValid ? null : _submit,
-              style: FilledButton.styleFrom(
-                backgroundColor: AgrisellColors.authGreen,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
+              style: OrderFeedbackStyles.submitButtonStyle,
               icon: const Icon(Icons.refresh_rounded, size: 17),
               label: Text(
                 _saving ? 'Submitting…' : 'Submit for verification',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: SharedPresentationStyles.captionExtraBold,
               ),
             ),
           ),

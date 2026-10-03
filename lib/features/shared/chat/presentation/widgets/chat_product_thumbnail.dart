@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/shared/chat/presentation/styles/chat_product_thumbnail_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -38,10 +39,8 @@ class ChatProductThumbnail extends StatelessWidget {
         child: Container(
           width: size,
           height: size,
-          decoration: BoxDecoration(
-            color: AgrisellColors.searchBackground,
-            borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(color: AgrisellColors.borderLine),
+          decoration: ChatProductThumbnailStyles.containerDecoration(
+            borderRadius,
           ),
           child: Icon(
             placeholderIcon,

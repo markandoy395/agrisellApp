@@ -1,6 +1,7 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/profile/presentation/styles/rider_sign_up_availability_note_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/profile/presentation/controllers/rider_sign_up_controller.dart';
 
 class RiderSignUpAvailabilityNote extends StatelessWidget {
@@ -20,7 +21,10 @@ class RiderSignUpAvailabilityNote extends StatelessWidget {
             child: CircularProgressIndicator(strokeWidth: 2),
           ),
           SizedBox(width: 6),
-          Text('Checking availability...', style: TextStyle(fontSize: 12)),
+          Text(
+            'Checking availability...',
+            style: SharedPresentationStyles.caption,
+          ),
         ],
       ),
     ),
@@ -28,14 +32,14 @@ class RiderSignUpAvailabilityNote extends StatelessWidget {
       padding: EdgeInsets.only(top: 5),
       child: Text(
         'Available',
-        style: TextStyle(color: AgrisellColors.statusGreenText, fontSize: 12),
+        style: RiderSignUpAvailabilityNoteStyles.availableText,
       ),
     ),
     RiderFieldAvailability.unavailable => const Padding(
       padding: EdgeInsets.only(top: 5),
       child: Text(
         'Already registered',
-        style: TextStyle(color: AgrisellColors.statusRedText, fontSize: 12),
+        style: SharedPresentationStyles.errorCaption,
       ),
     ),
   };

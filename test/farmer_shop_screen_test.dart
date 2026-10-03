@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
+import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
+import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/farmer/dashboard/presentation/screens/farmer_dashboard_screen.dart';
 import 'package:agresell_app/features/farmer/dashboard/presentation/widgets/farmer_quick_menu.dart';
 import 'package:agresell_app/features/shared/products/domain/product_availability_date_rules.dart';
@@ -8,8 +10,27 @@ import 'package:agresell_app/features/shared/products/domain/product_production_
 import 'package:agresell_app/features/shared/products/domain/product_sale_status.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'support/auth_account_fixture.dart';
 
 void main() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    AuthRegistrationService.instance.clearForTesting();
+    AuthSessionService.instance.clearMemoryForTesting();
+    final account = await registerTestAccount();
+    final verifiedAccount = account.copyWith(verificationStatus: 'verified');
+    AuthRegistrationService.instance.setCurrentAccountForTesting(
+      verifiedAccount,
+    );
+    await AuthSessionService.instance.start(verifiedAccount, rememberMe: false);
+  });
+
+  tearDown(() {
+    AuthSessionService.instance.clearMemoryForTesting();
+    AuthRegistrationService.instance.clearForTesting();
+  });
+
   testWidgets('farmer dashboard starts empty until backend data arrives', (
     tester,
   ) async {

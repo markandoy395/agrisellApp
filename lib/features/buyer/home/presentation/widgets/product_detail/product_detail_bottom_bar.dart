@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/buyer/home/presentation/styles/product_detail_bottom_bar_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -31,16 +33,7 @@ class BottomActionBar extends StatelessWidget {
         top: false,
         child: Container(
           padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-          decoration: BoxDecoration(
-            color: AgrisellColors.surface,
-            boxShadow: [
-              BoxShadow(
-                color: AgrisellColors.brandBlack.withValues(alpha: 0.09),
-                blurRadius: 16,
-                offset: const Offset(0, -4),
-              ),
-            ],
-          ),
+          decoration: ProductDetailBottomBarStyles.containerDecoration,
           child: isAvailable
               ? _AvailableActions(
                   onBuyNow: onBuyNow,
@@ -78,18 +71,7 @@ class _AvailableActions extends StatelessWidget {
             height: 40,
             child: OutlinedButton(
               onPressed: onBuyNow,
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AgrisellColors.authGreen,
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                side: const BorderSide(color: AgrisellColors.authGreen),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+              style: ProductDetailBottomBarStyles.outlinedButtonStyle,
               child: Text(isPreOrder ? 'Pre-order now' : 'Buy Now'),
             ),
           ),
@@ -101,18 +83,7 @@ class _AvailableActions extends StatelessWidget {
             height: 40,
             child: FilledButton(
               onPressed: onAddToBasket,
-              style: FilledButton.styleFrom(
-                backgroundColor: AgrisellColors.authGreen,
-                foregroundColor: AgrisellColors.surface,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+              style: ProductDetailBottomBarStyles.filledButtonStyle,
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 180),
                 child: Text(
@@ -145,17 +116,11 @@ class _UnavailableAction extends StatelessWidget {
         height: 40,
         child: FilledButton.icon(
           onPressed: null,
-          style: FilledButton.styleFrom(
-            disabledBackgroundColor: AgrisellColors.deliveryGray,
-            disabledForegroundColor: AgrisellColors.mutedText,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-          ),
+          style: ProductDetailBottomBarStyles.filledButtonStyle2,
           icon: const Icon(Icons.block_rounded, size: 18),
           label: const Text(
             'Currently Unavailable',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+            style: SharedPresentationStyles.captionBold,
           ),
         ),
       ),

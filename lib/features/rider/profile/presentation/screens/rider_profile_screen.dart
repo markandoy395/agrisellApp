@@ -3,13 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/presentation/account_session_navigation.dart';
 import 'package:agresell_app/features/rider/profile/data/rider_registration_service.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_account_exit_policy.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
+import 'package:agresell_app/features/rider/profile/presentation/styles/rider_profile_screen_styles.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/controllers/rider_analytics_controller.dart';
 import 'package:agresell_app/features/rider/safety/presentation/controllers/rider_safety_controller.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
@@ -60,6 +60,8 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
   late RiderProfile? _profile;
   var _mode = _RiderProfileMode.overview;
 
+  void _updateUi(VoidCallback update) => setState(update);
+
   void _syncProfile() {
     final profile = RiderRegistrationService.instance.currentProfile;
     if (mounted && profile != _profile) setState(() => _profile = profile);
@@ -98,7 +100,7 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
   Widget build(BuildContext context) {
     final profile = _profile;
     return ColoredBox(
-      color: AgrisellColors.homeBackground,
+      color: RiderProfileScreenStyles.backgroundColor,
       child: Column(
         children: [
           RiderPageHeader(
@@ -106,10 +108,10 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
             subtitle: 'Account, vehicle, documents, and safety',
             action: IconButton(
               tooltip: 'Settings',
-              constraints: const BoxConstraints.tightFor(width: 38, height: 38),
-              padding: EdgeInsets.zero,
-              color: AgrisellColors.surface,
-              iconSize: 24,
+              constraints: RiderProfileScreenStyles.settingsConstraints,
+              padding: RiderProfileScreenStyles.settingsIconPadding,
+              color: RiderProfileScreenStyles.settingsIconColor,
+              iconSize: RiderProfileScreenStyles.settingsIconSize,
               onPressed: () => _setMode(_RiderProfileMode.settings),
               icon: const Icon(Icons.settings_rounded),
             ),
@@ -118,7 +120,7 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
             child: profile == null
                 ? const Center(
                     child: Padding(
-                      padding: EdgeInsets.all(22),
+                      padding: RiderProfileScreenStyles.emptyStatePadding,
                       child: RiderEmptyStateCard(
                         title: 'No rider profile',
                         message:
@@ -180,37 +182,5 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
   void _setMode(_RiderProfileMode mode) {
     if (_mode == mode) return;
     setState(() => _mode = mode);
-  }
-
-  Future<void> _editProfile() async {
-    final profile = _profile;
-    if (profile == null) return;
-    final updated = await showRiderProfileEditDialog(context, profile);
-    if (updated == null || !mounted) return;
-    try {
-      final saved = await RiderRegistrationService.instance.saveCurrentProfile(
-        updated,
-      );
-      if (mounted) setState(() => _profile = saved);
-    } on RiderRegistrationException catch (error) {
-      if (mounted) _message(error.message);
-    }
-  }
-
-  Future<void> _changePassword() async {
-    final profile = _profile;
-    if (profile == null) return;
-    final change = await showRiderPasswordChangeDialog(context);
-    if (change == null || !mounted) return;
-    try {
-      await AuthRegistrationService.instance.changePassword(
-        email: profile.email,
-        currentPassword: change.currentPassword,
-        newPassword: change.newPassword,
-      );
-      if (mounted) _message('Password updated.');
-    } on AuthRegistrationException catch (error) {
-      if (mounted) _message(error.message);
-    }
   }
 }

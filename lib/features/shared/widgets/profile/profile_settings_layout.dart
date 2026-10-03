@@ -1,8 +1,8 @@
+import 'package:agresell_app/features/shared/widgets/profile/profile_settings_layout_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/widgets/profile/profile_section_label.dart';
-import 'package:agresell_app/features/shared/widgets/profile/profile_text_styles.dart';
 
 class ProfileSettingsHeader extends StatelessWidget {
   const ProfileSettingsHeader({this.onClose, super.key});
@@ -43,20 +43,13 @@ class ProfileSettingsAccountSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AgrisellColors.limeSoft,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AgrisellColors.borderLine),
-      ),
+      decoration: ProfileSettingsLayoutStyles.decoratedBoxDecoration,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
             const DecoratedBox(
-              decoration: BoxDecoration(
-                color: AgrisellColors.authGreen,
-                shape: BoxShape.circle,
-              ),
+              decoration: ProfileSettingsLayoutStyles.decoratedBoxDecoration2,
               child: SizedBox.square(
                 dimension: 34,
                 child: Icon(
@@ -75,18 +68,14 @@ class ProfileSettingsAccountSummary extends StatelessWidget {
                     name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: ProfileTextStyles.infoLabel(
-                      context,
-                    ).copyWith(fontWeight: FontWeight.w700, height: 1.1),
+                    style: ProfileSettingsLayoutStyles.nameText(context),
                   ),
                   const SizedBox(height: 3),
                   Text(
                     email,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: ProfileTextStyles.profileDescription(
-                      context,
-                    ).copyWith(fontSize: 12, height: 1.2),
+                    style: ProfileSettingsLayoutStyles.emailText(context),
                   ),
                 ],
               ),
@@ -113,14 +102,7 @@ class ProfileSettingsGroup extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            color: AgrisellColors.headingGreen,
-            fontSize: 12,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
+        Text(title, style: ProfileSettingsLayoutStyles.titleText),
         const SizedBox(height: 3),
         for (var index = 0; index < children.length; index++) ...[
           children[index],

@@ -1,6 +1,5 @@
+import 'package:agresell_app/features/auth/presentation/styles/auth_description_text_styles.dart';
 import 'package:flutter/material.dart';
-
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 class AuthDescriptionText extends StatelessWidget {
   const AuthDescriptionText({
@@ -20,12 +19,7 @@ class AuthDescriptionText extends StatelessWidget {
         child: Text(
           text,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: AgrisellColors.brandBlack,
-            fontSize: 15,
-            fontWeight: FontWeight.w400,
-            height: 1.18,
-          ),
+          style: AuthDescriptionTextStyles.textText,
         ),
       ),
     );

@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/farmer/products/presentation/styles/product_edit_sale_status_row_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/app_dropdown_style.dart';
@@ -27,32 +29,12 @@ class ProductEditSaleStatusRow extends StatelessWidget {
         child: DropdownButtonFormField<ProductSaleStatus>(
           dropdownColor: AppDropdownStyle.menuColor,
           borderRadius: AppDropdownStyle.menuBorderRadius,
-          style: AppDropdownStyle.textStyle.copyWith(fontSize: 12),
+          style: ProductEditSaleStatusRowStyles.dropdownButtonFormFieldStyle,
           iconEnabledColor: AppDropdownStyle.iconColor,
           initialValue: value,
           isExpanded: true,
           icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 17),
-          decoration: InputDecoration(
-            isDense: true,
-            filled: true,
-            fillColor: AgrisellColors.surface,
-            contentPadding: const EdgeInsets.fromLTRB(11, 4, 5, 4),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(17),
-              borderSide: const BorderSide(color: AgrisellColors.authGreen),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(17),
-              borderSide: const BorderSide(color: AgrisellColors.authGreen),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(17),
-              borderSide: const BorderSide(
-                color: AgrisellColors.authGreen,
-                width: 1.4,
-              ),
-            ),
-          ),
+          decoration: ProductEditSaleStatusRowStyles.inputDecoration,
           selectedItemBuilder: (context) => [
             for (final status in _options)
               Align(
@@ -61,7 +43,7 @@ class ProductEditSaleStatusRow extends StatelessWidget {
                   status.farmerLabel,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 12, height: 1),
+                  style: ProductEditSaleStatusRowStyles.textStyle,
                 ),
               ),
           ],
@@ -73,7 +55,7 @@ class ProductEditSaleStatusRow extends StatelessWidget {
                   status.farmerLabel,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 12),
+                  style: SharedPresentationStyles.caption,
                 ),
               ),
           ],
@@ -113,19 +95,14 @@ class ProductEditProductionStageRow extends StatelessWidget {
         child: DropdownButtonFormField<ProductProductionStage>(
           dropdownColor: AppDropdownStyle.menuColor,
           borderRadius: AppDropdownStyle.menuBorderRadius,
-          style: AppDropdownStyle.textStyle.copyWith(fontSize: 12),
+          style: ProductEditSaleStatusRowStyles.dropdownButtonFormFieldStyle,
           iconEnabledColor: AppDropdownStyle.iconColor,
           initialValue: value,
           isExpanded: true,
           icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 17),
-          decoration: InputDecoration(
-            isDense: true,
-            filled: true,
-            fillColor: AgrisellColors.surface,
-            contentPadding: const EdgeInsets.fromLTRB(11, 4, 5, 4),
-            border: _stageBorder(),
-            enabledBorder: _stageBorder(),
-            focusedBorder: _stageBorder(width: 1.4),
+          decoration: ProductEditSaleStatusRowStyles.inputDecoration2(
+            _stageBorder(),
+            _stageBorder(width: 1.4),
           ),
           selectedItemBuilder: (context) => [
             for (final stage in ProductProductionStage.values)
@@ -134,7 +111,7 @@ class ProductEditProductionStageRow extends StatelessWidget {
                 child: Text(
                   stage.farmerLabel,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 12),
+                  style: SharedPresentationStyles.caption,
                 ),
               ),
           ],
@@ -144,7 +121,7 @@ class ProductEditProductionStageRow extends StatelessWidget {
                 value: stage,
                 child: Text(
                   stage.farmerLabel,
-                  style: const TextStyle(fontSize: 12),
+                  style: SharedPresentationStyles.caption,
                 ),
               ),
           ],

@@ -24,21 +24,14 @@ class _FeedbackProductHeader extends StatelessWidget {
               item.productName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AgrisellColors.headingGreen,
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-              ),
+              style: SharedPresentationStyles.headingTitleExtraBold,
             ),
             const SizedBox(height: 2),
             Text(
               'Sold by ${item.sellerName}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AgrisellColors.mutedText,
-                fontSize: 12,
-              ),
+              style: SharedPresentationStyles.mutedCaption,
             ),
           ],
         ),

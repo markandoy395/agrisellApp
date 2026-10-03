@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/farmer/registration/presentation/styles/farmer_signup_progress_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -47,38 +48,20 @@ class FarmerSignupProgress extends StatelessWidget {
                           width: 34,
                           height: 34,
                           alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: active
-                                ? AgrisellColors.authGreen
-                                : AgrisellColors.deliveryGray,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AgrisellColors.surface,
-                              width: 2,
-                            ),
-                          ),
+                          decoration:
+                              FarmerSignupProgressStyles.containerDecoration(
+                                active,
+                              ),
                           child: Text(
                             '${index + 1}',
-                            style: const TextStyle(
-                              color: AgrisellColors.surface,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                            ),
+                            style: FarmerSignupProgressStyles.textStyle,
                           ),
                         ),
                         const SizedBox(height: 5),
                         Text(
                           _labels[index],
                           maxLines: 1,
-                          style: TextStyle(
-                            color: active
-                                ? AgrisellColors.authGreen
-                                : AgrisellColors.mutedText,
-                            fontSize: 12,
-                            fontWeight: active
-                                ? FontWeight.w600
-                                : FontWeight.w400,
-                          ),
+                          style: FarmerSignupProgressStyles.textStyle2(active),
                         ),
                       ],
                     ),

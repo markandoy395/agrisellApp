@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/farmer/chat/presentation/styles/message_filter_tabs_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -78,21 +79,14 @@ class _MessageFilterChip extends StatelessWidget {
           curve: Curves.easeOutCubic,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: background,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: AgrisellColors.authGreen),
+          decoration: MessageFilterTabsStyles.animatedContainerDecoration(
+            background,
           ),
           child: Text(
             filter.label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: foreground,
-              fontSize: 12,
-              height: 1,
-              fontWeight: FontWeight.w700,
-            ),
+            style: MessageFilterTabsStyles.textStyle(foreground),
           ),
         ),
       ),

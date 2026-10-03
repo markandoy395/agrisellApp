@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/farmer_order_summary_card_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -48,11 +50,7 @@ class FarmerOrderSummaryCard extends StatelessWidget {
                         'Order #${order.id}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AgrisellColors.mutedText,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: SharedPresentationStyles.mutedCaptionBold,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -67,11 +65,7 @@ class FarmerOrderSummaryCard extends StatelessWidget {
                   buyerName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AgrisellColors.headingGreen,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: SharedPresentationStyles.headingSubtitleExtraBold,
                 ),
                 const SizedBox(height: 5),
                 Row(
@@ -80,11 +74,7 @@ class FarmerOrderSummaryCard extends StatelessWidget {
                       child: Text(
                         '${order.totalQuantity} $itemLabel \u2022 '
                         '${formatBasketPeso(order.total)}',
-                        style: const TextStyle(
-                          color: AgrisellColors.brandBlack,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: FarmerOrderSummaryCardStyles.textStyle,
                       ),
                     ),
                     const Icon(

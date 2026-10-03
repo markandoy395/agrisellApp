@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/farmer/dashboard/presentation/styles/farmer_sold_status_overlay_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -11,16 +12,7 @@ class FarmerSoldStatusOverlay extends StatelessWidget {
     return Positioned.fill(
       child: IgnorePointer(
         child: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AgrisellColors.brandBlack.withValues(alpha: 0.46),
-                AgrisellColors.brandBlack.withValues(alpha: 0.12),
-              ],
-            ),
-          ),
+          decoration: FarmerSoldStatusOverlayStyles.decoratedBoxDecoration,
           child: const Align(
             alignment: Alignment.topLeft,
             child: Padding(
@@ -40,20 +32,7 @@ class _FarmerSoldStatusPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AgrisellColors.statusRedBackground,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AgrisellColors.statusRedText.withValues(alpha: 0.22),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.16),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
+      decoration: FarmerSoldStatusOverlayStyles.decoratedBoxDecoration2,
       child: const Padding(
         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         child: Row(
@@ -65,15 +44,7 @@ class _FarmerSoldStatusPill extends StatelessWidget {
               size: 14,
             ),
             SizedBox(width: 5),
-            Text(
-              'Sold',
-              style: TextStyle(
-                color: AgrisellColors.statusRedText,
-                fontSize: 12,
-                height: 1,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
+            Text('Sold', style: FarmerSoldStatusOverlayStyles.soldText),
           ],
         ),
       ),

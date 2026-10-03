@@ -65,32 +65,18 @@ class _AvailabilityFields extends StatelessWidget {
                       expectedDate == null
                           ? 'Select date'
                           : _displayDate(expectedDate!),
-                      style: const TextStyle(fontSize: 12),
+                      style: SharedPresentationStyles.caption,
                     ),
-                    style: OutlinedButton.styleFrom(
-                      alignment: Alignment.centerLeft,
-                      foregroundColor: AgrisellColors.authGreen,
-                      side: BorderSide(
-                        color: errors.containsKey(AddProductField.harvestDate)
-                            ? AgrisellColors.statusRedText
-                            : AgrisellColors.borderLine,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
+                    style:
+                        AddProductAvailabilityFieldsStyles.outlinedButtonStyle(
+                          errors,
+                        ),
                   ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   errors[AddProductField.harvestDate] ?? dateWindow.guidance,
-                  style: TextStyle(
-                    color: errors.containsKey(AddProductField.harvestDate)
-                        ? AgrisellColors.statusRedText
-                        : AgrisellColors.mutedText,
-                    fontSize: 12,
-                    height: 1.25,
-                  ),
+                  style: AddProductAvailabilityFieldsStyles.textStyle(errors),
                 ),
               ],
             ),

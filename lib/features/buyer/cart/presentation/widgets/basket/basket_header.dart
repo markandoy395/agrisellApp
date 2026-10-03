@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/buyer/cart/presentation/styles/basket_header_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -26,21 +27,7 @@ class BasketHeader extends StatelessWidget {
         horizontalPadding,
         22,
       ),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AgrisellColors.forestDark, AgrisellColors.authGreen],
-        ),
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.forestDark.withValues(alpha: 0.2),
-            blurRadius: 18,
-            offset: const Offset(0, 7),
-          ),
-        ],
-      ),
+      decoration: BasketHeaderStyles.containerDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -60,26 +47,13 @@ class BasketHeader extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Basket',
-            style: TextStyle(
-              color: AgrisellColors.surface,
-              fontSize: 15,
-              height: 1.05,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
+          const Text('Basket', style: BasketHeaderStyles.basketText),
           const SizedBox(height: 6),
           Text(
             itemCount == 0
                 ? 'Fresh finds from local farmers await.'
                 : '$itemCount ${itemCount == 1 ? 'product' : 'products'} ready to review',
-            style: TextStyle(
-              color: AgrisellColors.surface.withValues(alpha: 0.78),
-              fontSize: 12,
-              height: 1.3,
-              fontWeight: FontWeight.w500,
-            ),
+            style: BasketHeaderStyles.textStyle,
           ),
         ],
       ),

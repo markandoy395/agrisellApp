@@ -1,6 +1,6 @@
+import 'package:agresell_app/features/auth/presentation/styles/auth_card_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/responsive.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/keyboard_adaptive_scroll_view.dart';
 
@@ -40,22 +40,11 @@ class AuthCard extends StatelessWidget {
             keyboardPadding +
             keyboardGap,
       ),
-      decoration: const BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(46)),
-      ),
+      decoration: AuthCardStyles.containerDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              color: AgrisellColors.authGreen,
-              fontSize: largeTitle ? 15 : lerpDouble(14, 15, scale),
-              fontWeight: FontWeight.w700,
-              height: 1.1,
-            ),
-          ),
+          Text(title, style: AuthCardStyles.titleText(largeTitle, scale)),
           SizedBox(height: lerpDouble(18, 22, scale) - keyboardCompaction),
           Expanded(
             child: scrollable

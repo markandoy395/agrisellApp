@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/buyer/home/presentation/styles/farmer_shop_tabs_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -18,10 +19,7 @@ class FarmerShopTabs extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 42,
-      decoration: const BoxDecoration(
-        color: AgrisellColors.surface,
-        border: Border(bottom: BorderSide(color: AgrisellColors.borderLine)),
-      ),
+      decoration: FarmerShopTabsStyles.containerDecoration,
       child: ClipRect(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -76,12 +74,7 @@ class _TabButton extends StatelessWidget {
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: textColor,
-                fontSize: 13,
-                height: 1,
-                fontWeight: FontWeight.w700,
-              ),
+              style: FarmerShopTabsStyles.labelText(textColor),
             ),
           ),
         ),

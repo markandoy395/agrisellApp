@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/farmer/chat/presentation/styles/farmer_message_product_preview_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -13,17 +14,7 @@ class FarmerMessageProductPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 7),
-          ),
-        ],
-      ),
+      decoration: FarmerMessageProductPreviewStyles.decoratedBoxDecoration,
       child: Stack(
         children: [
           Padding(
@@ -45,24 +36,14 @@ class FarmerMessageProductPreview extends StatelessWidget {
                         thread.productName ?? thread.farmName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AgrisellColors.headingGreen,
-                          fontSize: 14,
-                          height: 1.15,
-                          fontWeight: FontWeight.w800,
-                        ),
+                        style: FarmerMessageProductPreviewStyles.textStyle,
                       ),
                       const SizedBox(height: 5),
                       Text(
                         _quantityAndPrice(thread),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AgrisellColors.brandBlack,
-                          fontSize: 12,
-                          height: 1,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: FarmerMessageProductPreviewStyles.textStyle2,
                       ),
                       const SizedBox(height: 7),
                       _StatusChip(label: thread.orderStatusLabel),
@@ -106,20 +87,12 @@ class _StatusChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: AgrisellColors.statusGreenBackground,
-        borderRadius: BorderRadius.circular(14),
-      ),
+      decoration: FarmerMessageProductPreviewStyles.containerDecoration,
       child: Text(
         label,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
-          color: AgrisellColors.authGreen,
-          fontSize: 12,
-          height: 1,
-          fontWeight: FontWeight.w800,
-        ),
+        style: FarmerMessageProductPreviewStyles.labelText,
       ),
     );
   }

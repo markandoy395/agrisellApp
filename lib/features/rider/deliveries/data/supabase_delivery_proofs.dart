@@ -101,8 +101,10 @@ extension SupabaseDeliveryProofs on SupabaseDeliveryDataSource {
     String filePath, {
     Duration expiresIn = const Duration(minutes: 5),
   }) => _guard(
-    () => client.storage
-        .from(SupabaseDeliveryDataSource.proofBucket)
-        .createSignedUrl(filePath, expiresIn.inSeconds),
+    () async => authenticatedStorageUrl(
+      client.storage
+          .from(SupabaseDeliveryDataSource.proofBucket)
+          .getPublicUrl(filePath),
+    ),
   );
 }

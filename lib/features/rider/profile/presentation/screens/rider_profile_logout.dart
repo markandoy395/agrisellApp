@@ -58,4 +58,36 @@ extension _RiderProfileLogout on _RiderProfileScreenState {
     }
     return synchronized;
   }
+
+  Future<void> _editProfile() async {
+    final profile = _profile;
+    if (profile == null) return;
+    final updated = await showRiderProfileEditDialog(context, profile);
+    if (updated == null || !mounted) return;
+    try {
+      final saved = await RiderRegistrationService.instance.saveCurrentProfile(
+        updated,
+      );
+      if (mounted) _updateUi(() => _profile = saved);
+    } on RiderRegistrationException catch (error) {
+      if (mounted) _message(error.message);
+    }
+  }
+
+  Future<void> _changePassword() async {
+    final profile = _profile;
+    if (profile == null) return;
+    final change = await showRiderPasswordChangeDialog(context);
+    if (change == null || !mounted) return;
+    try {
+      await AuthRegistrationService.instance.changePassword(
+        email: profile.email,
+        currentPassword: change.currentPassword,
+        newPassword: change.newPassword,
+      );
+      if (mounted) _message('Password updated.');
+    } on AuthRegistrationException catch (error) {
+      if (mounted) _message(error.message);
+    }
+  }
 }

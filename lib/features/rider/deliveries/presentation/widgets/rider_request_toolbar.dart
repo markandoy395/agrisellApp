@@ -1,7 +1,8 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_request_toolbar_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/app_dropdown_style.dart';
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_request_query.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_request_filter_sheet.dart';
@@ -32,24 +33,11 @@ class _RiderRequestToolbarState extends State<RiderRequestToolbar> {
         controller: _search,
         onChanged: widget.controller.setSearchText,
         textInputAction: TextInputAction.search,
-        style: const TextStyle(fontSize: 12),
-        decoration: InputDecoration(
-          hintText: 'Search product, location, seller, or request number',
-          prefixIcon: const Icon(Icons.search_rounded, size: 19),
-          suffixIcon: _search.text.isEmpty
-              ? null
-              : IconButton(
-                  tooltip: 'Clear search',
-                  onPressed: () {
-                    _search.clear();
-                    widget.controller.setSearchText('');
-                    setState(() {});
-                  },
-                  icon: const Icon(Icons.close_rounded, size: 18),
-                ),
-          filled: true,
-          fillColor: AgrisellColors.surface,
-          isDense: true,
+        style: SharedPresentationStyles.caption,
+        decoration: RiderRequestToolbarStyles.inputDecoration(
+          _search,
+          widget.controller,
+          () => setState(() {}),
         ),
       ),
       const SizedBox(height: 8),
@@ -62,11 +50,8 @@ class _RiderRequestToolbarState extends State<RiderRequestToolbar> {
               iconEnabledColor: AppDropdownStyle.iconColor,
               initialValue: widget.controller.requestSort,
               isExpanded: true,
-              decoration: const InputDecoration(
-                labelText: 'Sort by',
-                isDense: true,
-              ),
-              style: AppDropdownStyle.textStyle.copyWith(fontSize: 12),
+              decoration: RiderRequestToolbarStyles.inputDecoration2,
+              style: RiderRequestToolbarStyles.dropdownButtonFormFieldStyle,
               items: [
                 for (final sort in RiderRequestSort.values)
                   DropdownMenuItem(value: sort, child: Text(sort.label)),

@@ -18,8 +18,10 @@ import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dar
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
+import 'package:agresell_app/features/rider/dashboard/presentation/styles/rider_dashboard_content_styles.dart';
 
 part 'rider_dashboard_content.dart';
+part 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_dashboard_snapshot_cards.dart';
 
 class RiderDashboardScreen extends StatefulWidget {
   const RiderDashboardScreen({

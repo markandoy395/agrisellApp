@@ -1,3 +1,6 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/farmer_rider_selection_states_styles.dart';
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/farmer_rider_request_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -9,11 +12,7 @@ class FarmerRiderDeliverySummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(
-      color: AgrisellColors.surface,
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: AgrisellColors.borderLine),
-    ),
+    decoration: SharedPresentationStyles.borderedSurface,
     child: Padding(
       padding: const EdgeInsets.all(12),
       child: Column(
@@ -21,16 +20,12 @@ class FarmerRiderDeliverySummary extends StatelessWidget {
         children: [
           Text(
             selection.delivery.orderId,
-            style: const TextStyle(
-              color: AgrisellColors.headingGreen,
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
-            ),
+            style: SharedPresentationStyles.headingBodyExtraBold,
           ),
           const SizedBox(height: 5),
           Text(
             selection.delivery.goodsSummary,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+            style: SharedPresentationStyles.captionBold,
           ),
           const SizedBox(height: 4),
           _RouteLine(
@@ -54,11 +49,7 @@ class FarmerRiderDeliverySummary extends StatelessWidget {
                 if (selection.delivery.estimatedDeliveryMinutes != null)
                   '~${selection.delivery.estimatedDeliveryMinutes} min delivery',
               ].join(' - '),
-              style: const TextStyle(
-                color: AgrisellColors.mutedText,
-                fontSize: 12,
-                height: 1.35,
-              ),
+              style: SharedPresentationStyles.mutedCaptionLoose,
             ),
           ],
         ],
@@ -90,16 +81,12 @@ class _RouteLine extends StatelessWidget {
             children: [
               TextSpan(
                 text: '$label: ',
-                style: const TextStyle(fontWeight: FontWeight.w800),
+                style: SharedPresentationStyles.extraBold,
               ),
               TextSpan(text: value),
             ],
           ),
-          style: const TextStyle(
-            color: AgrisellColors.mutedText,
-            fontSize: 12,
-            height: 1.35,
-          ),
+          style: SharedPresentationStyles.mutedCaptionLoose,
         ),
       ),
     ],
@@ -124,12 +111,7 @@ class FarmerRiderGroupNotice extends StatelessWidget {
       Expanded(
         child: Text(
           message,
-          style: const TextStyle(
-            color: AgrisellColors.headingGreen,
-            fontSize: 12,
-            height: 1.35,
-            fontWeight: FontWeight.w700,
-          ),
+          style: FarmerRiderSelectionStatesStyles.messageText,
         ),
       ),
     ],
@@ -168,17 +150,13 @@ class FarmerRiderSelectionStateView extends StatelessWidget {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+            style: SharedPresentationStyles.subtitleExtraBold,
           ),
           const SizedBox(height: 5),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AgrisellColors.mutedText,
-              fontSize: 12,
-              height: 1.4,
-            ),
+            style: FarmerRiderSelectionStatesStyles.messageText2,
           ),
           if (actionLabel != null) ...[
             const SizedBox(height: 12),
@@ -186,9 +164,7 @@ class FarmerRiderSelectionStateView extends StatelessWidget {
               height: 38,
               child: FilledButton(
                 onPressed: onAction,
-                style: FilledButton.styleFrom(
-                  backgroundColor: AgrisellColors.authGreen,
-                ),
+                style: FarmerRiderRequestStyles.chooseAnotherButtonStyle,
                 child: Text(actionLabel!),
               ),
             ),

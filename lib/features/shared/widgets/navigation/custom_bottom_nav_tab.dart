@@ -1,7 +1,7 @@
+import 'package:agresell_app/features/shared/widgets/navigation/custom_bottom_nav_tab_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 import 'package:agresell_app/core/models/home_bottom_nav_item.dart';
 
@@ -75,11 +75,11 @@ class CustomBottomNavTab extends StatelessWidget {
               AnimatedDefaultTextStyle(
                 duration: duration,
                 curve: curve,
-                style: TextStyle(
-                  color: isSelected ? activeBackground : labelColor,
-                  fontSize: labelFontSize,
-                  height: 1,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                style: CustomBottomNavTabStyles.textStyle(
+                  isSelected,
+                  activeBackground,
+                  labelColor,
+                  labelFontSize,
                 ),
                 child: Text(
                   item.label,
@@ -134,9 +134,9 @@ class _NavIcon extends StatelessWidget {
           curve: curve,
           width: size,
           height: 32,
-          decoration: BoxDecoration(
-            color: isSelected ? activeBackground : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
+          decoration: CustomBottomNavTabStyles.animatedContainerDecoration(
+            isSelected,
+            activeBackground,
           ),
           child: Center(child: _icon(color)),
         ),
@@ -148,26 +148,10 @@ class _NavIcon extends StatelessWidget {
               constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
               padding: const EdgeInsets.symmetric(horizontal: 4),
               alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: AgrisellColors.authGreen,
-                borderRadius: BorderRadius.circular(9),
-                border: Border.all(color: AgrisellColors.surface, width: 1.5),
-                boxShadow: [
-                  BoxShadow(
-                    color: AgrisellColors.brandBlack.withValues(alpha: 0.16),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
+              decoration: CustomBottomNavTabStyles.containerDecoration,
               child: Text(
                 badgeCount > 99 ? '99+' : '$badgeCount',
-                style: const TextStyle(
-                  color: AgrisellColors.surface,
-                  fontSize: 12,
-                  height: 1,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: CustomBottomNavTabStyles.textStyle2,
               ),
             ),
           ),

@@ -18,17 +18,7 @@ class _OrderTrackingHeader extends StatelessWidget {
         horizontalPadding,
         16,
       ),
-      decoration: BoxDecoration(
-        color: AgrisellColors.authGreen,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(22)),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.16),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
+      decoration: OrderTrackingHeaderStyles.containerDecoration,
       child: Row(
         children: [
           _HeaderCircleButton(
@@ -49,24 +39,15 @@ class _OrderTrackingHeader extends StatelessWidget {
                   'Order Tracking',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: AgrisellColors.surface,
-                    fontSize: 15,
-                    height: 1,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: OrderTrackingHeaderStyles.orderTrackingText,
                 ),
                 SizedBox(height: 5),
                 Text(
                   'Fresh orders waiting for delivery',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: AgrisellColors.surface,
-                    fontSize: 12,
-                    height: 1,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: OrderTrackingHeaderStyles
+                      .freshOrdersWaitingForDeliveryText,
                 ),
               ],
             ),
@@ -75,10 +56,7 @@ class _OrderTrackingHeader extends StatelessWidget {
           Container(
             width: 38,
             height: 38,
-            decoration: BoxDecoration(
-              color: AgrisellColors.surface,
-              borderRadius: BorderRadius.circular(15),
-            ),
+            decoration: OrderTrackingHeaderStyles.containerDecoration2,
             child: const Icon(
               Icons.route_rounded,
               color: AgrisellColors.authGreen,

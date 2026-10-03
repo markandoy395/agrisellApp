@@ -3,9 +3,8 @@ import '../domain/rider_history_models.dart';
 import '../domain/rider_rating_models.dart';
 import '../domain/rider_withdrawal_models.dart';
 import '../../deliveries/domain/delivery_completion.dart';
-import '../../deliveries/domain/delivery_earning.dart';
-import '../../deliveries/domain/delivery_status.dart';
 import 'rider_analytics_repository.dart';
+import 'rider_delivery_analytics_calculations.dart';
 import 'rider_earnings_summary_builder.dart';
 
 /// Bridges persisted delivery completions into Rider finance and performance.
@@ -50,7 +49,11 @@ class RiderDeliveryAnalyticsRepository implements RiderAnalyticsRepository {
   }) async {
     final entries = <RiderEarningEntry>[
       for (final record in _forRider(riderId))
-        if (_inRange(record.completedAt, dateRange)) _earningEntry(record),
+        if (RiderDeliveryAnalyticsCalculations.inDateRange(
+          record.completedAt,
+          dateRange,
+        ))
+          RiderDeliveryAnalyticsCalculations.earningEntry(record),
     ]..sort((a, b) => b.occurredAt.compareTo(a.occurredAt));
     return RiderEarningsData(
       summary: summarizeRiderEarnings(entries),
@@ -89,9 +92,12 @@ class RiderDeliveryAnalyticsRepository implements RiderAnalyticsRepository {
         completedDeliveries: records.length,
         acceptanceRate: records.isEmpty ? 0 : 100,
         completionRate: records.isEmpty ? 0 : 100,
-        onTimePickupRate: _onTimePickupRate(records),
-        onTimeDeliveryRate: _onTimeDeliveryRate(records),
-        averageWaitingMinutes: _averageWaitingMinutes(records),
+        onTimePickupRate:
+            RiderDeliveryAnalyticsCalculations.onTimePickupRate(records),
+        onTimeDeliveryRate:
+            RiderDeliveryAnalyticsCalculations.onTimeDeliveryRate(records),
+        averageWaitingMinutes:
+            RiderDeliveryAnalyticsCalculations.averageWaitingMinutes(records),
       ),
       reviews: List.unmodifiable(reviews),
     );
@@ -126,80 +132,4 @@ class RiderDeliveryAnalyticsRepository implements RiderAnalyticsRepository {
       completionRecords()
           .where((record) => record.request.isAssignedTo(riderId))
           .toList(growable: false);
-
-  RiderEarningEntry _earningEntry(DeliveryCompletionRecord record) {
-    final earning =
-        record.earning ??
-        RiderDeliveryEarningCalculator.calculate(
-          estimatedEarning: record.request.deliveryFee,
-          fees: record.request.feeBreakdown,
-        );
-    return RiderEarningEntry(
-      id: 'earning-${record.request.id}',
-      deliveryId: record.request.id,
-      orderNumber: record.request.orderNumber,
-      occurredAt: record.completedAt,
-      description: record.request.productName,
-      amount: earning.finalEarning,
-      type: RiderEarningType.deliveryFee,
-      payoutStatus: earning.payoutStatus == DeliveryPayoutStatus.paid
-          ? RiderPayoutStatus.paid
-          : RiderPayoutStatus.pending,
-      estimatedEarning: earning.estimatedEarning,
-      finalEarning: earning.finalEarning,
-      waitingAdjustment: earning.waitingAdjustment,
-      returnAdjustment: earning.returnAdjustment,
-      bonus: earning.bonus,
-      incentive: earning.incentive,
-      deduction: earning.deduction,
-      penalty: earning.penalty,
-    );
-  }
-
-  double _onTimePickupRate(List<DeliveryCompletionRecord> records) =>
-      _rate(records, (record) {
-        final pickedUp = record.events
-            .where((event) => event.newStatus == DeliveryStatus.productPickedUp)
-            .firstOrNull;
-        return pickedUp != null &&
-            !pickedUp.timestamp.isAfter(record.request.pickupDeadline);
-      });
-
-  double _onTimeDeliveryRate(List<DeliveryCompletionRecord> records) =>
-      _rate(records, (record) {
-        final deadline = record.request.deliveryDeadline;
-        return deadline != null && !record.completedAt.isAfter(deadline);
-      });
-
-  double _averageWaitingMinutes(List<DeliveryCompletionRecord> records) {
-    final durations = <Duration>[];
-    for (final record in records) {
-      for (var index = 0; index < record.events.length - 1; index++) {
-        final status = record.events[index].newStatus;
-        if (status == DeliveryStatus.waitingForProduct ||
-            status == DeliveryStatus.waitingForBuyer) {
-          durations.add(
-            record.events[index + 1].timestamp.difference(
-              record.events[index].timestamp,
-            ),
-          );
-        }
-      }
-    }
-    if (durations.isEmpty) return 0;
-    return durations.fold<int>(0, (sum, item) => sum + item.inSeconds) /
-        durations.length /
-        60;
-  }
-
-  double _rate(
-    List<DeliveryCompletionRecord> records,
-    bool Function(DeliveryCompletionRecord) matches,
-  ) => records.isEmpty
-      ? 0
-      : records.where(matches).length / records.length * 100;
-
-  bool _inRange(DateTime value, RiderDateRange range) =>
-      !value.isBefore(range.start) &&
-      value.isBefore(range.end.add(const Duration(days: 1)));
 }

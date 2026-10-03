@@ -1,3 +1,6 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/farmer_rider_request_styles.dart';
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/farmer_gcash_review_sheet_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
@@ -51,11 +54,7 @@ class _FarmerGcashReviewSheetState extends State<_FarmerGcashReviewSheet> {
                 _expired
                     ? 'Review expired GCash payment'
                     : 'Review GCash reference',
-                style: const TextStyle(
-                  color: AgrisellColors.headingGreen,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w900,
-                ),
+                style: SharedPresentationStyles.headingTitleBlack,
               ),
             ),
             IconButton(
@@ -70,24 +69,13 @@ class _FarmerGcashReviewSheetState extends State<_FarmerGcashReviewSheet> {
           _expired
               ? 'Check whether the payment was received. Confirming it will require a buyer refund and will not restore the expired order.'
               : 'Confirm the reference against your GCash transaction history before accepting this order.',
-          style: const TextStyle(
-            color: AgrisellColors.mutedText,
-            fontSize: 12,
-            height: 1.35,
-          ),
+          style: SharedPresentationStyles.mutedCaptionLoose,
         ),
         const SizedBox(height: 13),
         FarmerGcashReviewSummary(order: widget.order),
         if (_error case final message?) ...[
           const SizedBox(height: 9),
-          Text(
-            message,
-            style: const TextStyle(
-              color: AgrisellColors.statusRedText,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          Text(message, style: SharedPresentationStyles.errorCaptionSemibold),
         ],
         const SizedBox(height: 14),
         Row(
@@ -106,22 +94,21 @@ class _FarmerGcashReviewSheetState extends State<_FarmerGcashReviewSheet> {
     child: approved
         ? FilledButton.icon(
             onPressed: _saving ? null : () => _review(true),
-            style: FilledButton.styleFrom(
-              backgroundColor: AgrisellColors.authGreen,
-            ),
+            style: FarmerRiderRequestStyles.chooseAnotherButtonStyle,
             icon: const Icon(Icons.verified_outlined, size: 16),
             label: Text(
               _expired ? 'Received' : 'Verify',
-              style: const TextStyle(fontSize: 12),
+              style: SharedPresentationStyles.caption,
             ),
           )
         : OutlinedButton.icon(
             onPressed: _saving ? null : () => _review(false),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AgrisellColors.statusRedText,
-            ),
+            style: FarmerGcashReviewSheetStyles.outlinedButtonStyle,
             icon: const Icon(Icons.close_rounded, size: 16),
-            label: const Text('Reject', style: TextStyle(fontSize: 12)),
+            label: const Text(
+              'Reject',
+              style: SharedPresentationStyles.caption,
+            ),
           ),
   );
 

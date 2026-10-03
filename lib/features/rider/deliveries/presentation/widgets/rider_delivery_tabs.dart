@@ -1,6 +1,7 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_tabs_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
@@ -90,11 +91,7 @@ class _ActiveDeliveryCard extends StatelessWidget {
         children: [
           Text(
             request.productName,
-            style: const TextStyle(
-              color: AgrisellColors.headingGreen,
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
-            ),
+            style: SharedPresentationStyles.headingSubtitleExtraBold,
           ),
           const SizedBox(height: 10),
           RiderRequestDetailLine(
@@ -128,14 +125,7 @@ class _ActiveDeliveryCard extends StatelessWidget {
                       ),
                     );
                   },
-            style: FilledButton.styleFrom(
-              backgroundColor: AgrisellColors.authGreen,
-              minimumSize: const Size.fromHeight(38),
-              textStyle: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+            style: RiderDeliveryTabsStyles.filledButtonStyle,
             child: const Text('Manage delivery'),
           ),
         ],

@@ -1,6 +1,6 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_input_style.dart';
 
 class FarmerSignupOptionsField extends StatefulWidget {
@@ -66,13 +66,11 @@ class _FarmerSignupOptionsFieldState extends State<FarmerSignupOptionsField> {
           menuHeight: 240,
           label: Text(
             '${widget.label} (select or type)',
-            style: const TextStyle(fontSize: 12),
+            style: SharedPresentationStyles.caption,
           ),
-          textStyle: const TextStyle(fontSize: 12),
+          textStyle: SharedPresentationStyles.caption,
           inputDecorationTheme: AuthInputStyle.dropdownTheme,
-          menuStyle: const MenuStyle(
-            backgroundColor: WidgetStatePropertyAll(AgrisellColors.surface),
-          ),
+          menuStyle: SharedPresentationStyles.dropdownMenu,
           dropdownMenuEntries: widget.options
               .map(
                 (option) => DropdownMenuEntry<String>(
@@ -80,7 +78,7 @@ class _FarmerSignupOptionsFieldState extends State<FarmerSignupOptionsField> {
                   label: option,
                   labelWidget: Text(
                     option,
-                    style: const TextStyle(fontSize: 12),
+                    style: SharedPresentationStyles.caption,
                   ),
                 ),
               )
@@ -91,10 +89,7 @@ class _FarmerSignupOptionsFieldState extends State<FarmerSignupOptionsField> {
             padding: const EdgeInsets.fromLTRB(12, 5, 12, 0),
             child: Text(
               widget.error!,
-              style: const TextStyle(
-                color: AgrisellColors.statusRedText,
-                fontSize: 12,
-              ),
+              style: SharedPresentationStyles.errorCaption,
             ),
           ),
       ],

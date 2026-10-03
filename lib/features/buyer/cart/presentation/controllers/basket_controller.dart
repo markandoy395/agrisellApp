@@ -2,8 +2,9 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
 import 'package:agresell_app/features/buyer/cart/data/basket_cart_sync.dart';
+import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_totals.dart';
+import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 
 class BasketController extends ChangeNotifier {
@@ -14,33 +15,20 @@ class BasketController extends ChangeNotifier {
   final List<BasketCartItem> _items = <BasketCartItem>[];
   final _cartSync = BasketCartSync();
   late final List<BasketCartItem> _itemsView = UnmodifiableListView(_items);
-  List<BasketCartItem> _selectedItems = const <BasketCartItem>[];
+  BasketTotals _totals = BasketTotals.empty;
   var _pulse = 0;
-  var _allSelected = false;
-  var _totalQuantity = 0;
-  var _selectedQuantity = 0;
-  var _selectedTotal = 0.0;
 
   List<BasketCartItem> get items => _itemsView;
-
-  List<BasketCartItem> get selectedItems => _selectedItems;
-
+  List<BasketCartItem> get selectedItems => _totals.selectedItems;
   int get pulse => _pulse;
-
   bool get hasItems => _items.isNotEmpty;
-
-  bool get allSelected => _allSelected;
-
-  int get totalQuantity => _totalQuantity;
-
-  int get selectedQuantity => _selectedQuantity;
-
-  double get selectedTotal => _selectedTotal;
+  bool get allSelected => _totals.allSelected;
+  int get totalQuantity => _totals.totalQuantity;
+  int get selectedQuantity => _totals.selectedQuantity;
+  double get selectedTotal => _totals.selectedTotal;
 
   void addProduct(HomeProduct product, {int quantity = 1}) {
-    if (!product.canOrder) {
-      return;
-    }
+    if (!product.canOrder) return;
 
     final safeQuantity = quantity < 1 ? 1 : quantity;
     final index = _items.indexWhere((item) => item.productId == product.id);
@@ -61,9 +49,7 @@ class BasketController extends ChangeNotifier {
 
   void incrementQuantity(String productId) {
     final index = _indexFor(productId);
-    if (index == -1) {
-      return;
-    }
+    if (index == -1) return;
 
     final item = _items[index];
     _items[index] = item.copyWith(quantity: item.quantity + 1);
@@ -72,14 +58,10 @@ class BasketController extends ChangeNotifier {
 
   void decrementQuantity(String productId) {
     final index = _indexFor(productId);
-    if (index == -1) {
-      return;
-    }
+    if (index == -1) return;
 
     final item = _items[index];
-    if (item.quantity == 1) {
-      return;
-    }
+    if (item.quantity == 1) return;
 
     _items[index] = item.copyWith(quantity: item.quantity - 1);
     _commitChange();
@@ -87,9 +69,7 @@ class BasketController extends ChangeNotifier {
 
   BasketCartItem? removeProduct(String productId) {
     final index = _indexFor(productId);
-    if (index == -1) {
-      return null;
-    }
+    if (index == -1) return null;
 
     final removedItem = _items.removeAt(index);
     _commitChange();
@@ -105,30 +85,22 @@ class BasketController extends ChangeNotifier {
       }
     }
 
-    if (changed) {
-      _commitChange();
-    }
+    if (changed) _commitChange();
   }
 
   void setSelected(String productId, bool isSelected) {
     final index = _indexFor(productId);
-    if (index == -1) {
-      return;
-    }
+    if (index == -1) return;
 
     final item = _items[index];
-    if (item.isSelected == isSelected) {
-      return;
-    }
+    if (item.isSelected == isSelected) return;
 
     _items[index] = item.copyWith(isSelected: isSelected);
     _commitChange();
   }
 
   void setAllSelected(bool isSelected) {
-    if (_items.isEmpty) {
-      return;
-    }
+    if (_items.isEmpty) return;
 
     var changed = false;
     for (var index = 0; index < _items.length; index++) {
@@ -139,16 +111,11 @@ class BasketController extends ChangeNotifier {
       }
     }
 
-    if (changed) {
-      _commitChange();
-    }
+    if (changed) _commitChange();
   }
 
   void clear() {
-    if (_items.isEmpty) {
-      return;
-    }
-
+    if (_items.isEmpty) return;
     _items.clear();
     _commitChange();
   }
@@ -165,58 +132,21 @@ class BasketController extends ChangeNotifier {
     final originalLength = _items.length;
     _items.removeWhere((item) => item.isSelected);
 
-    if (_items.length != originalLength) {
-      _commitChange();
-    }
+    if (_items.length != originalLength) _commitChange();
   }
 
   bool reconcileAvailableQuantities(Map<String, int> quantities) {
-    if (quantities.isEmpty) return false;
-    var changed = false;
-    for (var index = _items.length - 1; index >= 0; index--) {
-      final item = _items[index];
-      final available = quantities[item.productId];
-      if (available == null) continue;
-      if (available <= 0) {
-        _items.removeAt(index);
-        changed = true;
-      } else if (item.quantity > available) {
-        _items[index] = item.copyWith(quantity: available);
-        changed = true;
-      }
-    }
+    final changed = BasketItemOperations.reconcileQuantities(_items, quantities);
     if (changed) _commitChange();
     return changed;
   }
 
   void _commitChange({bool synchronize = true}) {
-    final selected = <BasketCartItem>[];
-    var totalQuantity = 0;
-    var selectedQuantity = 0;
-    var selectedTotal = 0.0;
-    var allSelected = _items.isNotEmpty;
-
-    for (final item in _items) {
-      totalQuantity += item.quantity;
-      if (item.isSelected) {
-        selected.add(item);
-        selectedQuantity += item.quantity;
-        selectedTotal += item.quantity * item.pricePerKg;
-      } else {
-        allSelected = false;
-      }
-    }
-
-    _selectedItems = List<BasketCartItem>.unmodifiable(selected);
-    _totalQuantity = totalQuantity;
-    _selectedQuantity = selectedQuantity;
-    _selectedTotal = selectedTotal;
-    _allSelected = allSelected;
+    _totals = BasketTotals.compute(_items);
     notifyListeners();
     if (synchronize) _cartSync.save(_items);
   }
 
-  int _indexFor(String productId) {
-    return _items.indexWhere((item) => item.productId == productId);
-  }
+  int _indexFor(String productId) =>
+      _items.indexWhere((item) => item.productId == productId);
 }

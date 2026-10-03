@@ -9,17 +9,7 @@ class _PaymentMethodsPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.07),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
+      decoration: CheckoutPaymentMethodsStyles.decoratedBoxDecoration,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -27,20 +17,12 @@ class _PaymentMethodsPanel extends StatelessWidget {
           children: [
             const Text(
               'Payment Methods',
-              style: TextStyle(
-                color: AgrisellColors.headingGreen,
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-              ),
+              style: SharedPresentationStyles.headingSubtitleExtraBold,
             ),
             const SizedBox(height: 4),
             const Text(
               'Choose how you want to settle this order.',
-              style: TextStyle(
-                color: AgrisellColors.mutedText,
-                fontSize: 12,
-                height: 1.25,
-              ),
+              style: SharedPresentationStyles.mutedCaptionCompact,
             ),
             const SizedBox(height: 10),
             _PaymentChoiceTile(
@@ -107,11 +89,8 @@ class _PaymentChoiceTile extends StatelessWidget {
                 Container(
                   width: 34,
                   height: 34,
-                  decoration: BoxDecoration(
-                    color: selected
-                        ? AgrisellColors.authGreen
-                        : AgrisellColors.searchBackground,
-                    borderRadius: BorderRadius.circular(9),
+                  decoration: CheckoutPaymentMethodsStyles.containerDecoration(
+                    selected,
                   ),
                   child: Icon(
                     icon,
@@ -128,22 +107,14 @@ class _PaymentChoiceTile extends StatelessWidget {
                     children: [
                       Text(
                         method.label,
-                        style: const TextStyle(
-                          color: AgrisellColors.brandBlack,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                        ),
+                        style: SharedPresentationStyles.inkBodyExtraBold,
                       ),
                       const SizedBox(height: 2),
                       Text(
                         subtitle,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AgrisellColors.mutedText,
-                          fontSize: 12,
-                          height: 1.2,
-                        ),
+                        style: CheckoutPaymentMethodsStyles.subtitleText,
                       ),
                     ],
                   ),

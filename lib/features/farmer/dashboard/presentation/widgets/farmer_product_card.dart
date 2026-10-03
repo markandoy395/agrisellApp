@@ -18,18 +18,7 @@ class _FarmerProductCard extends StatelessWidget {
     final radius = BorderRadius.circular(10);
 
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: radius,
-        border: Border.all(color: AgrisellColors.borderLine),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.05),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: FarmerProductCardStyles.decoratedBoxDecoration(radius),
       child: ClipRRect(
         borderRadius: radius,
         child: Material(
@@ -100,23 +89,14 @@ class _ProductCategoryTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(
-      color: AgrisellColors.surface.withValues(alpha: 0.94),
-      borderRadius: BorderRadius.circular(6),
-      border: Border.all(color: AgrisellColors.borderLine),
-    ),
+    decoration: FarmerProductCardStyles.decoratedBoxDecoration2,
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
       child: Text(
         label,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
-          color: AgrisellColors.headingGreen,
-          fontSize: 12,
-          height: 1,
-          fontWeight: FontWeight.w700,
-        ),
+        style: FarmerProductCardStyles.labelText,
       ),
     ),
   );
@@ -129,38 +109,15 @@ class _FarmerSaleBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(
-      color: AgrisellColors.statusRedText,
-      borderRadius: BorderRadius.circular(6),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.15),
-          blurRadius: 4,
-          offset: const Offset(0, 1),
-        ),
-      ],
-    ),
+    decoration: FarmerProductCardStyles.decoratedBoxDecoration3,
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
-            Icons.local_offer_rounded,
-            color: Colors.white,
-            size: 11,
-          ),
+          const Icon(Icons.local_offer_rounded, color: Colors.white, size: 11),
           const SizedBox(width: 4),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              height: 1,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.3,
-            ),
-          ),
+          Text(label, style: FarmerProductCardStyles.labelText2),
         ],
       ),
     ),

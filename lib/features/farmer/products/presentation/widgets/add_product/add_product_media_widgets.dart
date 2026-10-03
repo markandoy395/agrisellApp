@@ -16,10 +16,7 @@ class _BackButton extends StatelessWidget {
         child: Container(
           width: 38,
           height: 38,
-          decoration: BoxDecoration(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.42),
-            shape: BoxShape.circle,
-          ),
+          decoration: AddProductMediaWidgetsStyles.containerDecoration,
           child: const Icon(
             Icons.arrow_back_rounded,
             color: AgrisellColors.surface,
@@ -78,32 +75,20 @@ class _PhotoPicker extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 photoBytes == null ? 'Insert photo' : 'Change photo',
-                style: TextStyle(
-                  color: AgrisellColors.brandBlack.withValues(alpha: 0.56),
-                  fontSize: 12,
-                  height: 1,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: AddProductMediaWidgetsStyles.textStyle,
               ),
               const SizedBox(height: 4),
               Text(
                 photoBytes == null
                     ? 'Use one clear, well-lit product photo'
                     : 'Tap the photo to replace it',
-                style: const TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 12,
-                ),
+                style: SharedPresentationStyles.mutedCaption,
               ),
               if (errorText case final error?) ...[
                 const SizedBox(height: 6),
                 Text(
                   error,
-                  style: const TextStyle(
-                    color: AgrisellColors.statusRedText,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: SharedPresentationStyles.errorCaptionSemibold,
                 ),
               ],
             ],

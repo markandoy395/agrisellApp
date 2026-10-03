@@ -1,31 +1,35 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
-import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
+
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
+import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:agresell_app/features/auth/presentation/screens/role_selection_screen.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/auth_button.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/account_found_dialog.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/login_page_layout.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/otp_verification_screen.dart';
-import 'package:agresell_app/features/farmer/registration/domain/farmer_signup_validator.dart';
 import 'package:agresell_app/features/farmer/registration/domain/farmer_registration_choices.dart';
-import 'package:agresell_app/features/farmer/registration/presentation/screens/farmer_registration_submitted_screen.dart';
+import 'package:agresell_app/features/farmer/registration/domain/farmer_signup_validator.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/controllers/farmer_signup_controllers.dart';
+import 'package:agresell_app/features/farmer/registration/presentation/screens/farmer_registration_submitted_screen.dart';
+import 'package:agresell_app/features/farmer/registration/presentation/styles/farmer_sign_up_styles.dart';
+import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_discard_dialog.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_account_step.dart';
+import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_controls.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_farm_step.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_personal_step.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/widgets/farmer_signup_progress.dart';
 import 'package:agresell_app/features/shared/location/data/gps_location_gateway.dart';
 
 part 'farmer_sign_up_actions.dart';
+part 'farmer_sign_up_location_actions.dart';
 part 'farmer_sign_up_validation.dart';
 
 class FarmerSignUpScreen extends StatefulWidget {
@@ -93,27 +97,32 @@ class _FarmerSignUpScreenState extends State<FarmerSignUpScreen> {
       scrollViewKey: const PageStorageKey('farmer-signup-step-scroll'),
       onBack: _step > 0 ? _previousStep : null,
       child: Column(
-        children: [_currentStep(), const SizedBox(height: 14), _controls()],
+        children: [
+          _currentStep(),
+          const SizedBox(height: 14),
+          FarmerSignupControls(
+            step: _step,
+            isSubmitting: _isSubmitting,
+            onPrevious: _previousStep,
+            onNext: _next,
+            onLogin: _goToLogin,
+          ),
+        ],
       ),
     ),
   );
+
   Widget _progress() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       const SizedBox(height: 3),
-      Text(
-        '${_step + 1} of 3',
-        style: const TextStyle(
-          color: AgrisellColors.mutedText,
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
+      Text('${_step + 1} of 3', style: FarmerSignUpStyles.stepIndicatorStyle),
       const SizedBox(height: 12),
       FarmerSignupProgress(currentStep: _step),
       const SizedBox(height: 18),
     ],
   );
+
   Widget _currentStep() => switch (_step) {
     0 => FarmerSignupAccountStep(
       controllers: _controllers,
@@ -136,88 +145,7 @@ class _FarmerSignUpScreenState extends State<FarmerSignUpScreen> {
       onPickImage: () => _pickImage(profile: false),
     ),
   };
-  Widget _controls() => Column(
-    children: [
-      Row(
-        children: [
-          if (_step > 0)
-            Expanded(
-              flex: _step == 1 ? 3 : 1,
-              child: OutlinedButton.icon(
-                onPressed: _isSubmitting ? null : _previousStep,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AgrisellColors.authGreen,
-                  side: const BorderSide(color: AgrisellColors.authGreen),
-                  minimumSize: Size(0, _step == 1 ? 50 : 40),
-                  maximumSize: Size(double.infinity, _step == 1 ? 50 : 40),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                icon: const Icon(Icons.arrow_back_rounded),
-                label: const Text('Back'),
-              ),
-            ),
-          if (_step > 0) const SizedBox(width: 10),
-          Expanded(
-            flex: _step == 1
-                ? 5
-                : _step > 0
-                ? 2
-                : 1,
-            child: AuthPrimaryButton(
-              label: _step == 2 ? 'Submit registration' : 'Continue',
-              loginStyle: _step < 2,
-              isLoading: _isSubmitting,
-              borderRadius: 14,
-              hasShadow: true,
-              fontSize: 15,
-              onPressed: _isSubmitting ? null : _next,
-            ),
-          ),
-        ],
-      ),
-      const SizedBox(height: 16),
-      const Row(
-        children: [
-          Expanded(child: Divider(color: AgrisellColors.borderLine)),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 14),
-            child: Text(
-              'OR',
-              style: TextStyle(color: AgrisellColors.mutedText, fontSize: 12),
-            ),
-          ),
-          Expanded(child: Divider(color: AgrisellColors.borderLine)),
-        ],
-      ),
-      const SizedBox(height: 4),
-      Wrap(
-        crossAxisAlignment: WrapCrossAlignment.center,
-        alignment: WrapAlignment.center,
-        spacing: 5,
-        children: [
-          const Text(
-            'Already have an account?',
-            style: TextStyle(fontSize: 13),
-          ),
-          TextButton(
-            onPressed: _isSubmitting ? null : _goToLogin,
-            style: TextButton.styleFrom(
-              foregroundColor: AgrisellColors.authGreen,
-              padding: EdgeInsets.zero,
-              minimumSize: const Size(0, 38),
-              textStyle: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            child: const Text('Log in'),
-          ),
-        ],
-      ),
-    ],
-  );
+
   void _onChanged() => setState(() => _validateCurrent(showEmpty: false));
   void _refresh(VoidCallback update) => setState(update);
 

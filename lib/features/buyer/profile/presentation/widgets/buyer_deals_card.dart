@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/buyer/profile/presentation/styles/buyer_deals_card_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
@@ -8,9 +9,7 @@ class BuyerDealsCard extends StatelessWidget {
 
   void _openDeals(BuildContext context) {
     Navigator.of(context).push(
-      agrisellPageRoute<void>(
-        builder: (_) => const DealsAndPromosScreen(),
-      ),
+      agrisellPageRoute<void>(builder: (_) => const DealsAndPromosScreen()),
     );
   }
 
@@ -18,22 +17,7 @@ class BuyerDealsCard extends StatelessWidget {
   Widget build(BuildContext context) => GestureDetector(
     onTap: () => _openDeals(context),
     child: Container(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF0B5435), Color(0xFF0E7A4F), Color(0xFF1AA06A)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          stops: [0.0, 0.55, 1.0],
-        ),
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF08683F).withValues(alpha: 0.35),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
+      decoration: BuyerDealsCardStyles.containerDecoration,
       child: Material(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(18),
@@ -49,13 +33,7 @@ class BuyerDealsCard extends StatelessWidget {
                 Container(
                   width: 48,
                   height: 48,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.2),
-                    ),
-                  ),
+                  decoration: BuyerDealsCardStyles.containerDecoration2,
                   child: const Icon(
                     Icons.confirmation_number_outlined,
                     color: Colors.white,
@@ -66,13 +44,7 @@ class BuyerDealsCard extends StatelessWidget {
                 const Expanded(
                   child: Text(
                     'Voucher Wallet & Deals',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.2,
-                    ),
+                    style: BuyerDealsCardStyles.voucherWalletDealsText,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -80,10 +52,7 @@ class BuyerDealsCard extends StatelessWidget {
                 Container(
                   width: 32,
                   height: 32,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                  ),
+                  decoration: BuyerDealsCardStyles.containerDecoration3,
                   child: const Icon(
                     Icons.arrow_forward_ios_rounded,
                     color: Colors.white,

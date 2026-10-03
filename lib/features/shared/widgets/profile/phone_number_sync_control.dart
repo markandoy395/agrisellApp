@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/shared/widgets/profile/phone_number_sync_control_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
@@ -32,10 +33,7 @@ class _PhoneNumberSyncControlState extends State<PhoneNumberSyncControl> {
       return Container(
         constraints: const BoxConstraints(minHeight: 64),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: const Color(0xFFEDF8F0),
-          borderRadius: BorderRadius.circular(12),
-        ),
+        decoration: PhoneNumberSyncControlStyles.containerDecoration,
         child: Row(
           children: [
             const Icon(Icons.sync_rounded, size: 26, color: Color(0xFF075239)),
@@ -46,15 +44,12 @@ class _PhoneNumberSyncControlState extends State<PhoneNumberSyncControl> {
                 children: [
                   Text(
                     'Sync contact to phone',
-                    style: TextStyle(
-                      color: Color(0xFF075239),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: PhoneNumberSyncControlStyles.syncContactToPhoneText,
                   ),
                   Text(
                     'Easily find and connect with your contacts.',
-                    style: TextStyle(fontSize: 11, color: Colors.blueGrey),
+                    style: PhoneNumberSyncControlStyles
+                        .easilyFindAndConnectWithText,
                   ),
                 ],
               ),
@@ -76,9 +71,8 @@ class _PhoneNumberSyncControlState extends State<PhoneNumberSyncControl> {
           Expanded(
             child: Text(
               'Sync contact to phone',
-              style: TextStyle(
-                fontSize: widget.spacious ? 14 : 12,
-                fontWeight: FontWeight.w500,
+              style: PhoneNumberSyncControlStyles.syncContactToPhoneText2(
+                widget.spacious,
               ),
             ),
           ),

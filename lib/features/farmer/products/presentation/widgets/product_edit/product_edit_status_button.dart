@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/farmer/products/presentation/styles/product_edit_status_button_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -21,23 +22,12 @@ class ProductEditStatusButton extends StatelessWidget {
       height: 38,
       child: OutlinedButton(
         onPressed: onTap,
-        style: OutlinedButton.styleFrom(
-          backgroundColor: isSold ? red : AgrisellColors.surface,
-          foregroundColor: isSold ? AgrisellColors.surface : red,
-          side: BorderSide(color: red, width: 1.8),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
+        style: ProductEditStatusButtonStyles.outlinedButtonStyle(isSold, red),
         child: Text(
           isSold ? 'Sold' : 'Unsold',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            fontSize: 15,
-            height: 1,
-            fontWeight: FontWeight.w700,
-          ),
+          style: ProductEditStatusButtonStyles.textStyle,
         ),
       ),
     );

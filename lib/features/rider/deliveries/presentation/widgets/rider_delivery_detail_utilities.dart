@@ -1,6 +1,6 @@
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_detail_utilities_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_proof.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dart';
 
@@ -50,12 +50,7 @@ class _ContactButton extends StatelessWidget {
       onPressed: onTap,
       icon: Icon(icon, size: 16),
       label: Text(label),
-      style: OutlinedButton.styleFrom(
-        foregroundColor: AgrisellColors.authGreen,
-        side: const BorderSide(color: AgrisellColors.borderLine),
-        minimumSize: const Size.fromHeight(38),
-        textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-      ),
+      style: RiderDeliveryDetailUtilitiesStyles.outlinedButtonStyle,
     ),
   );
 }
@@ -75,7 +70,7 @@ Future<DeliveryProof?> captureRiderDeliveryProof(
       content: TextField(
         controller: controller,
         autofocus: true,
-        decoration: InputDecoration(labelText: 'Enter the $label'),
+        decoration: RiderDeliveryDetailUtilitiesStyles.inputDecoration(label),
       ),
       actions: [
         TextButton(
@@ -110,11 +105,7 @@ void showRiderDeliverySafetySheet(BuildContext context) {
       padding: EdgeInsets.all(20),
       child: Text(
         'For safety, report an unsafe pickup, delivery issue, or cancellation reason through the connected support service.',
-        style: TextStyle(
-          fontSize: 12,
-          height: 1.35,
-          fontWeight: FontWeight.w600,
-        ),
+        style: RiderDeliveryDetailUtilitiesStyles.textStyle,
       ),
     ),
   );

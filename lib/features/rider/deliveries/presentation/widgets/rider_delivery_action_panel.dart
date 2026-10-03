@@ -1,6 +1,6 @@
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_action_panel_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_status.dart';
@@ -132,25 +132,12 @@ class RiderDeliveryActionPanel extends StatelessWidget {
       child: primary
           ? FilledButton(
               onPressed: isEnabled ? onPressed : null,
-              style: FilledButton.styleFrom(
-                backgroundColor: AgrisellColors.authGreen,
-                textStyle: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+              style: RiderDeliveryActionPanelStyles.filledButtonStyle,
               child: Text(label),
             )
           : OutlinedButton(
               onPressed: isEnabled ? onPressed : null,
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AgrisellColors.statusRedText,
-                side: const BorderSide(color: AgrisellColors.statusRedText),
-                textStyle: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+              style: RiderDeliveryActionPanelStyles.outlinedButtonStyle,
               child: Text(label),
             ),
     );

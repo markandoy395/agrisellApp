@@ -8,10 +8,7 @@ class _GcashVerificationNotice extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(11),
-    decoration: BoxDecoration(
-      color: AgrisellColors.statusBlueBackground,
-      borderRadius: BorderRadius.circular(10),
-    ),
+    decoration: GcashPaymentNoticeStyles.containerDecoration,
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -25,16 +22,12 @@ class _GcashVerificationNotice extends StatelessWidget {
           child: Text.rich(
             TextSpan(
               text: 'Amount to transfer: ${formatBasketPeso(total)}\n',
-              style: const TextStyle(
-                color: AgrisellColors.statusBlueText,
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-              ),
+              style: GcashPaymentNoticeStyles.textStyle,
               children: const [
                 TextSpan(
                   text:
                       'Your reference is submitted for verification and does not mark the order paid.',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                  style: SharedPresentationStyles.captionMedium,
                 ),
               ],
             ),
@@ -54,21 +47,13 @@ class _GcashAccountCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     width: double.infinity,
     padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: AgrisellColors.forestSoft,
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: AgrisellColors.authGreen),
-    ),
+    decoration: GcashPaymentNoticeStyles.containerDecoration2,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           details.farmerName,
-          style: const TextStyle(
-            color: AgrisellColors.headingGreen,
-            fontSize: 13,
-            fontWeight: FontWeight.w800,
-          ),
+          style: SharedPresentationStyles.headingBodyExtraBold,
         ),
         const SizedBox(height: 8),
         _GcashDetailLine(label: 'Account name', value: details.accountName),
@@ -90,19 +75,12 @@ class _GcashDetailLine extends StatelessWidget {
     children: [
       SizedBox(
         width: 95,
-        child: Text(
-          label,
-          style: const TextStyle(color: AgrisellColors.mutedText, fontSize: 12),
-        ),
+        child: Text(label, style: SharedPresentationStyles.mutedCaption),
       ),
       Expanded(
         child: SelectableText(
           value,
-          style: const TextStyle(
-            color: AgrisellColors.brandBlack,
-            fontSize: 13,
-            fontWeight: FontWeight.w800,
-          ),
+          style: SharedPresentationStyles.inkBodyExtraBold,
         ),
       ),
     ],
@@ -132,10 +110,7 @@ class _GcashUnavailableState extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: AgrisellColors.statusOrangeBackground,
-      borderRadius: BorderRadius.circular(10),
-    ),
+    decoration: GcashPaymentNoticeStyles.containerDecoration3,
     child: Row(
       children: [
         const Icon(
@@ -147,12 +122,7 @@ class _GcashUnavailableState extends StatelessWidget {
         const Expanded(
           child: Text(
             'This farmer has not shared complete GCash details. Choose Cash on Delivery for now.',
-            style: TextStyle(
-              color: AgrisellColors.statusOrangeText,
-              fontSize: 12,
-              height: 1.25,
-              fontWeight: FontWeight.w600,
-            ),
+            style: GcashPaymentNoticeStyles.textStyle3,
           ),
         ),
         TextButton(onPressed: onRetry, child: const Text('Retry')),

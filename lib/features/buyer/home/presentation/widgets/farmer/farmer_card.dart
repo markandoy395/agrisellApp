@@ -1,6 +1,6 @@
+import 'package:agresell_app/features/buyer/home/presentation/styles/farmer_card_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/buyer/home/domain/farmer_profile.dart';
 import 'package:agresell_app/features/buyer/home/presentation/controllers/farmer_follow_controller.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/farmer_avatar.dart';
@@ -29,17 +29,7 @@ class FarmerCard extends StatelessWidget {
       button: true,
       label: 'Open ${farmer.name} shop',
       child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AgrisellColors.surface,
-          borderRadius: borderRadius,
-          boxShadow: [
-            BoxShadow(
-              color: AgrisellColors.brandBlack.withValues(alpha: 0.08),
-              blurRadius: 14,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
+        decoration: FarmerCardStyles.decoratedBoxDecoration(borderRadius),
         child: ClipRRect(
           borderRadius: borderRadius,
           child: Material(

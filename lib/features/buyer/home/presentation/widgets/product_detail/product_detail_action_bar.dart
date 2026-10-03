@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/constants/agrisell_routes.dart';
@@ -37,11 +38,7 @@ class ProductDetailActionBar extends StatelessWidget {
               child: const Text(
                 'Product Details',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AgrisellColors.headingGreen,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: SharedPresentationStyles.headingTitleExtraBold,
               ),
             ),
             if (onSavedToggle != null) ...[

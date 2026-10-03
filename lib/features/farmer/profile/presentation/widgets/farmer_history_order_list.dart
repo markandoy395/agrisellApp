@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -90,11 +91,7 @@ class _EmptyHistorySection extends StatelessWidget {
           Text(
             'No ${section.label.toLowerCase()} orders',
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AgrisellColors.headingGreen,
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
-            ),
+            style: SharedPresentationStyles.headingSubtitleExtraBold,
           ),
           const SizedBox(height: 5),
           Text(
@@ -102,10 +99,7 @@ class _EmptyHistorySection extends StatelessWidget {
                 ? 'Buyer feedback on completed products will appear here.'
                 : 'Orders will appear here when they reach this stage.',
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AgrisellColors.mutedText,
-              fontSize: 12,
-            ),
+            style: SharedPresentationStyles.mutedCaption,
           ),
         ],
       ),

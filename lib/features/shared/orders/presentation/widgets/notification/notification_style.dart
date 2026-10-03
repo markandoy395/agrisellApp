@@ -1,21 +1,9 @@
+export 'package:agresell_app/features/shared/orders/presentation/styles/notification_type_styles.dart';
+import 'package:agresell_app/features/shared/orders/presentation/styles/notification_type_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/orders/domain/home_notification.dart';
-
-class NotificationStyle {
-  const NotificationStyle({
-    required this.icon,
-    required this.color,
-    required this.background,
-    required this.label,
-  });
-
-  final IconData icon;
-  final Color color;
-  final Color background;
-  final String label;
-}
 
 class NotificationTypeIcon extends StatelessWidget {
   const NotificationTypeIcon({required this.style, super.key});
@@ -26,10 +14,7 @@ class NotificationTypeIcon extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     width: 42,
     height: 42,
-    decoration: BoxDecoration(
-      color: style.background,
-      borderRadius: BorderRadius.circular(13),
-    ),
+    decoration: NotificationTypeStyles.containerDecoration(style),
     child: Icon(style.icon, color: style.color, size: 21),
   );
 }
@@ -40,14 +25,8 @@ class NotificationTypeLabel extends StatelessWidget {
   final NotificationStyle style;
 
   @override
-  Widget build(BuildContext context) => Text(
-    style.label,
-    style: TextStyle(
-      color: style.color,
-      fontSize: 12,
-      fontWeight: FontWeight.w700,
-    ),
-  );
+  Widget build(BuildContext context) =>
+      Text(style.label, style: NotificationTypeStyles.textStyle(style));
 }
 
 NotificationStyle notificationStyleFor(HomeNotificationType type) {

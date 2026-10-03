@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/shared/products/presentation/styles/home_product_card_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -39,17 +40,8 @@ class HomeProductCard extends StatelessWidget {
           onTap: onTap,
           borderRadius: borderRadius,
           child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: AgrisellColors.surface,
-              borderRadius: borderRadius,
-              border: Border.all(color: AgrisellColors.borderLine),
-              boxShadow: [
-                BoxShadow(
-                  color: AgrisellColors.brandBlack.withValues(alpha: 0.05),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+            decoration: HomeProductCardStyles.decoratedBoxDecoration(
+              borderRadius,
             ),
             child: ClipRRect(
               borderRadius: borderRadius,

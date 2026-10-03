@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/farmer/profile/presentation/styles/farmer_gcash_settings_sheet_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
@@ -90,11 +92,7 @@ class _FarmerGcashSettingsSheetState extends State<_FarmerGcashSettingsSheet> {
           ),
           const Text(
             'Buyers see these details only when they choose GCash for your products.',
-            style: TextStyle(
-              color: AgrisellColors.mutedText,
-              fontSize: 12,
-              height: 1.3,
-            ),
+            style: SharedPresentationStyles.mutedCaptionRelaxed,
           ),
           const SizedBox(height: 13),
           if (_loading)
@@ -123,13 +121,7 @@ class _FarmerGcashSettingsSheetState extends State<_FarmerGcashSettingsSheet> {
             ),
             if (_error case final message?) ...[
               const SizedBox(height: 8),
-              Text(
-                message,
-                style: const TextStyle(
-                  color: AgrisellColors.statusRedText,
-                  fontSize: 12,
-                ),
-              ),
+              Text(message, style: SharedPresentationStyles.errorCaption),
             ],
             const SizedBox(height: 13),
             SizedBox(
@@ -137,19 +129,11 @@ class _FarmerGcashSettingsSheetState extends State<_FarmerGcashSettingsSheet> {
               height: 38,
               child: FilledButton.icon(
                 onPressed: _saving || !_isValid ? null : _save,
-                style: FilledButton.styleFrom(
-                  backgroundColor: AgrisellColors.authGreen,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+                style: FarmerGcashSettingsSheetStyles.filledButtonStyle,
                 icon: const Icon(Icons.lock_outline_rounded, size: 16),
                 label: Text(
                   _saving ? 'Saving…' : 'Save GCash details',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: SharedPresentationStyles.captionExtraBold,
                 ),
               ),
             ),

@@ -1,19 +1,10 @@
+export 'package:agresell_app/features/shared/chat/presentation/styles/chat_message_bubble_styles.dart';
+
+import 'package:agresell_app/features/shared/chat/presentation/styles/chat_message_bubble_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/chat/domain/marketplace_conversation.dart';
-
-class ChatMessageBubbleStyle {
-  const ChatMessageBubbleStyle({
-    this.statusTextStyle = const TextStyle(fontSize: 12),
-    this.statusMaxLines,
-    this.statusOverflow,
-  });
-
-  final TextStyle statusTextStyle;
-  final int? statusMaxLines;
-  final TextOverflow? statusOverflow;
-}
 
 class ChatMessageBubble extends StatelessWidget {
   const ChatMessageBubble({
@@ -81,21 +72,14 @@ class ChatMessageBubble extends StatelessWidget {
                     horizontal: 13,
                     vertical: 10,
                   ),
-                  decoration: BoxDecoration(
-                    color: background,
-                    borderRadius: radius,
-                    border: failed
-                        ? Border.all(color: AgrisellColors.statusRedText)
-                        : null,
+                  decoration: ChatMessageBubbleStyles.containerDecoration(
+                    background,
+                    radius,
+                    failed,
                   ),
                   child: Text(
                     message.text,
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 12,
-                      height: 1.32,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: ChatMessageBubbleStyles.textStyle(textColor),
                   ),
                 ),
               ),
@@ -106,11 +90,7 @@ class ChatMessageBubble extends StatelessWidget {
                   status,
                   maxLines: style.statusMaxLines,
                   overflow: style.statusOverflow,
-                  style: style.statusTextStyle.copyWith(
-                    color: failed
-                        ? AgrisellColors.statusRedText
-                        : AgrisellColors.mutedText,
-                  ),
+                  style: ChatMessageBubbleStyles.statusText(style, failed),
                 ),
               ),
             ],

@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -19,7 +20,7 @@ class RiderDocumentsScreen extends StatelessWidget {
           const Text(
             'Your private credentials are available only to you and authorized '
             'Agrisell verification staff.',
-            style: TextStyle(fontSize: 12, color: AgrisellColors.mutedText),
+            style: SharedPresentationStyles.mutedCaption,
           ),
           const SizedBox(height: 12),
           ListTile(
@@ -46,7 +47,7 @@ class RiderDocumentsScreen extends StatelessWidget {
           const SizedBox(height: 14),
           const Text(
             'Verification documents',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+            style: SharedPresentationStyles.subtitleBold,
           ),
           const SizedBox(height: 8),
           if (RiderRegistrationService.instance.currentDocuments.isEmpty)

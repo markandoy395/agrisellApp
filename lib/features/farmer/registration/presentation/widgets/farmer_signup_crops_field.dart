@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/farmer/registration/presentation/styles/farmer_signup_crops_field_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -64,7 +66,10 @@ class _FarmerSignupCropsFieldState extends State<FarmerSignupCropsField> {
             children: [
               for (final crop in selected)
                 InputChip(
-                  label: Text(crop, style: const TextStyle(fontSize: 11)),
+                  label: Text(
+                    crop,
+                    style: FarmerSignupCropsFieldStyles.cropText,
+                  ),
                   onDeleted: () => _removeCrop(crop),
                   backgroundColor: AgrisellColors.forestSoft,
                   deleteIconColor: AgrisellColors.authGreen,
@@ -78,10 +83,7 @@ class _FarmerSignupCropsFieldState extends State<FarmerSignupCropsField> {
             padding: const EdgeInsets.only(top: 3, left: 4),
             child: Text(
               widget.error!,
-              style: const TextStyle(
-                color: AgrisellColors.statusRedText,
-                fontSize: 12,
-              ),
+              style: SharedPresentationStyles.errorCaption,
             ),
           ),
         const SizedBox(height: 8),

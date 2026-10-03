@@ -1,3 +1,9 @@
+import 'package:agresell_app/features/farmer/products/presentation/styles/add_product_availability_fields_styles.dart';
+import 'package:agresell_app/features/farmer/products/presentation/styles/add_product_form_fields_styles.dart';
+import 'package:agresell_app/features/farmer/products/presentation/styles/add_product_form_panel_styles.dart';
+import 'package:agresell_app/features/farmer/products/presentation/styles/add_product_inventory_lot_fields_styles.dart';
+import 'package:agresell_app/features/farmer/products/presentation/styles/add_product_media_widgets_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -22,6 +28,7 @@ part 'package:agresell_app/features/farmer/products/presentation/widgets/add_pro
 part 'package:agresell_app/features/farmer/products/presentation/widgets/add_product/add_product_availability_fields.dart';
 part 'package:agresell_app/features/farmer/products/presentation/widgets/add_product/add_product_inventory_lot_fields.dart';
 part 'package:agresell_app/features/farmer/products/presentation/controllers/add_product_screen_actions.dart';
+part 'package:agresell_app/features/farmer/products/presentation/controllers/add_product_date_actions.dart';
 
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({
@@ -93,11 +100,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   const SizedBox(width: 12),
                   const Text(
                     'Create product listing',
-                    style: TextStyle(
-                      color: AgrisellColors.headingGreen,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: SharedPresentationStyles.headingTitleExtraBold,
                   ),
                 ],
               ),

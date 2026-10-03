@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/buyer/cart/presentation/styles/quantity_stepper_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -17,10 +18,7 @@ class QuantityStepper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AgrisellColors.forestSoft,
-        borderRadius: BorderRadius.circular(22),
-      ),
+      decoration: QuantityStepperStyles.decoratedBoxDecoration,
       child: SizedBox(
         height: 36,
         child: Row(
@@ -38,12 +36,7 @@ class QuantityStepper extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: AgrisellColors.brandBlack,
-                  fontSize: 13,
-                  height: 1,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: QuantityStepperStyles.textStyle,
               ),
             ),
             _StepperButton(

@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
@@ -158,10 +159,7 @@ class RiderRequestDetailSections extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
-        ),
+        Text(title, style: SharedPresentationStyles.subtitleExtraBold),
         const SizedBox(height: 9),
         ...children,
       ],

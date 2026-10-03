@@ -1,3 +1,6 @@
+import 'package:agresell_app/features/buyer/home/presentation/styles/farmer_screen_components_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/buyer/home/presentation/styles/farmer_screen_controls_styles.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';

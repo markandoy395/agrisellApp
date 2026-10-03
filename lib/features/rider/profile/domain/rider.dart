@@ -1,4 +1,5 @@
 import 'package:agresell_app/features/rider/dashboard/domain/rider_availability.dart';
+import 'package:agresell_app/features/rider/profile/domain/rider_json.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_status.dart';
 
 export 'package:agresell_app/features/rider/profile/domain/rider_status.dart';
@@ -68,69 +69,9 @@ class Rider {
       ? RiderDeliveryProgress.assigned
       : RiderDeliveryProgress.waiting;
 
-  factory Rider.fromJson(Map<String, Object?> json) => Rider(
-    riderId: _text(json['rider_id']),
-    logisticsCompanyId: _nullableText(json['logistics_company_id']),
-    licenseNumber: _text(json['license_number']),
-    fullName: _text(json['full_name']),
-    vehicleType: _text(json['vehicle_type']),
-    vehiclePlateNumber: _text(json['vehicle_plate_number']),
-    availabilityStatus: RiderDatabaseAvailability.values.firstWhere(
-      (item) => item.name == json['availability_status'],
-      orElse: () => RiderDatabaseAvailability.offline,
-    ),
-    rating: _number(json['rating']),
-    firstName: _text(json['first_name']),
-    lastName: _text(json['last_name']),
-    contactNumber: _text(json['contact_number']),
-    email: _text(json['email']),
-    gpsLatitude: _nullableNumber(json['gps_lat']),
-    gpsLongitude: _nullableNumber(json['gps_long']),
-    locationLabel: _text(json['location_label']),
-    addressLine: _text(json['address_line']),
-    barangay: _text(json['barangay']),
-    cityMunicipality: _text(json['city_municipality']),
-    province: _text(json['province']),
-    postalCode: _text(json['postal_code']),
-    totalDeliveries: _integer(json['total_deliveries']),
-    maximumActiveDeliveries: _positiveInteger(
-      json['maximum_active_deliveries'],
-    ),
-    employmentStatus: RiderEmploymentStatus.values.firstWhere(
-      (item) => item.name == json['employment_status'],
-      orElse: () => RiderEmploymentStatus.inactive,
-    ),
-    profilePhotoPath: _nullableText(json['profile_photo_url']),
-  );
+  factory Rider.fromJson(Map<String, Object?> json) => parseRiderJson(json);
 
-  Map<String, Object?> toJson() => {
-    if (riderId.isNotEmpty) 'rider_id': riderId,
-    'logistics_company_id': logisticsCompanyId,
-    'license_number': _blankToNull(licenseNumber)?.toUpperCase(),
-    'full_name': fullName.trim(),
-    'vehicle_type': vehicleType.trim(),
-    'vehicle_plate_number': _blankToNull(vehiclePlateNumber)?.toUpperCase(),
-    'availability_status': availabilityStatus.name,
-    'rating': rating,
-    'first_name': firstName.trim(),
-    'last_name': lastName.trim(),
-    'contact_number': contactNumber.trim(),
-    'email': email.trim().toLowerCase(),
-    'gps_lat': gpsLatitude,
-    'gps_long': gpsLongitude,
-    'location_label': _blankToNull(locationLabel),
-    'address_line': _blankToNull(addressLine),
-    'barangay': _blankToNull(barangay),
-    'city_municipality': _blankToNull(cityMunicipality),
-    'province': _blankToNull(province),
-    'postal_code': _blankToNull(postalCode),
-    'total_deliveries': totalDeliveries,
-    'maximum_active_deliveries': maximumActiveDeliveries,
-    'employment_status': employmentStatus == RiderEmploymentStatus.pending
-        ? RiderEmploymentStatus.inactive.name
-        : employmentStatus.name,
-    'profile_photo_url': _blankToNull(profilePhotoPath),
-  };
+  Map<String, Object?> toJson() => serializeRiderJson(this);
 
   Rider copyWith({
     String? licenseNumber,
@@ -184,20 +125,4 @@ class Rider {
   bool operator ==(Object other) => other is Rider && other.riderId == riderId;
   @override
   int get hashCode => riderId.hashCode;
-}
-
-String _text(Object? value) => value?.toString().trim() ?? '';
-String? _nullableText(Object? value) => _blankToNull(value?.toString());
-String? _blankToNull(String? value) => switch (value?.trim()) {
-  final text? when text.isNotEmpty => text,
-  _ => null,
-};
-double _number(Object? value) => _nullableNumber(value) ?? 0;
-double? _nullableNumber(Object? value) =>
-    value is num ? value.toDouble() : double.tryParse(value?.toString() ?? '');
-int _integer(Object? value) =>
-    value is num ? value.toInt() : int.tryParse(value?.toString() ?? '') ?? 0;
-int _positiveInteger(Object? value) {
-  final parsed = _integer(value);
-  return parsed > 0 ? parsed : 1;
 }

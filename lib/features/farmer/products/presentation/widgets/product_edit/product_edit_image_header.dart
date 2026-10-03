@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/farmer/products/presentation/styles/product_edit_image_header_styles.dart';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -36,9 +37,7 @@ class ProductEditImageHeader extends StatelessWidget {
           semanticLabel: 'Product photo',
         ),
         DecoratedBox(
-          decoration: BoxDecoration(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.18),
-          ),
+          decoration: ProductEditImageHeaderStyles.decoratedBoxDecoration,
         ),
         SafeArea(
           bottom: false,
@@ -73,10 +72,7 @@ class ProductEditImageHeader extends StatelessWidget {
               child: Container(
                 width: 104,
                 height: 104,
-                decoration: BoxDecoration(
-                  color: AgrisellColors.surface.withValues(alpha: 0.33),
-                  shape: BoxShape.circle,
-                ),
+                decoration: ProductEditImageHeaderStyles.containerDecoration,
                 child: const Icon(
                   Icons.photo_camera_outlined,
                   color: AgrisellColors.surface,

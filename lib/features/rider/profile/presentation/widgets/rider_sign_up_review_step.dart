@@ -1,6 +1,6 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_draft.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_sign_up_validator.dart';
 import 'package:agresell_app/features/rider/profile/presentation/controllers/rider_sign_up_controller.dart';
@@ -18,7 +18,7 @@ class RiderSignUpReviewStep extends StatelessWidget {
       children: [
         const Text(
           'Review each section before you submit your Rider application.',
-          style: TextStyle(fontSize: 12, color: AgrisellColors.mutedText),
+          style: SharedPresentationStyles.mutedCaption,
         ),
         const SizedBox(height: 12),
         _ReviewCard(
@@ -61,7 +61,7 @@ class RiderSignUpReviewStep extends StatelessWidget {
         ),
         const Text(
           'Logistics partner',
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+          style: SharedPresentationStyles.bodyExtraBold,
         ),
         const SizedBox(height: 6),
         RiderLogisticsCompanySelector(controller: controller),
@@ -81,7 +81,7 @@ class RiderSignUpReviewStep extends StatelessWidget {
               controller.updateAgreement(terms: value ?? false),
           title: const Text(
             'I accept the Terms and Conditions',
-            style: TextStyle(fontSize: 12),
+            style: SharedPresentationStyles.caption,
           ),
         ),
         CheckboxListTile(
@@ -91,7 +91,7 @@ class RiderSignUpReviewStep extends StatelessWidget {
               controller.updateAgreement(privacy: value ?? false),
           title: const Text(
             'I accept the Privacy Policy',
-            style: TextStyle(fontSize: 12),
+            style: SharedPresentationStyles.caption,
           ),
         ),
         CheckboxListTile(
@@ -101,13 +101,13 @@ class RiderSignUpReviewStep extends StatelessWidget {
               controller.updateAgreement(accuracy: value ?? false),
           title: const Text(
             'I confirm that my submitted information is accurate',
-            style: TextStyle(fontSize: 12),
+            style: SharedPresentationStyles.caption,
           ),
         ),
         const SizedBox(height: 8),
         const Text(
           'Your Rider account will be reviewed after submission. You will receive a notification when your account is approved.',
-          style: TextStyle(fontSize: 12, color: AgrisellColors.mutedText),
+          style: SharedPresentationStyles.mutedCaption,
         ),
       ],
     );
@@ -129,24 +129,14 @@ class _ReviewCard extends StatelessWidget {
     width: double.infinity,
     margin: const EdgeInsets.only(bottom: 10),
     padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: AgrisellColors.fieldFill,
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: AgrisellColors.borderLine),
-    ),
+    decoration: SharedPresentationStyles.borderedField,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
             Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
+              child: Text(title, style: SharedPresentationStyles.bodyExtraBold),
             ),
             TextButton(onPressed: onEdit, child: const Text('Edit')),
           ],
@@ -156,7 +146,7 @@ class _ReviewCard extends StatelessWidget {
             padding: const EdgeInsets.only(top: 3),
             child: Text(
               value.isEmpty ? 'Not provided' : value,
-              style: const TextStyle(fontSize: 12),
+              style: SharedPresentationStyles.caption,
             ),
           ),
       ],

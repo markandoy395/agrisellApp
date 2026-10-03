@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/buyer/home/presentation/styles/product_detail_unavailable_notice_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -10,13 +11,7 @@ class ProductDetailUnavailableNotice extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-      decoration: BoxDecoration(
-        color: AgrisellColors.statusRedBackground,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: AgrisellColors.statusRedText.withValues(alpha: 0.22),
-        ),
-      ),
+      decoration: ProductDetailUnavailableNoticeStyles.containerDecoration,
       child: const Row(
         children: [
           Icon(
@@ -28,12 +23,8 @@ class ProductDetailUnavailableNotice extends StatelessWidget {
           Expanded(
             child: Text(
               'This product is not accepting orders right now.',
-              style: TextStyle(
-                color: AgrisellColors.statusRedText,
-                fontSize: 12,
-                height: 1.25,
-                fontWeight: FontWeight.w700,
-              ),
+              style: ProductDetailUnavailableNoticeStyles
+                  .thisProductIsNotAcceptingText,
             ),
           ),
         ],

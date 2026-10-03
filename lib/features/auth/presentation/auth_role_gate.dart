@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'auth_page_gate.dart';
 
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
@@ -22,7 +23,15 @@ class AuthRoleGate extends StatelessWidget {
   final AuthRedirectBuilder? redirectFor;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: AuthSessionService.instance,
+    builder: (context, _) => _buildAuthorized(context),
+  );
+
+  Widget _buildAuthorized(BuildContext context) {
+    if (!AuthSessionService.instance.isAuthenticated) {
+      return const SignedOutRedirect();
+    }
     final account = AuthSessionService.instance.currentAccount;
     if (account != null && AuthRouteGuard.allowsRole(account, requiredRole)) {
       return child;

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -7,6 +8,7 @@ import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/core/services/push_notification_service.dart';
 import 'package:agresell_app/features/auth/data/account_session_store.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
+import 'package:agresell_app/features/auth/domain/auth_session_models.dart';
 import 'package:agresell_app/features/auth/domain/saved_account.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_controller.dart';
@@ -14,34 +16,12 @@ import 'package:agresell_app/features/buyer/home/presentation/controllers/farmer
 import 'package:agresell_app/features/rider/profile/data/rider_registration_service.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/order_controller.dart';
 
+export 'package:agresell_app/features/auth/domain/auth_session_models.dart';
+
 part 'auth_session_service_lifecycle.dart';
+part 'auth_session_service_switching.dart';
 
-class AuthSessionRestoreResult {
-  const AuthSessionRestoreResult({
-    required this.account,
-    required this.wasExpired,
-  });
-
-  const AuthSessionRestoreResult.noSession()
-    : account = null,
-      wasExpired = false;
-
-  const AuthSessionRestoreResult.expired() : account = null, wasExpired = true;
-
-  final RegisteredAccount? account;
-  final bool wasExpired;
-}
-
-class SavedAccountSessionException implements Exception {
-  const SavedAccountSessionException(this.message);
-
-  final String message;
-
-  @override
-  String toString() => message;
-}
-
-class AuthSessionService {
+class AuthSessionService extends ChangeNotifier {
   AuthSessionService._();
 
   static final AuthSessionService instance = AuthSessionService._();
@@ -52,6 +32,21 @@ class AuthSessionService {
   StreamSubscription<AuthState>? _authSubscription;
   String? _currentAccountId;
   bool _currentAccountRemembered = false;
+
+  void _notifySessionChanged() => notifyListeners();
+
+  bool get isAuthenticated {
+    final account = currentAccount;
+    if (account == null) return false;
+    if (!AuthRegistrationService.instance.usesSupabase) {
+      return AuthRegistrationService.instance.localStoreEnabledForTesting;
+    }
+    final session = AgrisellSupabase.client.auth.currentSession;
+    return session != null &&
+        !session.isExpired &&
+        !session.user.isAnonymous &&
+        session.user.id == account.id;
+  }
 
   RegisteredAccount? get currentAccount => _currentAccountId == null
       ? null
@@ -95,54 +90,8 @@ class AuthSessionService {
     _currentAccountRemembered = true;
   }
 
-  Future<RegisteredAccount> switchTo(String accountId) async {
-    if (accountId == _currentAccountId) {
-      final account = currentAccount;
-      if (account != null) return account;
-    }
-    final saved = await _sessionStore.loadAccounts();
-    final selected = saved.where((item) => item.id == accountId).firstOrNull;
-    if (selected == null) {
-      throw const SavedAccountSessionException(
-        'This account is no longer saved on this device.',
-      );
-    }
-
-    await preserveCurrentAccountForSwitch();
-
-    await BasketController.instance.flush();
-    late final RegisteredAccount? account;
-    if (AuthRegistrationService.instance.usesSupabase) {
-      final credential = await _sessionStore.readCredential(accountId);
-      if (credential == null || credential.isEmpty) {
-        throw SavedAccountSessionException(
-          'Sign in to ${selected.email} again to restore this account.',
-        );
-      }
-      try {
-        account = await AuthRegistrationService.instance.restoreSavedSession(
-          credential,
-        );
-      } on AuthException {
-        throw SavedAccountSessionException(
-          'The saved session for ${selected.email} expired. Sign in again.',
-        );
-      }
-    } else {
-      account = AuthRegistrationService.instance.accountById(accountId);
-    }
-    if (account == null || account.id != accountId) {
-      throw SavedAccountSessionException(
-        'The saved session for ${selected.email} is unavailable.',
-      );
-    }
-
-    await _activate(account);
-    await _remember(account);
-    await _persistActiveAccount(account.id);
-    _currentAccountRemembered = true;
-    return account;
-  }
+  Future<RegisteredAccount> switchTo(String accountId) =>
+      _switchToAccount(accountId);
 
   Future<void> _activate(RegisteredAccount account) async {
     if (_currentAccountId != null && _currentAccountId != account.id) {
@@ -151,6 +100,7 @@ class AuthSessionService {
     _currentAccountId = account.id;
     _currentAccountRemembered = false;
     _ensureAuthListener();
+    notifyListeners();
     await OrderController.instance.loadForAccount(account.id);
     unawaited(PushNotificationService.instance.registerForUser(account.id));
   }
@@ -172,6 +122,12 @@ class AuthSessionService {
       state,
     ) {
       final session = state.session;
+      if (state.event == AuthChangeEvent.signedOut) {
+        _currentAccountId = null;
+        _currentAccountRemembered = false;
+        _clearAccountState();
+      }
+      notifyListeners();
       final credential = session?.refreshToken;
       if (session == null || credential == null || credential.isEmpty) return;
       unawaited(_refreshSavedCredential(session.user.id, credential));

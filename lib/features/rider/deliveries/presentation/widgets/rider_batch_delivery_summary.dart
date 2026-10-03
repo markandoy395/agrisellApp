@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_batch_delivery_summary_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -33,11 +35,7 @@ class RiderBatchDeliverySummary extends StatelessWidget {
               Expanded(
                 child: Text(
                   '${deliveries.length}-delivery batch',
-                  style: const TextStyle(
-                    color: AgrisellColors.headingGreen,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: SharedPresentationStyles.headingSubtitleExtraBold,
                 ),
               ),
             ],
@@ -46,7 +44,7 @@ class RiderBatchDeliverySummary extends StatelessWidget {
           if (currentPlan == null)
             const Text(
               'Route planning needs verified coordinates and deadlines.',
-              style: TextStyle(color: AgrisellColors.mutedText, fontSize: 12),
+              style: SharedPresentationStyles.mutedCaption,
             )
           else ...[
             Wrap(
@@ -73,8 +71,7 @@ class RiderBatchDeliverySummary extends StatelessWidget {
                 ),
                 _Metric(
                   label: 'COD total',
-                  value:
-                      'PHP ${_codTotal(deliveries).toStringAsFixed(2)}',
+                  value: 'PHP ${_codTotal(deliveries).toStringAsFixed(2)}',
                 ),
               ],
             ),
@@ -94,11 +91,7 @@ class RiderBatchDeliverySummary extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 'Handling: ${currentPlan.handlingWarnings.join(' • ')}',
-                style: const TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: SharedPresentationStyles.mutedCaptionSemibold,
               ),
             ],
           ],
@@ -109,10 +102,7 @@ class RiderBatchDeliverySummary extends StatelessWidget {
               child: Text(
                 '${delivery.orderNumber} • ${delivery.productName} • '
                 '${_deadline(delivery)} • PHP ${delivery.deliveryFee.toStringAsFixed(2)}',
-                style: const TextStyle(
-                  color: AgrisellColors.headingGreenAlt,
-                  fontSize: 12,
-                ),
+                style: RiderBatchDeliverySummaryStyles.textStyle,
               ),
             ),
         ],
@@ -131,11 +121,7 @@ class _Metric extends StatelessWidget {
     label: '$label $value',
     child: Text(
       '$label: $value',
-      style: const TextStyle(
-        color: AgrisellColors.headingGreenAlt,
-        fontSize: 12,
-        fontWeight: FontWeight.w700,
-      ),
+      style: RiderBatchDeliverySummaryStyles.textStyle2,
     ),
   );
 }
@@ -148,11 +134,7 @@ class _StopSequence extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Text(
     '$title: ${stops.isEmpty ? 'None' : stops.map((stop) => '${stop.sequence}. ${stop.location.address}').join('  →  ')}',
-    style: const TextStyle(
-      color: AgrisellColors.headingGreenAlt,
-      fontSize: 12,
-      fontWeight: FontWeight.w600,
-    ),
+    style: RiderBatchDeliverySummaryStyles.textStyle3,
   );
 }
 
@@ -165,6 +147,5 @@ String _deadline(DeliveryRequest delivery) {
 
 double _codTotal(Iterable<DeliveryRequest> deliveries) => deliveries.fold(
   0,
-  (total, delivery) =>
-      total + (delivery.cashOnDelivery?.amountToCollect ?? 0),
+  (total, delivery) => total + (delivery.cashOnDelivery?.amountToCollect ?? 0),
 );

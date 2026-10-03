@@ -26,11 +26,7 @@ class _OrderDetailsSheet extends StatelessWidget {
                   const Expanded(
                     child: Text(
                       'Order Details',
-                      style: TextStyle(
-                        color: AgrisellColors.brandBlack,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                      ),
+                      style: SharedPresentationStyles.inkTitleExtraBold,
                     ),
                   ),
                   IconButton(
@@ -58,7 +54,10 @@ class _OrderDetailsSheet extends StatelessWidget {
                 label: 'Items',
                 value: '${order.totalQuantity} $itemLabel',
               ),
-              _DetailsLine(label: 'Total', value: formatBasketPeso(order.total)),
+              _DetailsLine(
+                label: 'Total',
+                value: formatBasketPeso(order.total),
+              ),
               _DetailsLine(label: 'Payment', value: order.payment.method.label),
               _DetailsLine(
                 label: 'Payment status',
@@ -97,17 +96,11 @@ class _OrderDetailsSheet extends StatelessWidget {
                       Navigator.pop(context);
                       showBuyerRefundDetailSheet(context, order: order);
                     },
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AgrisellColors.statusPurpleText,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
+                    style: OrderDetailsSheetStyles.filledButtonStyle,
                     icon: const Icon(Icons.receipt_long_outlined, size: 18),
                     label: const Text(
                       'Track Refund Status',
-                      style: TextStyle(fontWeight: FontWeight.w700),
+                      style: OrderDetailsSheetStyles.trackRefundStatusText,
                     ),
                   ),
                 ),
@@ -121,17 +114,11 @@ class _OrderDetailsSheet extends StatelessWidget {
                   child: FilledButton.icon(
                     onPressed: () =>
                         showDeliveryTrackingSheet(context, order: order),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AgrisellColors.authGreen,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
+                    style: OrderDetailsSheetStyles.filledButtonStyle2,
                     icon: const Icon(Icons.map_rounded, size: 18),
                     label: const Text(
                       'Track Live Delivery on Map',
-                      style: TextStyle(fontWeight: FontWeight.w700),
+                      style: OrderDetailsSheetStyles.trackRefundStatusText,
                     ),
                   ),
                 ),
@@ -161,22 +148,11 @@ class _DetailsLine extends StatelessWidget {
             width: 116,
             child: Text(
               label,
-              style: const TextStyle(
-                color: AgrisellColors.mutedText,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
+              style: SharedPresentationStyles.mutedCaptionSemibold,
             ),
           ),
           Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                color: AgrisellColors.brandBlack,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            child: Text(value, style: OrderDetailsSheetStyles.valueText),
           ),
         ],
       ),

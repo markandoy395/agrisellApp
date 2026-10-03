@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/buyer/home/presentation/styles/home_product_filter_sheet_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -33,11 +35,7 @@ class HomeProductFilterSheet extends StatelessWidget {
                     const Expanded(
                       child: Text(
                         'Filter products',
-                        style: TextStyle(
-                          color: AgrisellColors.headingGreen,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                        ),
+                        style: SharedPresentationStyles.headingTitleExtraBold,
                       ),
                     ),
                     TextButton(
@@ -46,7 +44,7 @@ class HomeProductFilterSheet extends StatelessWidget {
                           : null,
                       child: const Text(
                         'Reset',
-                        style: TextStyle(fontSize: 12),
+                        style: SharedPresentationStyles.caption,
                       ),
                     ),
                   ],
@@ -67,11 +65,7 @@ class HomeProductFilterSheet extends StatelessWidget {
                 const SizedBox(height: 12),
                 const Text(
                   'Sort by',
-                  style: TextStyle(
-                    color: AgrisellColors.brandBlack,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: HomeProductFilterSheetStyles.sortByText,
                 ),
                 const SizedBox(height: 8),
                 Wrap(
@@ -83,12 +77,9 @@ class HomeProductFilterSheet extends StatelessWidget {
                         label: Text(option.label),
                         selected: controller.sort == option,
                         onSelected: (_) => controller.setSort(option),
-                        labelStyle: TextStyle(
-                          color: controller.sort == option
-                              ? AgrisellColors.surface
-                              : AgrisellColors.brandBlack,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                        labelStyle: HomeProductFilterSheetStyles.textStyle(
+                          controller,
+                          option,
                         ),
                         selectedColor: AgrisellColors.authGreen,
                         backgroundColor: AgrisellColors.fieldFill,
@@ -104,19 +95,10 @@ class HomeProductFilterSheet extends StatelessWidget {
                     height: 38,
                     child: FilledButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AgrisellColors.authGreen,
-                        foregroundColor: AgrisellColors.surface,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
+                      style: HomeProductFilterSheetStyles.filledButtonStyle,
                       child: const Text(
                         'Show products',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: SharedPresentationStyles.bodyBold,
                       ),
                     ),
                   ),
@@ -138,10 +120,7 @@ class _SheetHandle extends StatelessWidget {
     return Container(
       width: 38,
       height: 4,
-      decoration: BoxDecoration(
-        color: AgrisellColors.mutedText.withValues(alpha: 0.35),
-        borderRadius: BorderRadius.circular(4),
-      ),
+      decoration: HomeProductFilterSheetStyles.containerDecoration,
     );
   }
 }
@@ -164,18 +143,8 @@ class _FilterSwitch extends StatelessWidget {
     return SwitchListTile.adaptive(
       contentPadding: EdgeInsets.zero,
       dense: true,
-      title: Text(
-        title,
-        style: const TextStyle(
-          color: AgrisellColors.brandBlack,
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: const TextStyle(color: AgrisellColors.mutedText, fontSize: 12),
-      ),
+      title: Text(title, style: HomeProductFilterSheetStyles.sortByText),
+      subtitle: Text(subtitle, style: SharedPresentationStyles.mutedCaption),
       value: value,
       activeTrackColor: AgrisellColors.authGreen,
       onChanged: onChanged,

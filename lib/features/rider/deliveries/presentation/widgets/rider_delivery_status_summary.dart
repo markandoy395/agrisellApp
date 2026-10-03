@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_status_summary_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -19,10 +21,7 @@ class RiderDeliveryStatusSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     final next = _nextStatus(status);
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AgrisellColors.limeSoft,
-        borderRadius: BorderRadius.circular(10),
-      ),
+      decoration: RiderDeliveryStatusSummaryStyles.decoratedBoxDecoration,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         child: Row(
@@ -35,29 +34,18 @@ class RiderDeliveryStatusSummary extends StatelessWidget {
                 children: [
                   Text(
                     'Current: ${status.displayLabel}',
-                    style: const TextStyle(
-                      color: AgrisellColors.headingGreen,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: SharedPresentationStyles.headingBodyExtraBold,
                   ),
                   Text(
                     next == null
                         ? 'No further Rider action.'
                         : 'Next: ${next.displayLabel}',
-                    style: const TextStyle(
-                      color: AgrisellColors.mutedText,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: SharedPresentationStyles.mutedCaptionSemibold,
                   ),
                   if (accuracyMeters != null)
                     Text(
                       'GPS accuracy: ${accuracyMeters!.toStringAsFixed(0)} m',
-                      style: const TextStyle(
-                        color: AgrisellColors.mutedText,
-                        fontSize: 12,
-                      ),
+                      style: SharedPresentationStyles.mutedCaption,
                     ),
                 ],
               ),

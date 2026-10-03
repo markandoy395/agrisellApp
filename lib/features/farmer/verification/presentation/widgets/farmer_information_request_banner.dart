@@ -1,5 +1,6 @@
+import 'package:agresell_app/features/farmer/verification/presentation/styles/farmer_information_request_banner_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/farmer/verification/domain/farmer_verification_details.dart';
 
 class FarmerInformationRequestBanner extends StatelessWidget {
@@ -25,21 +26,7 @@ class FarmerInformationRequestBanner extends StatelessWidget {
     return Padding(
       padding: margin,
       child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFFFFF8E1), // Warm amber background
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: const Color(0xFFFFB74D), // Amber accent border
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFFE65100).withValues(alpha: 0.08),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+        decoration: FarmerInformationRequestBannerStyles.containerDecoration,
         child: Material(
           color: Colors.transparent,
           child: InkWell(
@@ -55,10 +42,8 @@ class FarmerInformationRequestBanner extends StatelessWidget {
                     children: [
                       Container(
                         padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFE082),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                        decoration: FarmerInformationRequestBannerStyles
+                            .containerDecoration2,
                         child: const Icon(
                           Icons.warning_amber_rounded,
                           color: Color(0xFFE65100),
@@ -72,23 +57,16 @@ class FarmerInformationRequestBanner extends StatelessWidget {
                           children: [
                             const Text(
                               'Action Required: Information Requested',
-                              style: TextStyle(
-                                color: Color(0xFFBF360C),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w800,
-                              ),
+                              style: FarmerInformationRequestBannerStyles
+                                  .actionRequiredInformationRequestedText,
                             ),
                             const SizedBox(height: 4),
                             Text(
                               message,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: AgrisellColors.brandBlack,
-                                fontSize: 12,
-                                height: 1.35,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: FarmerInformationRequestBannerStyles
+                                  .messageText,
                             ),
                           ],
                         ),
@@ -100,40 +78,34 @@ class FarmerInformationRequestBanner extends StatelessWidget {
                     Wrap(
                       spacing: 6,
                       runSpacing: 4,
-                      children: details.missingItems.map((item) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
-                              color: const Color(0xFFFFCC80),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.error_outline_rounded,
-                                size: 12,
-                                color: Color(0xFFE65100),
+                      children: details.missingItems
+                          .map((item) {
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
                               ),
-                              const SizedBox(width: 4),
-                              Text(
-                                item,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFFE65100),
-                                ),
+                              decoration: FarmerInformationRequestBannerStyles
+                                  .containerDecoration3,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.error_outline_rounded,
+                                    size: 12,
+                                    color: Color(0xFFE65100),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    item,
+                                    style: FarmerInformationRequestBannerStyles
+                                        .itemText,
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        );
-                      }).toList(growable: false),
+                            );
+                          })
+                          .toList(growable: false),
                     ),
                   ],
                   const SizedBox(height: 12),
@@ -145,35 +117,16 @@ class FarmerInformationRequestBanner extends StatelessWidget {
                     children: [
                       Text(
                         'Requested: ${details.formattedRequestedDate}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AgrisellColors.mutedText,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: FarmerInformationRequestBannerStyles.textStyle,
                       ),
                       ElevatedButton.icon(
                         onPressed: onTap,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFE65100),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 8,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          elevation: 0,
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
+                        style: FarmerInformationRequestBannerStyles
+                            .elevatedButtonStyle,
                         icon: const Icon(Icons.edit_note_rounded, size: 16),
                         label: const Text(
                           'Review & Resubmit',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                          ),
+                          style: SharedPresentationStyles.captionBold,
                         ),
                       ),
                     ],

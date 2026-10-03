@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -112,11 +113,7 @@ class RiderHistoryDetailsScreen extends StatelessWidget {
               const Text(
                 'Completed delivery records are read-only.',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: SharedPresentationStyles.mutedCaptionSemibold,
               ),
             ],
           ),
@@ -129,23 +126,9 @@ class RiderHistoryDetailsScreen extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            color: AgrisellColors.headingGreen,
-            fontSize: 13,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
+        Text(title, style: SharedPresentationStyles.headingBodyExtraBold),
         const SizedBox(height: 5),
-        Text(
-          value.trim(),
-          style: const TextStyle(
-            color: AgrisellColors.mutedText,
-            fontSize: 12,
-            height: 1.35,
-          ),
-        ),
+        Text(value.trim(), style: SharedPresentationStyles.mutedCaptionLoose),
       ],
     ),
   );

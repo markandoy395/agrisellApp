@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/reserved_order_card_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -23,17 +25,7 @@ class ReservedOrderCard extends StatelessWidget {
     final cardPadding = width < 380 ? 12.0 : 14.0;
 
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.08),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
+      decoration: ReservedOrderCardStyles.decoratedBoxDecoration,
       child: Padding(
         padding: EdgeInsets.all(cardPadding),
         child: Column(
@@ -102,19 +94,11 @@ class _BuyerDetailLine extends StatelessWidget {
     return Text.rich(
       TextSpan(
         children: [
-          TextSpan(
-            text: '$label: ',
-            style: const TextStyle(fontWeight: FontWeight.w800),
-          ),
+          TextSpan(text: '$label: ', style: SharedPresentationStyles.extraBold),
           TextSpan(text: value),
         ],
       ),
-      style: const TextStyle(
-        color: AgrisellColors.brandBlack,
-        fontSize: 12,
-        height: 1.26,
-        fontWeight: FontWeight.w500,
-      ),
+      style: ReservedOrderCardStyles.textStyle,
     );
   }
 }

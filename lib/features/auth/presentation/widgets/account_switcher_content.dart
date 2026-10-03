@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/auth/presentation/styles/account_switcher_content_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -31,7 +33,7 @@ class AccountSwitcherContent extends StatelessWidget {
           accounts.isEmpty
               ? 'No accounts are saved on this device.'
               : 'Choose an account saved on this device.',
-          style: const TextStyle(color: AgrisellColors.mutedText, fontSize: 13),
+          style: AccountSwitcherContentStyles.textStyle,
         ),
         const SizedBox(height: 12),
         for (final account in accounts) ...[
@@ -99,20 +101,20 @@ class SavedAccountTile extends StatelessWidget {
           foregroundColor: AgrisellColors.authGreen,
           fallback: Text(
             _initials(account),
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+            style: SharedPresentationStyles.subtitleBold,
           ),
         ),
         title: Text(
           account.displayName,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+          style: SharedPresentationStyles.subtitleBold,
         ),
         subtitle: Text(
           '${account.email} • ${account.assignedRole?.label ?? 'Account'}',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 12),
+          style: SharedPresentationStyles.caption,
         ),
         trailing: isSwitching
             ? const SizedBox.square(

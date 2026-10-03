@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/features/auth/presentation/widgets/auth_password_requirements.dart';
@@ -26,12 +27,12 @@ class FarmerSignupAccountStep extends StatelessWidget {
     children: [
       const Text(
         'Account information',
-        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+        style: SharedPresentationStyles.subtitleBold,
       ),
       const SizedBox(height: 6),
       const Text(
         'Use an email address you can access.',
-        style: TextStyle(fontSize: 12),
+        style: SharedPresentationStyles.caption,
       ),
       const SizedBox(height: 12),
       FarmerSignupField(
@@ -71,7 +72,7 @@ class FarmerSignupAccountStep extends StatelessWidget {
           emailVerified
               ? 'Email verified. Your account credentials are locked for this registration.'
               : 'OTP sent. Use Change email on the verification screen to edit these credentials.',
-          style: const TextStyle(fontSize: 12),
+          style: SharedPresentationStyles.caption,
         ),
     ],
   );

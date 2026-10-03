@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/services/authenticated_storage_image.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -18,15 +20,12 @@ class RiderDeliveryEvidenceView extends StatelessWidget {
       children: [
         const Text(
           'Delivery evidence',
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+          style: SharedPresentationStyles.bodyExtraBold,
         ),
         const SizedBox(height: 8),
         _EvidenceImage(reference: proof.secureReference),
         const SizedBox(height: 8),
-        Text(
-          _metadata,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-        ),
+        Text(_metadata, style: SharedPresentationStyles.captionSemibold),
       ],
     ),
   );
@@ -55,7 +54,11 @@ class _EvidenceImage extends StatelessWidget {
     if (reference.startsWith('http://') || reference.startsWith('https://')) {
       return _previewable(
         context,
-        Image.network(reference, fit: BoxFit.cover, errorBuilder: _error),
+        authenticatedNetworkImage(
+          reference,
+          fit: BoxFit.cover,
+          errorBuilder: _error,
+        ),
       );
     }
     return FutureBuilder<Uint8List?>(
@@ -79,7 +82,7 @@ class _EvidenceImage extends StatelessWidget {
         child: Center(
           child: Text(
             'Evidence preview is temporarily unavailable.',
-            style: TextStyle(fontSize: 12),
+            style: SharedPresentationStyles.caption,
           ),
         ),
       );

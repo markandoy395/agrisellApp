@@ -28,20 +28,11 @@ class _CheckoutBottomBar extends StatelessWidget {
           child: Text.rich(
             TextSpan(
               text: 'Total ',
-              style: const TextStyle(
-                color: AgrisellColors.brandBlack,
-                fontSize: 13,
-                height: 1,
-                fontWeight: FontWeight.w600,
-              ),
+              style: CheckoutBottomBarStyles.textStyle,
               children: [
                 TextSpan(
                   text: formatBasketPeso(total),
-                  style: const TextStyle(
-                    color: AgrisellColors.authGreen,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: SharedPresentationStyles.greenTitleExtraBold,
                 ),
               ],
             ),

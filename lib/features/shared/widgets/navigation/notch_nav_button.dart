@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/shared/widgets/navigation/notch_nav_button_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
@@ -75,12 +76,9 @@ class _NotchNavButtonState extends State<NotchNavButton> {
             width: buttonWidth,
             height: buttonHeight,
             child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: widget.background,
-                shape: borderRadius == null
-                    ? BoxShape.circle
-                    : BoxShape.rectangle,
-                borderRadius: borderRadius,
+              decoration: NotchNavButtonStyles.decoratedBoxDecoration(
+                widget.background,
+                borderRadius,
               ),
               child: _ButtonClip(
                 borderRadius: borderRadius,
@@ -154,12 +152,7 @@ class _NotchNavButtonContent extends StatelessWidget {
           child: Text(
             label,
             maxLines: 1,
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              height: 1,
-              fontWeight: FontWeight.w800,
-            ),
+            style: NotchNavButtonStyles.labelText(color),
           ),
         ),
       );

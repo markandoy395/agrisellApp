@@ -1,6 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
-
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 class SummaryMetric extends StatelessWidget {
   const SummaryMetric({
@@ -20,22 +19,8 @@ class SummaryMetric extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: AgrisellColors.headingGreen,
-            fontSize: 13,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(
-            color: AgrisellColors.mutedText,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        Text(value, style: SharedPresentationStyles.headingBodyExtraBold),
+        Text(label, style: SharedPresentationStyles.mutedCaptionSemibold),
       ],
     ),
   );

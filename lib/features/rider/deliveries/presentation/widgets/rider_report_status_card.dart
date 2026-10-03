@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -25,19 +26,11 @@ class RiderReportStatusCard extends StatelessWidget {
             children: [
               const Text(
                 'Problem report',
-                style: TextStyle(
-                  color: AgrisellColors.headingGreen,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: SharedPresentationStyles.headingBodyExtraBold,
               ),
               Text(
                 '${report.kind.label} - ${report.status.label}',
-                style: const TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: SharedPresentationStyles.mutedCaptionSemibold,
               ),
             ],
           ),

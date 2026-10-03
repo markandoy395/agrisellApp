@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/farmer/chat/presentation/styles/farmer_message_inbox_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -83,18 +85,9 @@ class FarmerMessageInbox extends StatelessWidget {
                       'Buyer conversations connected to products and orders will appear here.',
                 ),
                 style: const ChatContentStateStyle(
-                  titleStyle: TextStyle(
-                    color: AgrisellColors.headingGreen,
-                    fontSize: 14,
-                    height: 1.2,
-                    fontWeight: FontWeight.w800,
-                  ),
-                  messageStyle: TextStyle(
-                    color: AgrisellColors.mutedText,
-                    fontSize: 12,
-                    height: 1.35,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  titleStyle: FarmerMessageInboxStyles.textStyle,
+                  messageStyle:
+                      SharedPresentationStyles.mutedCaptionMediumLoose,
                 ),
               ),
             ),

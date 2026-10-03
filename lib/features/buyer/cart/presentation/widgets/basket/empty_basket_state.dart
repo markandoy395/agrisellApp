@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/buyer/cart/presentation/styles/empty_basket_state_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/constants/agrisell_assets.dart';
@@ -14,17 +16,7 @@ class EmptyBasketState extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(18, 24, 18, 24),
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.08),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
+      decoration: EmptyBasketStateStyles.containerDecoration,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -37,39 +29,22 @@ class EmptyBasketState extends StatelessWidget {
           const Text(
             'Your basket is ready for fresh picks',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AgrisellColors.brandBlack,
-              fontSize: 15,
-              height: 1.15,
-              fontWeight: FontWeight.w700,
-            ),
+            style: EmptyBasketStateStyles.yourBasketIsReadyForText,
           ),
           const SizedBox(height: 7),
           const Text(
             'Browse locally grown produce and add what you need for your next delivery.',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AgrisellColors.mutedText,
-              fontSize: 12,
-              height: 1.25,
-              fontWeight: FontWeight.w500,
-            ),
+            style: EmptyBasketStateStyles.textStyle,
           ),
           const SizedBox(height: 18),
           FilledButton.icon(
             onPressed: onContinueShopping,
-            style: FilledButton.styleFrom(
-              backgroundColor: AgrisellColors.authGreen,
-              foregroundColor: AgrisellColors.surface,
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
+            style: EmptyBasketStateStyles.filledButtonStyle,
             icon: const Icon(Icons.storefront_outlined, size: 18),
             label: const Text(
               'Browse products',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+              style: SharedPresentationStyles.captionBold,
             ),
           ),
         ],

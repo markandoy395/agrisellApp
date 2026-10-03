@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_pickup_methods_section_styles.dart';
 import 'dart:async';
 import 'dart:math';
 
@@ -11,10 +12,12 @@ import 'package:agresell_app/features/rider/deliveries/domain/delivery_status_up
 import 'package:agresell_app/features/rider/deliveries/domain/pickup_confirmation.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_location_controller.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_pickup_confirmation_styles.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_pickup_problem_dialog.dart';
 
 part 'rider_pickup_confirmation_actions.dart';
 part 'rider_pickup_confirmation_sections.dart';
+part 'rider_pickup_methods_section.dart';
 
 class RiderPickupConfirmationScreen extends StatefulWidget {
   const RiderPickupConfirmationScreen({

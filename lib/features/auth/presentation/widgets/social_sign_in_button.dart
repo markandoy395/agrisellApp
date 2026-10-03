@@ -1,7 +1,7 @@
+import 'package:agresell_app/features/auth/presentation/styles/social_sign_in_button_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/constants/agrisell_assets.dart';
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/responsive.dart';
 import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 
@@ -37,12 +37,7 @@ class SocialSignInButton extends StatelessWidget {
                 child: Text(
                   label,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: AgrisellColors.brandBlack,
-                    fontSize: lerpDouble(12, 14, scale),
-                    fontWeight: FontWeight.w400,
-                    height: 1.2,
-                  ),
+                  style: SocialSignInButtonStyles.labelText(scale),
                 ),
               ),
             ],

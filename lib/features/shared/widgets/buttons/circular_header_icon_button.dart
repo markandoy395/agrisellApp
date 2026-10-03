@@ -1,29 +1,6 @@
+export 'package:agresell_app/features/shared/widgets/buttons/circular_header_icon_button_styles.dart';
+import 'package:agresell_app/features/shared/widgets/buttons/circular_header_icon_button_styles.dart';
 import 'package:flutter/material.dart';
-
-class CircularHeaderIconButtonStyle {
-  const CircularHeaderIconButtonStyle.inkWell({
-    required this.dimension,
-    required this.backgroundColor,
-    required this.iconColor,
-    required this.iconSize,
-  }) : _feedback = _CircularHeaderButtonFeedback.inkWell,
-       splashRadius = 0;
-
-  const CircularHeaderIconButtonStyle.inkResponse({
-    required this.dimension,
-    required this.backgroundColor,
-    required this.iconColor,
-    required this.iconSize,
-    required this.splashRadius,
-  }) : _feedback = _CircularHeaderButtonFeedback.inkResponse;
-
-  final double dimension;
-  final Color backgroundColor;
-  final Color iconColor;
-  final double iconSize;
-  final double splashRadius;
-  final _CircularHeaderButtonFeedback _feedback;
-}
 
 class CircularHeaderIconButton extends StatelessWidget {
   const CircularHeaderIconButton({
@@ -41,8 +18,8 @@ class CircularHeaderIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final button = switch (style._feedback) {
-      _CircularHeaderButtonFeedback.inkWell => SizedBox.square(
+    final button = switch (style.usesInkResponse) {
+      false => SizedBox.square(
         dimension: style.dimension,
         child: Material(
           color: style.backgroundColor,
@@ -54,16 +31,13 @@ class CircularHeaderIconButton extends StatelessWidget {
           ),
         ),
       ),
-      _CircularHeaderButtonFeedback.inkResponse => InkResponse(
+      true => InkResponse(
         onTap: onTap,
         radius: style.splashRadius,
         child: Container(
           width: style.dimension,
           height: style.dimension,
-          decoration: BoxDecoration(
-            color: style.backgroundColor,
-            shape: BoxShape.circle,
-          ),
+          decoration: CircularHeaderIconButtonStyles.containerDecoration(style),
           child: Icon(icon, color: style.iconColor, size: style.iconSize),
         ),
       ),
@@ -72,5 +46,3 @@ class CircularHeaderIconButton extends StatelessWidget {
     return Semantics(button: true, label: semanticLabel, child: button);
   }
 }
-
-enum _CircularHeaderButtonFeedback { inkWell, inkResponse }

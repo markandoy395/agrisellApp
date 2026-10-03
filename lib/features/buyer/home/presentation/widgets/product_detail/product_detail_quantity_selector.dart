@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/buyer/home/presentation/styles/product_detail_quantity_selector_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -20,10 +22,7 @@ class ProductDetailQuantitySelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 36,
-      decoration: BoxDecoration(
-        color: AgrisellColors.forestSoft,
-        borderRadius: BorderRadius.circular(18),
-      ),
+      decoration: ProductDetailQuantitySelectorStyles.containerDecoration,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -37,11 +36,7 @@ class ProductDetailQuantitySelector extends StatelessWidget {
             child: Text(
               quantity.toString().padLeft(2, '0'),
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AgrisellColors.headingGreen,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-              ),
+              style: SharedPresentationStyles.headingCaptionBold,
             ),
           ),
           _QuantityButton(

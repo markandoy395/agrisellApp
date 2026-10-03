@@ -7,44 +7,37 @@ class _MetricTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => RiderSurfaceCard(
-    padding: const EdgeInsets.all(14),
+    padding: RiderDashboardMetricsStyles.tilePadding,
     child: Row(
       children: [
         Container(
-          width: 38,
-          height: 38,
+          width: RiderDashboardMetricsStyles.tileSize,
+          height: RiderDashboardMetricsStyles.tileSize,
           alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: data.backgroundColor,
-            borderRadius: BorderRadius.circular(12),
+          decoration: RiderDashboardMetricTileStyles.containerDecoration(
+            data.backgroundColor,
           ),
-          child: Icon(data.icon, color: data.accentColor, size: 20),
+          child: Icon(
+            data.icon,
+            color: data.accentColor,
+            size: RiderDashboardMetricsStyles.tileIconSize,
+          ),
         ),
-        const SizedBox(width: 10),
+        RiderDashboardMetricsStyles.horizontalGap,
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 data.value,
-                style: const TextStyle(
-                  color: AgrisellColors.headingGreen,
-                  fontSize: 15,
-                  height: 1,
-                  fontWeight: FontWeight.w900,
-                ),
+                style: RiderDashboardMetricsStyles.tileValueStyle,
               ),
               const SizedBox(height: 4),
               Text(
                 data.label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 12,
-                  height: 1.1,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: RiderDashboardMetricsStyles.tileLabelStyle,
               ),
             ],
           ),

@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/buyer/cart/presentation/styles/basket_checkout_controls_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -49,11 +51,7 @@ class BasketCheckoutSummary extends StatelessWidget {
                       ? 'Selected total'
                       : '$selectedQuantity selected',
                   maxLines: 1,
-                  style: const TextStyle(
-                    color: AgrisellColors.mutedText,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: SharedPresentationStyles.mutedCaptionSemibold,
                 ),
               ),
               const SizedBox(height: 4),
@@ -63,12 +61,7 @@ class BasketCheckoutSummary extends StatelessWidget {
                 child: Text(
                   formatBasketPeso(total),
                   maxLines: 1,
-                  style: const TextStyle(
-                    color: AgrisellColors.authGreen,
-                    fontSize: 15,
-                    height: 1,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: BasketCheckoutControlsStyles.textStyle2,
                 ),
               ),
             ],
@@ -114,17 +107,7 @@ class _AllSelector extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 4),
-            Text(
-              'All',
-              style: TextStyle(
-                color: enabled
-                    ? AgrisellColors.brandBlack
-                    : AgrisellColors.mutedText,
-                fontSize: 15,
-                height: 1,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            Text('All', style: BasketCheckoutControlsStyles.allText(enabled)),
           ],
         ),
       ),

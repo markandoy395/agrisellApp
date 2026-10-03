@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/shared/products/presentation/styles/home_product_card_details_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -11,7 +13,7 @@ class HomeProductCardDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(color: AgrisellColors.surface),
+      decoration: HomeProductCardDetailsStyles.containerDecoration,
       padding: const EdgeInsets.fromLTRB(10, 7, 10, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -20,12 +22,7 @@ class HomeProductCardDetails extends StatelessWidget {
             product.name,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: AgrisellColors.brandBlack,
-              fontSize: 14,
-              height: 1.1,
-              fontWeight: FontWeight.w700,
-            ),
+            style: HomeProductCardDetailsStyles.textStyle,
           ),
           const SizedBox(height: 2),
           _ProductCardPrice(product: product),
@@ -73,12 +70,7 @@ class _ProductCardMeta extends StatelessWidget {
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: AgrisellColors.mutedText,
-              fontSize: 12,
-              height: 1,
-              fontWeight: emphasis ? FontWeight.w700 : FontWeight.w500,
-            ),
+            style: HomeProductCardDetailsStyles.valueText(emphasis),
           ),
         ),
       ],
@@ -93,12 +85,7 @@ class _ProductCardPrice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const activeStyle = TextStyle(
-      color: AgrisellColors.authGreen,
-      fontSize: 14,
-      height: 1.05,
-      fontWeight: FontWeight.w700,
-    );
+    const activeStyle = HomeProductCardDetailsStyles.textStyle2;
     if (!product.hasSale) {
       return Text.rich(
         TextSpan(
@@ -107,7 +94,7 @@ class _ProductCardPrice extends StatelessWidget {
           children: [
             TextSpan(
               text: ' ${product.unit}',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+              style: SharedPresentationStyles.captionMedium,
             ),
           ],
         ),
@@ -117,19 +104,10 @@ class _ProductCardPrice extends StatelessWidget {
     }
     return Row(
       children: [
-        Text(
-          product.price,
-          style: const TextStyle(
-            color: Colors.red,
-            fontSize: 12,
-            decoration: TextDecoration.lineThrough,
-            decorationColor: Colors.red,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        Text(product.price, style: SharedPresentationStyles.originalPrice),
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 6),
-          child: Text('→', style: TextStyle(color: AgrisellColors.mutedText)),
+          child: Text('→', style: SharedPresentationStyles.mutedText),
         ),
         Expanded(
           child: Text.rich(
@@ -139,10 +117,7 @@ class _ProductCardPrice extends StatelessWidget {
               children: [
                 TextSpan(
                   text: ' ${product.unit}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: SharedPresentationStyles.captionMedium,
                 ),
               ],
             ),

@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/buyer/home/presentation/styles/buyer_home_categories_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -23,7 +25,7 @@ class BuyerHomeCategories extends StatelessWidget {
         child: Text(
           'Categories from the backend will appear here.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: AgrisellColors.mutedText, fontSize: 12),
+          style: SharedPresentationStyles.mutedCaption,
         ),
       );
     }
@@ -127,27 +129,11 @@ class _CircleCategoryButton extends StatelessWidget {
                 width: 54,
                 height: 54,
                 padding: EdgeInsets.all(isShowAll ? 0 : 10),
-                decoration: BoxDecoration(
-                  color: isShowAll
-                      ? AgrisellColors.authGreen
-                      : selected
-                      ? AgrisellColors.forestSoft
-                      : AgrisellColors.surface,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: selected
-                        ? AgrisellColors.authGreen
-                        : AgrisellColors.borderLine,
-                    width: selected ? 2 : 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AgrisellColors.brandBlack.withValues(alpha: 0.07),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
+                decoration:
+                    BuyerHomeCategoriesStyles.animatedContainerDecoration(
+                      isShowAll,
+                      selected,
                     ),
-                  ],
-                ),
                 child: circleChild,
               ),
               const SizedBox(height: 6),
@@ -158,15 +144,9 @@ class _CircleCategoryButton extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: selected || isShowAll
-                        ? AgrisellColors.authGreen
-                        : AgrisellColors.brandBlack,
-                    fontSize: 12,
-                    height: 1.05,
-                    fontWeight: selected || isShowAll
-                        ? FontWeight.w700
-                        : FontWeight.w500,
+                  style: BuyerHomeCategoriesStyles.labelText(
+                    selected,
+                    isShowAll,
                   ),
                 ),
               ),

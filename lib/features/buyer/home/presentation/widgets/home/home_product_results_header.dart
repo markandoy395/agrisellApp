@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/buyer/home/presentation/styles/home_product_results_header_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -31,19 +33,11 @@ class HomeProductResultsHeader extends StatelessWidget {
             children: [
               const Text(
                 'Fresh picks',
-                style: TextStyle(
-                  color: AgrisellColors.headingGreen,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: SharedPresentationStyles.headingTitleExtraBold,
               ),
               Text(
                 '$resultCount ${resultCount == 1 ? 'product' : 'products'} found',
-                style: const TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: SharedPresentationStyles.mutedCaptionMedium,
               ),
             ],
           ),
@@ -78,7 +72,7 @@ class HomeProductResultsHeader extends StatelessWidget {
                             )
                           : null,
                     ),
-                    Text(option.label, style: const TextStyle(fontSize: 12)),
+                    Text(option.label, style: SharedPresentationStyles.caption),
                   ],
                 ),
               ),
@@ -112,10 +106,8 @@ class _SavedButton extends StatelessWidget {
         child: Container(
           height: 36,
           padding: const EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(
-            color: selected ? AgrisellColors.authGreen : AgrisellColors.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AgrisellColors.authGreen),
+          decoration: HomeProductResultsHeaderStyles.containerDecoration(
+            selected,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -130,13 +122,7 @@ class _SavedButton extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 '$count',
-                style: TextStyle(
-                  color: selected
-                      ? AgrisellColors.surface
-                      : AgrisellColors.authGreen,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: HomeProductResultsHeaderStyles.textStyle(selected),
               ),
             ],
           ),

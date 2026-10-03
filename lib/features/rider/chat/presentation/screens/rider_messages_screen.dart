@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/rider/chat/presentation/styles/rider_messages_screen_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -91,16 +93,7 @@ class _RiderMessagesScreenState extends State<RiderMessagesScreen> {
                 TextField(
                   controller: _searchController,
                   onChanged: (_) => setState(() {}),
-                  decoration: InputDecoration(
-                    hintText: 'Search delivery messages',
-                    prefixIcon: const Icon(Icons.search_rounded),
-                    filled: true,
-                    fillColor: AgrisellColors.surface,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
+                  decoration: RiderMessagesScreenStyles.inputDecoration,
                 ),
                 const SizedBox(height: 4),
                 ..._content(),
@@ -108,12 +101,7 @@ class _RiderMessagesScreenState extends State<RiderMessagesScreen> {
                 const Text(
                   'Contact details remain private. Use protected in-app delivery chat.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: AgrisellColors.mutedText,
-                    fontSize: 12,
-                    height: 1.3,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: SharedPresentationStyles.mutedCaptionSemiboldLoose,
                 ),
               ],
             ),

@@ -1,3 +1,5 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/profile/presentation/styles/rider_sign_up_widgets_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -19,21 +21,10 @@ class RiderSignUpHeader extends StatelessWidget {
     children: [
       Text(
         '${step.index + 1} of ${RiderSignUpStep.values.length}',
-        style: const TextStyle(
-          color: AgrisellColors.authGreen,
-          fontSize: 12,
-          fontWeight: FontWeight.w800,
-        ),
+        style: SharedPresentationStyles.greenCaptionExtraBold,
       ),
       const SizedBox(height: 5),
-      Text(
-        step.title,
-        style: const TextStyle(
-          color: AgrisellColors.headingGreen,
-          fontSize: 15,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
+      Text(step.title, style: SharedPresentationStyles.headingTitleExtraBold),
       const SizedBox(height: 8),
       LinearProgressIndicator(
         value: (step.index + 1) / RiderSignUpStep.values.length,
@@ -88,7 +79,7 @@ class RiderSignUpTextField extends StatelessWidget {
       keyboardType: keyboardType,
       autofillHints: autofillHints,
       inputFormatters: inputFormatters,
-      style: const TextStyle(fontSize: 13),
+      style: SharedPresentationStyles.body,
       decoration: AuthInputStyle.decoration(
         label: label,
         contentPadding: riderSignUpFieldContentPadding,
@@ -140,7 +131,7 @@ class RiderSignUpActions extends StatelessWidget {
       Expanded(
         child: FilledButton(
           onPressed: enabled && !loading ? onContinue : null,
-          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(40)),
+          style: RiderSignUpWidgetsStyles.filledButtonStyle,
           child: loading
               ? const SizedBox.square(
                   dimension: 18,

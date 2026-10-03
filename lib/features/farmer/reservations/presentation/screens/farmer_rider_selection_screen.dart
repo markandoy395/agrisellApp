@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -61,7 +62,7 @@ class _FarmerRiderSelectionScreenState
       foregroundColor: AgrisellColors.surface,
       title: const Text(
         'Choose a rider',
-        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+        style: SharedPresentationStyles.titleExtraBold,
       ),
     ),
     body: SafeArea(child: _content()),

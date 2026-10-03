@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/buyer/home/presentation/styles/farmer_product_grid_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -68,11 +70,7 @@ class _ProductStatusCard extends StatelessWidget {
         width: double.infinity,
         margin: const EdgeInsets.all(20),
         padding: const EdgeInsets.fromLTRB(22, 26, 22, 22),
-        decoration: BoxDecoration(
-          color: AgrisellColors.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AgrisellColors.borderLine),
-        ),
+        decoration: FarmerProductGridStyles.containerDecoration,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -85,11 +83,7 @@ class _ProductStatusCard extends StatelessWidget {
             Text(
               loadFailed ? 'Couldn\'t load products' : 'No produce listed yet',
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AgrisellColors.headingGreen,
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-              ),
+              style: SharedPresentationStyles.headingTitleExtraBold,
             ),
             const SizedBox(height: 6),
             Text(
@@ -97,11 +91,7 @@ class _ProductStatusCard extends StatelessWidget {
                   ? 'Check the connection or product access, then try again.'
                   : 'This farmer has not published any products for buyers yet.',
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AgrisellColors.mutedText,
-                fontSize: 12,
-                height: 1.3,
-              ),
+              style: SharedPresentationStyles.mutedCaptionRelaxed,
             ),
             if (loadFailed) ...[
               const SizedBox(height: 14),
@@ -109,10 +99,7 @@ class _ProductStatusCard extends StatelessWidget {
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh_rounded, size: 16),
                 label: const Text('Try again'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AgrisellColors.authGreen,
-                  minimumSize: const Size(112, 38),
-                ),
+                style: FarmerProductGridStyles.outlinedButtonStyle,
               ),
             ],
           ],

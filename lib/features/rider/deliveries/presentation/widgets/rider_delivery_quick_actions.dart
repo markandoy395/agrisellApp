@@ -1,6 +1,5 @@
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_quick_actions_styles.dart';
 import 'package:flutter/material.dart';
-
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 class RiderDeliveryQuickActions extends StatelessWidget {
   const RiderDeliveryQuickActions({
@@ -59,22 +58,13 @@ class _Action extends StatelessWidget {
       height: 40,
       child: OutlinedButton(
         onPressed: onTap,
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AgrisellColors.authGreen,
-          side: const BorderSide(color: AgrisellColors.borderLine),
-          padding: const EdgeInsets.symmetric(horizontal: 2),
-          textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-        ),
+        style: RiderDeliveryQuickActionsStyles.outlinedButtonStyle,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, size: 15),
             const SizedBox(height: 1),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+            Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
           ],
         ),
       ),

@@ -1,6 +1,7 @@
+import 'package:agresell_app/features/buyer/home/presentation/styles/farmer_follow_button_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/features/buyer/home/data/farmer_follow_repository.dart';
 import 'package:agresell_app/features/buyer/home/domain/farmer_profile.dart';
@@ -58,37 +59,11 @@ class FarmerFollowButton extends StatelessWidget {
     );
   }
 
-  ButtonStyle _filledStyle() => FilledButton.styleFrom(
-    backgroundColor: onDarkBackground
-        ? AgrisellColors.surface
-        : AgrisellColors.authGreen,
-    foregroundColor: onDarkBackground
-        ? AgrisellColors.authGreen
-        : AgrisellColors.surface,
-    disabledBackgroundColor: onDarkBackground
-        ? AgrisellColors.surface.withValues(alpha: 0.72)
-        : AgrisellColors.authGreen.withValues(alpha: 0.72),
-    shape: const StadiumBorder(),
-    padding: EdgeInsets.symmetric(horizontal: compact ? 7 : 10),
-    minimumSize: Size.zero,
-    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-  );
+  ButtonStyle _filledStyle() =>
+      FarmerFollowButtonStyles.buttonStyle(onDarkBackground, compact);
 
-  ButtonStyle _outlinedStyle() => OutlinedButton.styleFrom(
-    foregroundColor: onDarkBackground
-        ? AgrisellColors.surface
-        : AgrisellColors.authGreen,
-    side: BorderSide(
-      color: onDarkBackground
-          ? AgrisellColors.surface
-          : AgrisellColors.authGreen,
-      width: 1.2,
-    ),
-    shape: const StadiumBorder(),
-    padding: EdgeInsets.symmetric(horizontal: compact ? 7 : 10),
-    minimumSize: Size.zero,
-    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-  );
+  ButtonStyle _outlinedStyle() =>
+      FarmerFollowButtonStyles.buttonStyle2(onDarkBackground, compact);
 
   Widget _label(bool isFollowing, bool isBusy) {
     if (isBusy) {
@@ -111,7 +86,7 @@ class FarmerFollowButton extends StatelessWidget {
             isFollowing ? 'Following' : 'Follow',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+            style: SharedPresentationStyles.captionSemibold,
           ),
         ),
       ],

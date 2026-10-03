@@ -6,10 +6,7 @@ class _EmptyCheckoutState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(8),
-      ),
+      decoration: EmptyCheckoutStateStyles.decoratedBoxDecoration,
       child: const SizedBox(
         width: double.infinity,
         height: 130,
@@ -17,11 +14,7 @@ class _EmptyCheckoutState extends StatelessWidget {
           child: Text(
             'No selected items for checkout.',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: AgrisellColors.mutedText,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
+            style: EmptyCheckoutStateStyles.noSelectedItemsForCheckoutText,
           ),
         ),
       ),

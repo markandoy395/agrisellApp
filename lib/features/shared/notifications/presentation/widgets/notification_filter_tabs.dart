@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/shared/notifications/presentation/styles/notification_filter_tabs_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -79,13 +80,7 @@ class _NotificationFilterTabsState extends State<NotificationFilterTabs> {
                     ? AgrisellColors.authGreen
                     : AgrisellColors.borderLine,
               ),
-              labelStyle: TextStyle(
-                color: isSelected
-                    ? AgrisellColors.surface
-                    : AgrisellColors.headingGreen,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-              ),
+              labelStyle: NotificationFilterTabsStyles.textStyle(isSelected),
               padding: const EdgeInsets.symmetric(horizontal: 8),
               visualDensity: VisualDensity.compact,
             ),

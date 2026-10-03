@@ -1,5 +1,6 @@
 import { JWT } from 'npm:google-auth-library@9.15.1'
 import { createClient } from 'jsr:@supabase/supabase-js@2'
+import { isWebhookAuthenticated } from './webhook_auth.ts'
 
 type NotificationRecord = {
   notification_id: number
@@ -20,10 +21,7 @@ Deno.serve(async (request) => {
   if (request.method !== 'POST') {
     return new Response('Method not allowed', { status: 405 })
   }
-  if (
-    request.headers.get('x-agrisell-webhook-secret') !==
-      Deno.env.get('PUSH_WEBHOOK_SECRET')
-  ) {
+  if (!isWebhookAuthenticated(request, Deno.env.get('PUSH_WEBHOOK_SECRET'))) {
     return new Response('Unauthorized', { status: 401 })
   }
 

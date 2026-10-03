@@ -1,6 +1,6 @@
+import 'package:agresell_app/features/auth/presentation/styles/auth_bottom_link_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/responsive.dart';
 
 class AuthBottomLink extends StatelessWidget {
@@ -24,26 +24,10 @@ class AuthBottomLink extends StatelessWidget {
         crossAxisAlignment: WrapCrossAlignment.center,
         spacing: 32,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: AgrisellColors.brandBlack,
-              fontSize: lerpDouble(12, 14, scale),
-              fontWeight: FontWeight.w400,
-            ),
-          ),
+          Text(label, style: AuthBottomLinkStyles.labelText(scale)),
           TextButton(
             onPressed: onTap,
-            style: TextButton.styleFrom(
-              foregroundColor: AgrisellColors.authGreen,
-              padding: EdgeInsets.zero,
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              textStyle: TextStyle(
-                fontSize: lerpDouble(13, 15, scale),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            style: AuthBottomLinkStyles.textButtonStyle(scale),
             child: Text(action),
           ),
         ],

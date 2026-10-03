@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:agresell_app/core/services/authenticated_storage_image.dart';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -18,6 +19,7 @@ import '../domain/pickup_confirmation.dart';
 import '../domain/rider_delivery_search.dart';
 
 part 'supabase_delivery_mutations.dart';
+part 'supabase_delivery_completion_mutations.dart';
 part 'supabase_delivery_proofs.dart';
 
 enum DeliveryDataFailureType {

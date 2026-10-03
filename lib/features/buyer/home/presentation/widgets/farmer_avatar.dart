@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/buyer/home/presentation/styles/farmer_avatar_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -26,11 +27,7 @@ class FarmerAvatar extends StatelessWidget {
                   child: Center(
                     child: Text(
                       farmer.initials,
-                      style: TextStyle(
-                        color: AgrisellColors.forestDark,
-                        fontSize: size < 50 ? 14 : 15,
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: FarmerAvatarStyles.textStyle(size),
                     ),
                   ),
                 ),

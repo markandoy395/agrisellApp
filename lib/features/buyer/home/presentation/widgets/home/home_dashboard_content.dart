@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
@@ -74,7 +75,7 @@ class _HomeDashboardContentState extends State<HomeDashboardContent> {
     final saleId = banner.campaignSaleId;
     if (saleId == null) return;
     Navigator.of(context).push(
-      MaterialPageRoute<void>(
+      agrisellMaterialPageRoute<void>(
         builder: (_) => SaleProductsScreen(
           title: banner.subtitle.isEmpty ? 'Sale products' : banner.subtitle,
           campaignSaleId: saleId,
@@ -85,7 +86,7 @@ class _HomeDashboardContentState extends State<HomeDashboardContent> {
 
   void _openAllSaleProducts(List<HomeProduct> products) {
     Navigator.of(context).push(
-      MaterialPageRoute<void>(
+      agrisellMaterialPageRoute<void>(
         builder: (_) => SaleProductsScreen(
           title: 'All sale products',
           initialProducts: products,
@@ -96,7 +97,7 @@ class _HomeDashboardContentState extends State<HomeDashboardContent> {
 
   void _openDealsAndPromos() {
     Navigator.of(context).push(
-      MaterialPageRoute<void>(
+      agrisellMaterialPageRoute<void>(
         builder: (_) => const DealsAndPromosScreen(),
       ),
     );

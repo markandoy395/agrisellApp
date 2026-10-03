@@ -1,3 +1,6 @@
+import 'package:agresell_app/core/services/authenticated_storage_image.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_request_details_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -25,7 +28,7 @@ class RiderRequestProductImage extends StatelessWidget {
             ? _imageFallback
             : imagePath.startsWith('http://') ||
                   imagePath.startsWith('https://')
-            ? Image.network(
+            ? authenticatedNetworkImage(
                 imagePath,
                 fit: BoxFit.cover,
                 semanticLabel: '$productName product image',
@@ -73,12 +76,7 @@ class RiderRequestDetailLine extends StatelessWidget {
             text,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: AgrisellColors.brandBlack,
-              fontSize: 12,
-              height: 1.2,
-              fontWeight: FontWeight.w600,
-            ),
+            style: RiderDeliveryRequestDetailsStyles.textText,
           ),
         ),
       ],
@@ -99,10 +97,7 @@ class RiderRequestMetaChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
-    decoration: BoxDecoration(
-      color: AgrisellColors.searchBackground,
-      borderRadius: BorderRadius.circular(8),
-    ),
+    decoration: RiderDeliveryRequestDetailsStyles.containerDecoration,
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -114,7 +109,7 @@ class RiderRequestMetaChip extends StatelessWidget {
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+            style: SharedPresentationStyles.captionSemibold,
           ),
         ),
       ],
@@ -134,7 +129,7 @@ void showRiderRequestDetails(BuildContext context, DeliveryRequest request) {
         children: [
           Text(
             request.productName,
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+            style: SharedPresentationStyles.titleExtraBold,
           ),
           const SizedBox(height: 12),
           RiderRequestDetailLine(
@@ -156,20 +151,20 @@ void showRiderRequestDetails(BuildContext context, DeliveryRequest request) {
           const SizedBox(height: 8),
           Text(
             'Fee: ₱${request.deliveryFee.toStringAsFixed(2)} • ${request.routeDistanceKm?.toStringAsFixed(1) ?? 'Distance pending'} km • ${request.routeEstimatedTravelMinutes ?? 'ETA pending'} min',
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+            style: SharedPresentationStyles.captionBold,
           ),
           if (request.pickupInstructions.isNotEmpty) ...[
             const SizedBox(height: 10),
             Text(
               'Pickup: ${request.pickupInstructions}',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              style: SharedPresentationStyles.captionSemibold,
             ),
           ],
           if (request.deliveryInstructions.isNotEmpty) ...[
             const SizedBox(height: 6),
             Text(
               'Delivery: ${request.deliveryInstructions}',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              style: SharedPresentationStyles.captionSemibold,
             ),
           ],
         ],

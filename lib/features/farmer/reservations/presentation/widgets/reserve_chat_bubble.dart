@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/reserve_chat_bubble_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -31,9 +32,8 @@ class ReserveChatBubble extends StatelessWidget {
           maxWidth: MediaQuery.sizeOf(context).width * 0.72,
         ),
         child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: background,
-            borderRadius: BorderRadius.circular(8),
+          decoration: ReserveChatBubbleStyles.decoratedBoxDecoration(
+            background,
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
@@ -44,23 +44,10 @@ class ReserveChatBubble extends StatelessWidget {
                   name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: textColor.withValues(alpha: 0.72),
-                    fontSize: 12,
-                    height: 1,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: ReserveChatBubbleStyles.nameText(textColor),
                 ),
                 const SizedBox(height: 5),
-                Text(
-                  text,
-                  style: TextStyle(
-                    color: textColor,
-                    fontSize: 12,
-                    height: 1.3,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                Text(text, style: ReserveChatBubbleStyles.textText(textColor)),
               ],
             ),
           ),

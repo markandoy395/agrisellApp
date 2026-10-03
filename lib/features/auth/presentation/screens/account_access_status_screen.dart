@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -29,13 +30,13 @@ class AccountAccessStatusScreen extends StatelessWidget {
               const Text(
                 'Account access restricted',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                style: SharedPresentationStyles.titleBold,
               ),
               const SizedBox(height: 8),
               Text(
                 message,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 12),
+                style: SharedPresentationStyles.caption,
               ),
               const SizedBox(height: 22),
               SizedBox(

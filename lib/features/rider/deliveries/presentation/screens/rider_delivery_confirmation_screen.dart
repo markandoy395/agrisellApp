@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_confirmation_styles.dart';
 import 'package:agresell_app/features/rider/deliveries/data/delivery_proof_storage.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_completion.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
@@ -18,6 +18,7 @@ import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widg
 import 'package:agresell_app/features/rider/presentation/widgets/rider_state_cards.dart';
 
 part 'rider_delivery_confirmation_actions.dart';
+part 'rider_delivery_confirmation_recovery.dart';
 
 class RiderDeliveryConfirmationScreen extends StatefulWidget {
   const RiderDeliveryConfirmationScreen({
@@ -82,56 +83,6 @@ class _RiderDeliveryConfirmationScreenState
     super.dispose();
   }
 
-  String get _recoveryScope => 'deliveryConfirmation:${widget.request.id}';
-
-  void _restoreRecovery() {
-    final saved = widget.controller.recoveryDataFor(_recoveryScope);
-    _notes.text = saved['deliveryNotes'] as String? ?? '';
-    _buyerConfirmed = saved['buyerConfirmed'] as bool? ?? false;
-    _signatureReference = saved['signatureReference'] as String?;
-    _photoReference = saved['photoReference'] as String?;
-    _photoCapturedAt = DateTime.tryParse(
-      saved['photoCapturedAt'] as String? ?? '',
-    )?.toLocal();
-    final photoLatitude = saved['photoLatitude'] as num?;
-    final photoLongitude = saved['photoLongitude'] as num?;
-    final photoAccuracy = saved['photoAccuracyMeters'] as num?;
-    if (photoLatitude != null &&
-        photoLongitude != null &&
-        photoAccuracy != null) {
-      _photoLocation = DeliveryStatusLocation(
-        latitude: photoLatitude.toDouble(),
-        longitude: photoLongitude.toDouble(),
-        accuracyMeters: photoAccuracy.toDouble(),
-        timestamp: _photoCapturedAt,
-      );
-    }
-    _cashAmount.text = saved['cashAmount'] as String? ?? '';
-    _cashNotes.text = saved['cashNotes'] as String? ?? '';
-    _cashConfirmed = saved['cashConfirmed'] as bool? ?? false;
-    final issue = saved['cashIssue'] as String?;
-    _cashIssue = issue == null
-        ? null
-        : CashCollectionIssue.values.byName(issue);
-  }
-
-  void _saveRecovery() => unawaited(
-    widget.controller.saveRecoveryData(_recoveryScope, {
-      'deliveryNotes': _notes.text,
-      'buyerConfirmed': _buyerConfirmed,
-      'signatureReference': _signatureReference,
-      'photoReference': _photoReference,
-      'photoCapturedAt': _photoCapturedAt?.toUtc().toIso8601String(),
-      'photoLatitude': _photoLocation?.latitude,
-      'photoLongitude': _photoLocation?.longitude,
-      'photoAccuracyMeters': _photoLocation?.accuracyMeters,
-      'cashAmount': _cashAmount.text,
-      'cashNotes': _cashNotes.text,
-      'cashConfirmed': _cashConfirmed,
-      'cashIssue': _cashIssue?.name,
-    }),
-  );
-
   void _setBuyerConfirmed(bool value) {
     setState(() => _buyerConfirmed = value);
     _saveRecovery();
@@ -152,7 +103,7 @@ class _RiderDeliveryConfirmationScreenState
     final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
 
     return Scaffold(
-      backgroundColor: AgrisellColors.homeBackground,
+      backgroundColor: RiderDeliveryConfirmationStyles.background,
       // Keep the header and its surrounding Column at the full screen height.
       // The list accounts for the keyboard so focused cash fields remain
       // reachable without making the outer Column overflow on short screens.
@@ -167,13 +118,15 @@ class _RiderDeliveryConfirmationScreenState
               onPressed: _submitting ? null : () => Navigator.of(context).pop(),
               icon: const Icon(
                 Icons.close_rounded,
-                color: AgrisellColors.surface,
+                color: RiderDeliveryConfirmationStyles.closeIconColor,
               ),
             ),
           ),
           Expanded(
             child: ListView(
-              padding: EdgeInsets.fromLTRB(14, 14, 14, keyboardInset + 28),
+              padding: RiderDeliveryConfirmationStyles.listPadding(
+                keyboardInset,
+              ),
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               children: [_content()],
             ),

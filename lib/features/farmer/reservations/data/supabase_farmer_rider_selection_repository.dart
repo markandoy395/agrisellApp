@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/services/authenticated_storage_image.dart';
 import 'dart:async';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -124,9 +125,9 @@ class SupabaseFarmerRiderSelectionRepository
     final path = rider.profilePhotoPath;
     if (path == null) return rider;
     try {
-      final url = await client.storage
-          .from('rider-documents')
-          .createSignedUrl(path, 3600);
+      final url = authenticatedStorageUrl(
+        client.storage.from('rider-documents').getPublicUrl(path),
+      );
       return rider.copyWith(profileImageUrl: url);
     } on Object {
       return rider;

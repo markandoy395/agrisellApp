@@ -48,11 +48,7 @@ class _InventoryLotFields extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 dateType.guidance,
-                style: const TextStyle(
-                  color: AgrisellColors.mutedText,
-                  fontSize: 12,
-                  height: 1.25,
-                ),
+                style: SharedPresentationStyles.mutedCaptionCompact,
               ),
             ],
           ),
@@ -136,31 +132,16 @@ class _LotDateField extends StatelessWidget {
               icon: const Icon(Icons.calendar_month_outlined, size: 18),
               label: Text(
                 value == null ? 'Choose date' : _formatLotDate(value!),
-                style: const TextStyle(fontSize: 12),
+                style: SharedPresentationStyles.caption,
               ),
-              style: OutlinedButton.styleFrom(
-                alignment: Alignment.centerLeft,
-                foregroundColor: AgrisellColors.authGreen,
-                side: BorderSide(
-                  color: errorText == null
-                      ? AgrisellColors.borderLine
-                      : AgrisellColors.statusRedText,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+              style: AddProductInventoryLotFieldsStyles.outlinedButtonStyle(
+                errorText,
               ),
             ),
           ),
           if (errorText != null) ...[
             const SizedBox(height: 6),
-            Text(
-              errorText!,
-              style: const TextStyle(
-                color: AgrisellColors.statusRedText,
-                fontSize: 12,
-              ),
-            ),
+            Text(errorText!, style: SharedPresentationStyles.errorCaption),
           ],
         ],
       ),

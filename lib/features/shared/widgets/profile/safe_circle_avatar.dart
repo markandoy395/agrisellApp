@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/services/authenticated_storage_image.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -57,7 +58,7 @@ class _AvatarImage extends StatelessWidget {
     final uri = Uri.tryParse(source);
     if (uri?.hasScheme ?? false) {
       final sanitized = source.replaceAll(RegExp(r'\s+'), '');
-      return Image.network(
+      return authenticatedNetworkImage(
         sanitized,
         width: size,
         height: size,

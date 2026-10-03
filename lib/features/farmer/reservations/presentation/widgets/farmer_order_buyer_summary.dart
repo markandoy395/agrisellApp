@@ -1,3 +1,5 @@
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/farmer_order_buyer_summary_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -12,10 +14,7 @@ class FarmerOrderBuyerSummary extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     width: double.infinity,
     padding: const EdgeInsets.all(10),
-    decoration: BoxDecoration(
-      color: AgrisellColors.forestSoft,
-      borderRadius: BorderRadius.circular(12),
-    ),
+    decoration: FarmerOrderBuyerSummaryStyles.containerDecoration,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -29,11 +28,7 @@ class FarmerOrderBuyerSummary extends StatelessWidget {
             SizedBox(width: 6),
             Text(
               'New buyer order',
-              style: TextStyle(
-                color: AgrisellColors.headingGreen,
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-              ),
+              style: SharedPresentationStyles.headingBodyExtraBold,
             ),
           ],
         ),
@@ -62,15 +57,7 @@ class _BuyerSummaryLine extends StatelessWidget {
       Icon(icon, size: 16, color: AgrisellColors.mutedText),
       const SizedBox(width: 7),
       Expanded(
-        child: Text(
-          value,
-          style: const TextStyle(
-            color: AgrisellColors.brandBlack,
-            fontSize: 12,
-            height: 1.25,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        child: Text(value, style: FarmerOrderBuyerSummaryStyles.valueText),
       ),
     ],
   );

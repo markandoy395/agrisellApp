@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/buyer/profile/presentation/styles/orders_card_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
@@ -31,7 +32,10 @@ class OrdersCard extends StatelessWidget {
                 Row(
                   children: [
                     const Expanded(
-                      child: Text('My orders', style: BuyerProfileStyle.heading),
+                      child: Text(
+                        'My orders',
+                        style: BuyerProfileStyle.heading,
+                      ),
                     ),
                     InkWell(
                       onTap: () => _openOrderTracking(context),
@@ -46,11 +50,7 @@ class OrdersCard extends StatelessWidget {
                           children: [
                             Text(
                               'View all',
-                              style: TextStyle(
-                                color: BuyerProfileStyle.green,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: OrdersCardStyles.viewAllText,
                             ),
                             SizedBox(width: 2),
                             Icon(
@@ -66,7 +66,9 @@ class OrdersCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 14),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: shortcutSidePadding),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: shortcutSidePadding,
+                  ),
                   child: Row(
                     children: [
                       for (final item in homeOrderStatuses)
@@ -86,7 +88,9 @@ class OrdersCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 14),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: shortcutSidePadding),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: shortcutSidePadding,
+                  ),
                   child: InkWell(
                     key: const ValueKey('buyer-refunds-shortcut'),
                     onTap: () => _openRefundTracker(context),
@@ -97,13 +101,7 @@ class OrdersCard extends StatelessWidget {
                         horizontal: 14,
                         vertical: 10,
                       ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF7F4FA),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: const Color(0xFF9C27B0).withValues(alpha: 0.15),
-                        ),
-                      ),
+                      decoration: OrdersCardStyles.containerDecoration,
                       child: const Row(
                         children: [
                           Icon(
@@ -115,11 +113,8 @@ class OrdersCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               'Refunds & Returns · Track status',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF7B1FA2),
-                              ),
+                              style: OrdersCardStyles
+                                  .refundsReturnsTrackStatusText,
                             ),
                           ),
                           Icon(
@@ -153,9 +148,7 @@ class OrdersCard extends StatelessWidget {
 
   void _openRefundTracker(BuildContext context) {
     Navigator.of(context).push(
-      agrisellPageRoute<void>(
-        builder: (_) => const BuyerRefundTrackerScreen(),
-      ),
+      agrisellPageRoute<void>(builder: (_) => const BuyerRefundTrackerScreen()),
     );
   }
 }

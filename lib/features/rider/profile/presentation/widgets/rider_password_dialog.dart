@@ -1,6 +1,7 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/rider/profile/presentation/styles/rider_password_dialog_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/password_policy.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_password_requirements.dart';
 
@@ -35,13 +36,7 @@ Future<RiderPasswordChange?> showRiderPasswordChangeDialog(
             const SizedBox(height: 8),
             _PasswordField(controller: confirm, label: 'Confirm new password'),
             if (error != null)
-              Text(
-                error!,
-                style: const TextStyle(
-                  color: AgrisellColors.statusRedText,
-                  fontSize: 12,
-                ),
-              ),
+              Text(error!, style: SharedPresentationStyles.errorCaption),
           ],
         ),
         actions: [
@@ -90,7 +85,7 @@ class _PasswordField extends StatelessWidget {
     child: TextField(
       controller: controller,
       obscureText: true,
-      decoration: InputDecoration(labelText: label),
+      decoration: RiderPasswordDialogStyles.inputDecoration(label),
     ),
   );
 }

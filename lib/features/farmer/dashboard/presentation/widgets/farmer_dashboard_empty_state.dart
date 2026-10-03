@@ -19,11 +19,7 @@ class _FarmerDashboardEmptyState extends StatelessWidget {
         Text(
           message,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: AgrisellColors.mutedText,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
+          style: SharedPresentationStyles.mutedCaptionSemibold,
         ),
       ],
     ),

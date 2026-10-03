@@ -1,6 +1,6 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/buyer/cart/presentation/styles/basket_management_bar_styles.dart';
 import 'package:flutter/material.dart';
-
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 class BasketManagementBar extends StatelessWidget {
   const BasketManagementBar({
@@ -24,26 +24,15 @@ class BasketManagementBar extends StatelessWidget {
             children: [
               Text(
                 '$itemCount ${itemCount == 1 ? 'item' : 'items'}',
-                style: const TextStyle(
-                  color: AgrisellColors.headingGreen,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                ),
+                style: SharedPresentationStyles.headingBodyExtraBold,
               ),
               const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AgrisellColors.forestSoft,
-                  borderRadius: BorderRadius.circular(20),
-                ),
+                decoration: BasketManagementBarStyles.containerDecoration,
                 child: Text(
                   '$selectedCount selected',
-                  style: const TextStyle(
-                    color: AgrisellColors.forestDark,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: BasketManagementBarStyles.textStyle,
                 ),
               ),
             ],
@@ -52,17 +41,11 @@ class BasketManagementBar extends StatelessWidget {
         TextButton.icon(
           key: const ValueKey('remove-selected-items'),
           onPressed: selectedCount == 0 ? null : onRemoveSelected,
-          style: TextButton.styleFrom(
-            foregroundColor: AgrisellColors.statusRedText,
-            disabledForegroundColor: AgrisellColors.mutedText,
-            minimumSize: const Size(0, 36),
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
+          style: BasketManagementBarStyles.textButtonStyle,
           icon: const Icon(Icons.delete_outline_rounded, size: 18),
           label: const Text(
             'Remove',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+            style: SharedPresentationStyles.captionBold,
           ),
         ),
       ],

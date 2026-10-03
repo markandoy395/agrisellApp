@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/shared/products/presentation/styles/home_product_grid_skeleton_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -80,18 +81,7 @@ class _SkeletonCard extends StatelessWidget {
 
     return DecoratedBox(
       key: const ValueKey('home-product-skeleton-card'),
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AgrisellColors.borderLine),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.05),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: HomeProductGridSkeletonStyles.decoratedBoxDecoration,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: Column(
@@ -135,10 +125,7 @@ class _SkeletonLine extends StatelessWidget {
       widthFactor: widthFactor,
       child: Container(
         height: 11,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(8),
-        ),
+        decoration: HomeProductGridSkeletonStyles.containerDecoration(color),
       ),
     );
   }

@@ -19,22 +19,12 @@ class _TrackingOrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final imageSize = width < 380 ? 72.0 : 82.0;
+    final imageSize = TrackingOrderCardStyles.imageSize(width);
 
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AgrisellColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: AgrisellColors.brandBlack.withValues(alpha: 0.09),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
+      decoration: TrackingOrderCardStyles.cardDecoration,
       child: Padding(
-        padding: EdgeInsets.all(width < 380 ? 11.0 : 13.0),
+        padding: TrackingOrderCardStyles.cardPadding(width),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -45,20 +35,16 @@ class _TrackingOrderCard extends StatelessWidget {
                     order.id,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AgrisellColors.mutedText,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TrackingOrderCardStyles.orderIdStyle,
                   ),
                 ),
                 ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: width < 380 ? 190 : 250,
+                  constraints: TrackingOrderCardStyles.statusChipConstraints(
+                    width,
                   ),
                   child: _StatusChip(
                     status: order.status,
-                    label: _statusLabel(order),
+                    label: _TrackingOrderStatusResolver.resolve(order),
                   ),
                 ),
               ],
@@ -86,14 +72,12 @@ class _TrackingOrderCard extends StatelessWidget {
             if (order.acceptanceExpiresAt != null &&
                 (order.isExpired || order.status == PlacedOrderStatus.toShip))
               const SizedBox(height: 14),
-            _DeliveryRouteTracker(
-              status: order.status,
-              order: order,
-            ),
+            _DeliveryRouteTracker(status: order.status, order: order),
             const SizedBox(height: 14),
             _OrderCardActions(
               status: order.status,
-              hasRefund: order.payment.hasRefund ||
+              hasRefund:
+                  order.payment.hasRefund ||
                   (order.status == PlacedOrderStatus.cancelled &&
                       order.payment.method == OrderPaymentMethod.gcash),
               canLeaveFeedback:
@@ -129,9 +113,7 @@ class _TrackingOrderCard extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
-      ),
+      shape: TrackingOrderCardStyles.sheetShape,
       builder: (context) => _OrderDetailsSheet(order: order),
     );
   }
@@ -143,39 +125,6 @@ class _TrackingOrderCard extends StatelessWidget {
       order: order,
       onSubmitDispute: onReportDispute!,
     );
-  }
-
-  String _statusLabel(PlacedOrder order) {
-    if (order.hasDispute) {
-      return switch (order.dispute!.status) {
-        OrderDisputeStatus.pending => 'Dispute: Under review',
-        OrderDisputeStatus.resolved => 'Dispute: Resolved',
-        OrderDisputeStatus.rejected => 'Dispute: Rejected',
-      };
-    }
-    if (order.isExpired) return 'Expired';
-    if (order.payment.status == OrderPaymentStatus.rejected) {
-      return 'Fix payment';
-    }
-    if (order.payment.status == OrderPaymentStatus.submittedForVerification) {
-      return 'Payment review';
-    }
-    if (order.payment.status == OrderPaymentStatus.paymentReviewRequired) {
-      return 'Payment review required';
-    }
-    if (order.payment.status == OrderPaymentStatus.refundRequired) {
-      return 'Refund required';
-    }
-    if (order.payment.status == OrderPaymentStatus.refunded) {
-      return 'Refunded';
-    }
-    if (order.canLeaveFeedback) return OrderTrackingFilter.toRate.label;
-    return switch (order.status) {
-      PlacedOrderStatus.toShip => 'Awaiting acceptance',
-      PlacedOrderStatus.preparing => 'Preparing',
-      PlacedOrderStatus.readyForPickup => 'Ready for pickup',
-      _ => order.status.label,
-    };
   }
 
   Future<void> _cancelOrder(BuildContext context) async {
@@ -198,9 +147,7 @@ class _TrackingOrderCard extends StatelessWidget {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
-      ),
+      shape: TrackingOrderCardStyles.sheetShape,
       builder: (context) => _OrderFeedbackSheet(
         order: order,
         item: item,

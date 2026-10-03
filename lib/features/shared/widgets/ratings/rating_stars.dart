@@ -1,20 +1,8 @@
+export 'package:agresell_app/features/shared/widgets/ratings/rating_stars_styles.dart';
+import 'package:agresell_app/features/shared/widgets/ratings/rating_stars_styles.dart';
 import 'package:flutter/material.dart';
 
 enum RatingStarPrecision { whole, half }
-
-class RatingStarsStyle {
-  const RatingStarsStyle({
-    required this.size,
-    required this.filledColor,
-    required this.emptyColor,
-    this.emptyIcon = Icons.star_border_rounded,
-  });
-
-  final double size;
-  final Color filledColor;
-  final Color emptyColor;
-  final IconData emptyIcon;
-}
 
 class RatingStars extends StatelessWidget {
   const RatingStars({

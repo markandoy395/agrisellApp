@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/core/utils/password_policy.dart';
+import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/auth_button.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/auth_password_requirements.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/auth_text_field.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/forgot_password_request_step.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/forgot_password_reset_step.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/login_page_layout.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/otp_verification_screen.dart';
 
@@ -56,134 +55,28 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       subtitle: null,
       cardHeight: cardHeight,
       cardTopPadding: 44,
-      child: isRequestStep ? _requestCodeContent() : _newPasswordContent(),
+      child: isRequestStep
+          ? ForgotPasswordRequestStep(
+              emailController: _email,
+              loading: _loading,
+              onSendCode: _sendCode,
+              onBackToLogin: () => Navigator.of(context).pop(),
+            )
+          : ForgotPasswordResetStep(
+              passwordController: _password,
+              confirmationController: _confirmation,
+              confirmationError: _confirmationError,
+              loading: _loading,
+              onPasswordChanged: (_) {
+                if (_confirmationTouched) setState(() {});
+              },
+              onConfirmationChanged: (_) =>
+                  setState(() => _confirmationTouched = true),
+              onUpdatePassword: _updatePassword,
+              onBackToLogin: () => Navigator.of(context).pop(),
+            ),
     );
   }
-
-  Widget _requestCodeContent() => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      const SizedBox(
-        width: double.infinity,
-        child: Text(
-          'Enter your email address and we will send a password-reset code.',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: AgrisellColors.headingGreenAlt,
-            fontSize: 15,
-            height: 1.4,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-      ),
-      const SizedBox(height: 24),
-      AuthTextField(
-        controller: _email,
-        hintText: 'Email address',
-        leadingIcon: Icons.mail_outline,
-        keyboardType: TextInputType.emailAddress,
-        autofillHints: const [AutofillHints.email],
-      ),
-      const SizedBox(height: 18),
-      AuthPrimaryButton(
-        label: 'Send code',
-        isLoading: _loading,
-        borderRadius: 14,
-        hasShadow: true,
-        fontSize: 15,
-        onPressed: _loading ? null : _sendCode,
-      ),
-      const SizedBox(height: 14),
-      Center(
-        child: TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          style: TextButton.styleFrom(
-            foregroundColor: AgrisellColors.authGreen,
-            textStyle: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          child: const Text('Back to login'),
-        ),
-      ),
-    ],
-  );
-
-  Widget _newPasswordContent() => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      const SizedBox(
-        width: double.infinity,
-        child: Text(
-          'Your email is verified. Choose a new password for your account.',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: AgrisellColors.headingGreenAlt,
-            fontSize: 15,
-            height: 1.4,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-      ),
-      const SizedBox(height: 24),
-      AuthTextField(
-        controller: _password,
-        hintText: 'New password',
-        leadingIcon: Icons.lock_outline,
-        showPasswordToggle: true,
-        autofillHints: const [AutofillHints.newPassword],
-        onChanged: (_) {
-          if (_confirmationTouched) setState(() {});
-        },
-      ),
-      AuthPasswordRequirements(controller: _password),
-      const SizedBox(height: 14),
-      AuthTextField(
-        controller: _confirmation,
-        hintText: 'Confirm new password',
-        leadingIcon: Icons.lock_outline,
-        showPasswordToggle: true,
-        autofillHints: const [AutofillHints.newPassword],
-        onChanged: (_) => setState(() => _confirmationTouched = true),
-      ),
-      if (_confirmationError case final error?)
-        Padding(
-          padding: const EdgeInsets.only(top: 6, left: 12),
-          child: Text(
-            error,
-            style: const TextStyle(
-              color: Color(0xFFB3261E),
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      const SizedBox(height: 20),
-      AuthPrimaryButton(
-        label: 'Update password',
-        isLoading: _loading,
-        borderRadius: 14,
-        hasShadow: true,
-        fontSize: 15,
-        onPressed: _loading ? null : _updatePassword,
-      ),
-      const SizedBox(height: 14),
-      Center(
-        child: TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          style: TextButton.styleFrom(
-            foregroundColor: AgrisellColors.authGreen,
-            textStyle: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          child: const Text('Back to login'),
-        ),
-      ),
-    ],
-  );
 
   Future<void> _sendCode() async {
     final email = _email.text.trim();

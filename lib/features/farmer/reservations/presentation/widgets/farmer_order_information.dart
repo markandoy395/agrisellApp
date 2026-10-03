@@ -1,6 +1,7 @@
+import 'package:agresell_app/features/farmer/reservations/presentation/styles/farmer_order_information_styles.dart';
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
 import 'package:agresell_app/features/shared/payments/price_formatter.dart';
 
@@ -90,22 +91,11 @@ class FarmerOrderInformationSection extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     width: double.infinity,
     padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(
-      color: AgrisellColors.surface,
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: AgrisellColors.borderLine),
-    ),
+    decoration: FarmerOrderInformationStyles.containerDecoration,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            color: AgrisellColors.headingGreen,
-            fontSize: 15,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
+        Text(title, style: SharedPresentationStyles.headingTitleExtraBold),
         const SizedBox(height: 12),
         for (var index = 0; index < children.length; index++) ...[
           children[index],
@@ -130,24 +120,9 @@ class FarmerOrderInformationLine extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(
-        label,
-        style: const TextStyle(
-          color: AgrisellColors.mutedText,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
+      Text(label, style: SharedPresentationStyles.mutedCaptionSemibold),
       const SizedBox(height: 2),
-      SelectableText(
-        value,
-        style: const TextStyle(
-          color: AgrisellColors.brandBlack,
-          fontSize: 13,
-          height: 1.3,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
+      SelectableText(value, style: FarmerOrderInformationStyles.textStyle),
     ],
   );
 }

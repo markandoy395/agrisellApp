@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -30,12 +31,12 @@ class RiderDeliveryEvidenceCapture extends StatelessWidget {
       children: [
         const Text(
           'Delivery evidence',
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+          style: SharedPresentationStyles.subtitleExtraBold,
         ),
         const SizedBox(height: 5),
         const Text(
           'Take a photo with the camera at the delivery location.',
-          style: TextStyle(fontSize: 12),
+          style: SharedPresentationStyles.caption,
         ),
         if (previewBytes case final bytes?) ...[
           const SizedBox(height: 10),
@@ -59,10 +60,7 @@ class RiderDeliveryEvidenceCapture extends StatelessWidget {
         ],
         if (captured) ...[
           const SizedBox(height: 8),
-          Text(
-            _metadata,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-          ),
+          Text(_metadata, style: SharedPresentationStyles.captionSemibold),
         ],
         const SizedBox(height: 10),
         SizedBox(

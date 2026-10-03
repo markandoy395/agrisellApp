@@ -34,22 +34,14 @@ class _FarmerListControls extends StatelessWidget {
           Expanded(
             child: Text(
               '$resultCount ${resultCount == 1 ? 'farmer' : 'farmers'} found',
-              style: const TextStyle(
-                color: AgrisellColors.headingGreen,
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-              ),
+              style: SharedPresentationStyles.headingSubtitleExtraBold,
             ),
           ),
           TextButton.icon(
             onPressed: onSort,
             icon: const Icon(Icons.swap_vert_rounded, size: 18),
             label: Text(sortLabel),
-            style: TextButton.styleFrom(
-              foregroundColor: AgrisellColors.authGreen,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
+            style: FarmerScreenControlsStyles.textButtonStyle,
           ),
         ],
       ),

@@ -65,9 +65,10 @@ extension SupabaseDeliveryProofs on SupabaseDeliveryDataSource {
             .from('delivery_proofs')
             .select(
               'proof_id,delivery_id,proof_stage,proof_type,file_path,remarks,'
-              'latitude,longitude,confirmed_at,created_at,updated_at',
+              'latitude,longitude,confirmed_at,created_at,updated_at,rider_id',
             )
             .eq('delivery_id', deliveryId)
+            .eq('rider_id', await QueryOwner(client).riderId())
             .order('created_at');
         return rows
             .map((row) => DeliveryProof.fromJson(_map(row)))

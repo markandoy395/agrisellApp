@@ -6,7 +6,9 @@ Audited the Flutter application's navigation constructors, named routes, session
 lifecycle, database/storage access, Supabase migrations and configuration, and
 the sole Edge Function in this repository. This repository has no separate web
 admin server or custom REST server to inspect. Hosted policies and deployments
-have not been read or changed.
+were subsequently inspected and the authentication/ownership migrations were
+deployed during the account ownership audit. Hosted authentication assertions
+passed; see `docs/data_ownership_audit.md` for deployment details.
 
 - Both navigation factories guard every destination. Only the explicitly listed
   login, signup, OTP, password recovery, splash, and signup receipt screens are
@@ -31,11 +33,11 @@ have not been read or changed.
   `verify_jwt = false` is intentional for this authenticated machine caller.
   Normal users must not be allowed to send arbitrary notification payloads.
 
-## Database deployment is required
+## Database deployment and verification
 
-Apply `supabase/migrations/20261003120000_require_authenticated_application_access.sql`
-after the preceding application migrations, using the project's established
-database deployment process. Do not blindly apply other pending migrations.
+`supabase/migrations/20261003120000_require_authenticated_application_access.sql`
+has been applied to the hosted database, followed by the support repair and
+ownership/RLS migrations. The hosted `authentication_boundary.sql` check passed.
 Deploy the updated `send-notification` function with its existing secret.
 
 The migration denies `anon` and `PUBLIC` application-schema usage, table/column
@@ -92,7 +94,7 @@ lines and have no inline CSS or prohibited Flutter style definitions. Dart
 formatting and whitespace checks passed for the audit's files. Existing unrelated
 working-tree edits were preserved.
 
-Database assertions were not executed: this environment has no local PostgreSQL
-or Docker, and hosted database credentials/state were not inspected. Deno is not
+Database assertions subsequently passed through the linked Supabase query API;
+this environment has no local PostgreSQL or Docker. Deno is not
 installed, so the full Edge Function runtime/type check was not run; its
 authentication helper was tested directly with Node's TypeScript support.

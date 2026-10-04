@@ -1,3 +1,4 @@
+import 'support/authenticated_test_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -8,6 +9,7 @@ import 'package:agresell_app/features/shared/orders/presentation/controllers/ord
 import 'support/home_product_fixture.dart';
 
 void main() {
+  configureAuthenticatedTests(role: AuthRole.farmer);
   final controller = OrderController.instance;
 
   setUp(controller.clear);
@@ -18,19 +20,23 @@ void main() {
   ) async {
     await tester.binding.setSurfaceSize(const Size(430, 932));
     addTearDown(() => tester.binding.setSurfaceSize(null));
-    final order = await controller.placeToShipOrder(
-      items: [BasketCartItem.fromProduct(testHomeProducts.first)],
-      deliveryAddress: 'Test address',
-      phoneNumber: '09171234567',
-      payment: OrderPayment.gcash(
-        '1234567890123',
-        receiptImageReference: 'local-secure://gcash-receipts/test',
-        receiptImageName: 'gcash-receipt.png',
+    final order = await tester.runAsync(
+      () => controller.placeToShipOrder(
+        items: [BasketCartItem.fromProduct(testHomeProducts.first)],
+        deliveryAddress: 'Test address',
+        phoneNumber: '09171234567',
+        payment: OrderPayment.gcash(
+          '1234567890123',
+          receiptImageReference: 'local-secure://gcash-receipts/test',
+          receiptImageName: 'gcash-receipt.png',
+        ),
       ),
     );
 
-    await tester.pumpWidget(
-      const MaterialApp(home: Scaffold(body: FarmerReserveScreen())),
+    await tester.runAsync(
+      () => tester.pumpWidget(
+        const MaterialApp(home: Scaffold(body: FarmerReserveScreen())),
+      ),
     );
     await tester.pumpAndSettle();
     await tester.tap(
@@ -47,7 +53,7 @@ void main() {
     expect(find.text('Review GCash reference'), findsOneWidget);
     expect(find.text('1234567890123'), findsOneWidget);
     expect(find.text('Receipt image uploaded'), findsOneWidget);
-    await tester.tap(find.text('Verify'));
+    await tester.runAsync(() => tester.tap(find.text('Verify')));
     await tester.pumpAndSettle();
 
     expect(
@@ -58,7 +64,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('Accept order').first);
     expect(find.text('Accept order'), findsOneWidget);
-    await tester.tap(find.text('Accept order'));
+    await tester.runAsync(() => tester.tap(find.text('Accept order')));
     await tester.pumpAndSettle();
     expect(controller.orders.single.id, order!.id);
     expect(find.text('Preparing'), findsOneWidget);
@@ -68,20 +74,24 @@ void main() {
   testWidgets('farmer records a required GCash refund', (tester) async {
     await tester.binding.setSurfaceSize(const Size(360, 800));
     addTearDown(() => tester.binding.setSurfaceSize(null));
-    final order = await controller.placeToShipOrder(
-      items: [BasketCartItem.fromProduct(testHomeProducts.first)],
-      deliveryAddress: 'Test address',
-      phoneNumber: '09171234567',
-      payment: const OrderPayment(
-        method: OrderPaymentMethod.gcash,
-        status: OrderPaymentStatus.verified,
-        transactionReference: '1234567890123',
+    final order = await tester.runAsync(
+      () => controller.placeToShipOrder(
+        items: [BasketCartItem.fromProduct(testHomeProducts.first)],
+        deliveryAddress: 'Test address',
+        phoneNumber: '09171234567',
+        payment: const OrderPayment(
+          method: OrderPaymentMethod.gcash,
+          status: OrderPaymentStatus.verified,
+          transactionReference: '1234567890123',
+        ),
       ),
     );
-    await controller.cancelOrder(order!.id);
+    await tester.runAsync(() => controller.cancelOrder(order!.id));
 
-    await tester.pumpWidget(
-      const MaterialApp(home: Scaffold(body: FarmerReserveScreen())),
+    await tester.runAsync(
+      () => tester.pumpWidget(
+        const MaterialApp(home: Scaffold(body: FarmerReserveScreen())),
+      ),
     );
     await tester.pumpAndSettle();
     await tester.tap(
@@ -99,7 +109,9 @@ void main() {
       find.byKey(const ValueKey('gcash-refund-reference')),
       'REFUND-123456',
     );
-    await tester.tap(find.text('Confirm refund completed'));
+    await tester.runAsync(
+      () => tester.tap(find.text('Confirm refund completed')),
+    );
     await tester.pumpAndSettle();
 
     expect(

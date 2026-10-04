@@ -1,6 +1,7 @@
 import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
-import 'package:agresell_app/features/rider/chat/presentation/styles/rider_chat_actions_styles.dart';
+
 import 'package:flutter/material.dart';
+import 'package:agresell_app/features/shared/chat/presentation/styles/chat_reference_styles.dart';
 
 import 'package:agresell_app/features/rider/chat/domain/rider_communication_models.dart';
 
@@ -26,10 +27,10 @@ class RiderQuickReplyRow extends StatelessWidget {
       separatorBuilder: (_, _) => const SizedBox(width: 8),
       itemBuilder: (context, index) {
         final reply = replies[index];
-        return ActionChip(
-          label: Text(reply.label),
+        return OutlinedButton(
+          child: Text(reply.label),
           onPressed: enabled ? () => onSelected(reply.message) : null,
-          labelStyle: SharedPresentationStyles.captionBold,
+          style: ChatReferenceStyles.actionButton,
         );
       },
     ),
@@ -40,11 +41,13 @@ class RiderConversationActionRow extends StatelessWidget {
   const RiderConversationActionRow({
     required this.enabled,
     required this.onAction,
+    required this.onOutside,
     super.key,
   });
 
   final bool enabled;
   final ValueChanged<RiderCommunicationActionType> onAction;
+  final VoidCallback onOutside;
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -53,15 +56,21 @@ class RiderConversationActionRow extends StatelessWidget {
       children: [
         _ActionButton(
           icon: Icons.share_location_outlined,
-          label: 'Location',
+          label: 'Share location',
           enabled: enabled,
           onTap: () => onAction(RiderCommunicationActionType.shareLocation),
         ),
         _ActionButton(
-          icon: Icons.photo_camera_outlined,
-          label: 'Photo',
+          icon: Icons.accessibility_new_rounded,
+          label: "I'm outside",
           enabled: enabled,
-          onTap: () => onAction(RiderCommunicationActionType.attachPhoto),
+          onTap: onOutside,
+        ),
+        _ActionButton(
+          icon: Icons.shield_outlined,
+          label: 'Safety',
+          enabled: enabled,
+          onTap: () => onAction(RiderCommunicationActionType.contactSupport),
         ),
       ],
     ),
@@ -83,11 +92,14 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Expanded(
-    child: TextButton.icon(
-      onPressed: enabled ? onTap : null,
-      icon: Icon(icon, size: 17),
-      label: Text(label),
-      style: RiderChatActionsStyles.textButtonStyle,
+    child: Padding(
+      padding: const EdgeInsets.all(3),
+      child: OutlinedButton.icon(
+        onPressed: enabled ? onTap : null,
+        icon: Icon(icon, size: 17),
+        label: Text(label),
+        style: ChatReferenceStyles.actionButton,
+      ),
     ),
   );
 }

@@ -1,3 +1,4 @@
+import 'support/authenticated_test_session.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import 'package:agresell_app/features/shared/widgets/navigation/custom_bottom_na
 import 'support/marketplace_messaging_fakes.dart';
 
 void main() {
+  configureAuthenticatedTests();
   testWidgets('buyer loads a thread and persists a sent message', (
     tester,
   ) async {

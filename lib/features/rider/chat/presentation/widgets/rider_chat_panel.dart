@@ -1,8 +1,10 @@
-import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'package:agresell_app/features/shared/chat/presentation/styles/chat_reference_styles.dart';
+import 'package:agresell_app/features/shared/chat/presentation/models/chat_participant_data.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_detail_header.dart';
 import 'package:flutter/material.dart';
+import 'package:agresell_app/features/shared/safety/presentation/widgets/app_safety_sheet.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/chat/domain/rider_communication_models.dart';
 import 'package:agresell_app/features/rider/chat/presentation/controllers/rider_messages_controller.dart';
 import 'package:agresell_app/features/rider/chat/presentation/widgets/rider_chat_actions.dart';
@@ -31,12 +33,23 @@ class RiderConversationPanel extends StatelessWidget {
         final conversation = controller.selectedConversation;
         if (conversation == null) return const SizedBox.shrink();
         return Material(
-          color: AgrisellColors.homeBackground,
+          color: ChatReferenceStyles.background,
           child: Column(
             children: [
-              RiderConversationHeader(
-                conversation: conversation,
-                onClose: () => Navigator.of(context).pop(),
+              ChatDetailHeader(
+                participant: riderChatParticipant(conversation),
+                subtitle: conversation.party.label + ' / Delivery chat',
+                isEmpty: controller.messages.isEmpty,
+                style: ChatReferenceStyles.header(
+                  MediaQuery.paddingOf(context).top,
+                ),
+                onBack: () => Navigator.of(context).pop(),
+                onCall: onAction == null || !controller.canCompose
+                    ? null
+                    : () => _runAction(
+                        context,
+                        RiderCommunicationActionType.call,
+                      ),
               ),
               Expanded(child: RiderMessageBody(controller: controller)),
               if (quickReplies.isNotEmpty)
@@ -48,6 +61,7 @@ class RiderConversationPanel extends StatelessWidget {
               RiderConversationActionRow(
                 enabled: controller.canCompose,
                 onAction: (type) => _runAction(context, type),
+                onOutside: () => controller.send("I'm outside."),
               ),
               if (controller.messageError case final message?)
                 RiderMessageError(message: message),
@@ -55,6 +69,12 @@ class RiderConversationPanel extends StatelessWidget {
                 enabled: controller.canCompose,
                 isSending: controller.isSending,
                 onSend: controller.send,
+                onAttach: onAttachmentRequested == null
+                    ? null
+                    : () => _runAction(
+                        context,
+                        RiderCommunicationActionType.attachPhoto,
+                      ),
               ),
             ],
           ),
@@ -69,6 +89,15 @@ class RiderConversationPanel extends StatelessWidget {
   ) async {
     final conversation = controller.selectedConversation;
     if (conversation == null) return;
+    if (type == RiderCommunicationActionType.contactSupport &&
+        onAction == null) {
+      await showAppSafetySheet(
+        context: context,
+        role: 'rider',
+        deliveryId: int.tryParse(conversation.deliveryId ?? ''),
+      );
+      return;
+    }
     final accepted = await controller.requestAction(type);
     if (!context.mounted) return;
     if (!accepted) {
@@ -129,45 +158,15 @@ class RiderConversationPanel extends StatelessWidget {
   }
 }
 
-class RiderConversationHeader extends StatelessWidget {
-  const RiderConversationHeader({
-    required this.conversation,
-    required this.onClose,
-    super.key,
-  });
-
-  final RiderConversation conversation;
-  final VoidCallback onClose;
-
-  @override
-  Widget build(BuildContext context) => SafeArea(
-    bottom: false,
-    child: Padding(
-      padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  conversation.participantLabel,
-                  style: SharedPresentationStyles.headingTitleExtraBold,
-                ),
-                Text(
-                  '${conversation.party.label} • In-app delivery chat',
-                  style: SharedPresentationStyles.mutedCaptionSemibold,
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            tooltip: 'Close conversation',
-            onPressed: onClose,
-            icon: const Icon(Icons.close_rounded, size: 20),
-          ),
-        ],
-      ),
-    ),
-  );
-}
+ChatParticipantData riderChatParticipant(RiderConversation conversation) =>
+    ChatParticipantData(
+      name: conversation.participantLabel,
+      initials: conversation.participantLabel
+          .trim()
+          .split(RegExp(r'\s+'))
+          .take(2)
+          .map((part) => part.isEmpty ? '' : part[0])
+          .join()
+          .toUpperCase(),
+      imageSemanticLabel: conversation.participantLabel + ' profile',
+    );

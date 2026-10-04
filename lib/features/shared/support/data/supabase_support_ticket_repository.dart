@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:agresell_app/core/services/query_owner.dart';
 
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/features/shared/support/data/support_ticket_repository.dart';
@@ -67,8 +68,9 @@ class SupabaseSupportTicketRepository implements SupportTicketRepository {
   Future<List<SupportMessage>> getTicketMessages(int ticketId) async {
     final rows = await _client
         .from('support_messages')
-        .select()
+        .select('*,support_tickets!inner(user_id)')
         .eq('ticket_id', ticketId)
+        .eq('support_tickets.user_id', await QueryOwner(_client).userId())
         .order('created_at', ascending: true);
 
     return (rows as List)

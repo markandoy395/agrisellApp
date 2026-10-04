@@ -1,3 +1,4 @@
+import 'support/authenticated_test_session.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -30,6 +31,7 @@ const profile = UserProfile(
 const details = FarmerVerificationDetails(action: 'needs_information');
 
 void main() {
+  configureAuthenticatedTests(role: AuthRole.farmer);
   test(
     'profile save preserves mode transitions and loaded verification details',
     () async {

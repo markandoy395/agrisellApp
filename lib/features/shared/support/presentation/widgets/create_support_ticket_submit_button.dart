@@ -18,22 +18,35 @@ class CreateSupportTicketSubmitButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: CreateSupportTicketStyles.submitButtonHeight,
-      child: FilledButton(
-        onPressed: isSubmitting ? null : onPressed,
-        style: CreateSupportTicketStyles.submitButtonStyle,
-        child: isSubmitting
-            ? const SizedBox(
-                width: CreateSupportTicketStyles.submitIndicatorSize,
-                height: CreateSupportTicketStyles.submitIndicatorSize,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: CreateSupportTicketStyles.submitIndicatorStroke,
+      child: DecoratedBox(
+        decoration: CreateSupportTicketStyles.submitDecoration,
+        child: FilledButton(
+          onPressed: isSubmitting ? null : onPressed,
+          style: CreateSupportTicketStyles.submitButtonStyle,
+          child: isSubmitting
+              ? const SizedBox(
+                  width: CreateSupportTicketStyles.submitIndicatorSize,
+                  height: CreateSupportTicketStyles.submitIndicatorSize,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth:
+                        CreateSupportTicketStyles.submitIndicatorStroke,
+                  ),
+                )
+              : const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        'Submit Support Ticket',
+                        style: CreateSupportTicketStyles.submitButtonText,
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Icon(Icons.arrow_forward_rounded, size: 22),
+                  ],
                 ),
-              )
-            : const Text(
-                'Submit Support Ticket',
-                style: CreateSupportTicketStyles.submitButtonText,
-              ),
+        ),
       ),
     );
   }

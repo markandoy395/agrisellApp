@@ -98,6 +98,20 @@ integration_test/
 test_driver/            Legacy integration-test driver support
 ```
 
+Keep device driver entry points outside `test/`: `flutter test` discovers files
+ending in `_test.dart` there and runs them without an attached application.
+The driver is `test_driver/integration_test.dart`; the device test itself remains
+under `integration_test/`.
+
+Tests that navigate to private pages must explicitly start an authenticated test
+session. Use `test/support/authenticated_test_session.dart` for local account
+fixtures and choose the appropriate role. Do not disable production route guards
+or apply this fixture to tests that verify signed-out/anonymous access denial.
+When a widget action writes to persistent storage that later tests await, run
+that action through `tester.runAsync` and then pump the UI. Dispose routed
+widgets within the test and unload the session before clearing account-owned
+controllers during cleanup.
+
 Production code must never import `test/` fixtures or local demo stores.
 
 ## What to test by change type

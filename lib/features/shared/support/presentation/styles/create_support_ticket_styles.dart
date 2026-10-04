@@ -1,174 +1,123 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
-
-/// Centralized styles, colors, dimensions, and decorations for the Create Support Ticket screen.
 abstract final class CreateSupportTicketStyles {
-  // Colors
-  static const Color backgroundColor = AgrisellColors.homeBackground;
-  static const Color surfaceColor = AgrisellColors.surface;
-  static const Color appBarTitleColor = AgrisellColors.headingGreen;
-  static const Color primaryGreen = AgrisellColors.forestGreen;
-  static const Color headingTextColor = AgrisellColors.headingGreen;
-  static const Color mutedTextColor = AgrisellColors.mutedText;
-  static const Color borderLineColor = AgrisellColors.borderLine;
-  static const Color infoBackgroundColor = AgrisellColors.limeSoft;
-  static final Color infoBorderColor = AgrisellColors.limeGreen.withValues(alpha: 0.3);
-  static const Color errorColor = AgrisellColors.unavailableRed;
-
-  // Dimensions & Spacings
-  static const EdgeInsets screenPadding = EdgeInsets.all(16);
-  static const double sectionSpacing = 18.0;
-  static const double fieldLabelSpacing = 6.0;
-  static const double chipSpacing = 8.0;
-  static const double chipRunSpacing = 8.0;
-  static const double chipRightMargin = 8.0;
-  static const double submitSpacing = 24.0;
-  static const double submitButtonHeight = 50.0;
-  static const double submitIndicatorSize = 24.0;
-  static const double submitIndicatorStroke = 2.5;
-
-  static const EdgeInsets infoCardPadding = EdgeInsets.all(14);
-  static const double infoIconSize = 24.0;
-  static const double infoContentSpacing = 12.0;
-  static const double chipAvatarSize = 16.0;
-
-  static const EdgeInsets subjectContentPadding = EdgeInsets.symmetric(
-    horizontal: 14,
-    vertical: 12,
-  );
-
-  static const EdgeInsets messageContentPadding = EdgeInsets.symmetric(
-    horizontal: 14,
-    vertical: 14,
-  );
-
-  // Border Radii
-  static const double cardRadius = 12.0;
-  static const double chipBorderRadius = 10.0;
-
-  // Text Styles
-  static const TextStyle appBarTitle = TextStyle(
+  static const backgroundColor = Color(0xFFF5FAF8);
+  static const surfaceColor = Colors.white;
+  static const appBarTitleColor = Color(0xFF09252B);
+  static const primaryGreen = Color(0xFF148548);
+  static const headingTextColor = appBarTitleColor;
+  static const mutedTextColor = Color(0xFF7C8294);
+  static const screenPadding = EdgeInsets.fromLTRB(16, 18, 16, 28);
+  static const sectionSpacing = 24.0;
+  static const fieldLabelSpacing = 10.0;
+  static const submitSpacing = 16.0;
+  static const submitButtonHeight = 56.0;
+  static const submitIndicatorSize = 24.0;
+  static const submitIndicatorStroke = 2.5;
+  static const infoCardPadding = EdgeInsets.all(16);
+  static const infoIconSize = 28.0;
+  static const infoContentSpacing = 12.0;
+  static const appBarTitle = TextStyle(
+    fontSize: 21,
     fontWeight: FontWeight.w800,
-    fontSize: 15,
   );
-
-  static final TextStyle infoText = TextStyle(
-    fontSize: 13,
-    color: headingTextColor.withValues(alpha: 0.9),
-    height: 1.35,
+  static const sectionHeading = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w800,
+    color: headingTextColor,
   );
-
-  static const TextStyle sectionHeading = TextStyle(
+  static const infoText = TextStyle(
     fontSize: 14,
     fontWeight: FontWeight.w700,
     color: headingTextColor,
+    height: 1.45,
   );
-
-  static TextStyle categoryChipLabel(bool isSelected) => TextStyle(
-    color: isSelected ? Colors.white : headingTextColor,
-    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+  static const description = TextStyle(
     fontSize: 13,
-  );
-
-  static TextStyle priorityChipLabel({
-    required bool isSelected,
-    required Color textColor,
-  }) => TextStyle(
-    color: isSelected ? textColor : mutedTextColor,
-    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-    fontSize: 13,
-  );
-
-  static const TextStyle inputHint = TextStyle(
     color: mutedTextColor,
-    fontSize: 14,
+    height: 1.45,
   );
-
-  static const TextStyle submitButtonText = TextStyle(
-    fontSize: 15,
+  static const fieldText = TextStyle(
+    fontSize: 14,
+    color: headingTextColor,
+    height: 1.5,
+  );
+  static const errorText = TextStyle(fontSize: 12, color: Color(0xFFB3261E));
+  static const inputHint = TextStyle(
+    fontSize: 14,
+    color: mutedTextColor,
+    height: 1.5,
+  );
+  static const submitButtonText = TextStyle(
+    fontSize: 16,
     fontWeight: FontWeight.w700,
   );
-
-  // Box Decorations
-  static final BoxDecoration infoCardDecoration = BoxDecoration(
-    color: infoBackgroundColor,
-    borderRadius: BorderRadius.circular(cardRadius),
-    border: Border.all(color: infoBorderColor),
+  static const greenGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF299959), Color(0xFF107B43)],
   );
-
-  // Chip Shapes
-  static OutlinedBorder categoryChipShape(bool isSelected) =>
-      RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(chipBorderRadius),
-        side: BorderSide(
-          color: isSelected ? primaryGreen : borderLineColor,
-        ),
-      );
-
-  static OutlinedBorder priorityChipShape({
-    required bool isSelected,
-    required Color activeColor,
-  }) =>
-      RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(chipBorderRadius),
-        side: BorderSide(
-          color: isSelected
-              ? activeColor.withValues(alpha: 0.5)
-              : borderLineColor,
-        ),
-      );
-
-  // Input Decorations
+  static final infoCardDecoration = BoxDecoration(
+    color: const Color(0xFFF1FAF4),
+    borderRadius: BorderRadius.circular(16),
+    border: Border.all(color: const Color(0xFFDCEFE3)),
+    boxShadow: const [
+      BoxShadow(color: Color(0x080D7045), blurRadius: 20, offset: Offset(0, 6)),
+    ],
+  );
+  static const infoIconDecoration = BoxDecoration(
+    color: Color(0xFFE2F4E8),
+    shape: BoxShape.circle,
+  );
+  static final submitDecoration = BoxDecoration(
+    gradient: greenGradient,
+    borderRadius: BorderRadius.circular(16),
+    boxShadow: const [
+      BoxShadow(color: Color(0x1A138549), blurRadius: 18, offset: Offset(0, 6)),
+    ],
+  );
+  static final submitButtonStyle = FilledButton.styleFrom(
+    backgroundColor: Colors.transparent,
+    disabledBackgroundColor: Colors.transparent,
+    foregroundColor: Colors.white,
+    disabledForegroundColor: Colors.white,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  );
   static InputDecoration inputDecoration({
     required String hintText,
     bool hasCounter = false,
-  }) {
-    return InputDecoration(
-      hintText: hintText,
-      hintStyle: inputHint,
-      filled: true,
-      fillColor: surfaceColor,
-      contentPadding: hasCounter ? subjectContentPadding : messageContentPadding,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(cardRadius),
-        borderSide: const BorderSide(color: borderLineColor),
+  }) => InputDecoration(
+    hintText: hintText,
+    hintStyle: inputHint,
+    filled: true,
+    fillColor: surfaceColor,
+    prefixIcon: Padding(
+      padding: const EdgeInsets.fromLTRB(14, 16, 10, 16),
+      child: Icon(
+        hasCounter
+            ? Icons.description_outlined
+            : Icons.chat_bubble_outline_rounded,
+        color: mutedTextColor,
+        size: 22,
       ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(cardRadius),
-        borderSide: const BorderSide(color: borderLineColor),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(cardRadius),
-        borderSide: const BorderSide(
-          color: primaryGreen,
-          width: 1.5,
-        ),
-      ),
-      counterText: hasCounter ? '' : null,
-    );
-  }
-
-  // Button Style
-  static final ButtonStyle submitButtonStyle = FilledButton.styleFrom(
-    backgroundColor: primaryGreen,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(cardRadius),
     ),
+    prefixIconConstraints: const BoxConstraints(minWidth: 46, minHeight: 52),
+    contentPadding: EdgeInsets.fromLTRB(14, 16, 16, hasCounter ? 16 : 44),
+    border: _border(const Color(0xFFE3E9E8)),
+    enabledBorder: _border(const Color(0xFFE3E9E8)),
+    focusedBorder: _border(primaryGreen),
+    counterText: '',
   );
-
-  // SnackBars
-  static SnackBar successSnackBar(String ticketNumber) {
-    return SnackBar(
-      content: Text('Support ticket $ticketNumber created successfully!'),
-      backgroundColor: primaryGreen,
-    );
-  }
-
-  static SnackBar errorSnackBar(String message) {
-    return SnackBar(
-      content: Text(message),
-      backgroundColor: errorColor,
-    );
-  }
+  static OutlineInputBorder _border(Color color) => OutlineInputBorder(
+    borderRadius: BorderRadius.circular(16),
+    borderSide: BorderSide(color: color),
+  );
+  static SnackBar successSnackBar(String number) => SnackBar(
+    content: Text('Support ticket $number created successfully!'),
+    backgroundColor: primaryGreen,
+  );
+  static SnackBar errorSnackBar(String message) => SnackBar(
+    content: Text(message),
+    backgroundColor: const Color(0xFFD84343),
+  );
 }

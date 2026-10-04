@@ -1,8 +1,8 @@
 export 'package:agresell_app/features/shared/chat/presentation/styles/chat_detail_header_styles.dart';
 import 'package:agresell_app/features/shared/chat/presentation/styles/chat_detail_header_styles.dart';
 import 'package:flutter/material.dart';
+import '../styles/chat_reference_styles.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/chat/presentation/models/chat_participant_data.dart';
 import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_avatar.dart';
 
@@ -12,9 +12,13 @@ class ChatDetailHeader extends StatelessWidget {
     required this.subtitle,
     required this.onBack,
     required this.style,
+    this.isEmpty = false,
+    this.onCall,
     super.key,
   });
 
+  final bool isEmpty;
+  final VoidCallback? onCall;
   final ChatParticipantData participant;
   final String subtitle;
   final VoidCallback onBack;
@@ -31,29 +35,60 @@ class ChatDetailHeader extends StatelessWidget {
           onPressed: onBack,
           tooltip: 'Back to messages',
           icon: const Icon(Icons.arrow_back_rounded),
-          color: AgrisellColors.surface,
+          color: style.titleStyle.color,
         ),
-        ChatAvatar(participant: participant, style: style.avatarStyle),
+        if (!isEmpty)
+          ChatAvatar(participant: participant, style: style.avatarStyle),
         const SizedBox(width: 10),
         Expanded(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: isEmpty
+                ? CrossAxisAlignment.center
+                : CrossAxisAlignment.start,
             children: [
               Text(
-                participant.name,
+                isEmpty ? 'Chat' : participant.name,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: style.titleStyle,
               ),
-              if (style.subtitleSpacing > 0)
+              if (!isEmpty && style.subtitleSpacing > 0)
                 SizedBox(height: style.subtitleSpacing),
-              Text(
-                subtitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: style.subtitleStyle,
-              ),
+              if (!isEmpty)
+                Text(subtitle, softWrap: true, style: style.subtitleStyle),
             ],
+          ),
+        ),
+        if (onCall != null)
+          IconButton(
+            onPressed: onCall,
+            tooltip: 'Protected call',
+            icon: const Icon(Icons.call_outlined),
+          ),
+        PopupMenuButton<String>(
+          tooltip: 'Conversation options',
+          icon: const Icon(
+            Icons.more_vert_rounded,
+            color: ChatReferenceStyles.teal,
+          ),
+          itemBuilder: (_) => const [
+            PopupMenuItem(
+              value: 'details',
+              child: Text('Conversation details'),
+            ),
+          ],
+          onSelected: (_) => showDialog<void>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(participant.name),
+              content: Text(subtitle),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Close'),
+                ),
+              ],
+            ),
           ),
         ),
       ],

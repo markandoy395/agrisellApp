@@ -15,7 +15,7 @@ void main() {
             'buyer_name': 'Alex Buyer',
             'farmer_name': 'Maria Santos',
             'farm_name': 'Green Farm',
-            'farm_location': 'Benguet',
+            'farm_location': 'Purok 4, San Jose, La Trinidad, Benguet',
             'last_message': 'Available tomorrow',
             'last_message_at': '2026-07-29T08:00:00Z',
             'unread_count': 2,
@@ -38,6 +38,10 @@ void main() {
       final messages = await repository.loadMessages('12');
 
       expect(conversations.single.farmerName, 'Maria Santos');
+      expect(
+        conversations.single.location,
+        'Purok 4, San Jose, La Trinidad, Benguet',
+      );
       expect(conversations.single.unreadCount, 2);
       expect(messages.single.senderRole, MarketplaceActorRole.farmer);
       expect(remote.calls.last.parameters, {'conversation_id': 12});

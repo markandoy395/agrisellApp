@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:agresell_app/core/services/query_owner.dart';
 
 import 'package:agresell_app/features/auth/domain/buyer_shipping_address.dart';
 
@@ -11,6 +12,7 @@ class BuyerShippingAddressRepository {
     final buyer = await _client
         .from('buyers')
         .select('shipping_address,gps_lat,gps_long')
+        .eq('buyer_user_id', await QueryOwner(_client).buyerId())
         .maybeSingle();
     final address = _text(buyer?['shipping_address']);
     return address == null

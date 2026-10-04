@@ -6,12 +6,13 @@ import 'package:agresell_app/features/shared/chat/domain/marketplace_conversatio
 MarketplaceConversation marketplaceConversationFixture({
   String id = '12',
   int unreadCount = 1,
+  String location = 'Benguet',
 }) => MarketplaceConversation(
   id: id,
   buyerName: 'Alex Buyer',
   farmerName: 'Maria Santos',
   farmName: 'Green Farm',
-  location: 'Benguet',
+  location: location,
   commodityId: '8',
   productName: 'Tomatoes',
   orderReference: 'ORD-100',

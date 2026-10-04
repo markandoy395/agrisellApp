@@ -6,6 +6,7 @@ extension HomeNotificationRepositorySync on HomeNotificationRepository {
     String notificationId, {
     required bool isRead,
   }) async {
+    if (_client != null) QueryOwner(_client!).requireAuthId(userId);
     if (!_isCloudId(notificationId)) return;
     await cache.setRead(userId, notificationId, isRead: isRead);
     final action = isRead
@@ -25,6 +26,7 @@ extension HomeNotificationRepositorySync on HomeNotificationRepository {
   }
 
   Future<void> delete(String userId, String notificationId) async {
+    if (_client != null) QueryOwner(_client!).requireAuthId(userId);
     if (!_isCloudId(notificationId)) return;
     await cache.remove(userId, notificationId);
     await cache.queue(userId, notificationId, NotificationSyncAction.delete);
@@ -72,6 +74,7 @@ extension HomeNotificationRepositorySync on HomeNotificationRepository {
     String id,
     NotificationSyncAction action,
   ) async {
+    QueryOwner(client).requireAuthId(userId);
     final values = switch (action) {
       NotificationSyncAction.read => {
         'read_at': DateTime.now().toUtc().toIso8601String(),

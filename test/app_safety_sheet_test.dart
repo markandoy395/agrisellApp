@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:agresell_app/features/shared/safety/data/safety_incident_repository.dart';
 import 'package:agresell_app/features/shared/safety/presentation/controllers/safety_incident_controller.dart';
 import 'package:agresell_app/features/shared/safety/presentation/widgets/app_safety_sheet.dart';
+import 'package:agresell_app/features/shared/safety/presentation/widgets/incident_report_category_card.dart';
 
 void main() {
   testWidgets(
@@ -49,42 +50,47 @@ void main() {
     },
   );
 
-  testWidgets(
-    'app safety sheet report incident option opens report dialog',
-    (tester) async {
-      final repository = InMemorySafetyIncidentRepository();
-      final controller = SafetyIncidentController(repository: repository);
+  testWidgets('app safety sheet report incident option opens report dialog', (
+    tester,
+  ) async {
+    final repository = InMemorySafetyIncidentRepository();
+    final controller = SafetyIncidentController(repository: repository);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => ElevatedButton(
-                onPressed: () => showAppSafetySheet(
-                  context: context,
-                  role: 'buyer',
-                  controller: controller,
-                ),
-                child: const Text('Open Safety Sheet'),
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => ElevatedButton(
+              onPressed: () => showAppSafetySheet(
+                context: context,
+                role: 'buyer',
+                controller: controller,
               ),
+              child: const Text('Open Safety Sheet'),
             ),
           ),
         ),
-      );
+      ),
+    );
 
-      await tester.tap(find.text('Open Safety Sheet'));
-      await tester.pumpAndSettle();
+    await tester.tap(find.text('Open Safety Sheet'));
+    await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Report a Safety Issue / Incident'));
-      await tester.pumpAndSettle();
+    await tester.tap(find.text('Report a Safety Issue / Incident'));
+    await tester.pumpAndSettle();
 
-      expect(find.text('Report Safety Incident'), findsOneWidget);
-      expect(find.text('Incident Category'), findsOneWidget);
-      expect(find.text('Describe the Incident'), findsOneWidget);
-      expect(find.text('Submit Report'), findsOneWidget);
+    expect(find.text('Report Safety Incident'), findsOneWidget);
+    expect(find.text('Select Incident Category'), findsOneWidget);
+    expect(find.byType(IncidentReportCategoryCard), findsWidgets);
+    await tester.scrollUntilVisible(
+      find.text('Describe the Incident'),
+      200,
+      scrollable: find.byType(Scrollable).last,
+    );
+    expect(find.text('Describe the Incident'), findsOneWidget);
+    expect(find.text('Submit Report'), findsOneWidget);
 
-      await tester.tap(find.text('Cancel'));
-      await tester.pumpAndSettle();
-    },
-  );
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+  });
 }

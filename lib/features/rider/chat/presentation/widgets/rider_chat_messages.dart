@@ -1,5 +1,7 @@
 import 'package:agresell_app/features/rider/chat/presentation/styles/rider_chat_messages_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_profile_intro.dart';
+import 'rider_chat_panel.dart';
 
 import 'package:agresell_app/features/rider/chat/domain/rider_communication_models.dart';
 import 'package:agresell_app/features/rider/chat/presentation/controllers/rider_messages_controller.dart';
@@ -24,17 +26,17 @@ class RiderMessageBody extends StatelessWidget {
       );
     }
     if (controller.messages.isEmpty) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(18),
-          child: RiderEmptyStateCard(
-            title: 'No messages yet',
-            message: 'Use the protected composer to start this conversation.',
-            icon: Icons.forum_outlined,
+      final conversation = controller.selectedConversation!;
+      return ListView(
+        children: [
+          ChatProfileIntro(
+            participant: riderChatParticipant(conversation),
+            subtitle: conversation.party.label + ' / Delivery chat',
           ),
-        ),
+        ],
       );
     }
+
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
       itemCount: controller.messages.length,

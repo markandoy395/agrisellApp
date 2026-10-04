@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'query_owner.dart';
 import 'dart:convert';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -119,6 +120,7 @@ class PushNotificationService {
   Future<void> _saveToken(String userId, String token) async {
     if (!AgrisellSupabase.isInitialized) return;
     try {
+      QueryOwner(AgrisellSupabase.client).requireAuthId(userId);
       await AgrisellSupabase.client.from('notification_devices').upsert({
         'user_id': userId,
         'fcm_token': token,

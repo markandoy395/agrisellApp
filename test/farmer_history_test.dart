@@ -1,3 +1,4 @@
+import 'support/authenticated_test_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -9,6 +10,7 @@ import 'package:agresell_app/features/shared/orders/domain/order_feedback.dart';
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
 
 void main() {
+  configureAuthenticatedTests(role: AuthRole.farmer);
   test('farmer history sections follow actual order workflow status', () {
     expect(
       FarmerHistorySection.confirm.matches(_order(PlacedOrderStatus.toShip)),

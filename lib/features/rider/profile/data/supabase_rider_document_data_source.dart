@@ -8,20 +8,24 @@ mixin _SupabaseRiderDocumentDataSourceMixin implements RiderRemoteDataSource {
     required String path,
     required Uint8List bytes,
     required String contentType,
-  }) => _client.storage
-      .from(SupabaseRiderDataSource.bucket)
-      .uploadBinary(
-        path,
-        bytes,
-        fileOptions: FileOptions(
-          cacheControl: '3600',
-          contentType: contentType,
-          upsert: false,
-        ),
-      );
+  }) async {
+    await QueryOwner(_client).requireStoragePath(path);
+    return _client.storage
+        .from(SupabaseRiderDataSource.bucket)
+        .uploadBinary(
+          path,
+          bytes,
+          fileOptions: FileOptions(
+            cacheControl: '3600',
+            contentType: contentType,
+            upsert: false,
+          ),
+        );
+  }
 
   @override
   Future<void> deleteObject(String path) async {
+    await QueryOwner(_client).requireStoragePath(path);
     await _client.storage.from(SupabaseRiderDataSource.bucket).remove([path]);
   }
 
@@ -34,6 +38,7 @@ mixin _SupabaseRiderDocumentDataSourceMixin implements RiderRemoteDataSource {
 
   @override
   Future<RiderDocument> createDocument(RiderDocument document) async {
+    await QueryOwner(_client).requireRiderId(document.riderId);
     final values = document.toJson()
       ..remove('document_id')
       ..remove('verification_status')
@@ -48,6 +53,7 @@ mixin _SupabaseRiderDocumentDataSourceMixin implements RiderRemoteDataSource {
 
   @override
   Future<List<RiderDocument>> getDocuments(String riderId) async {
+    await QueryOwner(_client).requireRiderId(riderId);
     final rows = await _client
         .from('rider_documents')
         .select()
@@ -67,6 +73,7 @@ mixin _SupabaseRiderDocumentDataSourceMixin implements RiderRemoteDataSource {
         .from('rider_documents')
         .update(values)
         .eq('document_id', documentId)
+        .eq('rider_id', await QueryOwner(_client).riderId())
         .select()
         .single();
     return RiderDocument.fromJson(_map(row));
@@ -77,6 +84,7 @@ mixin _SupabaseRiderDocumentDataSourceMixin implements RiderRemoteDataSource {
     await _client
         .from('rider_documents')
         .delete()
-        .eq('document_id', documentId);
+        .eq('document_id', documentId)
+        .eq('rider_id', await QueryOwner(_client).riderId());
   }
 }

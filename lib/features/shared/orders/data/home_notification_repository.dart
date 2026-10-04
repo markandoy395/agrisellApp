@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:agresell_app/core/services/query_owner.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -34,6 +35,7 @@ class HomeNotificationRepository {
     if (userId == null || userId.isEmpty) {
       return Future.value(const []);
     }
+    if (_client != null) QueryOwner(_client!).requireAuthId(userId);
     return cache.read(userId);
   }
 
@@ -57,6 +59,7 @@ class HomeNotificationRepository {
     if (userId == null || userId.isEmpty) return const [];
     final client = _client;
     if (client == null) return cache.read(userId);
+    QueryOwner(client).requireAuthId(userId);
     await _flushPending(client, userId);
     final rows = await client
         .from('notifications')
@@ -77,6 +80,7 @@ class HomeNotificationRepository {
     if (userId == null || userId.isEmpty) {
       return Stream.value(const []);
     }
+    if (_client != null) QueryOwner(_client!).requireAuthId(userId);
     late final StreamController<List<HomeNotification>> controller;
     RealtimeChannel? channel;
     var hasData = false;

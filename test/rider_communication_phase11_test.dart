@@ -23,26 +23,31 @@ void main() {
     supportAuthorized: true,
   );
 
-  testWidgets('conversation actions only show implemented attachments', (
+  testWidgets('conversation shortcuts route location, outside, and safety', (
     tester,
   ) async {
     RiderCommunicationActionType? selected;
+    var outside = false;
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
           body: RiderConversationActionRow(
             enabled: true,
             onAction: (value) => selected = value,
+            onOutside: () => outside = true,
           ),
         ),
       ),
     );
 
     expect(find.text('Call'), findsNothing);
-    expect(find.text('Location'), findsOneWidget);
-    expect(find.text('Photo'), findsOneWidget);
-    await tester.tap(find.text('Photo'));
-    expect(selected, RiderCommunicationActionType.attachPhoto);
+    expect(find.text('Share location'), findsOneWidget);
+    await tester.tap(find.text('Share location'));
+    expect(selected, RiderCommunicationActionType.shareLocation);
+    await tester.tap(find.text("I'm outside"));
+    expect(outside, isTrue);
+    await tester.tap(find.text('Safety'));
+    expect(selected, RiderCommunicationActionType.contactSupport);
   });
 
   test(

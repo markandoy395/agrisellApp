@@ -1,3 +1,4 @@
+import 'support/authenticated_test_session.dart';
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/home_screen.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/product_detail_screen.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'support/home_product_fixture.dart';
 
 void main() {
+  configureAuthenticatedTests();
   testWidgets('buyer home starts empty until backend products arrive', (
     tester,
   ) async {

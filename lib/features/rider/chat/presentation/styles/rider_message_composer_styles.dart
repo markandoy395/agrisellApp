@@ -1,21 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/features/shared/chat/presentation/styles/chat_reference_styles.dart';
 
 abstract final class RiderMessageComposerStyles {
-  static final inputDecoration = InputDecoration(
+  static final inputDecoration = ChatReferenceStyles.input.copyWith(
     hintText: 'Write a delivery message',
-    hintStyle: const TextStyle(fontSize: 12),
-    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-    filled: true,
-    fillColor: AgrisellColors.fieldFill,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide.none,
-    ),
   );
-
-  static final iconButtonStyle = IconButton.styleFrom(
-    backgroundColor: AgrisellColors.authGreen,
-    foregroundColor: AgrisellColors.surface,
-  );
+  static final iconButtonStyle = ChatReferenceStyles.sendButton;
 }

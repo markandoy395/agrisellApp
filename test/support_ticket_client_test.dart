@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'support/authenticated_test_session.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -84,9 +85,18 @@ void main() {
     });
 
     test('Category and priority enums fallback gracefully to defaults', () {
-      expect(SupportTicketCategory.fromDb('unknown_cat'), SupportTicketCategory.general);
-      expect(SupportTicketPriority.fromDb('crazy_priority'), SupportTicketPriority.medium);
-      expect(SupportTicketStatus.fromDb('unrecognized'), SupportTicketStatus.open);
+      expect(
+        SupportTicketCategory.fromDb('unknown_cat'),
+        SupportTicketCategory.general,
+      );
+      expect(
+        SupportTicketPriority.fromDb('crazy_priority'),
+        SupportTicketPriority.medium,
+      );
+      expect(
+        SupportTicketStatus.fromDb('unrecognized'),
+        SupportTicketStatus.open,
+      );
     });
   });
 
@@ -153,7 +163,10 @@ void main() {
       // Ticket must now be re-opened to 'open'
       current = (await repo.getMyTickets()).first;
       expect(current.status, SupportTicketStatus.open);
-      expect(current.lastMessage, 'Wait, I still have a question about the invoice.');
+      expect(
+        current.lastMessage,
+        'Wait, I still have a question about the invoice.',
+      );
     });
   });
 
@@ -221,7 +234,10 @@ void main() {
       controller.setFilter('all');
       controller.setSearch('safety');
       expect(controller.filteredTickets.length, 1);
-      expect(controller.filteredTickets.first.category, SupportTicketCategory.safety);
+      expect(
+        controller.filteredTickets.first.category,
+        SupportTicketCategory.safety,
+      );
 
       controller.setSearch('non-existent');
       expect(controller.filteredTickets.isEmpty, isTrue);
@@ -229,52 +245,61 @@ void main() {
       controller.dispose();
     });
 
-    test('SupportTicketDetailController loads messages and sends reply', () async {
-      final ticket = SupportTicket(
-        ticketId: 5,
-        ticketNumber: 'TCK-000005',
-        subject: 'Damaged item',
-        category: SupportTicketCategory.order,
-        status: SupportTicketStatus.open,
-        priority: SupportTicketPriority.medium,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
+    test(
+      'SupportTicketDetailController loads messages and sends reply',
+      () async {
+        final ticket = SupportTicket(
+          ticketId: 5,
+          ticketNumber: 'TCK-000005',
+          subject: 'Damaged item',
+          category: SupportTicketCategory.order,
+          status: SupportTicketStatus.open,
+          priority: SupportTicketPriority.medium,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
 
-      final repository = InMemorySupportTicketRepository(
-        seedTickets: [ticket],
-        seedMessages: {
-          5: [
-            SupportMessage(
-              messageId: 10,
-              ticketId: 5,
-              senderRole: SupportMessageSenderRole.user,
-              senderName: 'Customer',
-              body: 'My produce arrived damaged.',
-              createdAt: DateTime.now(),
-            ),
-          ],
-        },
-      );
+        final repository = InMemorySupportTicketRepository(
+          seedTickets: [ticket],
+          seedMessages: {
+            5: [
+              SupportMessage(
+                messageId: 10,
+                ticketId: 5,
+                senderRole: SupportMessageSenderRole.user,
+                senderName: 'Customer',
+                body: 'My produce arrived damaged.',
+                createdAt: DateTime.now(),
+              ),
+            ],
+          },
+        );
 
-      final detailController = SupportTicketDetailController(
-        ticket: ticket,
-        repository: repository,
-      );
+        final detailController = SupportTicketDetailController(
+          ticket: ticket,
+          repository: repository,
+        );
 
-      await detailController.loadMessages();
-      expect(detailController.messages.length, 1);
+        await detailController.loadMessages();
+        expect(detailController.messages.length, 1);
 
-      final sent = await detailController.sendMessage('Here is additional information.');
-      expect(sent, isTrue);
-      expect(detailController.messages.length, 2);
-      expect(detailController.messages.last.body, 'Here is additional information.');
+        final sent = await detailController.sendMessage(
+          'Here is additional information.',
+        );
+        expect(sent, isTrue);
+        expect(detailController.messages.length, 2);
+        expect(
+          detailController.messages.last.body,
+          'Here is additional information.',
+        );
 
-      detailController.dispose();
-    });
+        detailController.dispose();
+      },
+    );
   });
 
   group('Widget Tests', () {
+    configureAuthenticatedTests();
     testWidgets('SupportCenterScreen hides database details when unavailable', (
       tester,
     ) async {
@@ -298,7 +323,9 @@ void main() {
       controller.dispose();
     });
 
-    testWidgets('SupportCenterScreen displays tickets and filter chips', (tester) async {
+    testWidgets('SupportCenterScreen displays tickets and filter chips', (
+      tester,
+    ) async {
       final repository = InMemorySupportTicketRepository(
         seedTickets: [
           SupportTicket(
@@ -318,9 +345,7 @@ void main() {
       final controller = SupportTicketsController(repository: repository);
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: SupportCenterScreen(controller: controller),
-        ),
+        MaterialApp(home: SupportCenterScreen(controller: controller)),
       );
 
       await tester.pumpAndSettle();
@@ -332,7 +357,9 @@ void main() {
       expect(find.text('Open Ticket'), findsOneWidget);
     });
 
-    testWidgets('CreateSupportTicketScreen validates and submits new ticket', (tester) async {
+    testWidgets('CreateSupportTicketScreen validates and submits new ticket', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(800, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -362,7 +389,10 @@ void main() {
       await tester.tap(find.text('Submit Support Ticket'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Subject must be at least 2 characters long.'), findsOneWidget);
+      expect(
+        find.text('Subject must be at least 2 characters long.'),
+        findsOneWidget,
+      );
 
       // Enter subject and message
       await tester.enterText(
@@ -370,7 +400,7 @@ void main() {
         'Urgent safety concern at pickup',
       );
       await tester.enterText(
-        find.byType(TextFormField).last,
+        find.byType(TextField).last,
         'Dangerous road conditions near the warehouse gate.',
       );
       await tester.pumpAndSettle();
@@ -387,7 +417,9 @@ void main() {
       expect(tickets.first.priority, SupportTicketPriority.urgent);
     });
 
-    testWidgets('SupportTicketDetailScreen displays thread and composer', (tester) async {
+    testWidgets('SupportTicketDetailScreen displays thread and composer', (
+      tester,
+    ) async {
       final ticket = SupportTicket(
         ticketId: 20,
         ticketNumber: 'TCK-202020',
@@ -436,12 +468,21 @@ void main() {
 
       expect(find.text('TCK-202020'), findsOneWidget);
       expect(find.text('Payment verification issue'), findsOneWidget);
-      expect(find.text('I paid via GCash but reference is pending.'), findsOneWidget);
-      expect(find.text('We are verifying with our payment gateway.'), findsOneWidget);
+      expect(
+        find.text('I paid via GCash but reference is pending.'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('We are verifying with our payment gateway.'),
+        findsOneWidget,
+      );
       expect(find.text('Support Agent Dave'), findsOneWidget);
 
       // Send a follow-up reply
-      await tester.enterText(find.byType(TextField), 'Thank you, please expedite.');
+      await tester.enterText(
+        find.byType(TextField),
+        'Thank you, please expedite.',
+      );
       await tester.tap(find.byIcon(Icons.send_rounded));
       await tester.pumpAndSettle();
 

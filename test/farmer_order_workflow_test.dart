@@ -1,3 +1,4 @@
+import 'support/authenticated_test_session.dart';
 import 'support/home_product_fixture.dart';
 import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket_controller.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/order_controller.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  configureAuthenticatedTests(role: AuthRole.farmer);
   final basketController = BasketController.instance;
   final orderController = OrderController.instance;
 
@@ -26,14 +28,18 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     basketController.addProduct(testHomeProducts.first);
-    await orderController.placeToShipOrder(
-      items: basketController.selectedItems,
-      deliveryAddress: 'Test address',
-      phoneNumber: 'Test phone',
+    await tester.runAsync(
+      () => orderController.placeToShipOrder(
+        items: basketController.selectedItems,
+        deliveryAddress: 'Test address',
+        phoneNumber: 'Test phone',
+      ),
     );
 
-    await tester.pumpWidget(
-      const MaterialApp(home: Scaffold(body: FarmerReserveScreen())),
+    await tester.runAsync(
+      () => tester.pumpWidget(
+        const MaterialApp(home: Scaffold(body: FarmerReserveScreen())),
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -45,14 +51,16 @@ void main() {
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('Accept order').first);
     expect(find.text('Accept order'), findsWidgets);
-    await tester.tap(find.text('Accept order').first);
+    await tester.runAsync(() => tester.tap(find.text('Accept order').first));
     await tester.pumpAndSettle();
 
     await tester.pump(const Duration(seconds: 5));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('Mark ready for pickup').first);
     expect(find.text('Mark ready for pickup'), findsWidgets);
-    await tester.tap(find.text('Mark ready for pickup').first);
+    await tester.runAsync(
+      () => tester.tap(find.text('Mark ready for pickup').first),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Waiting for an assigned rider'), findsOneWidget);

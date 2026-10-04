@@ -34,7 +34,7 @@ void main() {
 
     await tester.tap(conversation);
     await tester.pumpAndSettle();
-    expect(find.text('Green Farm'), findsOneWidget);
+    expect(find.text('Benguet'), findsOneWidget);
     expect(find.byTooltip('Back to messages'), findsOneWidget);
     expect(find.widgetWithText(TextField, 'Write a message'), findsOneWidget);
   });

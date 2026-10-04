@@ -20,7 +20,9 @@ begin
       raise exception 'Anonymous table/column access remains: %', exposed.name;
     end if;
     if exposed.relkind in ('r', 'p') and
-       exposed.nspname = 'public' and not exposed.relrowsecurity then
+       not exists (select 1 from pg_depend d
+         where d.classid = 'pg_class'::regclass and d.objid = exposed.oid and d.deptype = 'e')
+       and not exposed.relrowsecurity then
       raise exception 'Application table missing RLS: %', exposed.name;
     end if;
   end loop;

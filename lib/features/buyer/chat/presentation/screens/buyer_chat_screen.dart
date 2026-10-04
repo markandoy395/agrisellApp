@@ -1,17 +1,15 @@
-import 'package:agresell_app/features/buyer/chat/presentation/styles/buyer_chat_screen_styles.dart';
-import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/buyer/chat/presentation/widgets/buyer_chat_product_context.dart';
 import 'package:agresell_app/features/shared/chat/domain/marketplace_conversation.dart';
 import 'package:agresell_app/features/shared/chat/presentation/controllers/marketplace_messaging_controller.dart';
 import 'package:agresell_app/features/shared/chat/presentation/models/chat_participant_data.dart';
-import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_avatar.dart';
 import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_content_state.dart';
 import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_detail_header.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_profile_intro.dart';
+import 'package:agresell_app/features/shared/chat/presentation/styles/chat_reference_styles.dart';
 import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_message_bubble.dart';
 import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_message_composer.dart';
 
@@ -56,6 +54,12 @@ class _BuyerChatScreenState extends State<BuyerChatScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = widget.controller;
+    final participant = ChatParticipantData(
+      name: widget.thread.farmerName,
+      initials: marketplaceInitials(widget.thread.farmerName),
+      imageUrl: widget.thread.farmerImageUrl,
+      imageSemanticLabel: '${widget.thread.farmerName} profile photo',
+    );
     final messages = controller.messagesFor(widget.thread.id);
     final isLoading = controller.isLoadingMessages(widget.thread.id);
     final error = controller.messageErrorFor(widget.thread.id);
@@ -63,34 +67,16 @@ class _BuyerChatScreenState extends State<BuyerChatScreen> {
     final composerBottomPadding = keyboardIsOpen ? 12.0 : widget.bottomPadding;
 
     return ColoredBox(
-      color: AgrisellColors.homeBackground,
+      color: ChatReferenceStyles.background,
       child: Column(
         children: [
           ChatDetailHeader(
-            participant: ChatParticipantData(
-              name: widget.thread.farmerName,
-              initials: marketplaceInitials(widget.thread.farmerName),
-              imageUrl: widget.thread.farmerImageUrl,
-              imageSemanticLabel: '${widget.thread.farmerName} profile photo',
-            ),
-            subtitle: widget.thread.farmName,
+            participant: participant,
+            isEmpty: messages.isEmpty,
+            subtitle: widget.thread.location,
             onBack: widget.onBack,
-            style: ChatDetailHeaderStyle(
-              padding: EdgeInsets.fromLTRB(
-                4,
-                MediaQuery.paddingOf(context).top + 8,
-                14,
-                10,
-              ),
-              decoration: BuyerChatScreenStyles.chatDetailHeaderStyleDecoration,
-              avatarStyle: const ChatAvatarStyle(
-                diameter: 40,
-                backgroundColor: AgrisellColors.surface,
-                foregroundColor: AgrisellColors.authGreen,
-                textStyle: SharedPresentationStyles.bodyExtraBold,
-              ),
-              titleStyle: BuyerChatScreenStyles.textStyle,
-              subtitleStyle: BuyerChatScreenStyles.textStyle2,
+            style: ChatReferenceStyles.header(
+              MediaQuery.paddingOf(context).top,
             ),
           ),
           Expanded(
@@ -125,19 +111,13 @@ class _BuyerChatScreenState extends State<BuyerChatScreen> {
                         ScrollViewKeyboardDismissBehavior.onDrag,
                     padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
                     children: [
-                      BuyerChatProductContext(thread: widget.thread),
+                      if (messages.isNotEmpty)
+                        BuyerChatProductContext(thread: widget.thread),
                       const SizedBox(height: 18),
                       if (messages.isEmpty)
-                        const ChatContentState(
-                          data: ChatContentStateData(
-                            icon: Icons.waving_hand_outlined,
-                            message: 'Say hello to start the conversation.',
-                          ),
-                          style: ChatContentStateStyle(
-                            padding: EdgeInsets.symmetric(vertical: 30),
-                            iconSize: 30,
-                            iconSpacing: 8,
-                          ),
+                        ChatProfileIntro(
+                          participant: participant,
+                          subtitle: widget.thread.location,
                         ),
                       for (final message in messages) ...[
                         ChatMessageBubble(
@@ -156,16 +136,22 @@ class _BuyerChatScreenState extends State<BuyerChatScreen> {
                     ],
                   ),
           ),
+          ChatSuggestedReplies(
+            replies: const ['Hello!', 'Thank you', 'Any updates?'],
+            onSelected: controller.isSending(widget.thread.id)
+                ? null
+                : (text) {
+                    _messageController.text = text;
+                    _sendMessage();
+                  },
+          ),
           ChatMessageComposer(
             controller: _messageController,
             onSend: _sendMessage,
             isSending: controller.isSending(widget.thread.id),
-            style: ChatMessageComposerStyle(
-              padding: EdgeInsets.fromLTRB(12, 8, 12, composerBottomPadding),
-              decoration:
-                  BuyerChatScreenStyles.chatMessageComposerStyleDecoration,
-              hintText: 'Write a message',
-              inputDecoration: BuyerChatScreenStyles.inputDecoration,
+            style: ChatReferenceStyles.composer(
+              composerBottomPadding,
+              'Write a message',
             ),
           ),
         ],

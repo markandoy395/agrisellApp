@@ -9,6 +9,8 @@ import 'package:agresell_app/features/shared/chat/presentation/controllers/marke
 import 'package:agresell_app/features/shared/chat/presentation/models/chat_participant_data.dart';
 import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_content_state.dart';
 import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_detail_header.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_profile_intro.dart';
+import 'package:agresell_app/features/shared/chat/presentation/styles/chat_reference_styles.dart';
 import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_message_bubble.dart';
 import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_message_composer.dart';
 
@@ -77,6 +79,12 @@ class _FarmerChatDetailScreenState extends State<FarmerChatDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = widget.controller;
+    final participant = ChatParticipantData(
+      name: widget.thread.buyerName,
+      initials: widget.thread.initials,
+      imageUrl: widget.thread.buyerImageUrl,
+      imageSemanticLabel: '${widget.thread.buyerName} profile photo',
+    );
     final messages = controller.messagesFor(widget.thread.id);
     final loading = controller.isLoadingMessages(widget.thread.id);
     final error = controller.messageErrorFor(widget.thread.id);
@@ -90,19 +98,15 @@ class _FarmerChatDetailScreenState extends State<FarmerChatDetailScreen> {
     );
 
     return ColoredBox(
-      color: FarmerChatDetailStyles.backgroundColor,
+      color: ChatReferenceStyles.background,
       child: Column(
         children: [
           ChatDetailHeader(
-            participant: ChatParticipantData(
-              name: widget.thread.buyerName,
-              initials: widget.thread.initials,
-              imageUrl: widget.thread.buyerImageUrl,
-              imageSemanticLabel: '${widget.thread.buyerName} profile photo',
-            ),
+            participant: participant,
+            isEmpty: messages.isEmpty,
             subtitle: widget.thread.contextLabel,
             onBack: widget.onBack,
-            style: FarmerChatDetailStyles.headerStyle(topInset),
+            style: ChatReferenceStyles.header(topInset),
           ),
           Expanded(
             child: loading && messages.isEmpty
@@ -132,17 +136,15 @@ class _FarmerChatDetailScreenState extends State<FarmerChatDetailScreen> {
                         ScrollViewKeyboardDismissBehavior.onDrag,
                     padding: EdgeInsets.fromLTRB(padding, 14, padding, 14),
                     children: [
-                      if (widget.thread.hasProductContext) ...[
+                      if (messages.isNotEmpty &&
+                          widget.thread.hasProductContext) ...[
                         FarmerMessageProductPreview(thread: widget.thread),
                         const SizedBox(height: 18),
                       ],
                       if (messages.isEmpty)
-                        const ChatContentState(
-                          data: ChatContentStateData(
-                            message:
-                                'Reply when you are ready to help this buyer.',
-                          ),
-                          style: FarmerChatDetailStyles.emptyStateStyle,
+                        ChatProfileIntro(
+                          participant: participant,
+                          subtitle: widget.thread.contextLabel,
                         ),
                       for (final message in messages) ...[
                         ChatMessageBubble(
@@ -162,11 +164,23 @@ class _FarmerChatDetailScreenState extends State<FarmerChatDetailScreen> {
                     ],
                   ),
           ),
+          ChatSuggestedReplies(
+            replies: const ['Hello!', 'Thank you', 'Any updates?'],
+            onSelected: controller.isSending(widget.thread.id)
+                ? null
+                : (text) {
+                    _messageController.text = text;
+                    _send();
+                  },
+          ),
           ChatMessageComposer(
             controller: _messageController,
             onSend: _send,
             isSending: controller.isSending(widget.thread.id),
-            style: FarmerChatDetailStyles.composerStyle(composerBottomPadding),
+            style: ChatReferenceStyles.composer(
+              composerBottomPadding,
+              'Type a reply',
+            ),
           ),
         ],
       ),

@@ -6,10 +6,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:agresell_app/core/models/user_profile.dart';
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
+import 'package:agresell_app/core/services/query_owner.dart';
 import 'package:agresell_app/core/utils/philippine_phone_number.dart';
 import 'package:agresell_app/core/utils/profile_birth_date.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
+
+part 'user_profile_mapping.dart';
 
 class UserProfileSaveException implements Exception {
   const UserProfileSaveException(this.message);
@@ -41,6 +44,7 @@ class UserProfileService {
       final currentUser = await client
           .from('users')
           .select('user_id')
+          .eq('user_id', await QueryOwner(client).userId())
           .single()
           .timeout(const Duration(seconds: 30));
       final row = await client
@@ -118,77 +122,4 @@ class UserProfileService {
     await AuthRegistrationService.instance.loadCurrentAccount();
     return _profileFromFarmerRow(profile, row);
   }
-}
-
-String _databaseMessage(PostgrestException error) => switch (error.code) {
-  '42501' =>
-    'Your account does not have permission to update this profile. '
-        'Please sign in again.',
-  'PGRST116' =>
-    'Your account profile could not be found. Please sign in again.',
-  '23514' =>
-    'One profile field does not meet the database requirements. '
-        'Check the phone number and birth date.',
-  _ =>
-    'Your profile could not be saved '
-        '(database error ${error.code ?? 'unknown'}). Please retry.',
-};
-
-UserProfile _profileFromRow(UserProfile previous, Map<String, dynamic> row) {
-  final firstName = _text(row['first_name']);
-  final lastName = _text(row['last_name']);
-  final extensionName = _text(row['extension_name']);
-  final dateOfBirth = ProfileBirthDate.parse(
-    _text(row['date_of_birth']),
-  ).formatted;
-  return previous.copyWith(
-    name: [
-      firstName,
-      lastName,
-      extensionName,
-    ].where((part) => part.isNotEmpty).join(' '),
-    firstName: firstName,
-    lastName: lastName,
-    extensionName: extensionName,
-    email: _text(row['email']),
-    phoneNumber: PhilippinePhoneNumber.display(_text(row['contact_number'])),
-    dateOfBirth: dateOfBirth,
-  );
-}
-
-UserProfile _profileFromFarmerRow(
-  UserProfile previous,
-  Map<String, dynamic> row,
-) {
-  final firstName = _text(row['first_name']);
-  final lastName = _text(row['last_name']);
-  final extensionName = _text(row['suffix']);
-  return previous.copyWith(
-    name: [
-      firstName,
-      lastName,
-      extensionName,
-    ].where((part) => part.isNotEmpty).join(' '),
-    firstName: firstName,
-    lastName: lastName,
-    extensionName: extensionName,
-    phoneNumber: PhilippinePhoneNumber.display(_text(row['phone_number'])),
-    dateOfBirth: ProfileBirthDate.parse(_text(row['date_of_birth'])).formatted,
-  );
-}
-
-String? _databaseDate(ProfileBirthDate value) {
-  if (value.day == null || value.month == null || value.year == null) {
-    return null;
-  }
-  final month = value.month!.toString().padLeft(2, '0');
-  final day = value.day!.toString().padLeft(2, '0');
-  return '${value.year}-$month-$day';
-}
-
-String _text(Object? value) => value?.toString().trim() ?? '';
-
-String? _blankToNull(String value) {
-  final text = value.trim();
-  return text.isEmpty ? null : text;
 }

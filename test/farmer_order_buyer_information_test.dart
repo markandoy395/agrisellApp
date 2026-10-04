@@ -1,3 +1,4 @@
+import 'support/authenticated_test_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,6 +9,7 @@ import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/order_controller.dart';
 
 void main() {
+  configureAuthenticatedTests(role: AuthRole.farmer);
   testWidgets('Reserve card opens complete snapshotted buyer information', (
     tester,
   ) async {

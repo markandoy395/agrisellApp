@@ -1,3 +1,4 @@
+import 'support/authenticated_test_session.dart';
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/shared/orders/data/home_order_statuses.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_status.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  configureAuthenticatedTests();
   final orderController = OrderController.instance;
 
   setUp(orderController.clear);

@@ -1,3 +1,4 @@
+import 'support/authenticated_test_session.dart';
 import 'package:agresell_app/core/constants/agrisell_routes.dart';
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'support/home_product_fixture.dart';
@@ -14,6 +15,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'support/marketplace_messaging_fakes.dart';
 
 void main() {
+  configureAuthenticatedTests();
   final controller = BasketController.instance;
   final orderController = OrderController.instance;
   setUp(() {

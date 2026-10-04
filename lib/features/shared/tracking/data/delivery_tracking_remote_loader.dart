@@ -54,79 +54,41 @@ abstract final class DeliveryTrackingRemoteLoader {
     double speedKph = 0.0;
     DateTime? locationUpdatedAt;
 
-    if (client != null) {
+    if (client != null && client.auth.currentUser != null) {
       try {
-        Map<String, dynamic>? deliveryRow;
-        if (deliveryId != null && deliveryId.isNotEmpty) {
-          final res = await client
-              .from('deliveries')
-              .select()
-              .eq('delivery_id', deliveryId)
-              .maybeSingle();
-          if (res != null) deliveryRow = Map<String, dynamic>.from(res);
+        final numericOrderId = int.tryParse(
+          order.id.replaceAll(RegExp(r'^[^\d]+'), ''),
+        );
+        final value = await client.rpc<Object?>(
+          'current_delivery_tracking',
+          params: {
+            'p_delivery_id': int.tryParse(deliveryId ?? ''),
+            'p_order_id': numericOrderId,
+          },
+        );
+        if (value is Map) {
+          deliveryId = value['delivery_id']?.toString();
+          riderId = value['rider_id']?.toString();
+          riderName = value['rider_name']?.toString();
+          riderPhone = value['rider_phone']?.toString();
+          riderVehicle = value['rider_vehicle']?.toString();
+          riderLat = (value['latitude'] as num?)?.toDouble();
+          riderLng = (value['longitude'] as num?)?.toDouble();
+          speedKph = (value['speed_kph'] as num?)?.toDouble() ?? 0;
+          riderHeading = (value['heading'] as num?)?.toDouble() ?? 0;
+          locationUpdatedAt = DateTime.tryParse(
+            value['location_updated_at']?.toString() ?? '',
+          )?.toLocal();
         }
-
-        if (deliveryRow == null) {
-          final cleanOrderId = order.id.replaceAll(RegExp(r'^[^\d]+'), '');
-          final numericOrderId = int.tryParse(cleanOrderId);
-          if (numericOrderId != null) {
-            final res = await client
-                .from('deliveries')
-                .select()
-                .eq('order_id', numericOrderId)
-                .order('created_at', ascending: false)
-                .limit(1)
-                .maybeSingle();
-            if (res != null) deliveryRow = Map<String, dynamic>.from(res);
-          }
-        }
-
-        if (deliveryRow != null) {
-          deliveryId = deliveryRow['delivery_id']?.toString() ?? deliveryId;
-          riderId = deliveryRow['rider_id']?.toString();
-
-          if (riderId != null && riderId.isNotEmpty) {
-            try {
-              final riderRow = await client
-                  .from('riders')
-                  .select()
-                  .eq('rider_id', riderId)
-                  .maybeSingle();
-              if (riderRow != null) {
-                riderName = riderRow['full_name']?.toString() ??
-                    '${riderRow['first_name'] ?? ''} ${riderRow['last_name'] ?? ''}'.trim();
-                riderPhone = riderRow['contact_number']?.toString();
-                riderVehicle = riderRow['vehicle_type']?.toString();
-              }
-            } catch (_) {}
-
-            try {
-              final locRow = await client
-                  .from('rider_locations')
-                  .select()
-                  .eq('rider_id', riderId)
-                  .maybeSingle();
-              if (locRow != null) {
-                riderLat = (locRow['latitude'] as num?)?.toDouble();
-                riderLng = (locRow['longitude'] as num?)?.toDouble();
-                speedKph = (locRow['speed_kph'] as num?)?.toDouble() ?? 0.0;
-                riderHeading = (locRow['heading'] as num?)?.toDouble() ?? 0.0;
-                final updatedStr = locRow['location_updated_at']?.toString();
-                if (updatedStr != null) {
-                  locationUpdatedAt = DateTime.tryParse(updatedStr)?.toLocal();
-                }
-              }
-            } catch (_) {}
-          }
-        }
-      } catch (_) {}
+      } on Object {
+        // Authorization failures never trigger a broader direct-table query.
+      }
     }
-
     final isShipping = order.status == PlacedOrderStatus.shipping;
     final isReady = order.status == PlacedOrderStatus.readyForPickup;
     final isDelivered = order.status == PlacedOrderStatus.delivered;
 
-    if (riderLat == null || riderLng == null) {
+    if (client == null && (riderLat == null || riderLng == null)) {
       if (isShipping || isReady) {
         riderId ??= 'rider-auto-assigned';
         riderName ??= 'Kuya Carlos (AgriSell Express)';
@@ -134,8 +96,12 @@ abstract final class DeliveryTrackingRemoteLoader {
         riderVehicle ??= 'Honda Click 125i (MC-8821)';
 
         final progressRatio = isShipping ? 0.65 : 0.15;
-        riderLat = pickup.latitude + (destination.latitude - pickup.latitude) * progressRatio;
-        riderLng = pickup.longitude + (destination.longitude - pickup.longitude) * progressRatio;
+        riderLat =
+            pickup.latitude +
+            (destination.latitude - pickup.latitude) * progressRatio;
+        riderLng =
+            pickup.longitude +
+            (destination.longitude - pickup.longitude) * progressRatio;
         speedKph = isShipping ? 28.5 : 0.0;
         riderHeading = 135.0;
         locationUpdatedAt = now.subtract(const Duration(seconds: 22));

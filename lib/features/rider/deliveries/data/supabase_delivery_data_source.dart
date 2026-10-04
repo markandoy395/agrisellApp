@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:agresell_app/core/services/query_owner.dart';
 import 'package:agresell_app/core/services/authenticated_storage_image.dart';
 import 'dart:io';
 import 'dart:typed_data';

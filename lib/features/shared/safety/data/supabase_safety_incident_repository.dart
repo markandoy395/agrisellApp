@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:agresell_app/core/services/query_owner.dart';
 
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/features/shared/safety/data/safety_incident_repository.dart';
@@ -6,7 +7,7 @@ import 'package:agresell_app/features/shared/safety/domain/safety_incident.dart'
 
 class SupabaseSafetyIncidentRepository implements SafetyIncidentRepository {
   SupabaseSafetyIncidentRepository({SupabaseClient? client})
-      : _client = client ?? AgrisellSupabase.client;
+    : _client = client ?? AgrisellSupabase.client;
 
   final SupabaseClient _client;
 
@@ -29,31 +30,33 @@ class SupabaseSafetyIncidentRepository implements SafetyIncidentRepository {
     List<String> requestedActions = const [],
     String reportType = 'safety_report',
   }) async {
+    final authId = QueryOwner(_client).authId;
     try {
       // Try the RPC first
-      final result = await _client.rpc('submit_safety_incident', params: {
-        'p_report_id': reportId,
-        'p_report_type': reportType,
-        'p_category': category.name,
-        'p_description': description,
-        'p_reporter_role': reporterRole,
-        'p_reporter_name': reporterName,
-        'p_reporter_contact': reporterContact,
-        'p_reporter_email': reporterEmail,
-        'p_order_id': orderId,
-        'p_delivery_id': deliveryId,
-        'p_stage': stage,
-        'p_latitude': latitude,
-        'p_longitude': longitude,
-        'p_accuracy_meters': accuracyMeters,
-        'p_attachments': attachments,
-        'p_requested_actions': requestedActions,
-      });
+      final result = await _client.rpc(
+        'submit_safety_incident',
+        params: {
+          'p_report_id': reportId,
+          'p_report_type': reportType,
+          'p_category': category.name,
+          'p_description': description,
+          'p_reporter_role': reporterRole,
+          'p_reporter_name': reporterName,
+          'p_reporter_contact': reporterContact,
+          'p_reporter_email': reporterEmail,
+          'p_order_id': orderId,
+          'p_delivery_id': deliveryId,
+          'p_stage': stage,
+          'p_latitude': latitude,
+          'p_longitude': longitude,
+          'p_accuracy_meters': accuracyMeters,
+          'p_attachments': attachments,
+          'p_requested_actions': requestedActions,
+        },
+      );
 
       if (result is Map) {
-        return SafetyIncident.fromJson(
-          Map<String, Object?>.from(result),
-        );
+        return SafetyIncident.fromJson(Map<String, Object?>.from(result));
       }
     } on PostgrestException catch (_) {
       // Fallback: direct insert to rider_incidents table if RPC not yet deployed
@@ -76,8 +79,7 @@ class SupabaseSafetyIncidentRepository implements SafetyIncidentRepository {
         'requested_actions': requestedActions,
         'status': 'submitted',
         'reported_at': DateTime.now().toUtc().toIso8601String(),
-        if (_client.auth.currentUser?.id != null)
-          'reporter_auth_id': _client.auth.currentUser!.id,
+        'reporter_auth_id': authId,
       };
 
       final row = await _client
@@ -113,31 +115,36 @@ class SupabaseSafetyIncidentRepository implements SafetyIncidentRepository {
 
   @override
   Future<List<SafetyIncident>> getMyIncidents({String? status}) async {
+    final authId = QueryOwner(_client).authId;
     try {
-      final result = await _client.rpc('get_my_safety_incidents', params: {
-        if (status != null && status != 'all') 'p_status': status,
-      });
+      final result = await _client.rpc(
+        'get_my_safety_incidents',
+        params: {if (status != null && status != 'all') 'p_status': status},
+      );
 
       if (result is List) {
         return result
-            .map((item) => SafetyIncident.fromJson(
-                  Map<String, Object?>.from(item as Map),
-                ))
+            .map(
+              (item) => SafetyIncident.fromJson(
+                Map<String, Object?>.from(item as Map),
+              ),
+            )
             .toList();
       }
     } on PostgrestException catch (_) {
       // Fallback: direct query
-      var query = _client.from('rider_incidents').select();
-      final currentUserId = _client.auth.currentUser?.id;
-      if (currentUserId != null) {
-        query = query.or('reporter_auth_id.eq.$currentUserId');
-      }
+      var query = _client
+          .from('rider_incidents')
+          .select()
+          .eq('reporter_auth_id', authId);
       if (status != null && status.isNotEmpty && status != 'all') {
         if (status == 'open') {
-          query = query.inFilter(
-            'status',
-            ['submitted', 'underReview', 'waitingForInformation', 'escalated'],
-          );
+          query = query.inFilter('status', [
+            'submitted',
+            'underReview',
+            'waitingForInformation',
+            'escalated',
+          ]);
         } else if (status == 'resolved') {
           query = query.inFilter('status', ['resolved', 'rejected']);
         } else {
@@ -147,9 +154,10 @@ class SupabaseSafetyIncidentRepository implements SafetyIncidentRepository {
 
       final rows = await query.order('reported_at', ascending: false);
       return (rows as List)
-          .map((item) => SafetyIncident.fromJson(
-                Map<String, Object?>.from(item as Map),
-              ))
+          .map(
+            (item) =>
+                SafetyIncident.fromJson(Map<String, Object?>.from(item as Map)),
+          )
           .toList();
     }
     return const [];

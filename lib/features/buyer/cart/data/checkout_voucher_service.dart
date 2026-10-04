@@ -1,7 +1,9 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:agresell_app/core/services/query_owner.dart';
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/features/buyer/cart/domain/checkout_voucher.dart';
 import 'package:agresell_app/features/buyer/cart/domain/checkout_voucher_discount.dart';
+import 'checkout_voucher_lookup.dart';
 import 'package:agresell_app/features/shared/orders/domain/basket_cart_item.dart';
 
 export 'package:agresell_app/features/buyer/cart/domain/checkout_voucher.dart';
@@ -41,14 +43,7 @@ class CheckoutVoucherService {
 
     final client = AgrisellSupabase.client;
     try {
-      final response = await client
-          .from('product_sales')
-          .select(
-            'sale_id, name, promo_code, discount_type, discount_value, target_user_group, starts_at, ends_at, is_enabled',
-          )
-          .ilike('promo_code', normalized)
-          .eq('is_enabled', true)
-          .maybeSingle();
+      final response = await CheckoutVoucherLookup(client).load(normalized);
 
       if (response == null) {
         throw const VoucherValidationException(
@@ -154,7 +149,7 @@ class CheckoutVoucherService {
       final buyer = await client
           .from('buyers')
           .select('buyer_user_id')
-          .eq('user_id', user.id)
+          .eq('buyer_user_id', await QueryOwner(client).buyerId())
           .maybeSingle();
 
       if (buyer == null) return false;

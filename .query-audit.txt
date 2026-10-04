@@ -1,0 +1,149 @@
+﻿Database query inventory - see docs/data_ownership_audit.md and docs/sql_injection_audit.md for scope and guards.
+Literal table/storage accesses:
+lib\core\services\push_notification_service.dart:124:      await AgrisellSupabase.client.from('notification_devices').upsert({
+lib\features\buyer\deals\data\buyer_deals_repository.dart:30:            .from('product_sales')
+lib\features\buyer\deals\data\buyer_deals_repository.dart:52:          .from('product_sale_items')
+lib\features\rider\safety\data\supabase_rider_incident_store.dart:46:          .from('rider_incidents')
+lib\features\rider\safety\data\supabase_rider_incident_store.dart:54:          .from('rider_incidents')
+lib\features\rider\safety\data\supabase_rider_incident_store.dart:70:        .from('rider_incidents')
+lib\features\rider\safety\data\supabase_rider_incident_store.dart:86:        .from('rider_incidents')
+lib\features\shared\safety\data\supabase_safety_incident_repository.dart:86:          .from('rider_incidents')
+lib\features\shared\safety\data\supabase_safety_incident_repository.dart:137:          .from('rider_incidents')
+lib\features\rider\profile\data\supabase_rider_document_data_source.dart:47:        .from('rider_documents')
+lib\features\rider\profile\data\supabase_rider_document_data_source.dart:58:        .from('rider_documents')
+lib\features\rider\profile\data\supabase_rider_document_data_source.dart:73:        .from('rider_documents')
+lib\features\rider\profile\data\supabase_rider_document_data_source.dart:85:        .from('rider_documents')
+lib\features\rider\profile\data\supabase_rider_data_source.dart:49:        .from('riders')
+lib\features\rider\profile\data\supabase_rider_data_source.dart:60:        .from('riders')
+lib\features\rider\profile\data\supabase_rider_data_source.dart:111:        .from('rider_locations')
+lib\features\rider\profile\data\supabase_rider_data_source.dart:122:        .from('rider_locations')
+lib\features\shared\profile\data\user_profile_service.dart:45:          .from('users')
+lib\features\shared\profile\data\user_profile_service.dart:51:          .from('users')
+lib\features\shared\profile\data\user_profile_service.dart:109:        .from('farmers')
+lib\features\shared\orders\data\home_notification_repository_sync.dart:88:        .from('notifications')
+lib\features\rider\profile\data\logistics_company_repository.dart:10:        .from('logistics_companies')
+lib\features\rider\profile\data\logistics_company_repository.dart:29:        .from('logistics_companies')
+lib\features\shared\orders\data\home_notification_repository.dart:65:        .from('notifications')
+lib\features\buyer\cart\data\checkout_voucher_service.dart:85:          .from('product_sale_items')
+lib\features\buyer\cart\data\checkout_voucher_service.dart:150:          .from('buyers')
+lib\features\buyer\cart\data\checkout_voucher_service.dart:159:          .from('orders')
+lib\features\buyer\cart\data\checkout_inventory_repository.dart:26:          .from('commodities')
+lib\features\auth\data\supabase_account_loader.dart:19:        .from('farmers')
+lib\features\auth\data\supabase_account_loader.dart:58:                .from('riders')
+lib\features\auth\data\supabase_account_loader.dart:93:        .from('users')
+lib\features\auth\data\supabase_account_loader.dart:184:        _client.storage.from('rider-documents').getPublicUrl(path),
+lib\features\auth\data\buyer_shipping_address_repository.dart:13:        .from('buyers')
+lib\features\rider\deliveries\data\supabase_delivery_proofs.dart:65:            .from('delivery_proofs')
+lib\features\rider\deliveries\data\supabase_delivery_mutations.dart:12:        .from('deliveries')
+lib\features\shared\support\data\supabase_support_ticket_repository.dart:70:        .from('support_messages')
+lib\features\farmer\profile\data\farmer_farm_service.dart:14:          .from('farms')
+lib\features\farmer\profile\data\farmer_farm_service.dart:35:      final query = AgrisellSupabase.client.from('farms');
+lib\features\farmer\profile\data\farmer_farm_service.dart:57:        .from('farmers')
+lib\features\farmer\registration\data\farmer_registration_service.dart:67:          .from('farmers')
+lib\features\farmer\registration\data\farmer_registration_service.dart:112:          .from('farmers')
+lib\features\farmer\registration\data\farmer_registration_service.dart:120:          .from('farmers')
+lib\features\farmer\registration\data\farmer_registration_service.dart:125:          .from('farms')
+lib\features\farmer\reservations\data\supabase_farmer_rider_selection_repository.dart:129:        client.storage.from('rider-documents').getPublicUrl(path),
+lib\features\farmer\products\data\farmer_commodity_sales_loader.dart:16:          .from('product_sale_items')
+lib\features\farmer\products\data\farmer_commodity_repository.dart:28:          .from('commodities')
+lib\features\farmer\products\data\farmer_commodity_repository.dart:163:    final commodities = AgrisellSupabase.client.from('commodities');
+lib\features\farmer\products\data\farmer_commodity_context.dart:18:        .from('farmers')
+lib\features\farmer\products\data\farmer_commodity_context.dart:26:        .from('farms')
+lib\features\farmer\products\data\farmer_commodity_context.dart:52:        .from('farmers')
+lib\features\farmer\products\data\farmer_commodity_context.dart:59:    await client.from('farms').insert({
+lib\features\farmer\products\data\farmer_commodity_context.dart:67:        .from('categories')
+lib\features\farmer\products\data\farmer_commodity_context.dart:80:        .from('categories')
+lib\features\farmer\products\data\farmer_commodity_context.dart:89:        .from('categories')
+RPC call sites (some names/parameters occur on following lines):
+lib\features\shared\chat\data\marketplace_messaging_remote.dart:20:    return client.rpc<Object?>(
+lib\features\shared\location\data\supabase_confirmed_location_remote.dart:22:    await client.rpc<void>(
+lib\core\services\query_owner.dart:24:    final value = await client.rpc<Object?>('current_query_owner');
+lib\features\shared\profile\data\profile_follow_counts_repository.dart:19:          .rpc('current_profile_follow_stats')
+lib\features\shared\tracking\data\delivery_tracking_remote_loader.dart:62:        final value = await client.rpc<Object?>(
+lib\features\shared\products\data\product_reviews.dart:15:      final response = await AgrisellSupabase.client.rpc<Object?>(
+lib\features\shared\products\data\home_product_repository.dart:30:            .rpc<List<dynamic>>('marketplace_products')
+lib\features\shared\products\data\home_product_repository.dart:33:        rawRows = await AgrisellSupabase.client.rpc<List<dynamic>>(
+lib\features\shared\products\data\home_product_repository.dart:90:      final rows = await AgrisellSupabase.client.rpc<List<dynamic>>(
+lib\features\shared\products\data\home_product_repository.dart:119:      final rows = await AgrisellSupabase.client.rpc<List<dynamic>>(
+lib\features\shared\products\data\home_product_data_hydrator.dart:18:      final rows = await AgrisellSupabase.client.rpc(
+lib\features\shared\products\data\home_product_data_hydrator.dart:40:    final response = await AgrisellSupabase.client.rpc<List<dynamic>>(
+lib\features\shared\orders\data\supabase_order_snapshot_loader.dart:10:  final orders = await client.rpc<Object?>('current_account_orders');
+lib\features\shared\orders\data\supabase_order_snapshot_loader.dart:11:  final payments = await client.rpc<Object?>(
+lib\features\shared\orders\data\supabase_order_snapshot_loader.dart:14:  final reviews = await client.rpc<Object?>('current_account_review_snapshots');
+lib\features\shared\orders\data\supabase_order_snapshot_loader.dart:15:  final expirations = await client.rpc<Object?>(
+lib\features\shared\orders\data\supabase_order_snapshot_loader.dart:18:  final cancellations = await client.rpc<Object?>(
+lib\features\shared\orders\data\supabase_order_snapshot_loader.dart:23:    refunds = await client.rpc<Object?>('current_account_refund_snapshots');
+lib\features\shared\orders\data\supabase_order_snapshot_loader.dart:29:    disputes = await client.rpc<Object?>('current_account_dispute_snapshots');
+lib\features\shared\orders\data\supabase_order_repository.dart:78:      await client.rpc<void>(
+lib\features\shared\orders\data\supabase_order_repository.dart:169:      await client.rpc<T>(function, params: params);
+lib\features\shared\safety\data\supabase_safety_incident_repository.dart:36:      final result = await _client.rpc(
+lib\features\shared\safety\data\supabase_safety_incident_repository.dart:120:      final result = await _client.rpc(
+lib\features\shared\support\data\supabase_support_ticket_repository.dart:17:    final res = await _client.rpc('current_user_support_tickets');
+lib\features\shared\support\data\supabase_support_ticket_repository.dart:38:    final res = await _client.rpc(
+lib\features\shared\support\data\supabase_support_ticket_repository.dart:89:    final res = await _client.rpc(
+lib\features\farmer\verification\data\farmer_verification_repository.dart:33:      final response = await AgrisellSupabase.client.rpc<dynamic>(
+lib\features\farmer\verification\data\farmer_verification_repository.dart:100:    await client.rpc<void>(
+lib\features\farmer\products\data\farmer_commodity_restock_service.dart:55:      final result = await AgrisellSupabase.client.rpc<Object?>(
+lib\features\rider\deliveries\data\supabase_delivery_proofs.dart:46:        final value = await client.rpc<Object?>(
+lib\features\rider\deliveries\data\supabase_delivery_proofs.dart:89:    final value = await client.rpc<Object?>(
+lib\features\farmer\products\data\farmer_commodity_repository.dart:184:    final response = await AgrisellSupabase.client.rpc<List<dynamic>>(
+lib\features\rider\deliveries\data\supabase_delivery_mutations.dart:23:    final value = await client.rpc(
+lib\features\rider\deliveries\data\supabase_delivery_mutations.dart:35:        await client.rpc<Object?>(
+lib\features\rider\deliveries\data\supabase_delivery_mutations.dart:50:    final value = await client.rpc(
+lib\features\rider\deliveries\data\supabase_delivery_data_source.dart:54:        final value = await client.rpc<Object?>(
+lib\features\rider\deliveries\data\supabase_delivery_data_source.dart:67:    final value = await client.rpc<Object?>(
+lib\features\rider\deliveries\data\supabase_delivery_data_source.dart:81:    final value = await client.rpc<Object?>(
+lib\features\rider\deliveries\data\supabase_delivery_data_source.dart:96:    final value = await client.rpc<Object?>(
+lib\features\rider\deliveries\data\supabase_delivery_completion_mutations.dart:12:    final value = await client.rpc(
+lib\features\rider\deliveries\data\supabase_delivery_completion_mutations.dart:57:    final value = await client.rpc(
+lib\features\rider\deliveries\data\rider_map_discovery_repository.dart:25:          .rpc<Object?>(
+lib\features\rider\profile\data\supabase_rider_verification_repository.dart:37:        final response = await client.rpc<Object?>(
+lib\features\rider\profile\data\supabase_rider_data_source.dart:37:    final row = await _client.rpc<Object?>(
+lib\features\rider\profile\data\supabase_rider_data_source.dart:136:    final result = await _client.rpc<Object?>(
+lib\features\farmer\registration\data\farmer_registration_service.dart:61:      await client.rpc<void>(
+lib\features\farmer\reservations\data\supabase_farmer_rider_selection_repository.dart:21:      () => client.rpc<Object?>(
+lib\features\farmer\reservations\data\supabase_farmer_rider_selection_repository.dart:37:      () => client.rpc<Object?>('current_farmer_rider_assignment_requests'),
+lib\features\farmer\reservations\data\supabase_farmer_rider_selection_repository.dart:106:      () => client.rpc<Object?>('request_current_farmer_rider', params: params),
+lib\features\farmer\reservations\data\supabase_farmer_rider_selection_repository.dart:114:      () => client.rpc<Object?>(
+lib\features\farmer\payouts\data\supabase_farmer_payout_repository.dart:15:      final response = await client.rpc<Object?>('current_farmer_payouts');
+lib\features\farmer\payouts\data\supabase_farmer_payout_repository.dart:30:      final response = await client.rpc<Object?>(
+lib\features\farmer\payouts\data\supabase_farmer_payout_repository.dart:49:    final response = await client.rpc<Object?>(
+lib\features\farmer\reviews\data\supabase_farmer_reviews_repository.dart:16:      final response = await _client.rpc<Object?>('current_farmer_reviews');
+lib\features\farmer\reviews\data\supabase_farmer_reviews_repository.dart:65:      await _client.rpc<dynamic>(
+lib\features\farmer\profile\data\farmer_payment_settings_repository.dart:12:      final response = await AgrisellSupabase.client.rpc<Object?>(
+lib\features\farmer\profile\data\farmer_payment_settings_repository.dart:32:      await AgrisellSupabase.client.rpc<void>(
+lib\features\rider\dashboard\data\supabase_rider_dashboard_repository.dart:20:    final value = await _client.rpc<Object?>('current_rider_dashboard');
+lib\features\rider\dashboard\data\supabase_rider_availability_repository.dart:85:    final row = await client.rpc<Object?>(
+lib\features\rider\dashboard\data\supabase_rider_analytics_repository.dart:45:    final value = await _client.rpc<Object?>('current_rider_ratings');
+lib\features\rider\dashboard\data\supabase_rider_analytics_repository.dart:81:    await _client.rpc<Object?>(
+lib\features\rider\dashboard\data\supabase_rider_analytics_repository.dart:96:      final value = await _client.rpc<Object?>(
+lib\features\rider\dashboard\data\supabase_rider_analytics_repository.dart:113:    final value = await _client.rpc<Object?>(
+lib\features\rider\dashboard\data\supabase_rider_analytics_repository.dart:132:    await _client.rpc<Object?>(
+lib\features\rider\dashboard\data\supabase_rider_analytics_repository.dart:143:    final value = await _client.rpc<Object?>(
+lib\features\rider\dashboard\data\supabase_rider_analytics_repository.dart:163:      final value = await _client.rpc<Object?>(
+lib\features\rider\chat\data\supabase_rider_message_repository.dart:67:    final value = await _client.rpc<Object?>('current_rider_conversations');
+lib\features\rider\chat\data\supabase_rider_message_repository.dart:78:    final value = await _client.rpc<Object?>(
+lib\features\rider\chat\data\supabase_rider_message_repository.dart:91:      final value = await _client.rpc<Object?>(
+lib\features\rider\chat\data\supabase_rider_message_repository.dart:114:  }) => _client.rpc<void>(
+lib\features\farmer\discounts\data\farmer_discount_repository.dart:46:      final rows = await AgrisellSupabase.client.rpc<List<dynamic>>(
+lib\features\farmer\discounts\data\farmer_discount_repository.dart:83:    final response = await AgrisellSupabase.client.rpc<dynamic>(
+lib\features\farmer\discounts\data\farmer_discount_repository.dart:128:    await AgrisellSupabase.client.rpc<void>(
+lib\features\farmer\discounts\data\farmer_discount_repository.dart:151:    await AgrisellSupabase.client.rpc<void>(
+lib\features\buyer\deals\data\buyer_deals_repository.dart:22:      final rows = await client.rpc<List<dynamic>>('marketplace_active_deals');
+lib\features\buyer\cart\data\buyer_cart_repository.dart:10:    await AgrisellSupabase.client.rpc<void>(
+lib\features\auth\data\supabase_registration_handler.dart:67:      await _client.rpc<void>(
+lib\features\auth\data\supabase_registration_handler.dart:94:    await _client.rpc<void>(
+lib\features\auth\data\buyer_shipping_address_repository.dart:28:    await _client.rpc<Object?>(
+lib\features\auth\data\supabase_account_loader.dart:71:        final rider = await _client.rpc<Object?>(
+lib\features\auth\data\supabase_account_loader.dart:121:      (await _client.rpc<Object?>(
+lib\features\buyer\cart\data\checkout_voucher_lookup.dart:10:    final value = await client.rpc<Object?>(
+lib\features\buyer\cart\data\checkout_payment_repository.dart:21:      final response = await AgrisellSupabase.client.rpc<List<dynamic>>(
+lib\features\buyer\home\data\home_banner_repository.dart:10:    final rows = await AgrisellSupabase.client.rpc<List<dynamic>>(
+lib\features\buyer\home\data\farmer_follow_repository.dart:47:          .rpc(function, params: parameters)
+lib\features\buyer\home\data\farmer_directory_repository.dart:21:          .rpc('marketplace_farmer_directory')
+lib\features\buyer\home\data\farmer_directory_repository.dart:39:          .rpc('marketplace_farmer_follow_states')
+Server webhook queries:
+supabase/functions\send-notification\index.ts:39:    .from('notification_devices')
+supabase/functions\send-notification\index.ts:55:        .from('notification_devices')
+
+2026-10-04: current_marketplace_conversations full farm address uses participant-scoped farm_location, barangay, city_municipality, province. See migration 20261004100000 and docs/data_ownership_audit.md. Hosted validation/deployment pending approval.

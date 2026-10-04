@@ -1,3 +1,4 @@
+import 'support/authenticated_test_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -9,6 +10,7 @@ import 'package:agresell_app/features/farmer/payouts/presentation/screens/farmer
 import 'package:agresell_app/features/farmer/profile/presentation/widgets/farmer_stats_card.dart';
 
 void main() {
+  configureAuthenticatedTests(role: AuthRole.farmer);
   final samplePayouts = [
     FarmerPayout(
       payoutId: '1',
@@ -48,55 +50,56 @@ void main() {
     ),
   ];
 
-  testWidgets('FarmerPayoutHistoryScreen renders metrics, tabs, and filters payouts', (
-    tester,
-  ) async {
-    final repository = InMemoryFarmerPayoutRepository(samplePayouts);
+  testWidgets(
+    'FarmerPayoutHistoryScreen renders metrics, tabs, and filters payouts',
+    (tester) async {
+      final repository = InMemoryFarmerPayoutRepository(samplePayouts);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: AgrisellTheme.light,
-        home: FarmerPayoutHistoryScreen(repository: repository),
-      ),
-    );
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AgrisellTheme.light,
+          home: FarmerPayoutHistoryScreen(repository: repository),
+        ),
+      );
 
-    await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
 
-    // Verify Metrics
-    expect(find.text('Total Disbursed'), findsOneWidget);
-    expect(find.text('Pending Payouts'), findsOneWidget);
-    expect(find.text('1 completed'), findsOneWidget);
-    expect(find.text('1 in transit'), findsOneWidget);
+      // Verify Metrics
+      expect(find.text('Total Disbursed'), findsOneWidget);
+      expect(find.text('Pending Payouts'), findsOneWidget);
+      expect(find.text('1 completed'), findsOneWidget);
+      expect(find.text('1 in transit'), findsOneWidget);
 
-    // Verify all 3 payouts appear in 'All' tab
-    expect(find.text('Order: ORD-FARM-501'), findsOneWidget);
-    expect(find.text('Order: ORD-FARM-502'), findsOneWidget);
-    expect(find.text('Order: ORD-FARM-503'), findsOneWidget);
+      // Verify all 3 payouts appear in 'All' tab
+      expect(find.text('Order: ORD-FARM-501'), findsOneWidget);
+      expect(find.text('Order: ORD-FARM-502'), findsOneWidget);
+      expect(find.text('Order: ORD-FARM-503'), findsOneWidget);
 
-    // Filter to 'Paid'
-    await tester.tap(find.widgetWithText(Tab, 'Paid'));
-    await tester.pumpAndSettle();
+      // Filter to 'Paid'
+      await tester.tap(find.widgetWithText(Tab, 'Paid'));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Order: ORD-FARM-501'), findsOneWidget);
-    expect(find.text('Order: ORD-FARM-502'), findsNothing);
-    expect(find.text('Order: ORD-FARM-503'), findsNothing);
+      expect(find.text('Order: ORD-FARM-501'), findsOneWidget);
+      expect(find.text('Order: ORD-FARM-502'), findsNothing);
+      expect(find.text('Order: ORD-FARM-503'), findsNothing);
 
-    // Filter to 'Pending'
-    await tester.tap(find.widgetWithText(Tab, 'Pending'));
-    await tester.pumpAndSettle();
+      // Filter to 'Pending'
+      await tester.tap(find.widgetWithText(Tab, 'Pending'));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Order: ORD-FARM-502'), findsOneWidget);
-    expect(find.text('Order: ORD-FARM-501'), findsNothing);
-    expect(find.text('Order: ORD-FARM-503'), findsNothing);
+      expect(find.text('Order: ORD-FARM-502'), findsOneWidget);
+      expect(find.text('Order: ORD-FARM-501'), findsNothing);
+      expect(find.text('Order: ORD-FARM-503'), findsNothing);
 
-    // Filter to 'Failed'
-    await tester.tap(find.widgetWithText(Tab, 'Failed'));
-    await tester.pumpAndSettle();
+      // Filter to 'Failed'
+      await tester.tap(find.widgetWithText(Tab, 'Failed'));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Order: ORD-FARM-503'), findsOneWidget);
-    expect(find.text('Order: ORD-FARM-501'), findsNothing);
-    expect(find.text('Order: ORD-FARM-502'), findsNothing);
-  });
+      expect(find.text('Order: ORD-FARM-503'), findsOneWidget);
+      expect(find.text('Order: ORD-FARM-501'), findsNothing);
+      expect(find.text('Order: ORD-FARM-502'), findsNothing);
+    },
+  );
 
   testWidgets('Tapping payout card opens details sheet with breakdown', (
     tester,
@@ -162,9 +165,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: AgrisellTheme.light,
-        home: Scaffold(
-          body: FarmerStatsCard(repository: repository),
-        ),
+        home: Scaffold(body: FarmerStatsCard(repository: repository)),
       ),
     );
 

@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:agresell_app/core/services/query_owner.dart';
 
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
 
@@ -23,7 +24,9 @@ class SupabaseRiderIncidentStore {
     List<String> attachments = const [],
     List<String> requestedActions = const [],
   }) async {
+    await QueryOwner(_client).requireRiderId(riderId);
     final values = <String, Object?>{
+      'reporter_auth_id': QueryOwner(_client).authId,
       'report_id': reportId,
       'rider_id': riderId,
       'delivery_id': deliveryId,
@@ -52,6 +55,7 @@ class SupabaseRiderIncidentStore {
           .select()
           .eq('report_id', reportId)
           .eq('rider_id', riderId)
+          .eq('reporter_auth_id', QueryOwner(_client).authId)
           .single();
       return _map(row);
     }
@@ -61,11 +65,13 @@ class SupabaseRiderIncidentStore {
     required String reportId,
     required String riderId,
   }) async {
+    await QueryOwner(_client).requireRiderId(riderId);
     final row = await _client
         .from('rider_incidents')
         .select()
         .eq('report_id', reportId)
         .eq('rider_id', riderId)
+        .eq('reporter_auth_id', QueryOwner(_client).authId)
         .maybeSingle();
     return row == null ? null : _map(row);
   }
@@ -75,6 +81,7 @@ class SupabaseRiderIncidentStore {
     required String riderId,
     required String status,
   }) async {
+    await QueryOwner(_client).requireRiderId(riderId);
     final row = await _client
         .from('rider_incidents')
         .update({
@@ -83,6 +90,7 @@ class SupabaseRiderIncidentStore {
         })
         .eq('report_id', reportId)
         .eq('rider_id', riderId)
+        .eq('reporter_auth_id', QueryOwner(_client).authId)
         .select()
         .maybeSingle();
     return row == null ? null : _map(row);

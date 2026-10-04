@@ -7,12 +7,24 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:agresell_app/features/rider/deliveries/domain/rider_location.dart';
 import 'package:agresell_app/features/rider/profile/data/supabase_rider_data_source.dart';
+import 'support/supabase_session_fixture.dart';
 
 void main() {
   test('live Rider GPS is upserted into rider_locations', () async {
     http.Request? capturedRequest;
     final capturedAt = DateTime.utc(2026, 8, 10, 1, 2, 3);
     final httpClient = MockClient((request) async {
+      if (request.url.path.endsWith('/rpc/current_query_owner')) {
+        return http.Response(
+          jsonEncode({
+            'auth_user_id': 'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa',
+            'rider_id': 'rider-1',
+          }),
+          200,
+          headers: {'content-type': 'application/json'},
+          request: request,
+        );
+      }
       capturedRequest = request;
       return http.Response(
         jsonEncode({
@@ -34,9 +46,9 @@ void main() {
       'https://example.supabase.co',
       'test-publishable-key',
       httpClient: httpClient,
-      accessToken: () async => 'test-access-token',
     );
     addTearDown(client.dispose);
+    await setTestSupabaseSession(client);
     final source = SupabaseRiderDataSource(client: client);
 
     final saved = await source.upsertLocation(

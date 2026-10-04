@@ -1,5 +1,6 @@
 import 'package:agresell_app/core/services/authenticated_storage_image.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:agresell_app/core/services/query_owner.dart';
 
 import 'package:agresell_app/features/auth/data/buyer_shipping_address_repository.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
@@ -50,13 +51,17 @@ class SupabaseAccountLoader {
     }
 
     if (role == AuthRole.rider.value) {
-      final rider = await _client
-          .from('riders')
-          .select(
-            'first_name,last_name,email,contact_number,employment_status,'
-            'profile_photo_url',
-          )
-          .maybeSingle();
+      final riderId = (await QueryOwner(_client).identity())['rider_id'];
+      final rider = riderId == null
+          ? null
+          : await _client
+                .from('riders')
+                .select(
+                  'first_name,last_name,email,contact_number,employment_status,'
+                  'profile_photo_url',
+                )
+                .eq('rider_id', riderId)
+                .maybeSingle();
       if (rider != null) {
         return _withRiderProfileImage(_riderAccount(authUser, role, rider));
       }
@@ -90,6 +95,7 @@ class SupabaseAccountLoader {
           'first_name,last_name,extension_name,email,contact_number,'
           'date_of_birth,account_status,profile_photo_url',
         )
+        .eq('user_id', await QueryOwner(_client).userId())
         .single();
 
     return RegisteredAccount(

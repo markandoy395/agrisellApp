@@ -2,6 +2,7 @@ export 'package:agresell_app/features/shared/chat/presentation/styles/chat_messa
 import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:agresell_app/features/shared/chat/presentation/styles/chat_message_composer_styles.dart';
 import 'package:flutter/material.dart';
+import '../styles/chat_reference_styles.dart';
 
 class ChatMessageComposer extends StatelessWidget {
   const ChatMessageComposer({
@@ -58,8 +59,8 @@ class _SendButton extends StatelessWidget {
     final button = IconButton.filled(
       onPressed: onPressed,
       tooltip: 'Send message',
-      icon: Icon(Icons.send_rounded, size: size == null ? 20 : 19),
-      style: ChatMessageComposerStyles.iconButtonStyle,
+      icon: Icon(Icons.send_outlined, size: size == null ? 20 : 19),
+      style: ChatReferenceStyles.sendButton,
     );
     if (size == null) return button;
     return SizedBox(width: size!.width, height: size!.height, child: button);

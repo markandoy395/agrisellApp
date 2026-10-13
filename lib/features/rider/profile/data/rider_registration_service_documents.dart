@@ -2,6 +2,19 @@ part of 'rider_registration_service.dart';
 
 extension RiderRegistrationServiceDocumentOperations
     on RiderRegistrationService {
+  Future<void> saveCapacity(double capacityKg) async {
+    try {
+      await SupabaseRiderDataSource().setCapacity(capacityKg);
+      await _loadRemoteProfile(force: true);
+    } on PostgrestException catch (error) {
+      throw RiderRegistrationException(error.message);
+    } on AuthException {
+      throw const RiderRegistrationException(
+        'Sign in to save vehicle capacity.',
+      );
+    }
+  }
+
   Future<void> _uploadRegistrationFiles(
     RiderRegistration registration,
     Map<RiderDraftDocumentType, RiderDraftDocument> documents,

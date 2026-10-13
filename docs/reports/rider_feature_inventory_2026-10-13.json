@@ -1,0 +1,132 @@
+{
+  "title": "AgriSell Rider App",
+  "subtitle": "Current Features, Missing Capabilities and Release Readiness",
+  "date": "October 13, 2026 | Asia/Manila",
+  "pages": [
+    {
+      "heading": "1. Current position",
+      "lead": "The rider module has a substantial delivery workflow in the Flutter code: registration, availability, job acceptance, pickup and delivery confirmation, maps, communication, earnings, safety and account management. Several recent database fixes remain awaiting deployment, so code availability must not be treated as proof that every feature works in the installed app.",
+      "paragraphs": [
+        "Scope: this inventory describes the current workspace, including uncommitted changes reviewed on October 13, 2026. It is a source review supported by previous targeted checks, not a new production audit or complete device acceptance test.",
+        "The five main rider tabs are Home, Deliveries, Map, Messages and Account/Profile. Additional pages include Earnings, Delivery history, Ratings, Vehicle details, Credentials, Notifications, Application status and Support.",
+        "Normal rider journey: register and verify email; submit personal, address, vehicle and driver documents; obtain account approval; enable location and go online; review and accept an eligible request; travel to pickup; confirm the goods and required proof; travel to the buyer; capture delivery evidence and confirm any COD collection; complete delivery; review recorded earnings and request payout.",
+        "Most urgent outstanding items: deploy and verify the prepared delivery-status, capacity and earnings repairs; establish verified cargo weights for non-kg items; resolve missing agreed delivery fees; and validate payout balances and actual settlement."
+      ],
+      "rows": [
+        ["Status used in this report", "Meaning"],
+        ["Implemented in code", "A screen or workflow exists in the reviewed source. Live configuration and device behavior may still need verification."],
+        ["Prepared; deployment pending", "Client changes and/or a migration exist, but the associated hosted database change has not been approved or applied in this conversation."],
+        ["Partial or missing", "A confirmed gap exists, or a complete operational workflow was not found in the inspected code."],
+        ["Needs verification", "The implementation exists, but deployment, integration, policy or real-device evidence is insufficient to call it fully operational."]
+      ]
+    },
+    {
+      "heading": "2. Account, onboarding and Home",
+      "lead": "These capabilities are present in the rider source. Approval, authentication, location and database configuration still determine whether a rider can use private delivery features.",
+      "rows": [
+        ["Feature", "Current implementation and limits"],
+        ["Registration and email verification", "Step-based signup covers account credentials, personal information, address and exact location, vehicle information, driver documents, and review/submit. Email OTP verification, field validation and saved signup drafts are implemented."],
+        ["Application and document status", "Submitted/application-status pages and verification feedback are present. Supported document types include profile photo, driver's license, valid ID, vehicle OR, vehicle CR and vehicle photo. Document states include submitted, approved, rejected and resubmission required."],
+        ["Profile and vehicle management", "Riders can review/edit contact and address information, inspect vehicle details and review credential information. Profile saving includes location capture. Missing vehicle details are shown as not provided rather than invented."],
+        ["Availability and location readiness", "Online/offline availability, connectivity checks, GPS/permission prompts and eligible-request access states are implemented. Disabled GPS, missing permissions and unavailable network/service states are distinguished."],
+        ["Home dashboard", "Home shows availability, active delivery or active batch, ready-for-pickup requests, daily metrics, earnings snapshot when available, performance information, notifications and safety/support shortcuts. Refresh and cached state help preserve the dashboard across tab changes."],
+        ["Cargo capacity declaration", "Registration and vehicle editing accept a declared cargo capacity with vehicle-specific ceilings. Existing riders receive a Home prompt when capacity is missing. Missing capacity blocks additional simultaneous acceptance in the client. Hosted capacity enforcement and policy correction remain deployment pending."],
+        ["Account controls", "Account includes change password, font-size preference, safety and incident-history links, support tickets, switch account and logout. Guarded private navigation and account cleanup are part of the implementation; do not infer a complete security audit from their presence."]
+      ]
+    },
+    {
+      "heading": "3. Requests, pickup and delivery",
+      "lead": "The delivery module supports a sequence of rider actions with server-side validation, evidence and recovery behavior. The new status-update endpoint must be deployed before the updated client can use that fix on the hosted project.",
+      "rows": [
+        ["Feature", "Current implementation and limits"],
+        ["Request discovery and review", "Deliveries and Map expose eligible nearby requests, search/filter controls and request details. Details include goods, seller, buyer, pickup/dropoff, fee and available route information. Farmer-selected assignment requests, expiry and assignment status are modeled."],
+        ["Acceptance", "The confirmation dialog displays estimated earnings, asks the server to recheck eligibility and handles reservation/failure states. Requests without a positive fee now show a fee-not-set warning. This warning does not establish a new fee policy or automatically pay the rider."],
+        ["Multiple orders and batch routes", "Active batch summaries, selected delivery, route ordering, load calculations and order-count policies exist. The prepared capacity repair validates combined active cargo against declared capacity, including quantity and all kg-based items. Weight and independent order-count limits both matter."],
+        ["Delivery progress", "Timeline and actions cover accepted, going to pickup, arrived at pickup, waiting for product, product picked up, going to buyer, arrived at destination, waiting for buyer, product delivered and completed. Transition validation, history and idempotency are implemented. A reported permission error has a prepared RPC fix awaiting deployment."],
+        ["Pickup confirmation", "Configurable methods include confirmation code, manually entered QR payload, quantity/weight confirmation, checklists, photos and signatures. Location and proof checks, problem reporting and recovery data are present. QR input is not a camera scanner."],
+        ["Delivery confirmation and COD", "Completion supports configured proof methods, camera evidence, preview/retake, timestamp and GPS metadata, recipient/buyer confirmation and signature where required. COD records amount received, collection confirmation and optional payment issue; cash-remittance requirements are displayed."],
+        ["Exceptions and recovery", "Delivery/pickup/destination problem reporting, cancellation/failure paths and reason handling are implemented subject to stage/permission rules. Offline queues and recovery drafts support selected status, proof, message and location operations; server validation remains authoritative after synchronization."],
+        ["Waybill and history", "Delivery tools include waybill/print-related flows. History pages and filters expose completed, cancelled and failed jobs with details and available evidence. Actual printer behavior and complete device workflows remain to be verified."]
+      ]
+    },
+    {
+      "heading": "4. Maps, communication and notifications",
+      "lead": "Map and communication features are implemented with location/service dependencies. Some controls are present without a complete native-device integration.",
+      "rows": [
+        ["Feature", "Current implementation and limits"],
+        ["Map display and nearby farms", "Flutter map views show the rider, requests and nearby farm markers, with discovery filters, refresh, recenter and zoom. Request/farm marker sheets provide location context and navigation actions."],
+        ["Route guidance", "OSRM-based routing, route geometry, distance/ETA information, a route panel, current route selection and navigation phase handling exist. Google Maps handoff is available from delivery details. Routing requires usable coordinates and service availability."],
+        ["Location tracking", "GPS freshness/accuracy checks and live-sharing policies are implemented. Android live-sharing settings include an ongoing foreground notification for active delivery tracking. Background continuity, battery restrictions and behavior across devices still require field testing."],
+        ["Road-access information", "Road-access resolution and source-selection components exist. Their presence does not guarantee that every farm road is mapped, passable or correctly classified; this needs route/data verification."],
+        ["Messaging", "Conversation lists, participant access checks, text messaging, quick replies, read state, realtime refresh and selected offline message recovery are implemented. Photo and location-reference messages are supported in code; actual attachment viewing and delivery should be acceptance-tested."],
+        ["Notifications", "Notification list, unread/read handling and destination actions are present. Push-service integration can route actions toward deliveries, conversations or earnings. Token registration, foreground/background delivery and permission behavior depend on deployed Firebase/Supabase configuration."],
+        ["Protected calling - partial", "The protected-call action is modeled, but the inspected conversation route does not provide its action handler. It shows an unavailable state instead of placing a call. No complete protected-call provider integration was found."],
+        ["QR/barcode scanning - missing", "Pickup/delivery QR requirements currently use text fields for a QR payload. A native camera scanner and scan-to-confirm workflow were not found in the rider implementation. The barcode visible on a cable in a delivery photo is simply part of that captured image."]
+      ]
+    },
+    {
+      "heading": "5. Earnings, payouts, safety and usability",
+      "lead": "Rider pay is separate from money collected for the farmer's products. A recorded earning or submitted cash-out request does not by itself prove that money has been transferred.",
+      "rows": [
+        ["Feature", "Current implementation and limits"],
+        ["How riders earn", "A new guide on Home and Earnings explains the agreed delivery fee, proof/completion requirements, recorded final pay, pending versus paid status and COD remittance. No new per-km rate, commission or guaranteed bonus was invented."],
+        ["Earnings screens", "Summary, period/custom-date controls, delivery earning history, adjustment categories and paid/pending displays exist. The latest client fix preserves server payment snapshots and payout status when rebuilding completion history."],
+        ["Automatic earning records - pending", "The prepared migration records a missing positive agreed fee on completion and repairs eligible historical deliveries. It uses the accepted request for the assigned rider, prevents duplicate entries and preserves existing adjusted/paid records. It creates calculated/unpaid records, not transfers. Hosted deployment is still pending."],
+        ["Payout methods and cash-out requests", "GCash/bank withdrawal-method management and cash-out request submission are present through RPC-backed repositories. A request workflow is not proof of automatic GCash/bank disbursement. The reviewed cash-out UI uses selected-period net earnings as its displayed available amount; reconciliation against paid, reserved and pending withdrawals needs verification."],
+        ["Reports and ratings", "Earnings/history CSV export and sharing/saving interfaces are implemented. Rider ratings/reviews and performance summaries are present. Data availability depends on actual completed deliveries, submitted reviews and hosted services."],
+        ["Safety and support", "Safety/SOS reporting, incident status/history and helpdesk tickets are reachable from the rider account/delivery flows. Some reports support offline queuing. No claim is made that SOS automatically dispatches emergency services or guarantees a response time."],
+        ["Device navigation and readability", "Recent changes protect rider content and bottom controls with safe areas for gesture and three-button navigation. Home no longer extends its tab content behind the app bar at the bottom. Standalone pages, selected sheets, profile editing and chat account for relevant insets; snackbar defaults use fixed placement. Physical-device verification remains outstanding."]
+      ]
+    },
+    {
+      "heading": "6. Missing items and release blockers",
+      "lead": "The items below distinguish confirmed source gaps from prepared fixes and operational checks. They should not all be described as features that are completely absent.",
+      "rows": [
+        ["Priority / item", "Gap, consequence and next action"],
+        ["Critical: earning repair deployment", "Migration 20261013130000 is prepared but not deployed. Missing payment records can still prevent reliable live earning displays. Approve/apply the migration, run the database assertions and verify one legitimate completed delivery and payout state."],
+        ["Critical: delivery-status permissions", "Migration 20261013120000 introduces the narrowly authorized update_current_rider_delivery_status endpoint. The updated client depends on it; restarting the app cannot replace this hosted change. Verify assigned-rider success and denied cross-account updates after rollout."],
+        ["High: capacity and batching rollout", "Migration 20261013110000 remains pending. The earlier hosted inspection found a motorcycle rider limited to one job with capacity unset. Deploy the correction, have legacy riders declare capacity and test concurrent acceptance and capacity changes."],
+        ["High: non-kg cargo weights", "Piece, bundle and sack catalogue units lack a verified kg-per-unit or shipment mass in the reviewed capacity correction. Their quantities cannot safely be treated as kg. Add a measurement/verification workflow and stored actual mass; unknown-weight orders currently fail closed in the prepared policy."],
+        ["High: fee policy and missing agreed fees", "No universal tariff is introduced by the earnings repair. Deliveries without a positive accepted fee are not automatically funded or assigned an invented rate. Define who pays, fee agreement/visibility, minimum fee, adjustments, deductions and disputes; resolve existing fee-less deliveries through an authorized process."],
+        ["High: payout reconciliation and settlement", "Confirm a server-authoritative withdrawable balance that excludes paid amounts and reserves open requests, prevents duplicate withdrawals and reconciles actual payouts. The inspected UI's selected-period net amount must not be assumed to be the withdrawable balance. Automatic external settlement was not established by this review."],
+        ["Medium: scanner and call integration", "Add camera-based QR scanning if required by operations. Connect the protected-call action to an authorized dial/provider flow or clearly remove it until supported."],
+        ["Medium: real-device acceptance", "Test gesture and three-button navigation, large text, keyboard, location permissions, background tracking, notification delivery, camera upload, offline reconnection and logout/account switching. Code and widget tests do not replace these checks."]
+      ]
+    },
+    {
+      "heading": "7. Capacity rules and verification status",
+      "lead": "The current capacity values are app policy ceilings, not universal manufacturer ratings. A rider must declare usable cargo capacity and remain within any lower server-configured maximum.",
+      "rows": [
+        ["Vehicle type", "Current app cargo ceiling"],
+        ["Bicycle / e-bike", "25 kg"],
+        ["Motorcycle", "30 kg"],
+        ["Tricycle / car", "200 kg"],
+        ["Van", "1,000 kg"],
+        ["Truck", "1,500 kg"]
+      ],
+      "paragraphs": [
+        "Combined-load rule: accepted active orders, their quantities and every item's known mass must fit the rider's declared capacity. Exact-capacity totals are allowed; higher totals are rejected. A rider without a saved capacity cannot accept multiple orders. Independent vehicle/order-count limits also remain; capacity alone does not permit unlimited orders.",
+        "The prepared motorcycle policy uses an order-count recommendation of three; other vehicle limits are configurable. A final operational policy for maximum simultaneous jobs, route time, volume, handling and perishability still needs agreement. Do not present the cargo ceiling alone as a universal safety guarantee.",
+        "Previously completed checks in this conversation: 35 targeted Flutter tests for navigation/layout flows; 37 Flutter tests for earnings, analytics, completion and bundle compatibility; isolated SQL checks for the proposed earnings repair. Targeted analysis and modified-source length/style checks passed at the time of those changes. These counts are from separate runs and are not a full-suite or new production certification.",
+        "The nearby-request radius/schema correction was documented as applied to the linked database, with read-only hosted assertions. In contrast, the capacity, status-RPC and earnings repairs are documented as deployment pending. No new live database inspection was performed to create this report.",
+        "Full local database assertions were blocked by the unavailable local Supabase PostgreSQL service at 127.0.0.1:54322. Hosted rollout checks and complete physical-device delivery/payout tests remain outstanding.",
+        "Suggested rollout order: validate and deploy the prepared migrations; verify authentication and ownership boundaries; save real rider capacities; verify actual cargo weights and agreed fees; perform complete pickup-to-payout acceptance testing; then validate navigation and background behavior on representative Android devices."
+      ]
+    },
+    {
+      "heading": "8. Evidence and maintenance notes",
+      "lead": "This report is grounded in the local code and project notes below. Paths are relative to the AgriSell repository. Pending deployment statements reflect the recorded session state, not a new hosted audit.",
+      "paragraphs": [
+        "Main navigation and Home: lib/features/rider/dashboard/presentation/screens/rider_home_screen.dart; rider_home_tabs.dart; rider_dashboard_screen.dart; rider_dashboard_content.dart.",
+        "Signup and profile: lib/features/rider/profile/presentation/screens/; lib/features/rider/profile/domain/rider_sign_up_draft.dart; lib/features/rider/profile/domain/rider_cargo_capacity_policy.dart; lib/features/rider/profile/presentation/widgets/rider_settings_panel.dart.",
+        "Delivery operations: lib/features/rider/deliveries/presentation/screens/rider_pickup_confirmation_screen.dart; rider_pickup_methods_section.dart; rider_delivery_confirmation_screen.dart; rider_delivery_details_content.dart; lib/features/rider/deliveries/presentation/controllers/rider_delivery_controller_offline.dart.",
+        "Maps and tracking: lib/features/rider/deliveries/presentation/screens/rider_map_screen.dart; rider_delivery_details_route.dart; lib/features/rider/deliveries/presentation/controllers/rider_location_controller_tracking.dart; rider_route_controller.dart.",
+        "Communication: lib/features/rider/chat/presentation/widgets/rider_chat_panel.dart; lib/features/rider/chat/data/supabase_rider_message_repository.dart; lib/features/rider/chat/presentation/screens/rider_notifications_screen.dart; lib/core/services/push_notification_service.dart.",
+        "Earnings and payouts: lib/features/rider/dashboard/presentation/widgets/rider_earning_guide.dart; rider_cash_out_dialog.dart; lib/features/rider/dashboard/presentation/utils/rider_earnings_actions_handler.dart; lib/features/rider/dashboard/data/supabase_rider_analytics_repository.dart; lib/features/rider/deliveries/data/supabase_rider_delivery_records.dart; lib/features/rider/deliveries/domain/delivery_bundle.dart.",
+        "Deployment and known gaps: docs/rider_request_loading.md; docs/rider_capacity_batching.md; docs/rider_status_rpc.md; docs/rider_earnings.md. Prepared migrations: 20261013110000_enable_motorcycle_capacity_batching.sql; 20261013120000_restore_rider_status_update_rpc.sql; 20261013130000_record_completed_rider_earnings.sql.",
+        "Regression evidence: test/rider_device_navigation_test.dart; test/rider_remote_earnings_test.dart; test/rider_analytics_test.dart; test/rider_delivery_completion_test.dart; test/support/rider_earnings_sql_harness.cjs; related tests and audit documents referenced by the deployment notes.",
+        "Maintenance: update this inventory after database deployment, policy decisions and device acceptance testing. Mark newly verified capabilities with the actual environment and date. Do not turn a prepared fix, modeled status or visible button into a claim of operational completion."
+      ]
+    }
+  ]
+}

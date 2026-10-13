@@ -1,6 +1,10 @@
-part of 'rider_registration_service.dart';
+import 'package:agresell_app/features/rider/profile/domain/rider.dart';
+import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
+import 'package:agresell_app/features/rider/profile/domain/rider_vehicle.dart';
+import 'package:agresell_app/features/rider/profile/domain/rider_document.dart';
+import 'package:agresell_app/features/rider/deliveries/domain/rider_location.dart';
 
-RiderProfile _profileFromEntities(
+RiderProfile riderProfileFromEntities(
   Rider rider,
   RiderVehicle vehicle,
   List<RiderDocument> documents,
@@ -35,6 +39,9 @@ RiderProfile _profileFromEntities(
     postalCode: rider.postalCode,
     totalDeliveries: rider.totalDeliveries,
     maximumActiveDeliveries: rider.maximumActiveDeliveries,
+    capacityKg:
+        rider.capacityKg ??
+        (vehicle.capacityKg > 0 ? vehicle.capacityKg : null),
     employmentStatus: rider.employmentStatus,
     profilePhotoUrl: photoUrl,
   );

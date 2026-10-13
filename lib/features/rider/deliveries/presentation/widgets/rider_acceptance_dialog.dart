@@ -56,7 +56,9 @@ class _RiderAcceptanceDialogState extends State<_RiderAcceptanceDialog> {
               ),
               _SummaryLine(
                 'Estimated earning',
-                'PHP ${widget.request.deliveryFee.toStringAsFixed(2)}',
+                widget.request.deliveryFee > 0
+                    ? 'PHP ${widget.request.deliveryFee.toStringAsFixed(2)}'
+                    : 'Fee not set — confirm with the farmer',
                 emphasized: true,
               ),
               const SizedBox(height: 8),

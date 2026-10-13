@@ -93,7 +93,18 @@ class SupabaseRiderDataSource
       if (values.containsKey('plate_number'))
         'vehicle_plate_number': values['plate_number'],
     });
+    if (values['capacity_kg'] case final num capacity when capacity > 0) {
+      await setCapacity(capacity.toDouble());
+      return _embeddedVehicle((await getCurrentRider())!);
+    }
     return _embeddedVehicle(rider);
+  }
+
+  Future<void> setCapacity(double capacityKg) async {
+    await _client.rpc<Object?>(
+      'set_current_rider_capacity',
+      params: {'p_capacity_kg': capacityKg},
+    );
   }
 
   @override

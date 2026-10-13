@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/features/auth/data/auth_login_error_mapper.dart';
+import 'package:agresell_app/features/auth/data/auth_login_failure_mapper.dart';
 import 'package:agresell_app/features/auth/data/auth_otp_error_mapper.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_exception.dart';
 import 'package:agresell_app/features/auth/data/local_auth_registration_store.dart';
@@ -59,11 +60,8 @@ class AuthRegistrationService {
     } on AuthException catch (error) {
       if (AuthLoginErrorMapper.isInvalidCredentials(error)) return null;
       throw AuthLoginErrorMapper.toRegistrationException(error);
-    } catch (_) {
-      throw const AuthRegistrationException(
-        "We couldn't sign you in right now. Please check your internet "
-        'connection and try again.',
-      );
+    } catch (error) {
+      throw AuthLoginFailureMapper.map(error);
     }
   }
 
@@ -109,9 +107,10 @@ class AuthRegistrationService {
 
   void _requireConfiguredBackend() {
     if (_localStoreEnabledForTesting) return;
+    AuthLoginFailureMapper.diagnose('configuration', 'missing_backend');
     throw const AuthRegistrationException(
-      "We couldn't connect to AgriSell right now. Please check your internet "
-      'connection and try again.',
+      'This installation is missing its sign-in configuration. Please update '
+      'AgriSell or contact support.',
     );
   }
 

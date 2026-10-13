@@ -26,7 +26,6 @@ void main() {
         await tester.binding.setSurfaceSize(Size(width, 900));
         addTearDown(() => tester.binding.setSurfaceSize(null));
         var edited = false;
-        var settingsOpened = false;
         await tester.pumpWidget(
           MaterialApp(
             theme: AgrisellTheme.light,
@@ -44,7 +43,6 @@ void main() {
                       isVerified: true,
                       followingCount: 2,
                       followerCount: 1,
-                      onSettingsTap: () => settingsOpened = true,
                     ),
                     const FarmerStatsCard(),
                     const FarmerHistoryCard(),
@@ -61,8 +59,7 @@ void main() {
         expect(tester.takeException(), isNull);
         expect(find.text('Maria Santos'), findsOneWidget);
         expect(find.text('2 Following  |  1 Follower'), findsOneWidget);
-        await tester.tap(find.byTooltip('Settings'));
-        expect(settingsOpened, isTrue);
+        expect(find.byTooltip('Settings'), findsNothing);
         await tester.drag(find.byType(Scrollable), const Offset(0, -700));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Edit'));

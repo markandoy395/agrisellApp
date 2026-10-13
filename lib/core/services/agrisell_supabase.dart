@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:agresell_app/core/services/secure_supabase_local_storage.dart';
+import 'package:agresell_app/core/services/rate_limited_supabase_http_client.dart';
 
 /// Central Supabase bootstrap. Build-time values can override the ignored
 /// local asset used by a normal development run.
@@ -44,6 +45,9 @@ class AgrisellSupabase {
     await Supabase.initialize(
       url: configuration.projectUrl,
       publishableKey: configuration.publishableKey,
+      httpClient: const bool.fromEnvironment('SUPABASE_RATE_LIMIT_GATEWAY')
+          ? RateLimitedSupabaseHttpClient(projectUrl: configuration.projectUrl)
+          : null,
       authOptions: FlutterAuthClientOptions(
         localStorage: SecureSupabaseLocalStorage(
           legacySessionKey:

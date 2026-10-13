@@ -6,6 +6,7 @@ import 'package:agresell_app/core/theme/agrisell_colors.dart';
 abstract final class RiderDeliveryDetailsStyles {
   // Padding & Insets
   static const EdgeInsets listPadding = EdgeInsets.fromLTRB(14, 14, 14, 28);
+  static const actionPadding = EdgeInsets.fromLTRB(14, 8, 14, 12);
 
   // Spacing
   static const double spacing12 = 12.0;
@@ -24,8 +25,6 @@ abstract final class RiderDeliveryDetailsStyles {
     foregroundColor: AgrisellColors.authGreen,
     backgroundColor: AgrisellColors.surface,
     side: const BorderSide(color: AgrisellColors.borderLine),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8),
-    ),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
   );
 }

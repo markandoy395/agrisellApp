@@ -113,54 +113,60 @@ class _TimelineRow extends StatelessWidget {
         ? AgrisellColors.limeGreen
         : AgrisellColors.deliveryGray;
     final timestamp = event == null ? null : _timestamp(event!.timestamp);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 28,
-          child: Column(
-            children: [
-              Container(
-                width: 22,
-                height: 22,
-                decoration:
-                    RiderDeliveryProgressTimelineStyles.containerDecoration(
-                      color,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 38),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              width: 28,
+              child: Column(
+                children: [
+                  Container(
+                    width: 22,
+                    height: 22,
+                    decoration:
+                        RiderDeliveryProgressTimelineStyles.containerDecoration(
+                          color,
+                        ),
+                    child: Icon(
+                      complete ? Icons.check_rounded : Icons.circle,
+                      size: complete ? 15 : 8,
+                      color: AgrisellColors.surface,
                     ),
-                child: Icon(
-                  complete ? Icons.check_rounded : Icons.circle,
-                  size: complete ? 15 : 8,
-                  color: AgrisellColors.surface,
+                  ),
+                  if (showLine)
+                    Expanded(child: Container(width: 2, color: color)),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 2, bottom: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      stage.label,
+                      style: RiderDeliveryProgressTimelineStyles.textStyle(
+                        complete,
+                        active,
+                      ),
+                    ),
+                    if (timestamp != null)
+                      Text(
+                        _eventDetail(event!, timestamp),
+                        style: SharedPresentationStyles.mutedCaption,
+                      ),
+                  ],
                 ),
               ),
-              if (showLine) Container(width: 2, height: 30, color: color),
-            ],
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  stage.label,
-                  style: RiderDeliveryProgressTimelineStyles.textStyle(
-                    complete,
-                    active,
-                  ),
-                ),
-                if (timestamp != null)
-                  Text(
-                    _eventDetail(event!, timestamp),
-                    style: SharedPresentationStyles.mutedCaption,
-                  ),
-              ],
             ),
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 

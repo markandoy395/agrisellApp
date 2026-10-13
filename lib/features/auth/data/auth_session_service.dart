@@ -22,13 +22,20 @@ part 'auth_session_service_lifecycle.dart';
 part 'auth_session_service_switching.dart';
 
 class AuthSessionService extends ChangeNotifier {
-  AuthSessionService._();
+  AuthSessionService._()
+    : _loadOrders = OrderController.instance.loadForAccount;
+
+  @visibleForTesting
+  AuthSessionService.forTesting({
+    required Future<void> Function(String) loadOrders,
+  }) : _loadOrders = loadOrders;
 
   static final AuthSessionService instance = AuthSessionService._();
   static const _accountIdKey = 'auth.session.account-id';
   static const _rememberedIdentifierKey = 'auth.login.remembered-identifier';
 
   final AccountSessionStore _sessionStore = AccountSessionStore();
+  final Future<void> Function(String) _loadOrders;
   StreamSubscription<AuthState>? _authSubscription;
   String? _currentAccountId;
   bool _currentAccountRemembered = false;
@@ -101,8 +108,17 @@ class AuthSessionService extends ChangeNotifier {
     _currentAccountRemembered = false;
     _ensureAuthListener();
     notifyListeners();
-    await OrderController.instance.loadForAccount(account.id);
+    // Order history is optional for sign-in and must not block navigation.
+    unawaited(_loadOrdersSafely(account.id));
     unawaited(PushNotificationService.instance.registerForUser(account.id));
+  }
+
+  Future<void> _loadOrdersSafely(String accountId) async {
+    try {
+      await _loadOrders(accountId);
+    } on Object {
+      if (kDebugMode) debugPrint('[auth] order_history failed (load_failed)');
+    }
   }
 
   Future<void> _remember(RegisteredAccount account) async {
@@ -122,7 +138,8 @@ class AuthSessionService extends ChangeNotifier {
       state,
     ) {
       final session = state.session;
-      if (state.event == AuthChangeEvent.signedOut) {
+      if (state.event == AuthChangeEvent.signedOut ||
+          (session != null && session.user.id != _currentAccountId)) {
         _currentAccountId = null;
         _currentAccountRemembered = false;
         _clearAccountState();

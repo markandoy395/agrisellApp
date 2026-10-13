@@ -1,11 +1,13 @@
 import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
-import 'package:agresell_app/features/rider/profile/presentation/styles/rider_vehicle_screen_styles.dart';
+import '../widgets/rider_vehicle_edit_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/profile/data/rider_registration_service.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_vehicle.dart';
+import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_capacity_editor.dart';
+import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_vehicle_content.dart';
 
 class RiderVehicleScreen extends StatefulWidget {
   const RiderVehicleScreen({super.key});
@@ -25,9 +27,17 @@ class _RiderVehicleScreenState extends State<RiderVehicleScreen> {
       backgroundColor: AgrisellColors.homeBackground,
       body: vehicle == null
           ? const Center(child: Text('No Rider vehicle is available.'))
-          : ListView(
-              padding: const EdgeInsets.all(14),
+          : RiderVehicleContent(
               children: [
+                RiderCapacityEditor(
+                  vehicle: vehicle,
+                  onSave: (capacity) async {
+                    await RiderRegistrationService.instance.saveCapacity(
+                      capacity,
+                    );
+                    if (mounted) setState(() {});
+                  },
+                ),
                 _row('Type', vehicle.vehicleType),
                 _row('Brand', vehicle.vehicleBrand ?? 'Not provided'),
                 _row('Model', vehicle.vehicleModel),
@@ -37,7 +47,12 @@ class _RiderVehicleScreenState extends State<RiderVehicleScreen> {
                   'Registration number',
                   vehicle.registrationNumber ?? 'Not provided',
                 ),
-                _row('Capacity', '${vehicle.capacityKg} kg'),
+                _row(
+                  'Capacity',
+                  vehicle.capacityKg > 0
+                      ? '${vehicle.capacityKg} kg'
+                      : 'Set your cargo capacity',
+                ),
                 _row('Verification', vehicle.verificationStatus.name),
                 const SizedBox(height: 12),
                 FilledButton.icon(
@@ -60,7 +75,7 @@ class _RiderVehicleScreenState extends State<RiderVehicleScreen> {
   Future<void> _edit(RiderVehicle vehicle) async {
     final values = await showDialog<List<String>>(
       context: context,
-      builder: (context) => _VehicleEditDialog(vehicle: vehicle),
+      builder: (context) => RiderVehicleEditDialog(vehicle: vehicle),
     );
     if (values == null || !mounted) return;
     setState(() => _saving = true);
@@ -87,91 +102,3 @@ class _RiderVehicleScreenState extends State<RiderVehicleScreen> {
     }
   }
 }
-
-class _VehicleEditDialog extends StatefulWidget {
-  const _VehicleEditDialog({required this.vehicle});
-  final RiderVehicle vehicle;
-  @override
-  State<_VehicleEditDialog> createState() => _VehicleEditDialogState();
-}
-
-class _VehicleEditDialogState extends State<_VehicleEditDialog> {
-  late final List<TextEditingController> _controllers = [
-    TextEditingController(text: widget.vehicle.vehicleBrand),
-    TextEditingController(text: widget.vehicle.vehicleModel),
-    TextEditingController(text: widget.vehicle.vehicleColor),
-    TextEditingController(text: widget.vehicle.plateNumber),
-    TextEditingController(text: widget.vehicle.registrationNumber),
-    TextEditingController(text: '${widget.vehicle.capacityKg}'),
-  ];
-  String? _error;
-  bool get _requiresRegistration =>
-      widget.vehicle.vehicleType != 'bicycle' &&
-      widget.vehicle.vehicleType != 'eBike';
-
-  @override
-  void dispose() {
-    for (final controller in _controllers) {
-      controller.dispose();
-    }
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Edit vehicle'),
-    content: SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (var index = 0; index < _labels.length; index++)
-            if (_requiresRegistration || (index != 3 && index != 4))
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: TextField(
-                  controller: _controllers[index],
-                  decoration: RiderVehicleScreenStyles.inputDecoration(
-                    _labels,
-                    index,
-                  ),
-                ),
-              ),
-          if (_error != null)
-            Text(_error!, style: SharedPresentationStyles.errorCaption),
-        ],
-      ),
-    ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text('Cancel'),
-      ),
-      FilledButton(onPressed: _save, child: const Text('Save')),
-    ],
-  );
-
-  void _save() {
-    final values = _controllers.map((item) => item.text.trim()).toList();
-    final requiredValues = <String>[
-      values[1],
-      values[2],
-      if (_requiresRegistration) values[3],
-      if (_requiresRegistration) values[4],
-      values[5],
-    ];
-    if (requiredValues.any((value) => value.isEmpty)) {
-      setState(() => _error = 'Complete all required vehicle fields.');
-      return;
-    }
-    Navigator.pop(context, values);
-  }
-}
-
-const _labels = [
-  'Brand (optional)',
-  'Model',
-  'Color',
-  'Plate number',
-  'Registration number',
-  'Capacity (kg)',
-];

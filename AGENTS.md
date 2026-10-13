@@ -110,6 +110,23 @@ RPC, realtime subscription, storage operation, and schema migration.
   (`%I`, `regclass`, `regprocedure`). Request values must never become SQL command
   text, policy expressions, role lists, or function templates.
 
+### Rate limiting and sign-in errors
+
+- Enforce sensitive endpoint quotas on the server, including reads, writes,
+  failed business requests and machine webhooks. Use persistent atomic counters;
+  client cooldowns alone are insufficient. Return HTTP 429 with Retry-After when
+  exhausted; fail closed if the limiter is unavailable.
+- Verify caller identity before choosing an account quota. Hash identities and
+  preserve caller JWTs/RLS when forwarding. Do not trust client owner IDs or
+  forwarding headers, or allow direct API paths to bypass enforced quotas.
+- Preserve Supabase Auth native limits for login, signup, recovery and OTP.
+  Local TOML changes do not prove hosted settings changed. Document rollout and
+  coverage gaps in docs/rate_limiting_audit.md; verify compatible clients before
+  activating gateway enforcement.
+- Distinguish configuration, authentication, profile, rate and connection errors.
+  Do not label every failure as poor internet. Logs must contain only safe stages
+  and short error codes, never credentials, tokens, private responses or payloads.
+
 ### Storage and secrets
 
 - Keep application storage buckets private. Use authenticated object requests

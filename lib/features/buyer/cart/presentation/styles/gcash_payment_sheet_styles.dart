@@ -32,7 +32,12 @@ abstract final class GcashPaymentSheetStyles {
   static const double closeIconSize = 20.0;
 
   // Paddings
-  static const EdgeInsets sheetBasePadding = EdgeInsets.fromLTRB(16, 10, 16, 16);
+  static const EdgeInsets sheetBasePadding = EdgeInsets.fromLTRB(
+    16,
+    10,
+    16,
+    16,
+  );
   static const EdgeInsets receiptPickerPadding = EdgeInsets.all(11);
   static const EdgeInsets uploadButtonPadding = EdgeInsets.symmetric(
     horizontal: 10,
@@ -59,9 +64,7 @@ abstract final class GcashPaymentSheetStyles {
     fontSize: 12,
   );
 
-  static const TextStyle referenceInputTextStyle = TextStyle(
-    fontSize: 13,
-  );
+  static const TextStyle referenceInputTextStyle = TextStyle(fontSize: 13);
 
   static const TextStyle receiptTitleStyle = TextStyle(
     color: AgrisellColors.brandBlack,
@@ -157,10 +160,7 @@ abstract final class GcashPaymentSheetStyles {
     hintText: 'Example: 1234 567 890123',
     helperText: 'Enter the 13-digit number printed on your receipt.',
     helperMaxLines: 2,
-    prefixIcon: const Icon(
-      Icons.receipt_long_outlined,
-      size: prefixIconSize,
-    ),
+    prefixIcon: const Icon(Icons.receipt_long_outlined, size: prefixIconSize),
     filled: true,
     fillColor: referenceFillColor,
     border: OutlineInputBorder(
@@ -172,16 +172,15 @@ abstract final class GcashPaymentSheetStyles {
   // Button Styles
   static final ButtonStyle submitButtonStyle = FilledButton.styleFrom(
     backgroundColor: AgrisellColors.authGreen,
-    shape: RoundedRectangleBorder(
-      borderRadius: submitButtonBorderRadius,
-    ),
+    minimumSize: const Size(0, 48),
+    maximumSize: Size.infinite,
+    shape: RoundedRectangleBorder(borderRadius: submitButtonBorderRadius),
   );
 
   static final ButtonStyle uploadButtonStyle = OutlinedButton.styleFrom(
+    maximumSize: Size.infinite,
     padding: uploadButtonPadding,
     foregroundColor: AgrisellColors.authGreen,
-    shape: RoundedRectangleBorder(
-      borderRadius: uploadButtonBorderRadius,
-    ),
+    shape: RoundedRectangleBorder(borderRadius: uploadButtonBorderRadius),
   );
 }

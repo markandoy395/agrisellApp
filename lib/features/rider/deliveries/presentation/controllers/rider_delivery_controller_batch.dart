@@ -16,6 +16,9 @@ extension RiderDeliveryControllerBatch on RiderDeliveryController {
         !_requestAccess.canAcceptRequests) {
       return false;
     }
+    if (activeDeliveryRequests.isNotEmpty && !profile.hasCargoCapacity) {
+      return false;
+    }
     final availabilityAllowsBatch =
         _status.availability == RiderAvailability.onlineAvailable ||
         _status.availability.isHandlingDelivery;

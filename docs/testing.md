@@ -19,6 +19,20 @@ scope based on risk.
 
 ## Targeted tests
 
+For a small starting suite with both unit and widget tests, run:
+
+```sh
+flutter test test/product_sale_status_test.dart test/rating_stars_test.dart
+```
+
+`product_sale_status_test.dart` tests domain logic without building widgets:
+database value round-trips, legacy availability values, normalization, and the
+existing fallback for missing or unknown values. `rating_stars_test.dart` renders
+the real rating widget and checks empty/full ratings, the half-star boundary,
+updated ratings, and screen-reader labels. Neither requires credentials,
+Supabase, Firebase, or an attached device. Tests are development checks run from
+the terminal or IDE; they do not add a testing screen to the shipped app.
+
 Run one test file:
 
 ```sh

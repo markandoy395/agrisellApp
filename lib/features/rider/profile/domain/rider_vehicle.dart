@@ -9,6 +9,7 @@ class RiderVehicle {
     required this.vehicleColor,
     required this.plateNumber,
     required this.capacityKg,
+    this.maximumCapacityKg,
     this.vehicleBrand,
     this.registrationNumber,
     this.handlingCapability,
@@ -26,6 +27,7 @@ class RiderVehicle {
   final String plateNumber;
   final String? registrationNumber;
   final double capacityKg;
+  final double? maximumCapacityKg;
   final String? handlingCapability;
   final RiderVehicleVerificationStatus verificationStatus;
   final DateTime? createdAt;
@@ -41,6 +43,9 @@ class RiderVehicle {
     plateNumber: _text(json['plate_number']),
     registrationNumber: _nullableText(json['registration_number']),
     capacityKg: _number(json['capacity_kg']),
+    maximumCapacityKg: json['maximum_capacity_kg'] == null
+        ? null
+        : _number(json['maximum_capacity_kg']),
     handlingCapability: _nullableText(json['handling_capability']),
     verificationStatus: RiderVehicleVerificationStatus.values.firstWhere(
       (item) => item.name == json['verification_status'],
@@ -84,6 +89,7 @@ class RiderVehicle {
     plateNumber: plateNumber ?? this.plateNumber,
     registrationNumber: registrationNumber ?? this.registrationNumber,
     capacityKg: capacityKg ?? this.capacityKg,
+    maximumCapacityKg: maximumCapacityKg,
     handlingCapability: handlingCapability ?? this.handlingCapability,
     verificationStatus: verificationStatus ?? this.verificationStatus,
     createdAt: createdAt,

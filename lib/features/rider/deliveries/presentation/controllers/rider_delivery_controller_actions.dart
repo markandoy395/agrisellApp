@@ -35,6 +35,9 @@ extension RiderDeliveryControllerActions on RiderDeliveryController {
           ? DeliveryAcceptanceFailure.riderOffline
           : !_requestAccess.canAcceptRequests
           ? DeliveryAcceptanceFailure.locationUnacceptable
+          : activeDeliveryRequests.isNotEmpty &&
+                _profile?.hasCargoCapacity != true
+          ? DeliveryAcceptanceFailure.capacityNotSet
           : activeDeliveryRequests.length >=
                 (_profile?.maximumActiveDeliveries ?? 1)
           ? DeliveryAcceptanceFailure.activeDeliveryLimit

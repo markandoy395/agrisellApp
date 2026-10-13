@@ -1,0 +1,41 @@
+{
+  "title": "AgriSell Rider Meeting",
+  "subtitle": "App Features to Discuss with Riders",
+  "date": "October 13, 2026 | Meeting discussion guide",
+  "pages": [
+    {
+      "heading": "1. Rider pay",
+      "lead": "Discuss how riders should earn and receive their pay. Use their delivery experience to agree on clear app rules.",
+      "rows": [
+        ["Topic", "What to discuss"],
+        ["Delivery fee", "Agree on a fair fee for each delivery. Consider distance, load, fuel costs and difficult roads."],
+        ["Who pays the rider", "Agree who will pay the rider and when the fee must be confirmed. Show the fee before the rider accepts an order."],
+        ["Extra pay", "Discuss extra pay for long waits, extra stops and return trips."],
+        ["Recording earnings", "Agree when a delivery counts as finished and its fee appears in Earnings. Clearly show money still owed and money already paid."],
+        ["Cash collected from buyers", "Agree how riders return product payments to the farmer. Keep that money separate from the rider's delivery fee."],
+        ["Receiving pay", "Agree how often riders receive payment and which payment method to use. Decide how riders report late, missing or incorrect pay."]
+      ],
+      "paragraphs": [
+        "Goal: clear delivery fees and payment steps that riders, farmers and the team understand."
+      ]
+    },
+    {
+      "heading": "2. Deliveries and important app features",
+      "lead": "Discuss common delivery problems and the app features riders need most.",
+      "rows": [
+        ["Topic", "What to discuss"],
+        ["Vehicle capacity", "Discuss how many kilograms and how much space each vehicle can carry. Riders must set a capacity within the app's vehicle limit."],
+        ["Multiple orders", "Agree when a rider can accept another order. Consider total weight, available space, route and delivery time."],
+        ["Checking the goods", "Agree who checks the weight, quantity and condition at pickup. Decide what to do when the goods do not match the order."],
+        ["Pickup and waiting", "Discuss the pickup details riders need and how they will know the goods are ready. Decide what to do when the farmer is not ready."],
+        ["Finding and contacting customers", "Discuss clear addresses, map pins and landmarks. Agree how riders can contact the farmer or buyer when they need help."],
+        ["Delivery problems", "Agree what riders should do if the buyer is absent, refuses the goods or the vehicle breaks down. Decide who handles returns and the rider's fee."],
+        ["Easy app use", "Discuss delivery photos, codes and signatures. Identify hidden buttons, missed alerts and features needed when the signal is weak."],
+        ["Safety and missing features", "Agree who riders should contact during an emergency. Choose the most important missing app features to work on first."]
+      ],
+      "paragraphs": [
+        "Goal: agree on the main delivery rules and the app improvements riders need first."
+      ]
+    }
+  ]
+}

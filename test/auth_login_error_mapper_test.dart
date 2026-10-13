@@ -15,7 +15,7 @@ void main() {
         isA<AuthRegistrationException>().having(
           (error) => error.message,
           'message',
-          contains("couldn't connect to AgriSell"),
+          contains('missing its sign-in configuration'),
         ),
       ),
     );

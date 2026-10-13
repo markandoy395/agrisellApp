@@ -2,6 +2,7 @@ import 'package:agresell_app/features/shared/chat/presentation/styles/chat_refer
 import 'package:agresell_app/features/shared/chat/presentation/models/chat_participant_data.dart';
 import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_detail_header.dart';
 import 'package:flutter/material.dart';
+import 'package:agresell_app/features/rider/presentation/widgets/rider_safe_scaffold.dart';
 import 'package:agresell_app/features/shared/safety/presentation/widgets/app_safety_sheet.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
@@ -32,9 +33,9 @@ class RiderConversationPanel extends StatelessWidget {
       builder: (context, _) {
         final conversation = controller.selectedConversation;
         if (conversation == null) return const SizedBox.shrink();
-        return Material(
-          color: ChatReferenceStyles.background,
-          child: Column(
+        return RiderSafeScaffold(
+          backgroundColor: ChatReferenceStyles.background,
+          body: Column(
             children: [
               ChatDetailHeader(
                 participant: riderChatParticipant(conversation),

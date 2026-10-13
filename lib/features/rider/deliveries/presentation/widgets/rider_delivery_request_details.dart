@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/rider/presentation/widgets/rider_safe_sheet.dart';
 import 'package:agresell_app/core/services/authenticated_storage_image.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_request_details_styles.dart';
 import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
@@ -121,53 +122,55 @@ void showRiderRequestDetails(BuildContext context, DeliveryRequest request) {
   showModalBottomSheet<void>(
     context: context,
     showDragHandle: true,
-    builder: (context) => Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            request.productName,
-            style: SharedPresentationStyles.titleExtraBold,
-          ),
-          const SizedBox(height: 12),
-          RiderRequestDetailLine(
-            icon: Icons.storefront_outlined,
-            text: 'Seller: ${request.sellerName}',
-          ),
-          RiderRequestDetailLine(
-            icon: Icons.person_outline_rounded,
-            text: 'Customer: ${request.buyerName}',
-          ),
-          RiderRequestDetailLine(
-            icon: Icons.place_outlined,
-            text: 'Pick up from: ${request.pickupLocation.address}',
-          ),
-          RiderRequestDetailLine(
-            icon: Icons.location_on_outlined,
-            text: 'Deliver to: ${request.deliveryLocation.address}',
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Fee: ₱${request.deliveryFee.toStringAsFixed(2)} • ${request.routeDistanceKm?.toStringAsFixed(1) ?? 'Distance pending'} km • ${request.routeEstimatedTravelMinutes ?? 'ETA pending'} min',
-            style: SharedPresentationStyles.captionBold,
-          ),
-          if (request.pickupInstructions.isNotEmpty) ...[
-            const SizedBox(height: 10),
+    builder: (context) => RiderSafeSheet(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             Text(
-              'Pickup: ${request.pickupInstructions}',
-              style: SharedPresentationStyles.captionSemibold,
+              request.productName,
+              style: SharedPresentationStyles.titleExtraBold,
             ),
-          ],
-          if (request.deliveryInstructions.isNotEmpty) ...[
-            const SizedBox(height: 6),
+            const SizedBox(height: 12),
+            RiderRequestDetailLine(
+              icon: Icons.storefront_outlined,
+              text: 'Seller: ${request.sellerName}',
+            ),
+            RiderRequestDetailLine(
+              icon: Icons.person_outline_rounded,
+              text: 'Customer: ${request.buyerName}',
+            ),
+            RiderRequestDetailLine(
+              icon: Icons.place_outlined,
+              text: 'Pick up from: ${request.pickupLocation.address}',
+            ),
+            RiderRequestDetailLine(
+              icon: Icons.location_on_outlined,
+              text: 'Deliver to: ${request.deliveryLocation.address}',
+            ),
+            const SizedBox(height: 8),
             Text(
-              'Delivery: ${request.deliveryInstructions}',
-              style: SharedPresentationStyles.captionSemibold,
+              'Fee: ₱${request.deliveryFee.toStringAsFixed(2)} • ${request.routeDistanceKm?.toStringAsFixed(1) ?? 'Distance pending'} km • ${request.routeEstimatedTravelMinutes ?? 'ETA pending'} min',
+              style: SharedPresentationStyles.captionBold,
             ),
+            if (request.pickupInstructions.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Text(
+                'Pickup: ${request.pickupInstructions}',
+                style: SharedPresentationStyles.captionSemibold,
+              ),
+            ],
+            if (request.deliveryInstructions.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              Text(
+                'Delivery: ${request.deliveryInstructions}',
+                style: SharedPresentationStyles.captionSemibold,
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     ),
   );

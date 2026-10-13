@@ -12,7 +12,6 @@ class FarmerProfileHeader extends StatelessWidget {
   const FarmerProfileHeader({
     required this.profile,
     required this.isVerified,
-    this.onSettingsTap,
     this.followingCount = 0,
     this.followerCount = 0,
     this.title = 'My Profile',
@@ -22,7 +21,6 @@ class FarmerProfileHeader extends StatelessWidget {
 
   final UserProfile profile;
   final bool isVerified;
-  final VoidCallback? onSettingsTap;
   final int followingCount;
   final int followerCount;
   final String title;
@@ -32,7 +30,7 @@ class FarmerProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      // ── Top bar: back + title + settings ──────────────────────────────
+      // Top bar: back and title
       Padding(
         padding: FarmerProfileHeaderStyles.topBarPadding,
         child: Row(
@@ -46,17 +44,8 @@ class FarmerProfileHeader extends StatelessWidget {
               FarmerProfileHeaderStyles.spacingNavButton,
             ],
             Expanded(
-              child: Text(
-                title,
-                style: FarmerProfileHeaderStyles.titleStyle,
-              ),
+              child: Text(title, style: FarmerProfileHeaderStyles.titleStyle),
             ),
-            if (onSettingsTap != null)
-              FarmerProfileNavButton(
-                tooltip: 'Settings',
-                onPressed: onSettingsTap!,
-                icon: Icons.tune_rounded,
-              ),
           ],
         ),
       ),
@@ -70,9 +59,7 @@ class FarmerProfileHeader extends StatelessWidget {
             children: [
               // Decorative background pattern
               const Positioned.fill(
-                child: CustomPaint(
-                  painter: FarmerProfileHeroPatternPainter(),
-                ),
+                child: CustomPaint(painter: FarmerProfileHeroPatternPainter()),
               ),
               // Content
               Padding(
@@ -100,8 +87,8 @@ class FarmerProfileHeader extends StatelessWidget {
                           if (isVerified) ...[
                             FarmerProfileHeaderStyles.spacingVerifiedBadge,
                             GlassChip(
-                              padding:
-                                  FarmerProfileHeaderStyles.verifiedBadgePadding,
+                              padding: FarmerProfileHeaderStyles
+                                  .verifiedBadgePadding,
                               child: FittedBox(
                                 fit: BoxFit.scaleDown,
                                 child: Row(
@@ -109,16 +96,17 @@ class FarmerProfileHeader extends StatelessWidget {
                                   children: [
                                     const Icon(
                                       Icons.verified_rounded,
-                                      color:
-                                          FarmerProfileHeaderStyles.verifiedIconColor,
-                                      size:
-                                          FarmerProfileHeaderStyles.verifiedIconSize,
+                                      color: FarmerProfileHeaderStyles
+                                          .verifiedIconColor,
+                                      size: FarmerProfileHeaderStyles
+                                          .verifiedIconSize,
                                     ),
-                                    FarmerProfileHeaderStyles.spacingVerifiedText,
+                                    FarmerProfileHeaderStyles
+                                        .spacingVerifiedText,
                                     Text(
                                       'Verified Farmer',
-                                      style:
-                                          FarmerProfileHeaderStyles.verifiedTextStyle,
+                                      style: FarmerProfileHeaderStyles
+                                          .verifiedTextStyle,
                                     ),
                                   ],
                                 ),
@@ -150,8 +138,8 @@ class FarmerProfileHeader extends StatelessWidget {
                                 Wrap(
                                   spacing:
                                       FarmerProfileHeaderStyles.pillWrapSpacing,
-                                  runSpacing:
-                                      FarmerProfileHeaderStyles.pillWrapRunSpacing,
+                                  runSpacing: FarmerProfileHeaderStyles
+                                      .pillWrapRunSpacing,
                                   children: [
                                     FarmerProfileStatPill(
                                       value: followingCount,

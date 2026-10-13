@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/rider/presentation/widgets/rider_safe_scaffold.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_pickup_methods_section_styles.dart';
 import 'dart:async';
 import 'dart:math';
@@ -16,6 +17,7 @@ import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_pickup_problem_dialog.dart';
 
 part 'rider_pickup_confirmation_actions.dart';
+part 'rider_pickup_location_refresh.dart';
 part 'rider_pickup_confirmation_sections.dart';
 part 'rider_pickup_methods_section.dart';
 
@@ -118,7 +120,7 @@ class _RiderPickupConfirmationScreenState
   @override
   Widget build(BuildContext context) {
     final config = _configuration;
-    return Scaffold(
+    return RiderSafeScaffold(
       backgroundColor: AgrisellColors.homeBackground,
       appBar: AppBar(title: const Text('Confirm pickup')),
       body: config == null
@@ -183,18 +185,13 @@ class _RiderPickupConfirmationScreenState
     if (mounted) setState(() => _submitting = value);
   }
 
+  void _setRefreshingLocation(bool value) {
+    if (mounted) setState(() => _refreshingLocation = value);
+  }
+
   void _locationChanged() {
     final location = widget.locationController?.location;
     widget.controller.updateCurrentRiderLocation(location);
     if (mounted) setState(() {});
-  }
-
-  Future<void> _refreshPickupLocation({required bool requestPermission}) async {
-    final locationController = widget.locationController;
-    if (locationController == null || _refreshingLocation) return;
-    setState(() => _refreshingLocation = true);
-    await locationController.refresh(requestPermission: requestPermission);
-    _locationChanged();
-    if (mounted) setState(() => _refreshingLocation = false);
   }
 }

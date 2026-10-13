@@ -26,6 +26,8 @@ enum DeliveryAcceptanceFailure {
   serviceAreaMismatch,
   vehicleMismatch,
   capacityMismatch,
+  capacityNotSet,
+  cargoWeightUnknown,
   batchIncompatible,
   codUnavailable,
   activeDeliveryLimit,
@@ -61,7 +63,11 @@ extension DeliveryAcceptanceFailureDetails on DeliveryAcceptanceFailure {
     DeliveryAcceptanceFailure.vehicleMismatch =>
       'Your current vehicle is not compatible with this delivery.',
     DeliveryAcceptanceFailure.capacityMismatch =>
-      'Your current vehicle capacity is not sufficient for this delivery.',
+      'This order plus your active orders exceeds your saved cargo capacity.',
+    DeliveryAcceptanceFailure.capacityNotSet =>
+      'Set your cargo capacity on Home before accepting multiple orders.',
+    DeliveryAcceptanceFailure.cargoWeightUnknown =>
+      'The order weight in kilograms must be verified before acceptance.',
     DeliveryAcceptanceFailure.batchIncompatible =>
       'This delivery is not compatible with your current delivery batch.',
     DeliveryAcceptanceFailure.codUnavailable =>

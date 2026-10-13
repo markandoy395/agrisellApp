@@ -1,6 +1,38 @@
 part of 'login_screen.dart';
 
 extension _LoginScreenActions on _LoginScreenState {
+  Future<void> _completeLogout() async {
+    try {
+      await AuthSessionService.instance.clear();
+    } catch (_) {
+      if (mounted) _showMessage('Logout could not be completed. Please retry.');
+    } finally {
+      if (mounted) _updateUi(() => _isLoggingIn = false);
+    }
+  }
+
+  Future<void> _restoreSelectedAccount() async {
+    try {
+      final account = await AuthSessionService.instance.switchTo(
+        widget.savedAccountId!,
+      );
+      if (!mounted) return;
+      _navigateTo(AuthDashboardRouter.destinationFor(account));
+    } on SavedAccountSessionException catch (error) {
+      if (mounted) _showMessage(error.message);
+    } on AuthRegistrationException catch (error) {
+      if (mounted) _showMessage(error.message);
+    } catch (_) {
+      if (mounted) {
+        _showMessage(
+          'This saved session could not be restored. Sign in again.',
+        );
+      }
+    } finally {
+      if (mounted) _updateUi(() => _isLoggingIn = false);
+    }
+  }
+
   Future<void> _logIn() async {
     final identifierError = LoginValidator.validateIdentifier(_identifier.text);
     if (identifierError != null) {

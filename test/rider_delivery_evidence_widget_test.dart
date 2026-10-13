@@ -41,6 +41,10 @@ void main() {
 
     expect(find.text('Retake delivery evidence'), findsOneWidget);
     expect(find.textContaining('GPS 8.49000, 124.66000'), findsOneWidget);
+    expect(
+      find.text('Captured 2026-08-10 14:30 | GPS 8.49000, 124.66000'),
+      findsOneWidget,
+    );
     await tester.tap(
       find.bySemanticsLabel('Preview captured delivery evidence'),
     );

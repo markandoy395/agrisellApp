@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 import '../widgets/farmer_profile_style.dart';
 
 abstract final class FarmerFarmEditStyles {
   static const cardPadding = EdgeInsets.all(22);
 
-  static const titleColor = Color(0xFF14763D);
-  static const subtitleColor = Color(0xFF677999);
+  static const titleColor = AgrisellColors.authGreen;
+  static const subtitleColor = AgrisellColors.mutedText;
   static const errorColor = Color(0xFFAB342D);
-  static const primaryGreen = Color(0xFF14763D);
+  static const primaryGreen = AgrisellColors.authGreen;
 
   static const titleStyle = TextStyle(
     color: titleColor,
@@ -16,28 +17,21 @@ abstract final class FarmerFarmEditStyles {
     fontWeight: FontWeight.w800,
   );
 
-  static const subtitleStyle = TextStyle(
-    color: subtitleColor,
-    fontSize: 14,
-  );
+  static const subtitleStyle = TextStyle(color: subtitleColor, fontSize: 14);
 
   static const capturingTextStyle = TextStyle(
     color: FarmerProfileStyle.muted,
     fontSize: 12,
   );
 
-  static const errorTextStyle = TextStyle(
-    color: errorColor,
-    fontSize: 13,
-  );
+  static const errorTextStyle = TextStyle(color: errorColor, fontSize: 13);
 
   static final cancelButtonStyle = OutlinedButton.styleFrom(
-    foregroundColor: FarmerProfileStyle.green,
-    minimumSize: const Size(125, 48),
-    side: const BorderSide(color: FarmerProfileStyle.green),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10),
-    ),
+    foregroundColor: primaryGreen,
+    minimumSize: const Size(125, 56),
+    maximumSize: Size.infinite,
+    side: const BorderSide(color: primaryGreen),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
   );
 
   static const cancelButtonTextStyle = TextStyle(
@@ -47,10 +41,10 @@ abstract final class FarmerFarmEditStyles {
 
   static final saveButtonStyle = FilledButton.styleFrom(
     backgroundColor: primaryGreen,
-    minimumSize: const Size(140, 48),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10),
-    ),
+    foregroundColor: AgrisellColors.surface,
+    minimumSize: const Size(140, 56),
+    maximumSize: Size.infinite,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
   );
 
   static const saveButtonTextStyle = TextStyle(
@@ -66,5 +60,4 @@ abstract final class FarmerFarmEditStyles {
   static const spacingFields = SizedBox(height: 16);
   static const spacingActionsTop = SizedBox(height: 12);
   static const spacingBetweenButtons = SizedBox(width: 12);
-  static const psgcLabelPadding = EdgeInsets.only(top: 8);
 }

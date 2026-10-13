@@ -114,6 +114,8 @@ class RiderProfile {
   bool get canAcceptDeliveries =>
       employmentStatus == RiderEmploymentStatus.active;
 
+  bool get hasCargoCapacity =>
+      capacityKg != null && capacityKg!.isFinite && capacityKg! > 0;
 
   RiderProfile copyWith({
     String? fullName,
@@ -170,4 +172,3 @@ class RiderProfile {
     );
   }
 }
-

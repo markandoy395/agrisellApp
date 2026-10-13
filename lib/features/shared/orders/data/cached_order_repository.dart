@@ -1,4 +1,5 @@
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
+import 'package:agresell_app/core/services/query_owner.dart';
 import 'package:agresell_app/features/shared/orders/data/order_local_repository.dart';
 import 'package:agresell_app/features/shared/orders/data/order_repository.dart';
 import 'package:agresell_app/features/shared/orders/data/supabase_order_repository.dart';
@@ -18,14 +19,17 @@ class CachedOrderRepository
   @override
   Future<List<PlacedOrder>> load(String accountId) async {
     if (!_hasRemoteSession) return _local.load(accountId);
+    QueryOwner(AgrisellSupabase.client).requireAuthId(accountId);
 
     try {
       final orders = await SupabaseOrderRepository(
         AgrisellSupabase.client,
       ).load(accountId);
+      QueryOwner(AgrisellSupabase.client).requireAuthId(accountId);
       await _local.save(accountId, orders);
       return orders;
     } on Object {
+      QueryOwner(AgrisellSupabase.client).requireAuthId(accountId);
       return _local.load(accountId);
     }
   }

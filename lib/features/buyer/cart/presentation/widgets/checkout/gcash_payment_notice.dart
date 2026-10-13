@@ -103,29 +103,55 @@ class _GcashLoadingState extends StatelessWidget {
 }
 
 class _GcashUnavailableState extends StatelessWidget {
-  const _GcashUnavailableState({required this.onRetry});
+  const _GcashUnavailableState({
+    required this.onRetry,
+    this.loadFailed = false,
+  });
 
   final VoidCallback onRetry;
+  final bool loadFailed;
 
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(12),
     decoration: GcashPaymentNoticeStyles.containerDecoration3,
-    child: Row(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Icon(
-          Icons.info_outline_rounded,
-          color: AgrisellColors.statusOrangeText,
-          size: 20,
+        Row(
+          children: [
+            const Icon(
+              Icons.info_outline_rounded,
+              color: AgrisellColors.statusOrangeText,
+              size: 20,
+            ),
+            const SizedBox(width: 9),
+            Expanded(
+              child: Text(
+                loadFailed
+                    ? 'Unable to load GCash details. Retry, or choose Cash on Delivery.'
+                    : 'This farmer has not shared complete GCash details. Choose Cash on Delivery for now.',
+                style: GcashPaymentNoticeStyles.textStyle3,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 9),
-        const Expanded(
-          child: Text(
-            'This farmer has not shared complete GCash details. Choose Cash on Delivery for now.',
-            style: GcashPaymentNoticeStyles.textStyle3,
-          ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          children: [
+            TextButton(onPressed: onRetry, child: const Text('Retry')),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(
+                const GcashPaymentSelection(
+                  farmId: null,
+                  payment: OrderPayment.cashOnDelivery(),
+                ),
+              ),
+              child: const Text('Use Cash on Delivery'),
+            ),
+          ],
         ),
-        TextButton(onPressed: onRetry, child: const Text('Retry')),
       ],
     ),
   );

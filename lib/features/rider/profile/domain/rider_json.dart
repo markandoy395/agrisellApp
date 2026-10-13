@@ -42,6 +42,8 @@ Rider parseRiderJson(Map<String, Object?> json) => Rider(
   province: riderText(json['province']),
   postalCode: riderText(json['postal_code']),
   totalDeliveries: riderInteger(json['total_deliveries']),
+  capacityKg: riderNullableNumber(json['capacity_kg']),
+  maximumCapacityKg: riderNullableNumber(json['maximum_capacity_kg']),
   maximumActiveDeliveries: riderPositiveInteger(
     json['maximum_active_deliveries'],
   ),
@@ -58,8 +60,9 @@ Map<String, Object?> serializeRiderJson(Rider rider) => {
   'license_number': riderBlankToNull(rider.licenseNumber)?.toUpperCase(),
   'full_name': rider.fullName.trim(),
   'vehicle_type': rider.vehicleType.trim(),
-  'vehicle_plate_number':
-      riderBlankToNull(rider.vehiclePlateNumber)?.toUpperCase(),
+  'vehicle_plate_number': riderBlankToNull(
+    rider.vehiclePlateNumber,
+  )?.toUpperCase(),
   'availability_status': rider.availabilityStatus.name,
   'rating': rider.rating,
   'first_name': rider.firstName.trim(),

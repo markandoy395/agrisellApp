@@ -52,7 +52,6 @@ abstract final class AgrisellColors {
   static const statusPurpleText = Color(0xFF6A4A8F);
   static const statusPurpleBackground = Color(0xFFF4EEF9);
 
-  static Color systemNavigationBar(Brightness brightness) {
-    return brightness == Brightness.dark ? brandBlack : surface;
-  }
+  // Navigation follows the app's light appearance on every device theme.
+  static Color systemNavigationBar(Brightness _) => surface;
 }

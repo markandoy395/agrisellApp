@@ -127,50 +127,53 @@ class _CreateSupportTicketScreenState extends State<CreateSupportTicketScreen> {
         foregroundColor: CreateSupportTicketStyles.appBarTitleColor,
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        padding: CreateSupportTicketStyles.screenPadding,
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 680),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const CreateSupportTicketInfoCard(),
-                  const SizedBox(
-                    height: CreateSupportTicketStyles.sectionSpacing,
-                  ),
-                  CreateSupportTicketCategoryPicker(
-                    selectedCategory: _selectedCategory,
-                    onCategorySelected: (cat) {
-                      setState(() => _selectedCategory = cat);
-                    },
-                  ),
-                  const SizedBox(
-                    height: CreateSupportTicketStyles.sectionSpacing,
-                  ),
-                  CreateSupportTicketPriorityPicker(
-                    selectedPriority: _selectedPriority,
-                    onPrioritySelected: (pri) {
-                      setState(() => _selectedPriority = pri);
-                    },
-                  ),
-                  const SizedBox(
-                    height: CreateSupportTicketStyles.sectionSpacing,
-                  ),
-                  CreateSupportTicketFormFields(
-                    subjectController: _subjectController,
-                    messageController: _messageController,
-                  ),
-                  const SizedBox(
-                    height: CreateSupportTicketStyles.submitSpacing,
-                  ),
-                  CreateSupportTicketSubmitButton(
-                    isSubmitting: _isSubmitting,
-                    onPressed: _submit,
-                  ),
-                ],
+      body: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          padding: CreateSupportTicketStyles.screenPadding,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 680),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const CreateSupportTicketInfoCard(),
+                    const SizedBox(
+                      height: CreateSupportTicketStyles.sectionSpacing,
+                    ),
+                    CreateSupportTicketCategoryPicker(
+                      selectedCategory: _selectedCategory,
+                      onCategorySelected: (cat) {
+                        setState(() => _selectedCategory = cat);
+                      },
+                    ),
+                    const SizedBox(
+                      height: CreateSupportTicketStyles.sectionSpacing,
+                    ),
+                    CreateSupportTicketPriorityPicker(
+                      selectedPriority: _selectedPriority,
+                      onPrioritySelected: (pri) {
+                        setState(() => _selectedPriority = pri);
+                      },
+                    ),
+                    const SizedBox(
+                      height: CreateSupportTicketStyles.sectionSpacing,
+                    ),
+                    CreateSupportTicketFormFields(
+                      subjectController: _subjectController,
+                      messageController: _messageController,
+                    ),
+                    const SizedBox(
+                      height: CreateSupportTicketStyles.submitSpacing,
+                    ),
+                    CreateSupportTicketSubmitButton(
+                      isSubmitting: _isSubmitting,
+                      onPressed: _submit,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

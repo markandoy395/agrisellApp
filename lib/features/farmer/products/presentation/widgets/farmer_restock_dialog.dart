@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:agresell_app/features/farmer/products/domain/farmer_dashboard_product.dart';
 import 'package:agresell_app/features/farmer/products/domain/farmer_restock.dart';
 import '../controllers/farmer_restock_controller.dart';
 import '../styles/farmer_restock_dialog_styles.dart';
+import 'farmer_restock_form.dart';
 import 'farmer_restock_header.dart';
-import 'farmer_restock_lot_fields.dart';
-import 'farmer_restock_stock_summary.dart';
 
 Future<FarmerRestockRequest?> showFarmerRestockDialog(
   BuildContext context, {
   required FarmerDashboardProduct product,
-}) => showDialog<FarmerRestockRequest>(
+}) => showModalBottomSheet<FarmerRestockRequest>(
   context: context,
+  isScrollControlled: true,
+  useSafeArea: true,
+  backgroundColor: FarmerRestockDialogStyles.dialogBackground,
+  shape: FarmerRestockDialogStyles.sheetShape,
+  clipBehavior: Clip.antiAlias,
   builder: (_) => FarmerRestockDialog(product: product),
 );
 
@@ -43,104 +46,81 @@ class _FarmerRestockDialogState extends State<FarmerRestockDialog> {
 
   void _handleSubmit() {
     final request = _controller.submit();
-    if (request != null && mounted) {
-      Navigator.of(context).pop(request);
-    }
+    if (request != null && mounted) Navigator.of(context).pop(request);
   }
 
   @override
-  Widget build(BuildContext context) {
-    final product = widget.product;
-
-    return ListenableBuilder(
-      listenable: _controller,
-      builder: (context, _) => AlertDialog(
-        backgroundColor: FarmerRestockDialogStyles.dialogBackground,
-        shape: FarmerRestockDialogStyles.dialogShape,
-        titlePadding: FarmerRestockDialogStyles.dialogTitlePadding,
-        contentPadding: FarmerRestockDialogStyles.dialogContentPadding,
-        actionsPadding: FarmerRestockDialogStyles.dialogActionsPadding,
-        title: FarmerRestockHeader(productName: product.name),
-        content: Form(
-          key: _controller.formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                FarmerRestockStockSummary(
-                  currentStock: product.availableQuantity,
-                  resultingStock: _controller.resultingStock(
-                    product.availableQuantity,
-                  ),
-                  unit: product.unitType,
+  Widget build(BuildContext context) => Padding(
+    padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+    child: SafeArea(
+      top: false,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * .92,
+          maxWidth: 640,
+        ),
+        child: ListenableBuilder(
+          listenable: _controller,
+          builder: (context, _) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 8),
+              Center(
+                child: Container(
+                  width: 38,
+                  height: 5,
+                  decoration: FarmerRestockDialogStyles.handleDecoration,
                 ),
-                FarmerRestockDialogStyles.spacingSummary,
-                const Text(
-                  'Quantity to add',
-                  style: FarmerRestockDialogStyles.fieldLabelStyle,
-                ),
-                FarmerRestockDialogStyles.spacingQuantityLabel,
-                TextFormField(
-                  key: const Key('restock-quantity-field'),
-                  controller: _controller.quantityController,
-                  autofocus: true,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
+              ),
+              Flexible(
+                child: SingleChildScrollView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  padding: const EdgeInsets.fromLTRB(24, 18, 24, 0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      FarmerRestockHeader(productName: widget.product.name),
+                      const SizedBox(height: 18),
+                      FarmerRestockForm(
+                        product: widget.product,
+                        controller: _controller,
+                      ),
+                    ],
                   ),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(
-                      RegExp(r'^\d{0,7}(?:\.\d{0,3})?'),
+                ),
+              ),
+              const Divider(height: 1, indent: 20, endIndent: 20),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: FarmerRestockDialogStyles.cancelButtonStyle,
+                        child: const Text('Cancel'),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: FilledButton(
+                        key: const Key('confirm-restock-button'),
+                        onPressed: _handleSubmit,
+                        style: FarmerRestockDialogStyles.restockButtonStyle,
+                        child: const Text(
+                          'Confirm restock',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                     ),
                   ],
-                  validator: (value) => FarmerRestockRules.validate(
-                    value,
-                    currentStock: product.availableQuantity,
-                  ),
-                  decoration: FarmerRestockDialogStyles.quantityDecoration(
-                    unit: product.unitType,
-                  ),
                 ),
-                FarmerRestockDialogStyles.spacingField,
-                FarmerRestockLotFields(
-                  dateType: _controller.dateType,
-                  allowedDateTypes: _controller.allowedDateTypes,
-                  harvestedAt: _controller.harvestedAt,
-                  marketableUntil: _controller.marketableUntil,
-                  lotCodeController: _controller.lotCodeController,
-                  storageController: _controller.storageController,
-                  errors: _controller.lotErrors,
-                  onDateTypeChanged: _controller.setDateType,
-                  onSelectHarvestDate: () =>
-                      _controller.pickHarvestDate(context),
-                  onSelectMarketableUntil: () =>
-                      _controller.pickMarketableUntil(context),
-                ),
-                FarmerRestockDialogStyles.spacingField,
-                TextField(
-                  key: const Key('restock-reason-field'),
-                  controller: _controller.reasonController,
-                  maxLength: 240,
-                  maxLines: 2,
-                  decoration: FarmerRestockDialogStyles.notesDecoration,
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            key: const Key('confirm-restock-button'),
-            onPressed: _handleSubmit,
-            style: FarmerRestockDialogStyles.confirmButtonStyle,
-            child: const Text('Confirm restock'),
-          ),
-        ],
       ),
-    );
-  }
+    ),
+  );
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_input_style.dart';
 
 import 'package:agresell_app/features/farmer/profile/presentation/controllers/farmer_farm_form_controllers.dart';
 import 'package:agresell_app/features/shared/location/presentation/widgets/psgc_address_fields.dart';
@@ -35,48 +36,32 @@ class FarmerFarmEditFormFields extends StatelessWidget {
           cityController: controllers.city,
           barangayController: controllers.barangay,
           onChanged: onAddressChanged,
-          decorationTheme: FarmerFarmFormStyle.decoration,
-          labelBuilder: (label) => Padding(
-            padding: FarmerFarmEditStyles.psgcLabelPadding,
-            child: FarmerFarmFormStyle.label(
-              '$label (select or type)',
-              switch (label) {
-                'Province' => Icons.map_outlined,
-                'Barangay' => Icons.location_on_rounded,
-                _ => Icons.location_city_rounded,
-              },
-            ),
-          ),
+          showSignupIcons: true,
+          leadingIconBuilder: AuthInputStyle.iconBadge,
+          decorationTheme: AuthInputStyle.dropdownTheme,
         ),
         FarmerFarmEditStyles.spacingFields,
         FarmerFarmField(
           label: 'Size (hectares)',
           icon: Icons.view_week_rounded,
           controller: controllers.size,
-          inline: true,
-          keyboardType: const TextInputType.numberWithOptions(
-            decimal: true,
-          ),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
         ),
         FarmerFarmField(
           label: 'Farming Type',
           icon: Icons.eco_rounded,
           controller: controllers.farmingType,
-          inline: true,
         ),
         FarmerFarmField(
           label: 'Irrigation Type',
           icon: Icons.water_drop_outlined,
           controller: controllers.irrigation,
-          inline: true,
           required: false,
-          hint: 'Select irrigation type',
         ),
         FarmerFarmField(
           label: 'Main Crops',
           icon: Icons.grass_rounded,
           controller: controllers.crops,
-          inline: true,
         ),
       ],
     );

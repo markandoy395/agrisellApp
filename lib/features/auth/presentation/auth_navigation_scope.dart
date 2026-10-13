@@ -41,7 +41,17 @@ class _AuthNavigationScopeState extends State<AuthNavigationScope> {
     PaintingBinding.instance.imageCache.clearLiveImages();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || _session.isAuthenticated) return;
-      widget.navigatorKey.currentState?.pushAndRemoveUntil(
+      final navigator = widget.navigatorKey.currentState;
+      if (navigator == null) return;
+      var showingLogin = false;
+      navigator.popUntil((route) {
+        showingLogin = route.settings.name == 'auth.login';
+        return true;
+      });
+      // Account handoffs already remove private routes and show the selected
+      // account's public login flow. Preserve that flow while its profile loads.
+      if (showingLogin) return;
+      navigator.pushAndRemoveUntil(
         MaterialPageRoute<void>(builder: (_) => const LoginScreen()),
         (_) => false,
       );

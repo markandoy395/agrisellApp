@@ -8,7 +8,7 @@ import 'package:agresell_app/features/shared/profile/domain/profile_follow_count
 import 'package:agresell_app/features/farmer/verification/data/farmer_verification_repository.dart';
 import 'package:agresell_app/features/farmer/verification/domain/farmer_verification_details.dart';
 
-enum FarmerProfileMode { overview, edit, editFarm, settings }
+enum FarmerProfileMode { overview, edit, editFarm }
 
 class FarmerProfileController extends ChangeNotifier {
   FarmerProfileController({required this.verificationRepository})
@@ -17,7 +17,6 @@ class FarmerProfileController extends ChangeNotifier {
   FarmerVerificationRepository verificationRepository;
   UserProfile profile;
   FarmerProfileMode mode = FarmerProfileMode.overview;
-  FarmerProfileMode returnModeAfterEdit = FarmerProfileMode.overview;
   ProfileFollowCounts followCounts = const ProfileFollowCounts();
   FarmerVerificationDetails? verificationDetails;
   bool _disposed = false;
@@ -42,16 +41,12 @@ class FarmerProfileController extends ChangeNotifier {
     }
   }
 
-  void openEditProfile({
-    FarmerProfileMode returnMode = FarmerProfileMode.overview,
-  }) {
-    returnModeAfterEdit = returnMode;
+  void openEditProfile() {
     mode = FarmerProfileMode.edit;
     notifyListeners();
   }
 
   void openEditFarm() {
-    returnModeAfterEdit = FarmerProfileMode.settings;
     mode = FarmerProfileMode.editFarm;
     notifyListeners();
   }

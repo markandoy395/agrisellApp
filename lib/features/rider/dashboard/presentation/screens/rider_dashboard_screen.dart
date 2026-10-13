@@ -1,7 +1,11 @@
 import 'dart:async';
+import '../widgets/rider_earning_guide.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
+import 'package:agresell_app/features/rider/profile/presentation/screens/rider_vehicle_screen.dart';
+import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_capacity_setup_banner.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/controllers/rider_availability_controller.dart';
@@ -56,6 +60,12 @@ class RiderDashboardScreen extends StatefulWidget {
 }
 
 class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
+  void _openCapacitySetup() {
+    Navigator.of(
+      context,
+    ).push(agrisellPageRoute<void>(builder: (_) => const RiderVehicleScreen()));
+  }
+
   @override
   void initState() {
     super.initState();

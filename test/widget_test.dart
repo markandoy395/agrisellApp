@@ -355,20 +355,31 @@ void main() {
     await _pumpUntilFound(tester, find.text('My orders'));
     expect(find.byType(CustomBottomNavBar), findsOneWidget);
     expect(find.text('Test Account'), findsAtLeastNWidgets(1));
-    expect(
-      find.text('Payouts & Disbursements'),
-      findsOneWidget,
-    );
+    expect(find.text('Payouts & Disbursements'), findsOneWidget);
     expect(find.text('My orders'), findsOneWidget);
     expect(find.text('To Ship'), findsOneWidget);
     expect(find.text('Personal information'), findsOneWidget);
     expect(find.text('Edit Profile'), findsNothing);
     expect(find.text('Switch Account'), findsNothing);
     expect(find.text('Logout'), findsNothing);
-    await tester.tap(find.byTooltip('Settings'));
+    expect(find.byTooltip('Settings'), findsNothing);
+    final profileScrollable = find.descendant(
+      of: find.byType(CustomScrollView),
+      matching: find.byType(Scrollable),
+    );
+    await tester.scrollUntilVisible(
+      find.text('Display'),
+      150,
+      scrollable: profileScrollable,
+    );
+    await tester.tap(find.text('Display'));
     await tester.pumpAndSettle();
-    await _pumpUntilFound(tester, find.text('Edit farmer profile'));
-    await tester.tap(find.text('Edit farmer profile'));
+    await tester.scrollUntilVisible(
+      find.text('Edit'),
+      150,
+      scrollable: profileScrollable,
+    );
+    await tester.tap(find.text('Edit'));
     await tester.pumpAndSettle();
     await _pumpUntilFound(tester, find.text('Save changes'));
     expect(find.byType(CustomBottomNavBar), findsOneWidget);
@@ -385,16 +396,18 @@ void main() {
     await _ensureVisibleCentered(tester, find.text('Save changes'));
     await tester.tap(find.text('Save changes'));
     await tester.pumpAndSettle();
+    tester.state<ScrollableState>(profileScrollable).position.jumpTo(0);
+    await tester.pumpAndSettle();
     await _pumpUntilFound(tester, find.text('Farm Account'));
+    expect(find.text('Farm Account'), findsAtLeastNWidgets(1));
     await tester.scrollUntilVisible(
-      find.text('Switch account'),
-      100,
-      scrollable: find.byType(Scrollable).last,
+      find.text('Log Out'),
+      150,
+      scrollable: profileScrollable,
     );
     await tester.pumpAndSettle();
-    expect(find.text('Farm Account'), findsAtLeastNWidgets(1));
-    expect(find.text('Switch account'), findsOneWidget);
-    expect(find.text('Logout'), findsOneWidget);
+    expect(find.text('Switch Account'), findsOneWidget);
+    expect(find.text('Log Out'), findsOneWidget);
   });
 }
 

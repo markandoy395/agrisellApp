@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/rider/presentation/widgets/rider_safe_sheet.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_detail_utilities_styles.dart';
 import 'package:flutter/material.dart';
 
@@ -65,23 +66,25 @@ Future<DeliveryProof?> captureRiderDeliveryProof(
       : 'delivery confirmation code';
   final value = await showDialog<String>(
     context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Proof required'),
-      content: TextField(
-        controller: controller,
-        autofocus: true,
-        decoration: RiderDeliveryDetailUtilitiesStyles.inputDecoration(label),
+    builder: (context) => RiderSafeSheet(
+      child: AlertDialog(
+        title: const Text('Proof required'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: RiderDeliveryDetailUtilitiesStyles.inputDecoration(label),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(controller.text.trim()),
+            child: const Text('Confirm'),
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.of(context).pop(controller.text.trim()),
-          child: const Text('Confirm'),
-        ),
-      ],
     ),
   );
   controller.dispose();

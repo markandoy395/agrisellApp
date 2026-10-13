@@ -12,7 +12,9 @@ abstract final class FarmerCommodityMapper {
     Map<int, String> categories,
     int farmId,
   ) {
-    final categoryId = FarmerCommodityFormat.integer(row['category_id']);
+    final categoryId = FarmerCommodityFormat.optionalInteger(
+      row['category_id'],
+    );
     final imageUrl = FarmerCommodityFormat.optionalText(row['image_url']);
     final unitType = FarmerCommodityFormat.text(
       row['unit_type'],
@@ -69,16 +71,22 @@ abstract final class FarmerCommodityMapper {
       storageInstructions: FarmerCommodityFormat.optionalText(
         row['storage_instructions'],
       ),
-      activeSaleName: FarmerCommodityFormat.optionalText(row['active_sale_name']),
+      activeSaleName: FarmerCommodityFormat.optionalText(
+        row['active_sale_name'],
+      ),
       activeSaleDiscount: FarmerCommodityFormat.optionalText(
         row['active_sale_discount'],
       ),
       activeSaleEndsAt: DateTime.tryParse(
         FarmerCommodityFormat.text(row['active_sale_ends_at']),
       ),
-      activeSaleId: FarmerCommodityFormat.integer(row['active_sale_id']),
+      activeSaleId: FarmerCommodityFormat.optionalInteger(
+        row['active_sale_id'],
+      ),
       activeSaleIsFarmerOwned: row['active_sale_is_farmer_owned'] == true,
-      activeSaleType: FarmerCommodityFormat.optionalText(row['active_sale_type']),
+      activeSaleType: FarmerCommodityFormat.optionalText(
+        row['active_sale_type'],
+      ),
       activeSaleValue: (row['active_sale_value'] as num?)?.toDouble(),
       activeSalePromoCode: FarmerCommodityFormat.optionalText(
         row['active_sale_promo_code'],

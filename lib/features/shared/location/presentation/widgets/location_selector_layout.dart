@@ -66,63 +66,103 @@ class LocationSelectorLayout extends StatelessWidget {
       color: AgrisellColors.surface,
       borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       clipBehavior: Clip.antiAlias,
-      child: Column(
-        children: [
-          LocationSelectorHeader(
-            centerPinMode: centerPinMode,
-            onModeChanged: onModeChanged,
-            onClose: onClose,
-            showModeSwitch: showAddressFields,
-          ),
-          if (showAddressFields)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-              child: LocationGpsStatus(controller: gpsController),
-            ),
-          if (offlineTiles)
-            const MaterialBanner(
-              content: Text(
-                'No internet connection. GPS and cached map tiles still work.',
-                style: SharedPresentationStyles.caption,
-              ),
-              actions: [SizedBox.shrink()],
-            ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(18),
-                child: LocationSelectorMap(
-                  controller: mapController,
-                  selected: selected,
-                  detected: detected,
-                  accuracyMeters: accuracyMeters,
-                  centerPinMode: centerPinMode,
-                  onSelected: onSelected,
-                  onMapMoved: onMapMoved,
-                  onTileError: onTileError,
-                  onZoom: onZoom,
-                  onUseCurrentLocation: onUseCurrentLocation,
-                  locating:
-                      gpsController.state ==
-                          GpsSelectionState.requestingPermission ||
-                      gpsController.state == GpsSelectionState.acquiring,
-                  mapKey: mapKey,
+      child: LayoutBuilder(
+        builder: (context, constraints) => Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                child: Column(
+                  children: [
+                    LocationSelectorHeader(
+                      centerPinMode: centerPinMode,
+                      onModeChanged: onModeChanged,
+                      onClose: onClose,
+                      showModeSwitch: showAddressFields,
+                    ),
+                    if (showAddressFields)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                        child: Column(
+                          children: [
+                            LocationGpsStatus(controller: gpsController),
+                            if (detected != null &&
+                                const Distance().as(
+                                      LengthUnit.Meter,
+                                      selected,
+                                      detected!,
+                                    ) >
+                                    (accuracyMeters ?? 15))
+                              const Padding(
+                                padding: EdgeInsets.only(top: 8),
+                                child: Text(
+                                  'The red pin is your selected destination. The blue circle '
+                                  'shows GPS. Tap the location button to select your GPS position.',
+                                  style: SharedPresentationStyles.mutedCaption,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    if (offlineTiles)
+                      const MaterialBanner(
+                        content: Text(
+                          'No internet connection. GPS and cached map tiles still work.',
+                          style: SharedPresentationStyles.caption,
+                        ),
+                        actions: [SizedBox.shrink()],
+                      ),
+                    SizedBox(
+                      height: showAddressFields
+                          ? (constraints.maxHeight * .42).clamp(220.0, 360.0)
+                          : (constraints.maxHeight - 180).clamp(
+                              180.0,
+                              double.infinity,
+                            ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(18),
+                          child: LocationSelectorMap(
+                            controller: mapController,
+                            selected: selected,
+                            detected: detected,
+                            accuracyMeters: accuracyMeters,
+                            centerPinMode: centerPinMode,
+                            onSelected: onSelected,
+                            onMapMoved: onMapMoved,
+                            onTileError: onTileError,
+                            onZoom: onZoom,
+                            onUseCurrentLocation: onUseCurrentLocation,
+                            locating:
+                                gpsController.state ==
+                                    GpsSelectionState.requestingPermission ||
+                                gpsController.state ==
+                                    GpsSelectionState.acquiring,
+                            mapKey: mapKey,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    LocationSelectorDetails(
+                      addressController: addressController,
+                      notesController: notesController,
+                      requiresWrittenAddress: requiresWrittenAddress,
+                      showFields: showAddressFields,
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 8),
-          LocationSelectorDetails(
-            addressController: addressController,
-            notesController: notesController,
-            canConfirm: canConfirm,
-            saving: saving,
-            onConfirm: onConfirm,
-            requiresWrittenAddress: requiresWrittenAddress,
-            showFields: showAddressFields,
-          ),
-        ],
+            LocationSelectorConfirmButton(
+              canConfirm: canConfirm,
+              saving: saving,
+              onConfirm: onConfirm,
+            ),
+          ],
+        ),
       ),
     );
   }

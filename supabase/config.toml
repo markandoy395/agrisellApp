@@ -94,6 +94,10 @@ enabled = true
 [functions.send-notification]
 verify_jwt = false
 
+[functions.application-api]
+# The handler verifies the actual user with Supabase Auth, including new API keys.
+verify_jwt = false
+
 [studio]
 enabled = true
 # Port to use for Supabase Studio.
@@ -230,7 +234,7 @@ enable_confirmations = true
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
-max_frequency = "1s"
+max_frequency = "60s"
 # Number of characters used in the email OTP.
 otp_length = 6
 # Number of seconds before the email OTP expires (defaults to 1 hour).

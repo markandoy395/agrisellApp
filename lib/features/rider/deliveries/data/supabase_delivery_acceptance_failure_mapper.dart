@@ -4,6 +4,12 @@ import 'package:agresell_app/features/rider/deliveries/domain/delivery_acceptanc
 abstract final class SupabaseDeliveryAcceptanceFailureMapper {
   static DeliveryAcceptanceFailure map(DeliveryDataException error) {
     final message = error.message.toLowerCase();
+    if (message.contains('set your vehicle cargo capacity')) {
+      return DeliveryAcceptanceFailure.capacityNotSet;
+    }
+    if (message.contains('cargo_weight_unknown')) {
+      return DeliveryAcceptanceFailure.cargoWeightUnknown;
+    }
     if (message.contains('active_delivery_limit_reached')) {
       return DeliveryAcceptanceFailure.activeDeliveryLimit;
     }

@@ -121,7 +121,7 @@ class _LocationSelectorSheetState extends State<LocationSelectorSheet> {
       height: MediaQuery.sizeOf(context).height * .9,
       child: LocationSelectorLayout(
         centerPinMode: _centerPinMode,
-        onModeChanged: (value) => setState(() => _centerPinMode = value),
+        onModeChanged: _changePinMode,
         onClose: () => Navigator.pop(context),
         gpsController: _gps,
         offlineTiles: _offlineTiles,

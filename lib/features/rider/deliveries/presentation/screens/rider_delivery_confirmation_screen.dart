@@ -12,6 +12,7 @@ import 'package:agresell_app/features/rider/deliveries/domain/delivery_status_up
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_payment.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_confirmation_form.dart';
+import '../widgets/rider_delivery_confirmation_content.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_cash_collection_card.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_signature_pad.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
@@ -100,8 +101,6 @@ class _RiderDeliveryConfirmationScreenState
 
   @override
   Widget build(BuildContext context) {
-    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
-
     return Scaffold(
       backgroundColor: RiderDeliveryConfirmationStyles.background,
       // Keep the header and its surrounding Column at the full screen height.
@@ -112,7 +111,10 @@ class _RiderDeliveryConfirmationScreenState
         children: [
           RiderPageHeader(
             title: 'Confirm delivery',
-            subtitle: 'Order ${widget.request.orderNumber}',
+            subtitle:
+                widget.request.orderNumber.toLowerCase().startsWith('order ')
+                ? widget.request.orderNumber
+                : 'Order ${widget.request.orderNumber}',
             action: IconButton(
               tooltip: 'Close',
               onPressed: _submitting ? null : () => Navigator.of(context).pop(),
@@ -122,15 +124,7 @@ class _RiderDeliveryConfirmationScreenState
               ),
             ),
           ),
-          Expanded(
-            child: ListView(
-              padding: RiderDeliveryConfirmationStyles.listPadding(
-                keyboardInset,
-              ),
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              children: [_content()],
-            ),
-          ),
+          Expanded(child: RiderDeliveryConfirmationContent(child: _content())),
         ],
       ),
     );

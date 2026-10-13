@@ -46,6 +46,7 @@ extension AuthSessionServiceSwitching on AuthSessionService {
     await _activate(account);
     await _remember(account);
     await _persistActiveAccount(account.id);
+    await _persistRememberedIdentifier(account.email);
     _currentAccountRemembered = true;
     return account;
   }

@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/rider/presentation/widgets/rider_safe_scaffold.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -37,7 +38,7 @@ class _RiderRatingsScreenState extends State<RiderRatingsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => RiderSafeScaffold(
     backgroundColor: AgrisellColors.homeBackground,
     body: Column(
       children: [

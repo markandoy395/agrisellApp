@@ -79,6 +79,16 @@ compiled into a client application must be treated as public.
 Android and web. The application initializes Firebase during startup and uses
 Firebase Cloud Messaging for notifications.
 
+Android also requires the ignored `android/app/google-services.json`. Use the
+configuration for the same Firebase Android app as `DefaultFirebaseOptions.android`;
+its project ID, sender ID, app ID and API key must agree with the Dart options.
+Placeholder native values can break messaging even when Dart options are valid.
+Regenerate/download the configuration for `com.agresell.agresell_app` using
+FlutterFire or the Firebase console, and supply it separately in CI. Rebuild and
+reinstall after changing this file; hot reload cannot update Android resources.
+`flutter test test/firebase_configuration_test.dart` verifies an available native
+configuration and explicitly skips when that ignored file is absent.
+
 - Android supports FCM token registration and foreground local notification
   display.
 - Web has Firebase initialization values, but notification behavior should be

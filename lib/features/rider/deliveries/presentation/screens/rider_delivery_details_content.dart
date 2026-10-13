@@ -10,7 +10,9 @@ extension _RiderDeliveryDetailsContent on _RiderDeliveryDetailsScreenState {
         children: [
           RiderPageHeader(
             title: 'Delivery details',
-            subtitle: 'Order ${_request.orderNumber}',
+            subtitle: _request.orderNumber.toLowerCase().startsWith('order ')
+                ? _request.orderNumber
+                : 'Order ${_request.orderNumber}',
             action: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -42,6 +44,13 @@ extension _RiderDeliveryDetailsContent on _RiderDeliveryDetailsScreenState {
                   : _activeContent(context, currentStatus),
             ),
           ),
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: RiderDeliveryDetailsStyles.actionPadding,
+              child: _deliveryActions(currentStatus, isRequest: isRequest),
+            ),
+          ),
         ],
       ),
     );
@@ -68,15 +77,6 @@ extension _RiderDeliveryDetailsContent on _RiderDeliveryDetailsScreenState {
       ),
     ),
     const SizedBox(height: RiderDeliveryDetailsStyles.spacing12),
-    RiderDeliveryActionPanel(
-      request: _request,
-      canAccept: widget.controller.canAcceptRequest(_request.id),
-      isUpdating: _isUpdating || _acceptanceOpen,
-      onAccept: _accept,
-      onDecline: _decline,
-      onAdvance: _advance,
-      onCancel: _cancel,
-    ),
   ];
 
   List<Widget> _activeContent(
@@ -126,26 +126,29 @@ extension _RiderDeliveryDetailsContent on _RiderDeliveryDetailsScreenState {
           onWaybill: _openWaybill,
         ),
       ),
-      const SizedBox(height: RiderDeliveryDetailsStyles.spacing14),
-      RiderDeliveryActionPanel(
-        request: _request,
-        canAccept: false,
-        isUpdating: _isUpdating,
-        onAccept: () {},
-        onDecline: _decline,
-        onAdvance: _advance,
-        onCancel: _cancel,
-        currentStatus: currentStatus,
-        onStatusAdvance: _advanceStatus,
-        onPickupConfirmation: _openPickupConfirmation,
-        onDeliveryConfirmation: _openDeliveryConfirmation,
-        onDestinationProblem:
-            currentStatus.index >= DeliveryStatus.goingToBuyer.index
-            ? _reportDestinationProblem
-            : null,
-      ),
     ];
   }
+
+  Widget _deliveryActions(
+    DeliveryStatus currentStatus, {
+    required bool isRequest,
+  }) => RiderDeliveryActionPanel(
+    request: _request,
+    canAccept: isRequest && widget.controller.canAcceptRequest(_request.id),
+    isUpdating: _isUpdating || _acceptanceOpen,
+    onAccept: _accept,
+    onDecline: _decline,
+    onAdvance: _advance,
+    onCancel: _cancel,
+    currentStatus: isRequest ? null : currentStatus,
+    onStatusAdvance: _advanceStatus,
+    onPickupConfirmation: _openPickupConfirmation,
+    onDeliveryConfirmation: _openDeliveryConfirmation,
+    onDestinationProblem:
+        currentStatus.index >= DeliveryStatus.goingToBuyer.index
+        ? _reportDestinationProblem
+        : null,
+  );
 
   Future<void> _openConversation() async {
     final opened = await widget.onOpenConversation?.call(_request.id) ?? false;

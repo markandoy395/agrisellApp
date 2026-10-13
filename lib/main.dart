@@ -74,6 +74,7 @@ class AgrisellApp extends StatelessWidget {
       title: 'AgriSell App',
       debugShowCheckedModeBanner: false,
       theme: AgrisellTheme.light,
+      themeMode: ThemeMode.light,
       builder: (context, child) {
         return AuthNavigationScope(
           navigatorKey: _navigatorKey,

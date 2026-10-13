@@ -1,0 +1,76 @@
+{
+  "title": "AgriSell Rider Questionnaire",
+  "subtitle": "Questions about your delivery work and what you need from the app",
+  "date": "Prepared October 13, 2026",
+  "pages": [
+    {
+      "heading": "1. Your vehicle and delivery work",
+      "lead": "For riders or delivery drivers. Answer from your own experience. There are no right or wrong answers. Write 'Not sure' or 'Not applicable' when needed. If you have not used AgriSell, skip questions about using it and answer based on your usual delivery work. Do not include account passwords, ID numbers or bank details.",
+      "rows": [
+        ["Question", "Your answer"],
+        ["1. What vehicle do you use for deliveries?", "Bicycle / E-bike / Motorcycle / Tricycle / Car / Van / Truck / Other: __________"],
+        ["2. How long have you worked as a delivery rider or driver?", "__________ months / years"],
+        ["3. Which areas do you usually serve?", "________________________________________________"],
+        ["4. About how many deliveries do you complete on a usual working day?", "__________ deliveries"],
+        ["5. What cargo weight can you comfortably carry with your usual delivery setup? If you do not know, say 'Not sure'.", "__________ kg / Not sure\nHow did you determine this? _______________________"],
+        ["6. Apart from weight, what limits what you can carry?", "Space / Cargo box or rack / Road condition / Fragile goods / Weather / Other: __________________"],
+        ["7. Do you currently carry more than one customer's order on a trip? What makes you accept or refuse another order?", "________________________________________________\n________________________________________________"],
+        ["8. What information do you need before deciding to accept a delivery?", "________________________________________________\n________________________________________________"]
+      ]
+    },
+    {
+      "heading": "2. How you earn and receive payment",
+      "lead": "These questions ask how delivery payment works for you. Estimates or ranges are enough; you do not need to disclose private financial account information.",
+      "rows": [
+        ["Question", "Your answer"],
+        ["9. Who usually pays your delivery fee?", "Buyer / Farmer or seller / Delivery company or platform / Other: __________ / It varies"],
+        ["10. How is your delivery fee usually agreed?", "Fixed per trip / Based on distance / Based on weight or size / Negotiated / Other: __________________"],
+        ["11. About how much do you receive for a typical delivery? Describe the usual distance and load.", "PHP __________ for about __________ km\nUsual load: ____________________________________"],
+        ["12. What is the lowest fee you would accept for a delivery? What would change that amount?", "PHP __________\nReason or conditions: ____________________________"],
+        ["13. What information about your pay should the app show before you accept an order?", "________________________________________________\n________________________________________________"],
+        ["14. What costs do you pay yourself when making deliveries?", "Fuel / Parking / Tolls / Mobile data / Vehicle maintenance / Other: __________________________"],
+        ["15. How and when do you normally receive your delivery pay?", "Cash / GCash / Bank / Other: _____________________\nAfter each job / Daily / Weekly / Other: ____________"],
+        ["16. If you collect cash for the products, how do you return it to the farmer or seller? Is your fee paid separately?", "________________________________________________\n________________________________________________"],
+        ["17. Have you experienced unpaid, delayed or incorrect delivery fees? What would help resolve them?", "No / Yes / Prefer not to answer\n________________________________________________"],
+        ["18. If you have completed an AgriSell delivery, did the earnings shown match what you expected?", "Yes / No / No completed AgriSell delivery yet\nWhat was different? ______________________________"]
+      ]
+    },
+    {
+      "heading": "3. Pickup, routes and communication",
+      "lead": "Describe what happens during real deliveries and what the app should help you do.",
+      "rows": [
+        ["Question", "Your answer"],
+        ["19. What usually delays you at pickup?", "________________________________________________\n________________________________________________"],
+        ["20. How do you check the quantity, weight and condition of goods before leaving?", "________________________________________________\n________________________________________________"],
+        ["21. When carrying several orders, how do you choose the pickup and delivery order?", "________________________________________________\n________________________________________________"],
+        ["22. What route or destination information is often missing or inaccurate?", "Address / Map pin / Landmark / Contact number / Road access / Other: __________________________"],
+        ["23. What navigation do you normally use, and what problems do you encounter?", "Google Maps / Other app / Local knowledge / Other: __________\nProblems: _____________________________________"],
+        ["24. How do you prefer to contact the farmer or buyer during a delivery?", "Phone call / In-app message / SMS / Other: __________\nWhy? __________________________________________"],
+        ["25. What proof of pickup or delivery can you reasonably provide? What would be difficult?", "Photo / Code / QR scan / Signature / Other: __________\nDifficulties: ____________________________________"],
+        ["26. What should happen if the buyer is unavailable, refuses the goods or pays less than expected?", "________________________________________________\n________________________________________________"],
+        ["27. How often do poor signal or loss of mobile data interrupt your work? What must remain usable offline?", "Never / Sometimes / Often\nNeeded offline: __________________________________"]
+      ]
+    },
+    {
+      "heading": "4. Using AgriSell and your priorities",
+      "lead": "Answer questions about AgriSell only if you have used it. Describe the action you attempted and what you saw; technical error codes are not required.",
+      "rows": [
+        ["Question", "Your answer"],
+        ["28. Which AgriSell rider features have you used?", "Signup / Online status / Accept job / Pickup / Delivery completion / Map / Chat / Earnings / None yet"],
+        ["29. Have any buttons been hidden or difficult to tap? On which screen?", "No / Yes / Have not used the app\nScreen and action: _______________________________"],
+        ["30. Which device navigation do you use?", "Three buttons at the bottom / Swipe gestures / Not sure\nPhone model, if known: ___________________________"],
+        ["31. Which step in the app is hardest to understand or complete?", "________________________________________________\n________________________________________________"],
+        ["32. Have order alerts or messages arrived late or failed to appear?", "No / Yes / Not sure / Have not used the app\nWhat happened? _________________________________"],
+        ["33. What safety problems do you face, and what help should be easy to request from the app?", "________________________________________________\n________________________________________________"],
+        ["34. What important feature is missing from AgriSell for your daily work? Explain when you would use it.", "________________________________________________\n________________________________________________"],
+        ["35. What are the three most important improvements for you?", "1. _____________________________________________\n2. _____________________________________________\n3. _____________________________________________"],
+        ["36. What would make you willing or unwilling to use AgriSell regularly?", "________________________________________________\n________________________________________________"]
+      ],
+      "paragraphs": [
+        "Additional comments: __________________________________________________________________________________________",
+        "____________________________________________________________________________________________________________",
+        "Thank you. Your answers will help prioritize rider features and clarify delivery and payment requirements."
+      ]
+    }
+  ]
+}

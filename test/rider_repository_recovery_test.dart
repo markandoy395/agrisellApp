@@ -44,6 +44,11 @@ void main() {
       final repository = RiderRepositoryImpl(remote: remote);
 
       final rider = await repository.getCurrentRider();
+      await expectLater(
+        repository.updateVehicle(_vehicle.copyWith(capacityKg: 31)),
+        throwsA(isA<RiderRepositoryException>()),
+      );
+      expect(remote.events, isEmpty);
       final vehicle = await repository.updateVehicle(_vehicle);
 
       expect(rider?.riderId, 'rider-1');
@@ -60,7 +65,7 @@ const _vehicle = RiderVehicle(
   vehicleModel: 'TMX',
   vehicleColor: 'Green',
   plateNumber: 'ABC1234',
-  capacityKg: 100,
+  capacityKg: 30,
 );
 
 class _RecoveryRemote extends Fake implements RiderRemoteDataSource {

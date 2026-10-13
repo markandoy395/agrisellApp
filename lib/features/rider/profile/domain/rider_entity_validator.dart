@@ -1,5 +1,6 @@
 import 'package:agresell_app/features/rider/profile/data/rider_repository_exception.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider.dart';
+import 'package:agresell_app/features/rider/profile/domain/rider_cargo_capacity_policy.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_document.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_vehicle.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_location.dart';
@@ -47,9 +48,12 @@ abstract final class RiderEntityValidator {
         !_plate.hasMatch(value.plateNumber.trim().toUpperCase())) {
       _invalid('Enter a valid vehicle plate number.');
     }
-    if (value.capacityKg <= 0 || !value.capacityKg.isFinite) {
-      _invalid('Vehicle capacity must be greater than zero.');
-    }
+    final capacityError = RiderCargoCapacityPolicy.error(
+      '${value.capacityKg}',
+      value.vehicleType,
+      serverMaximum: value.maximumCapacityKg,
+    );
+    if (capacityError != null) _invalid(capacityError);
   }
 
   static void document(RiderDocument value) {

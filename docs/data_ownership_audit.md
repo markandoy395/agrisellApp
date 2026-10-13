@@ -187,3 +187,58 @@ real authenticated/anonymous role execution. This minimal test schema does not
 replace the full Supabase assertion suite or hosted verification. Run the harness
 with `node test/support/marketplace_chat_address_sql_harness.cjs` after installing
 `@electric-sql/pglite` under `.dart-local/chat-sql`.
+
+## Account handoff and order cache â€” 2026-10-13
+
+Login now starts order-history loading in the background. The existing load
+generation check still rejects obsolete results; an additional check prevents
+queued outgoing loads from reaching the repository after a logout or switch.
+`CachedOrderRepository.load` verifies the requested auth UUID with `QueryOwner`
+before remote reads, cache writes, and fallback reads while a remote session is
+present. A changed identity aborts that load. Existing participant RPCs and RLS
+policies remain unchanged. The account handoff removes old private routes and
+clears account state on backend identity changes.
+
+Local handoff, navigation, and queued-load regression tests passed. No database
+changes or hosted cross-account assertions were run for this client correction;
+real account switching and refresh-token behavior still require device validation.
+
+## Rider Requests radius repair â€” 2026-10-13
+
+Hosted inspection confirmed that the bounded rider-delivery RPC referenced the
+removed `riders.service_radius_km` column (42703). Migration
+`20261013100000_fix_rider_requests_radius.sql` uses the bounded radius argument
+and preserves the existing current-rider delivery source and assignment checks.
+Missing, anonymous, and expired sessions are rejected before privileged reads.
+No table RLS or ownership mapping changes. The migration was applied to the
+linked database; the existing-rider RPC smoke test passed. An isolated PostgreSQL
+harness checks two-rider source isolation and geographic bounds using fixtures.
+It does not establish coverage of every production participant path. Full
+`account_data_isolation.sql` still requires a migrated local/test database;
+synthetic account fixtures were not run on production.
+
+## Rider capacity setup — 2026-10-13 (deployment pending)
+
+Capacity updates identify the current rider from the session; no owner or role
+parameter is accepted. Combined active cargo weight is scoped to that rider.
+The acceptance helper requires rider ownership or the existing trusted delivery
+manager contract. Existing participant policies and grants are retained. Local
+ownership/tampering tests passed; full local isolation was unavailable and the
+hosted deployment was rejected pending explicit approval. See
+rider_capacity_batching.md for scope and rollout.
+
+The pending October 13 cargo check recomputes item mass through seller-order,
+seller-farm and buyer-cart filters. Scalar helper execution is private; caller
+authorization remains in the capacity validator. Local tests exclude another
+buyer's and another farm's rows. See rider_capacity_batching.md for unsupported
+non-kg mass and the unapproved deployment.
+
+## Rider status update RPC — 2026-10-13 (deployment pending)
+
+The new current-rider status endpoint checks private.rider_delivery_assignments
+against the server current-rider mapping before reading/mutating a delivery or
+returning history. Clients supply the delivery ID but no rider identity. Local
+checks verify the other rider's status/history remain unchanged after denial.
+No legacy generic RPC or table privilege is restored. See rider_status_rpc.md.
+
+Rider earnings (2026-10-13): pending migration 20261013130000 augments existing current_rider_deliveries with caller-assigned payment snapshots, verifies authenticated/non-anonymous/unexpired session and gateway, and records agreed fees only through a server completion trigger. No client identity, dynamic SQL, new public endpoint, anonymous grant, or ordinary-user payment mutation. See docs/rider_earnings.md for isolated verification and outstanding hosted rollout/full-schema assertions.

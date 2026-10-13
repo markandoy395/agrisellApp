@@ -1,6 +1,7 @@
 import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:agresell_app/features/farmer/products/presentation/styles/farmer_restock_lot_fields_styles.dart';
 import 'package:flutter/material.dart';
+import '../styles/farmer_restock_dialog_styles.dart';
 
 import 'package:agresell_app/features/shared/products/domain/product_inventory_lot.dart';
 
@@ -41,6 +42,7 @@ class FarmerRestockLotFields extends StatelessWidget {
           key: const Key('restock-date-type-field'),
           initialValue: dateType,
           isExpanded: true,
+          style: FarmerRestockLotFieldsStyles.dropdownTextStyle,
           items: [
             for (final type in allowedDateTypes)
               DropdownMenuItem(value: type, child: Text(type.farmerLabel)),
@@ -51,7 +53,7 @@ class FarmerRestockLotFields extends StatelessWidget {
         const SizedBox(height: 6),
         Text(
           dateType.guidance,
-          style: SharedPresentationStyles.mutedCaptionCompact,
+          style: FarmerRestockLotFieldsStyles.guidanceStyle,
         ),
         if (dateType != ProductInventoryDateType.nonPerishable) ...[
           const SizedBox(height: 12),
@@ -95,6 +97,7 @@ class FarmerRestockLotFields extends StatelessWidget {
           controller: storageController,
           maxLength: 240,
           maxLines: 2,
+          style: FarmerRestockDialogStyles.inputTextStyle,
           decoration: _decoration(
             hintText: 'Example: Keep refrigerated',
             errorText: errors['storageInstructions'],
@@ -112,7 +115,7 @@ class _FieldLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      Text(text, style: SharedPresentationStyles.headingCaptionBold);
+      Text(text, style: FarmerRestockDialogStyles.fieldLabelStyle);
 }
 
 class _DateButton extends StatelessWidget {
@@ -138,11 +141,10 @@ class _DateButton extends StatelessWidget {
       const SizedBox(height: 7),
       SizedBox(
         width: double.infinity,
-        height: 40,
         child: OutlinedButton.icon(
           key: buttonKey,
           onPressed: onPressed,
-          icon: const Icon(Icons.calendar_month_outlined, size: 18),
+          icon: const Icon(Icons.calendar_month_outlined, size: 22),
           label: Text(value == null ? 'Select date' : _displayDate(value!)),
           style: FarmerRestockLotFieldsStyles.outlinedButtonStyle(errorText),
         ),

@@ -14,6 +14,11 @@ extension _RiderDashboardContent on _RiderDashboardScreenState {
         .where((request) => request.stage == DeliveryStage.readyForPickup)
         .toList();
     return [
+      if (widget.profile case final profile?
+          when !profile.hasCargoCapacity) ...[
+        RiderCapacitySetupBanner(onSetCapacity: _openCapacitySetup),
+        const SizedBox(height: 14),
+      ],
       RiderDashboardStateBanner(
         dashboard: widget.dashboardController,
         availability: widget.availabilityController,
@@ -90,6 +95,8 @@ extension _RiderDashboardContent on _RiderDashboardScreenState {
         onOpenMessages: widget.onOpenMessages,
         onOpenNotifications: widget.onOpenNotifications,
       ),
+      const SizedBox(height: 18),
+      RiderEarningGuide(onOpenEarnings: widget.onOpenEarnings),
       const SizedBox(height: 18),
       RiderPerformanceSummary(
         profile: widget.profile,

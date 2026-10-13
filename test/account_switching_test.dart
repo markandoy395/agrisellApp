@@ -220,9 +220,11 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('buyer.switch@example.com • Buyer'), findsOneWidget);
-    expect(find.text('farmer.switch@example.com • Farmer'), findsOneWidget);
-    await tester.tap(find.text('buyer.switch@example.com • Buyer'));
+    expect(find.text('buyer.switch@example.com'), findsOneWidget);
+    expect(find.text('farmer.switch@example.com'), findsOneWidget);
+    expect(find.text('Buyer'), findsOneWidget);
+    expect(find.text('Farmer'), findsOneWidget);
+    await tester.tap(find.text('buyer.switch@example.com'));
 
     expect(selected, buyer);
     expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);

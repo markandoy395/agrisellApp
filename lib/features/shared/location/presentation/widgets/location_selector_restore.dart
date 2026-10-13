@@ -1,6 +1,11 @@
 part of 'location_selector_sheet.dart';
 
 extension _LocationSelectorRestore on _LocationSelectorSheetState {
+  void _changePinMode(bool centerPinMode) {
+    _mapController.move(_selected, _mapController.camera.zoom);
+    _refresh(() => _centerPinMode = centerPinMode);
+  }
+
   Future<void> _restoreAndStart() async {
     final cached = await _repository.load(widget.role);
     if (cached != null && mounted) {

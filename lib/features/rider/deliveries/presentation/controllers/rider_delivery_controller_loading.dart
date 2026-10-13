@@ -43,10 +43,10 @@ extension RiderDeliveryControllerLoading on RiderDeliveryController {
       _nextCursor = page?.nextCursor;
       _lastSynchronizationTime = DateTime.now();
       _loadState = RiderRequestLoadState.ready;
-    } on Exception {
+    } on Exception catch (error) {
       if (generation != _requestGeneration) return;
       _loadState = RiderRequestLoadState.error;
-      _errorMessage = 'Delivery requests could not be loaded.';
+      _errorMessage = _requestLoadErrorMessage(error);
     } finally {
       _activeRequestLoads--;
       _schedulePendingRealtimeRefresh();
@@ -107,4 +107,31 @@ extension RiderDeliveryControllerLoading on RiderDeliveryController {
       pickupDistanceKm: _matchingContextOrNull()?.pickupDistanceKm,
     );
   }
+}
+
+String _requestLoadErrorMessage(Exception error) {
+  if (error is DeliveryDataException) {
+    if (kDebugMode) {
+      debugPrint('[rider.requests] load failed (${error.diagnosticCode})');
+    }
+    return switch (error.type) {
+      DeliveryDataFailureType.authentication =>
+        'Please sign in again to load delivery requests.',
+      DeliveryDataFailureType.authorization =>
+        'Your rider account cannot access delivery requests. '
+            'Please sign in again or contact support.',
+      DeliveryDataFailureType.offline =>
+        'No network connection is available. Reconnect and retry.',
+      DeliveryDataFailureType.timeout =>
+        'Loading delivery requests timed out. Please retry.',
+      _ =>
+        'Delivery requests could not be loaded. Please retry or contact support.',
+    };
+  }
+  if (kDebugMode) {
+    debugPrint('[rider.requests] load failed (${error.runtimeType})');
+  }
+  return error is FormatException
+      ? 'Some delivery request details could not be read. Please contact support.'
+      : 'Delivery requests could not be loaded.';
 }

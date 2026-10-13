@@ -18,25 +18,35 @@ class RiderDeliveryQuickActions extends StatelessWidget {
   final VoidCallback? onWaybill;
 
   @override
-  Widget build(BuildContext context) => Row(
-    children: [
-      _Action(icon: Icons.route_outlined, label: 'Route', onTap: onRoute),
-      const SizedBox(width: 4),
-      _Action(icon: Icons.chat_outlined, label: 'Message', onTap: onMessage),
-      const SizedBox(width: 4),
-      _Action(icon: Icons.flag_outlined, label: 'Problem', onTap: onProblem),
-      const SizedBox(width: 4),
-      _Action(icon: Icons.sos_outlined, label: 'Safety', onTap: onSafety),
-      if (onWaybill != null) ...[
-        const SizedBox(width: 4),
-        _Action(
-          key: const Key('rider-quick-action-waybill'),
-          icon: Icons.receipt_long_outlined,
-          label: 'Waybill',
-          onTap: onWaybill,
-        ),
-      ],
-    ],
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final actions = [
+        _Action(icon: Icons.route_outlined, label: 'Route', onTap: onRoute),
+        _Action(icon: Icons.chat_outlined, label: 'Message', onTap: onMessage),
+        _Action(icon: Icons.flag_outlined, label: 'Problem', onTap: onProblem),
+        _Action(icon: Icons.sos_outlined, label: 'Safety', onTap: onSafety),
+        if (onWaybill != null)
+          _Action(
+            key: const Key('rider-quick-action-waybill'),
+            icon: Icons.receipt_long_outlined,
+            label: 'Waybill',
+            onTap: onWaybill,
+          ),
+      ];
+      final columns =
+          constraints.maxWidth < 360 ||
+              MediaQuery.textScalerOf(context).scale(12) > 15
+          ? 3
+          : actions.length;
+      final width = (constraints.maxWidth - (columns - 1) * 6) / columns;
+      return Wrap(
+        spacing: 6,
+        runSpacing: 6,
+        children: [
+          for (final action in actions) SizedBox(width: width, child: action),
+        ],
+      );
+    },
   );
 }
 
@@ -53,21 +63,16 @@ class _Action extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) => Expanded(
-    child: SizedBox(
-      height: 40,
-      child: OutlinedButton(
-        onPressed: onTap,
-        style: RiderDeliveryQuickActionsStyles.outlinedButtonStyle,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 15),
-            const SizedBox(height: 1),
-            Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
-          ],
-        ),
-      ),
+  Widget build(BuildContext context) => OutlinedButton(
+    onPressed: onTap,
+    style: RiderDeliveryQuickActionsStyles.outlinedButtonStyle,
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 18),
+        const SizedBox(height: 3),
+        Text(label, textAlign: TextAlign.center),
+      ],
     ),
   );
 }

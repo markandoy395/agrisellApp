@@ -14,6 +14,9 @@ import 'package:agresell_app/features/rider/profile/data/rider_repository.dart';
 import 'package:agresell_app/features/rider/profile/data/rider_repository_exception.dart';
 import 'package:agresell_app/features/rider/profile/data/rider_repository_impl.dart';
 import 'package:agresell_app/features/rider/profile/data/rider_sign_up_submission_service.dart';
+import 'package:agresell_app/features/rider/profile/data/rider_profile_entity_mapper.dart';
+import 'package:agresell_app/features/rider/profile/data/supabase_rider_data_source.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_document.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
@@ -25,7 +28,6 @@ export 'package:agresell_app/features/rider/profile/data/rider_registration_exce
 
 part 'rider_registration_service_remote.dart';
 part 'rider_registration_service_documents.dart';
-part 'rider_profile_entity_mapper.dart';
 part 'rider_registration_service_profile_updater.dart';
 
 class RiderRegistrationService extends ChangeNotifier {

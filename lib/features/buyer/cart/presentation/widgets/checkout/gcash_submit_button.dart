@@ -7,20 +7,23 @@ class _GcashSubmitButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: GcashPaymentSheetStyles.submitButtonHeight,
-      child: FilledButton.icon(
-        key: const ValueKey('use-gcash-button'),
-        onPressed: onPressed,
-        style: GcashPaymentSheetStyles.submitButtonStyle,
-        icon: const Icon(
-          Icons.verified_user_outlined,
-          size: GcashPaymentSheetStyles.submitIconSize,
-        ),
-        label: const Text(
-          'Submit reference for verification',
-          style: GcashPaymentSheetStyles.submitButtonTextStyle,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 48),
+      child: SizedBox(
+        width: double.infinity,
+        child: FilledButton.icon(
+          key: const ValueKey('use-gcash-button'),
+          onPressed: onPressed,
+          style: GcashPaymentSheetStyles.submitButtonStyle,
+          icon: const Icon(
+            Icons.verified_user_outlined,
+            size: GcashPaymentSheetStyles.submitIconSize,
+          ),
+          label: const Text(
+            'Submit reference for verification',
+            textAlign: TextAlign.center,
+            style: GcashPaymentSheetStyles.submitButtonTextStyle,
+          ),
         ),
       ),
     );

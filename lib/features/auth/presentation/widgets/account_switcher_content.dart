@@ -110,11 +110,21 @@ class SavedAccountTile extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: SharedPresentationStyles.subtitleBold,
         ),
-        subtitle: Text(
-          '${account.email} • ${account.assignedRole?.label ?? 'Account'}',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: SharedPresentationStyles.caption,
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              account.email,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: SharedPresentationStyles.caption,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              account.assignedRole?.label ?? 'Account',
+              style: SharedPresentationStyles.caption,
+            ),
+          ],
         ),
         trailing: isSwitching
             ? const SizedBox.square(

@@ -168,7 +168,7 @@ class _RiderHomeScreenState extends State<RiderHomeScreen>
       );
     }
     return Scaffold(
-      extendBody: true,
+      extendBody: false,
       backgroundColor: AgrisellColors.homeBackground,
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: _activeIndex,

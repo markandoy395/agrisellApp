@@ -97,7 +97,7 @@ class RiderDeliveryEvidenceCapture extends StatelessWidget {
         '${location!.longitude.toStringAsFixed(5)}',
       );
     }
-    return parts.isEmpty ? 'Evidence captured securely' : parts.join(' â€¢ ');
+    return parts.isEmpty ? 'Evidence captured securely' : parts.join(' | ');
   }
 
   String _two(int value) => value.toString().padLeft(2, '0');

@@ -115,7 +115,7 @@ extension _RiderRegistrationServiceRemote on RiderRegistrationService {
           photoUrl = null;
         }
       }
-      final profile = _profileFromEntities(
+      final profile = riderProfileFromEntities(
         rider,
         vehicles.first,
         _currentDocuments,

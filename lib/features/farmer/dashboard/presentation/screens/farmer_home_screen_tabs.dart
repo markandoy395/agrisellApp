@@ -66,7 +66,7 @@ extension _FarmerHomeScreenTabs on _FarmerHomeScreenState {
         ),
       ),
       FarmerHomeScreen.profileNavIndex => const _FarmerKeepAliveTab(
-        child: FarmerProfileScreen(showSettingsIcon: true),
+        child: FarmerProfileScreen(),
       ),
       _ => const SizedBox.shrink(),
     };

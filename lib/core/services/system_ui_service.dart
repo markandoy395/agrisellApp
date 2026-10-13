@@ -1,29 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/core/theme/system_ui_styles.dart';
 
 abstract final class AgrisellSystemUi {
   static Future<void> applyAppSystemUi({Brightness? platformBrightness}) async {
-    final brightness =
-        platformBrightness ??
-        WidgetsBinding.instance.platformDispatcher.platformBrightness;
-    final navigationBarColor = AgrisellColors.systemNavigationBar(brightness);
-    final navigationBarIconBrightness = brightness == Brightness.dark
-        ? Brightness.light
-        : Brightness.dark;
-
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.light,
-        systemNavigationBarColor: navigationBarColor,
-        systemNavigationBarIconBrightness: navigationBarIconBrightness,
-        systemNavigationBarContrastEnforced: false,
-        systemStatusBarContrastEnforced: false,
-      ),
-    );
+    SystemChrome.setSystemUIOverlayStyle(SystemUiStyles.light);
 
     await SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,

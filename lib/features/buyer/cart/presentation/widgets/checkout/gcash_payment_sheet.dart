@@ -3,7 +3,7 @@ part of 'package:agresell_app/features/buyer/cart/presentation/screens/checkout_
 class GcashPaymentSelection {
   const GcashPaymentSelection({required this.farmId, required this.payment});
 
-  final int farmId;
+  final int? farmId;
   final OrderPayment payment;
 }
 
@@ -34,11 +34,23 @@ Future<GcashPaymentSelection?> showGcashPaymentSheet(
     useSafeArea: true,
     backgroundColor: GcashPaymentSheetStyles.sheetBackgroundColor,
     shape: GcashPaymentSheetStyles.sheetShape,
-    builder: (_) => _GcashPaymentSheet(
-      items: items,
-      total: total,
-      repository: repository,
-      receiptImagePicker: receiptImagePicker ?? _pickDeviceGcashReceiptImage,
+    builder: (context) => AnimatedPadding(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: FractionallySizedBox(
+        heightFactor: .85,
+        child: SafeArea(
+          top: false,
+          child: _GcashPaymentSheet(
+            items: items,
+            total: total,
+            repository: repository,
+            receiptImagePicker:
+                receiptImagePicker ?? _pickDeviceGcashReceiptImage,
+          ),
+        ),
+      ),
     ),
   );
 }
@@ -89,13 +101,15 @@ class _GcashPaymentSheetState extends State<_GcashPaymentSheet> {
     _detailsFuture = farmId == null
         ? Future.value(const [])
         : widget.repository.loadGcashDetails([farmId]);
+    // FutureBuilder attaches after the next rebuild when Retry is tapped.
+    _detailsFuture.ignore();
   }
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     return SingleChildScrollView(
-      padding: GcashPaymentSheetStyles.sheetPadding(bottomInset),
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      padding: GcashPaymentSheetStyles.sheetBasePadding,
       child: FutureBuilder<List<FarmerGcashDetails>>(
         future: _detailsFuture,
         builder: (context, snapshot) => Column(
@@ -109,7 +123,7 @@ class _GcashPaymentSheetState extends State<_GcashPaymentSheet> {
             if (snapshot.connectionState != ConnectionState.done)
               const _GcashLoadingState()
             else if (snapshot.hasError)
-              _GcashUnavailableState(onRetry: _retry)
+              _GcashUnavailableState(onRetry: _retry, loadFailed: true)
             else if (snapshot.data?.firstOrNull case final details?) ...[
               _GcashAccountCard(details: details),
               const SizedBox(height: GcashPaymentSheetStyles.sectionGap),

@@ -63,3 +63,28 @@ requires its new voucher RPC. Run the injection check and the existing
 authentication/RLS assertions after deploying or changing database functions.
 Keep future user data in structured SDK arguments or SQL parameters; never add
 a general-purpose SQL execution RPC or concatenate input into command text.
+
+## Gateway update â€” 2026-10-05
+
+The counter helper uses a structured RPC parameter map. The gateway preserves
+HTTP bodies/query parameters and caller JWTs, adding no SQL execution interface.
+The new pre-request function uses static SQL and fixed schema names. Hosted
+injection assertions passed after deployment. See [the staged rollout audit](rate_limiting_audit.md).
+
+## Rider capacity setup — 2026-10-13 (deployment pending)
+
+set_current_rider_capacity uses a Supabase numeric parameter map and static SQL;
+hostile text cannot become executable commands. The migration patches a trusted
+regprocedure definition with fixed literals, never request data. Local PGlite
+checks reject hostile numeric input and preserve ownership. See
+rider_capacity_batching.md; hosted post-change assertions have not run.
+
+The pending cargo-weight aggregation uses fixed joins and static bound variables.
+Unknown units remain unknown instead of being interpreted as weight or SQL.
+No new public query path is added; see rider_capacity_batching.md.
+
+The pending rider status RPC uses the existing parameter map and static SQL.
+Hostile remarks remain literal data in isolated PostgreSQL/client tests. There
+is no dynamic SQL or general query interface. See rider_status_rpc.md.
+
+Rider earnings (2026-10-13): pending migration 20261013130000 augments existing current_rider_deliveries with caller-assigned payment snapshots, verifies authenticated/non-anonymous/unexpired session and gateway, and records agreed fees only through a server completion trigger. No client identity, dynamic SQL, new public endpoint, anonymous grant, or ordinary-user payment mutation. See docs/rider_earnings.md for isolated verification and outstanding hosted rollout/full-schema assertions.

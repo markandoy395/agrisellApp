@@ -57,7 +57,6 @@ void main() {
                         isVerified: true,
                         title: 'Edit Profile',
                         onBack: () => backed = true,
-                        onSettingsTap: () {},
                       ),
                       FarmerProfileEditCard(
                         profile: profile,

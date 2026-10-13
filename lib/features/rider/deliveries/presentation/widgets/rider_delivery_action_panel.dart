@@ -127,18 +127,18 @@ class RiderDeliveryActionPanel extends StatelessWidget {
     bool? enabled,
   }) {
     final isEnabled = enabled ?? !isUpdating;
-    return SizedBox(
-      height: 38,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 48),
       child: primary
           ? FilledButton(
               onPressed: isEnabled ? onPressed : null,
               style: RiderDeliveryActionPanelStyles.filledButtonStyle,
-              child: Text(label),
+              child: Text(label, textAlign: TextAlign.center),
             )
           : OutlinedButton(
               onPressed: isEnabled ? onPressed : null,
               style: RiderDeliveryActionPanelStyles.outlinedButtonStyle,
-              child: Text(label),
+              child: Text(label, textAlign: TextAlign.center),
             ),
     );
   }

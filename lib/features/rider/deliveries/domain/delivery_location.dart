@@ -27,10 +27,15 @@ class DeliveryLocation {
     this.updatedAt,
   });
 
-  factory DeliveryLocation.fromJson(Map<String, Object?> json) {
+  factory DeliveryLocation.fromJson(
+    Map<String, Object?> json, {
+    bool requireCoordinates = true,
+  }) {
     final latitude = deliveryDouble(json['latitude']);
     final longitude = deliveryDouble(json['longitude']);
-    if (latitude == null || longitude == null) {
+    if ((requireCoordinates && (latitude == null || longitude == null)) ||
+        (json['latitude'] != null && latitude == null) ||
+        (json['longitude'] != null && longitude == null)) {
       throw const FormatException(
         'Delivery location coordinates are required.',
       );

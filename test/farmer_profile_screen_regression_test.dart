@@ -45,17 +45,16 @@ void main() {
       expect(controller.followCounts.followingCount, 0);
       await controller.loadVerificationDetails();
       expect(controller.verificationDetails, details);
-      controller.openEditProfile(returnMode: FarmerProfileMode.settings);
+      controller.openEditProfile();
       expect(controller.mode, FarmerProfileMode.edit);
       expect(await controller.saveProfile(profile), isTrue);
       expect(controller.profile, profile);
       expect(controller.mode, FarmerProfileMode.overview);
-      expect(controller.returnModeAfterEdit, FarmerProfileMode.settings);
       controller.openEditFarm();
       expect(controller.mode, FarmerProfileMode.editFarm);
       controller.showOverview();
       controller.openEditProfile();
-      expect(controller.returnModeAfterEdit, FarmerProfileMode.overview);
+      expect(controller.mode, FarmerProfileMode.edit);
       controller.verificationRepository = FarmerVerificationRepository(
         customDetailsLoader: () async => null,
       );

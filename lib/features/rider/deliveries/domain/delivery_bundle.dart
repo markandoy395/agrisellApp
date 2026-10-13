@@ -22,10 +22,24 @@ class DeliveryBundle {
     final delivery = Delivery.fromJson(json);
     final pickup = delivery.pickupLocation?.trim();
     final dropoff = delivery.dropoffLocation?.trim();
-    final normalizedLocations = _bundleMaps(
-      json['locations'],
-    ).map(DeliveryLocation.fromJson).toList(growable: false);
+    final normalizedLocations = _bundleMaps(json['locations'])
+        .map(
+          (location) => DeliveryLocation.fromJson(
+            location,
+            // Fulfillment RPCs can provide addresses before GPS is available.
+            // Preserve missing coordinates; routing and proof checks validate them.
+            requireCoordinates: false,
+          ),
+        )
+        .toList(growable: false);
     final requirementJson = _bundleMap(json['requirement']);
+    final paymentJson = _bundleMap(json['payment']);
+    final payment = paymentJson == null
+        ? null
+        : DeliveryPayment.fromJson(paymentJson);
+    if (payment != null && payment.deliveryId != delivery.deliveryId) {
+      throw const FormatException('Delivery payment does not match delivery.');
+    }
     return DeliveryBundle(
       delivery: delivery,
       locations: normalizedLocations.isNotEmpty
@@ -50,6 +64,7 @@ class DeliveryBundle {
       history: _bundleMaps(json['history']).map(DeliveryStatusHistory.fromJson),
       proofs: _bundleMaps(json['proofs']).map(DeliveryProof.fromJson),
       raw: Map.unmodifiable(json),
+      payment: payment,
     );
   }
 

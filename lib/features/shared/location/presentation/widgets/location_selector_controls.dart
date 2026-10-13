@@ -86,9 +86,6 @@ class LocationSelectorDetails extends StatelessWidget {
   const LocationSelectorDetails({
     required this.addressController,
     required this.notesController,
-    required this.canConfirm,
-    required this.saving,
-    required this.onConfirm,
     required this.requiresWrittenAddress,
     required this.showFields,
     super.key,
@@ -96,9 +93,6 @@ class LocationSelectorDetails extends StatelessWidget {
 
   final TextEditingController addressController;
   final TextEditingController notesController;
-  final bool canConfirm;
-  final bool saving;
-  final VoidCallback onConfirm;
   final bool requiresWrittenAddress;
   final bool showFields;
 
@@ -110,6 +104,9 @@ class LocationSelectorDetails extends StatelessWidget {
         if (showFields)
           TextField(
             controller: addressController,
+            minLines: 1,
+            maxLines: 3,
+            keyboardType: TextInputType.multiline,
             style: SharedPresentationStyles.caption,
             textCapitalization: TextCapitalization.words,
             decoration: LocationSelectorControlsStyles.inputDecoration(
@@ -120,20 +117,43 @@ class LocationSelectorDetails extends StatelessWidget {
         if (showFields)
           TextField(
             controller: notesController,
+            minLines: 1,
+            maxLines: 2,
+            keyboardType: TextInputType.multiline,
             style: SharedPresentationStyles.caption,
             decoration: LocationSelectorControlsStyles.inputDecoration2,
           ),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          height: 40,
-          child: FilledButton.icon(
-            onPressed: canConfirm && !saving ? onConfirm : null,
-            icon: const Icon(Icons.add_location_alt_outlined, size: 18),
-            label: Text(saving ? 'Saving…' : 'Confirm Location'),
-          ),
-        ),
       ],
+    ),
+  );
+}
+
+class LocationSelectorConfirmButton extends StatelessWidget {
+  const LocationSelectorConfirmButton({
+    required this.canConfirm,
+    required this.saving,
+    required this.onConfirm,
+    super.key,
+  });
+
+  final bool canConfirm;
+  final bool saving;
+  final VoidCallback onConfirm;
+
+  @override
+  Widget build(BuildContext context) => SafeArea(
+    top: false,
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+      child: SizedBox(
+        width: double.infinity,
+        child: FilledButton.icon(
+          style: LocationSelectorControlsStyles.confirmButton,
+          onPressed: canConfirm && !saving ? onConfirm : null,
+          icon: const Icon(Icons.add_location_alt_outlined, size: 18),
+          label: Text(saving ? 'Saving…' : 'Confirm Location'),
+        ),
+      ),
     ),
   );
 }

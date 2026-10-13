@@ -12,10 +12,8 @@ class FarmerProfileView extends StatelessWidget {
   const FarmerProfileView({
     super.key,
     required this.controller,
-    required this.showSettingsIcon,
     required this.onSave,
     required this.onCancelEdit,
-    required this.onSettings,
     required this.onResubmitInformation,
     required this.onEditProfile,
     required this.onEditFarm,
@@ -27,10 +25,8 @@ class FarmerProfileView extends StatelessWidget {
     required this.onLogout,
   });
   final FarmerProfileController controller;
-  final bool showSettingsIcon;
   final Future<void> Function(UserProfile) onSave;
   final VoidCallback onCancelEdit;
-  final VoidCallback onSettings;
   final VoidCallback onResubmitInformation;
   final VoidCallback onEditProfile;
   final VoidCallback onEditFarm;
@@ -75,7 +71,6 @@ class FarmerProfileView extends StatelessWidget {
                             .currentAccount
                             ?.isFarmerVerified ??
                         false,
-                    onSettingsTap: showSettingsIcon ? onSettings : null,
                   ),
                   const SizedBox(height: 14),
                   if (controller.mode == FarmerProfileMode.edit)

@@ -93,5 +93,9 @@ extension _SupabaseRiderDeliveryRecords on SupabaseRiderDeliveryRepository {
     proofReferences: const {},
     buyerNotified: true,
     farmerNotified: true,
+    earning: _earning(bundle.payment),
+    earningStatus:
+        _earning(bundle.payment)?.earningStatus ??
+        DeliveryEarningStatus.pending,
   );
 }

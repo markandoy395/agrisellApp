@@ -73,17 +73,18 @@ class LocationSelectorMap extends StatelessWidget {
                 Marker(
                   point: selected,
                   width: 48,
-                  height: 52,
-                  alignment: Alignment.bottomCenter,
+                  height: 48,
+                  alignment: Alignment.topCenter,
+                  rotate: true,
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
-                    onPanUpdate: (details) => _dragPin(details.globalPosition),
+                    onPanUpdate: (details) => _dragPin(details.delta),
                     child: Semantics(
                       label: 'Draggable selected location pin',
                       child: const Icon(
                         Icons.location_pin,
                         color: AgrisellColors.statusRedText,
-                        size: 40,
+                        size: 48,
                       ),
                     ),
                   ),
@@ -98,12 +99,15 @@ class LocationSelectorMap extends StatelessWidget {
       if (centerPinMode)
         const IgnorePointer(
           child: Center(
-            child: Padding(
-              padding: EdgeInsets.only(bottom: 38),
-              child: Icon(
-                Icons.location_pin,
-                color: AgrisellColors.statusRedText,
-                size: 42,
+            child: SizedBox(
+              height: 96,
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Icon(
+                  Icons.location_pin,
+                  color: AgrisellColors.statusRedText,
+                  size: 48,
+                ),
               ),
             ),
           ),
@@ -120,11 +124,12 @@ class LocationSelectorMap extends StatelessWidget {
     ],
   );
 
-  void _dragPin(Offset globalPosition) {
-    final box = mapKey.currentContext?.findRenderObject() as RenderBox?;
-    if (box == null) return;
+  void _dragPin(Offset delta) {
+    final camera = controller.camera;
     onSelected(
-      controller.camera.screenOffsetToLatLng(box.globalToLocal(globalPosition)),
+      camera.screenOffsetToLatLng(
+        camera.latLngToScreenOffset(selected) + delta,
+      ),
     );
   }
 }

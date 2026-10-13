@@ -1,5 +1,6 @@
 ﻿Database query inventory - see docs/data_ownership_audit.md and docs/sql_injection_audit.md for scope and guards.
 Literal table/storage accesses:
+2026-10-05: _shared/rate_limit.ts calls service-only admin_consume_rate_limit with bound RPC arguments. application-api retains caller JWTs and ownership checks. See docs/rate_limiting_audit.md for staged enforcement and coverage gaps.
 lib\core\services\push_notification_service.dart:124:      await AgrisellSupabase.client.from('notification_devices').upsert({
 lib\features\buyer\deals\data\buyer_deals_repository.dart:30:            .from('product_sales')
 lib\features\buyer\deals\data\buyer_deals_repository.dart:52:          .from('product_sale_items')
@@ -147,3 +148,15 @@ supabase/functions\send-notification\index.ts:39:    .from('notification_devices
 supabase/functions\send-notification\index.ts:55:        .from('notification_devices')
 
 2026-10-04: current_marketplace_conversations full farm address uses participant-scoped farm_location, barangay, city_municipality, province. See migration 20261004100000 and docs/data_ownership_audit.md. Hosted validation/deployment pending approval.
+2026-10-13: Login/account handoff clears private routes before session restoration. Order cache reads now verify QueryOwner before fetch/cache/fallback; queued obsolete order loads are cancelled before repository access. RPCs and database policies unchanged. See docs/authentication_audit.md.
+# 2026-10-13 rider Requests: repaired private.api_impl_current_rider_nearby_deliveries removed service_radius_km reference; bound radius 0.5–100km, existing current-rider/participant source retained, explicit nonanonymous/unexpired JWT check. Applied targeted hosted SQL; existing-rider smoke passed. No dynamic SQL or application data mutation.
+
+2026-10-13 capacity: SupabaseRiderDataSource.setCapacity -> rpc('set_current_rider_capacity', {'p_capacity_kg': numeric}); server resolves private.current_rider_id(), independent nonanonymous/unexpired check, row lock, bound values, current-owner capacity-only return. Trusted count/ceiling columns remain protected. Migration and deployment pending explicit approval; see docs/rider_capacity_batching.md.
+
+2026-10-13 cargo correction (pending deployment): private.delivery_order_cargo_kg aggregates persisted kg order quantities through fulfillment seller_order_id + representative seller_farm_id + cart.buyer_user_id. End-user execution revoked; capacity validation authorizes rider/manager before invoking it. Unknown piece/bundle/sack mass rejects acceptance. Existing public RPC quota/auth contracts retained; see docs/rider_capacity_batching.md.
+
+2026-10-13 rider home capacity setup: guarded agrisellPageRoute opens existing Vehicle details; missing/nonpositive/nonfinite capacity blocks additional accept calls and canAcceptRequest. Saved profile listeners refresh Home and controller. No role/RLS/RPC expansion in this UI follow-up. Pending backend migration remains undeployed; see docs/rider_capacity_batching.md.
+
+2026-10-13 status fix (pending explicit deployment approval): SupabaseDeliveryMutations.updateDeliveryStatus -> rpc('update_current_rider_delivery_status', existing bound p_delivery_id/status/key/remarks/coordinates map). Backend requires valid current rider + actual assignment before private status update. Legacy public.update_delivery_status remains denied. See docs/rider_status_rpc.md; no hosted mutation/deployment performed.
+
+Rider earnings (2026-10-13): pending migration 20261013130000 augments existing current_rider_deliveries with caller-assigned payment snapshots, verifies authenticated/non-anonymous/unexpired session and gateway, and records agreed fees only through a server completion trigger. No client identity, dynamic SQL, new public endpoint, anonymous grant, or ordinary-user payment mutation. See docs/rider_earnings.md for isolated verification and outstanding hosted rollout/full-schema assertions.

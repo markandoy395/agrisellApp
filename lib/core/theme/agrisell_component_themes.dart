@@ -87,19 +87,20 @@ abstract final class AgrisellComponentThemes {
     dragHandleSize: Size(40, 4),
   );
 
-  static SnackBarThemeData snackBarTheme(String fontFamily) => SnackBarThemeData(
-    behavior: SnackBarBehavior.floating,
-    backgroundColor: AgrisellColors.headingGreen,
-    contentTextStyle: TextStyle(
-      color: AgrisellColors.surface,
-      fontFamily: fontFamily,
-      fontSize: 13,
-      fontWeight: FontWeight.w600,
-    ),
-    elevation: 8,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-    insetPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-  );
+  static SnackBarThemeData snackBarTheme(String fontFamily) =>
+      SnackBarThemeData(
+        behavior: SnackBarBehavior.fixed,
+        backgroundColor: AgrisellColors.headingGreen,
+        contentTextStyle: TextStyle(
+          color: AgrisellColors.surface,
+          fontFamily: fontFamily,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        insetPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      );
 
   static PopupMenuThemeData popupMenuTheme(String fontFamily) =>
       PopupMenuThemeData(

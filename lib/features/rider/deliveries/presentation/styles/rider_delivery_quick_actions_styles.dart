@@ -5,7 +5,9 @@ abstract final class RiderDeliveryQuickActionsStyles {
   static final outlinedButtonStyle = OutlinedButton.styleFrom(
     foregroundColor: AgrisellColors.authGreen,
     side: const BorderSide(color: AgrisellColors.borderLine),
-    padding: const EdgeInsets.symmetric(horizontal: 2),
+    minimumSize: const Size(0, 56),
+    maximumSize: Size.infinite,
+    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
     textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
   );
 }

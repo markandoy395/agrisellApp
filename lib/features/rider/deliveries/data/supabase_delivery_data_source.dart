@@ -39,6 +39,14 @@ class DeliveryDataException implements Exception {
   final DeliveryDataFailureType type;
   final String message;
   final Object? cause;
+  String get diagnosticCode {
+    final error = cause;
+    final code = error is PostgrestException ? error.code : null;
+    return code != null && RegExp(r'^[A-Za-z0-9_]{1,32}$').hasMatch(code)
+        ? code
+        : type.name;
+  }
+
   @override
   String toString() => message;
 }
@@ -145,7 +153,10 @@ class SupabaseDeliveryDataSource {
         error,
       );
     } on PostgrestException catch (error) {
-      final type = error.code == '40001'
+      final type =
+          const {'401', 'PGRST301', 'PGRST302', 'PGRST303'}.contains(error.code)
+          ? DeliveryDataFailureType.authentication
+          : error.code == '40001'
           ? DeliveryDataFailureType.conflict
           : error.code == '42501'
           ? DeliveryDataFailureType.authorization

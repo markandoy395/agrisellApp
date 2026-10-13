@@ -16,7 +16,7 @@ abstract final class RiderMapStyles {
   static const filterRowHeight = 39.0;
   static const controlsRight = 14.0;
   static const activeCardCompactBreakpoint = 430.0;
-  static const routePanelBottom = 92.0;
+  static const routePanelBottom = 8.0;
 
   // --- Dimensions & Strokes ---
   static const spinnerDimension = 18.0;
@@ -87,5 +87,5 @@ abstract final class RiderMapStyles {
 
   // --- Conditional Style Variants ---
   static double controlsBottom({required bool navigationActive}) =>
-      navigationActive ? 258.0 : 104.0;
+      navigationActive ? 174.0 : 20.0;
 }

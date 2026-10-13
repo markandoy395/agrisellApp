@@ -22,6 +22,7 @@ abstract final class LocationSelectorControlsStyles {
     labelText: 'Written address',
     hintText: 'Purok 5, Lianga, Surigao del Sur',
     helperText: 'Required. Use a place name, not latitude and longitude.',
+    helperMaxLines: 3,
     filled: true,
     fillColor: AgrisellColors.searchBackground,
   );
@@ -42,5 +43,10 @@ abstract final class LocationSelectorControlsStyles {
     hintText: 'Farm entrance, gate, roadside',
     filled: true,
     fillColor: AgrisellColors.searchBackground,
+  );
+
+  static final confirmButton = FilledButton.styleFrom(
+    minimumSize: const Size(0, 48),
+    maximumSize: Size.infinite,
   );
 }

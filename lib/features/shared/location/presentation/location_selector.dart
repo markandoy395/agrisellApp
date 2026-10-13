@@ -20,13 +20,18 @@ Future<ConfirmedLocation?> showLocationSelector(
   useSafeArea: true,
   backgroundColor: Colors.transparent,
   clipBehavior: Clip.none,
-  builder: (_) => LocationSelectorSheet(
-    role: role,
-    initialAddress: initialAddress,
-    initialLatitude: initialLatitude,
-    initialLongitude: initialLongitude,
-    showAddressFields: showAddressFields,
-    repository: repository,
-    gpsController: gpsController,
+  builder: (context) => AnimatedPadding(
+    duration: const Duration(milliseconds: 200),
+    curve: Curves.easeOut,
+    padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+    child: LocationSelectorSheet(
+      role: role,
+      initialAddress: initialAddress,
+      initialLatitude: initialLatitude,
+      initialLongitude: initialLongitude,
+      showAddressFields: showAddressFields,
+      repository: repository,
+      gpsController: gpsController,
+    ),
   ),
 );

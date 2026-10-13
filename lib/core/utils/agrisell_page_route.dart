@@ -11,8 +11,10 @@ Route<T> agrisellPageRoute<T>({
   Offset beginOffset = const Offset(0.04, 0),
   Duration duration = const Duration(milliseconds: 260),
   Duration reverseDuration = const Duration(milliseconds: 200),
+  RouteSettings? settings,
 }) {
   return PageRouteBuilder<T>(
+    settings: settings,
     transitionDuration: duration,
     reverseTransitionDuration: reverseDuration,
     pageBuilder: (context, _, _) => AuthPageGate(child: builder(context)),

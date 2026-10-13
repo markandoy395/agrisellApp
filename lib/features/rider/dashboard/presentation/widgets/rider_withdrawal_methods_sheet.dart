@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/features/rider/dashboard/domain/rider_withdrawal_models.dart';
@@ -76,7 +77,7 @@ class _RiderWithdrawalMethodsSheetState
     } catch (e) {
       if (!mounted) return;
       setState(() => _isSaving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showAppSnackBar(
         SnackBar(content: Text('Failed to save withdrawal method: $e')),
       );
     }
@@ -92,7 +93,7 @@ class _RiderWithdrawalMethodsSheetState
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Failed to delete method: $e')));
+      ).showAppSnackBar(SnackBar(content: Text('Failed to delete method: $e')));
     }
   }
 

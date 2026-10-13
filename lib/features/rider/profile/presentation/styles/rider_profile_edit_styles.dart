@@ -16,7 +16,11 @@ abstract final class RiderProfileEditStyles {
     16,
     12,
     16,
-    16 + MediaQuery.viewInsetsOf(context).bottom,
+    16 +
+        (MediaQuery.viewInsetsOf(context).bottom >
+                MediaQuery.paddingOf(context).bottom
+            ? MediaQuery.viewInsetsOf(context).bottom
+            : MediaQuery.paddingOf(context).bottom),
   );
 
   static const EdgeInsets fieldBottomPadding = EdgeInsets.only(bottom: 8);

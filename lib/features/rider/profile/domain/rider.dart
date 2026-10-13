@@ -28,6 +28,8 @@ class Rider {
     this.postalCode = '',
     this.totalDeliveries = 0,
     this.maximumActiveDeliveries = 1,
+    this.capacityKg,
+    this.maximumCapacityKg,
     this.employmentStatus = RiderEmploymentStatus.inactive,
     this.profilePhotoPath,
   });
@@ -54,6 +56,8 @@ class Rider {
   final String postalCode;
   final int totalDeliveries;
   final int maximumActiveDeliveries;
+  final double? capacityKg;
+  final double? maximumCapacityKg;
   final RiderEmploymentStatus employmentStatus;
   final String? profilePhotoPath;
 
@@ -117,6 +121,8 @@ class Rider {
     totalDeliveries: totalDeliveries,
     maximumActiveDeliveries:
         maximumActiveDeliveries ?? this.maximumActiveDeliveries,
+    capacityKg: capacityKg,
+    maximumCapacityKg: maximumCapacityKg,
     employmentStatus: employmentStatus ?? this.employmentStatus,
     profilePhotoPath: profilePhotoPath ?? this.profilePhotoPath,
   );

@@ -6,7 +6,6 @@ import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/domain/saved_account.dart';
-import 'package:agresell_app/features/auth/presentation/auth_dashboard_router.dart';
 import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/account_switcher_content.dart';
 
@@ -74,39 +73,18 @@ class _AccountSwitcherScreenState extends State<AccountSwitcherScreen> {
       return;
     }
     setState(() => _switchingAccountId = selected.id);
-    try {
-      final account = await AuthSessionService.instance.switchTo(selected.id);
-      if (!mounted) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        agrisellPageRoute<void>(
-          builder: (_) => AuthDashboardRouter.destinationFor(account),
+    Navigator.of(context).pushAndRemoveUntil(
+      agrisellPageRoute<void>(
+        settings: const RouteSettings(name: 'auth.login'),
+        builder: (_) => LoginScreen(
+          title: 'Sign in again',
+          initialIdentifier: selected.email,
+          savedAccountId: selected.id,
+          rememberMeInitially: true,
         ),
-        (route) => false,
-      );
-    } on SavedAccountSessionException catch (error) {
-      if (!mounted) return;
-      setState(() => _switchingAccountId = null);
-      await Navigator.of(context).push(
-        agrisellPageRoute<void>(
-          builder: (_) => LoginScreen(
-            title: 'Sign in again',
-            initialIdentifier: selected.email,
-            initialMessage: error.message,
-            rememberMeInitially: true,
-          ),
-        ),
-      );
-      if (mounted) {
-        setState(() {
-          _switchingAccountId = null;
-          _reload();
-        });
-      }
-    } on Object {
-      if (!mounted) return;
-      setState(() => _switchingAccountId = null);
-      _message('Account switching failed. Check your connection and retry.');
-    }
+      ),
+      (route) => false,
+    );
   }
 
   Future<void> _removeAccount(SavedAccount account) async {
@@ -141,11 +119,18 @@ class _AccountSwitcherScreenState extends State<AccountSwitcherScreen> {
   }
 
   Future<void> _addAccount() async {
-    await Navigator.of(context).push(
+    await AuthSessionService.instance.preserveCurrentAccountForSwitch();
+    if (!mounted) return;
+    await Navigator.of(context).pushAndRemoveUntil(
       agrisellPageRoute<void>(
-        builder: (_) =>
-            const LoginScreen(title: 'Add account', rememberMeInitially: true),
+        settings: const RouteSettings(name: 'auth.login'),
+        builder: (_) => const LoginScreen(
+          title: 'Add account',
+          initialIdentifier: '',
+          rememberMeInitially: true,
+        ),
       ),
+      (route) => false,
     );
     if (mounted) setState(_reload);
   }

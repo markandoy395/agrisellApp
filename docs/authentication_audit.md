@@ -95,6 +95,72 @@ formatting and whitespace checks passed for the audit's files. Existing unrelate
 working-tree edits were preserved.
 
 Database assertions subsequently passed through the linked Supabase query API;
-this environment has no local PostgreSQL or Docker. Deno is not
-installed, so the full Edge Function runtime/type check was not run; its
-authentication helper was tested directly with Node's TypeScript support.
+this environment has no local PostgreSQL or Docker. Deno was unavailable during
+the original audit, so its authentication helper was tested with Node. Both
+current Edge Function entry points were checked with Deno through npm on 2026-10-05.
+
+## Rate limiting and login diagnostics â€” 2026-10-05
+
+See [the rate-limit audit](rate_limiting_audit.md) for deployment, compatibility
+mode, coverage gaps and verification. Full hosted sign-in profile queries passed
+without changing account records. Updated Android messages distinguish backend
+and profile failures from connection failures; the reported login issue still
+needs device reproduction before the underlying cause can be confirmed.
+
+## Account selection and login handoff â€” 2026-10-13
+
+Switching now removes outgoing private routes before restoring the selected
+session in the public login flow. The selected email stays attached to that
+form when the Supabase identity changes or restoration fails. The navigation
+scope preserves this explicitly named login route during a handoff; private
+page gates still require a valid matching session. Logout opens the same public
+flow with the active email and disables sign-in until logout completes. Add
+account starts with an empty identifier. Switching updates the remembered email.
+
+Order history loads after activation without holding up login navigation. Its
+generation checks discard obsolete loads, and the cache repository checks the
+current owner before fetching, caching, or falling back to an account snapshot.
+The auth listener clears outgoing private state when the backend identity
+changes. No RLS, RPC, or hosted configuration changes are involved.
+
+Local regression coverage includes remembered email selection, public login
+preservation during session loss, logout/back navigation, delayed or failed
+order loading, and cancellation of queued loads after logout/switching. Device
+sign-in and refresh-token rotation remain to be verified with real accounts.
+
+## Rider Requests RPC repair â€” 2026-10-13
+
+The deployed nearby-deliveries implementation referenced a removed radius column.
+The targeted repair preserves its public signature and existing rider identity
+mapping while explicitly requiring a non-anonymous JWT with an unexpired `exp`
+before privileged reads. No anonymous execution grants were added. Local
+PostgreSQL tests and the hosted existing-rider smoke test verify anonymous and
+expired-session rejection. See `docs/rider_request_loading.md` for rollout scope.
+
+## Rider capacity setup — 2026-10-13 (deployment pending)
+
+The prepared set_current_rider_capacity numeric RPC independently requires a
+non-anonymous unexpired caller, resolves private.current_rider_id server-side,
+checks the existing API gateway hook and returns only capacity metadata. Private
+helpers are not executable by end users. Trigger defaults preserve table RLS;
+trusted count/ceiling columns remain read-only. Local checks passed; no hosted
+migration was applied. See docs/rider_capacity_batching.md for approval and tests.
+
+## Rider home capacity navigation — 2026-10-13
+
+The Home setup CTA uses agrisellPageRoute/AuthPageGate for the existing private
+Vehicle details destination. Capacity status is an operational eligibility rule,
+not a new authentication role. No public navigation exception or account-ID
+parameter was introduced. Backend migration deployment remains pending; see
+rider_capacity_batching.md for the independent RPC authorization checks.
+
+## Rider status update RPC — 2026-10-13 (deployment pending)
+
+Flutter previously called the revoked generic update_delivery_status. The new
+update_current_rider_delivery_status independently rejects missing, anonymous
+and expired sessions, resolves the current rider and checks actual assignment,
+then calls the existing private transition implementation. Legacy grants remain
+denied. Isolated owner/cross-rider and transition tests passed; hosted deployment
+and post-change assertions remain pending. See rider_status_rpc.md.
+
+Rider earnings (2026-10-13): pending migration 20261013130000 augments existing current_rider_deliveries with caller-assigned payment snapshots, verifies authenticated/non-anonymous/unexpired session and gateway, and records agreed fees only through a server completion trigger. No client identity, dynamic SQL, new public endpoint, anonymous grant, or ordinary-user payment mutation. See docs/rider_earnings.md for isolated verification and outstanding hosted rollout/full-schema assertions.

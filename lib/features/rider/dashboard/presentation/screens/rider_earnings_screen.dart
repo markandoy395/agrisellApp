@@ -1,4 +1,6 @@
+import 'package:agresell_app/features/rider/presentation/widgets/rider_safe_scaffold.dart';
 import 'dart:async';
+import '../widgets/rider_earning_guide.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/features/rider/dashboard/domain/rider_analytics_models.dart';
@@ -42,7 +44,7 @@ class _RiderEarningsScreenState extends State<RiderEarningsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => RiderSafeScaffold(
     backgroundColor: RiderEarningsStyles.backgroundColor,
     body: Column(
       children: [
@@ -75,6 +77,8 @@ class _RiderEarningsScreenState extends State<RiderEarningsScreen> {
             builder: (context, _) => ListView(
               padding: RiderEarningsStyles.listPadding,
               children: [
+                const RiderEarningGuide(),
+                RiderEarningsStyles.cardSpacing,
                 RiderEarningsPeriodChips(
                   selectedPeriod: _period,
                   onSelected: _selectPeriod,

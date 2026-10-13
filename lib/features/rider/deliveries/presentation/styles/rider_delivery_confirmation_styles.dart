@@ -8,8 +8,7 @@ abstract final class RiderDeliveryConfirmationStyles {
   static const Color background = AgrisellColors.homeBackground;
   static const Color closeIconColor = AgrisellColors.surface;
 
-  static EdgeInsets listPadding(double keyboardInset) =>
-      EdgeInsets.fromLTRB(14, 14, 14, keyboardInset + 28);
+  static const listPadding = EdgeInsets.fromLTRB(14, 14, 14, 28);
 
   // Text Styles
   static const TextStyle requiredProofTitle = TextStyle(

@@ -41,7 +41,8 @@ RiderVehicle _embeddedVehicle(Rider rider) => RiderVehicle(
   vehicleModel: '',
   vehicleColor: '',
   plateNumber: rider.vehiclePlateNumber,
-  capacityKg: 0,
+  capacityKg: rider.capacityKg ?? 0,
+  maximumCapacityKg: rider.maximumCapacityKg,
 );
 Map<String, Object?> _selectKeys(
   Map<String, Object?> source,

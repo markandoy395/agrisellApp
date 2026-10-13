@@ -40,6 +40,9 @@ abstract final class FarmerCommodityFormat {
   static int integer(Object? value) =>
       value is int ? value : int.parse(value.toString());
 
+  static int? optionalInteger(Object? value) =>
+      value is int ? value : int.tryParse(value?.toString().trim() ?? '');
+
   static double number(String value) =>
       double.parse(RegExp(r'[\d.]+').firstMatch(value)?.group(0) ?? '');
 

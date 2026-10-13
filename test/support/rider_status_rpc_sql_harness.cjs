@@ -1,0 +1,46 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const {PGlite}=require('../../.dart-local/chat-sql/node_modules/@electric-sql/pglite');
+const a='00000000-0000-0000-0000-000000000001',b='00000000-0000-0000-0000-000000000002';
+async function main(){
+ const db=new PGlite();
+ await db.exec(`create role anon; create role authenticated; create schema auth; create schema private;
+ create function auth.jwt() returns jsonb language sql stable as $$ select coalesce(nullif(current_setting('request.jwt.claims',true),''),'{}')::jsonb $$;
+ create function auth.uid() returns uuid language sql stable as $$ select (auth.jwt()->>'sub')::uuid $$;
+ create function private.current_rider_id() returns uuid language sql stable as $$ select auth.uid() $$;
+ create function public.require_rate_limited_gateway() returns void language sql as $$ select $$;
+ create table public.deliveries(delivery_id bigint primary key,delivery_status text,actual_delivery_time timestamptz);
+ create table private.rider_delivery_assignments(delivery_id bigint,rider_id uuid);
+ create table private.delivery_status_events(delivery_id bigint,idempotency_key text,previous_status text,new_status text,remarks text,latitude double precision,longitude double precision,changed_at timestamptz);
+ create table private.order_delivery_fulfillments(delivery_id bigint,seller_order_id text,buyer_user_id bigint);
+ create table public.orders(client_order_id text,cart_item_id bigint,payment_method text,payment_status text);
+ create table public.cart_items(cart_item_id bigint,cart_id bigint);
+ create table public.carts(cart_id bigint,buyer_user_id bigint);
+ insert into public.deliveries values(75,'accepted',null),(76,'accepted',null);
+ insert into private.rider_delivery_assignments values(75,'${a}'),(76,'${b}');`);
+ const old=fs.readFileSync('supabase/migrations/20260729100007_secure_delivery_transitions.sql','utf8');
+ await db.exec(old.slice(old.indexOf('create or replace function'),old.indexOf('$$;')+3));
+ await db.exec('revoke all on function private.update_delivery_status(bigint,text,text,text,text,double precision,double precision) from public,anon,authenticated');
+ await db.exec(fs.readFileSync('supabase/migrations/20261013120000_restore_rider_status_update_rpc.sql','utf8'));
+ const claims=async(sub=a,extra={})=>db.query("select set_config('request.jwt.claims',$1,false)",[JSON.stringify({sub,is_anonymous:false,exp:4102444800,...extra})]);
+ const call=(id,from,to,key,remarks=null)=>db.query('select public.update_current_rider_delivery_status($1,$2,$3,$4,$5) as result',[id,from,to,key,remarks]);
+ await claims(); await db.exec('set role authenticated');
+ const hostile="literal %_*' ; delete from public.deliveries --";
+ const first=(await call(75,'accepted','going_to_pickup','key1',hostile)).rows[0].result;
+ assert.equal(first.history.remarks,hostile); assert.equal(first.delivery.delivery_status,'going_to_pickup');
+ const replay=(await call(75,'accepted','going_to_pickup','key1',hostile)).rows[0].result;
+ assert.equal(replay.history.status_history_id,'key1');
+ await assert.rejects(call(76,'accepted','going_to_pickup','b'),{code:'42501'});
+ await assert.rejects(call(75,'accepted','going_to_pickup','stale'),{code:'40001'});
+ await assert.rejects(call(75,'going_to_pickup','completed','skip'),{code:'22023'});
+ await assert.rejects(call(75,'going_to_pickup','picked_up','skip'),{code:'22023'});
+ await assert.rejects(db.query('select private.update_delivery_status(75,$1,$2,$3)',['going_to_pickup','arrived_at_pickup','direct']),{code:'42501'});
+ for(const extra of [{is_anonymous:true},{exp:1},{sub:null}]) { await claims(a,extra); await assert.rejects(call(75,'going_to_pickup','arrived_at_pickup','invalid'),{code:'42501'}); }
+ await db.exec('reset role'); await db.exec('set role anon');
+ await assert.rejects(call(75,'going_to_pickup','arrived_at_pickup','anon'),{code:'42501'});
+ await db.exec('reset role');
+ assert.equal((await db.query('select count(*)::int as n from private.delivery_status_events')).rows[0].n,1);
+ assert.equal((await db.query('select delivery_status from public.deliveries where delivery_id=76')).rows[0].delivery_status,'accepted');
+ await db.close(); process.stdout.write('Assigned rider status RPC: owner success, replay, cross-account, anonymous/expired, transition guards and literal payload passed.\n');
+}
+main().catch(e=>{process.stderr.write(`Rider status regression failed: ${e.code || e.name}\n`);process.exitCode=1});

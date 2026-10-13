@@ -1,7 +1,6 @@
 part of 'supabase_delivery_data_source.dart';
 
 extension SupabaseDeliveryMutations on SupabaseDeliveryDataSource {
-
   Future<Delivery> createDelivery(
     Delivery delivery, {
     Iterable<DeliveryLocation> locations = const [],
@@ -48,7 +47,7 @@ extension SupabaseDeliveryMutations on SupabaseDeliveryDataSource {
     double? longitude,
   }) => _guard(() async {
     final value = await client.rpc(
-      'update_delivery_status',
+      'update_current_rider_delivery_status',
       params: {
         'p_delivery_id': deliveryId,
         'p_previous_status': previousStatus.databaseValue,

@@ -29,6 +29,8 @@ class LoginScreen extends StatefulWidget {
     this.initialIdentifier,
     this.rememberMeInitially = false,
     this.title = 'Log In',
+    this.savedAccountId,
+    this.signOutOnOpen = false,
     super.key,
   });
 
@@ -36,6 +38,8 @@ class LoginScreen extends StatefulWidget {
   final String? initialIdentifier;
   final bool rememberMeInitially;
   final String title;
+  final String? savedAccountId;
+  final bool signOutOnOpen;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -56,6 +60,17 @@ class _LoginScreenState extends State<LoginScreen> {
     _rememberMe = widget.rememberMeInitially;
     if (widget.initialIdentifier == null) {
       unawaited(_loadRememberedIdentifier());
+    }
+    if (widget.signOutOnOpen) {
+      _isLoggingIn = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_completeLogout());
+      });
+    } else if (widget.savedAccountId != null) {
+      _isLoggingIn = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_restoreSelectedAccount());
+      });
     }
     final initialMessage = widget.initialMessage;
     if (initialMessage == null) return;

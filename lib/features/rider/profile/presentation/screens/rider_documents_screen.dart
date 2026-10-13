@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/rider/presentation/widgets/rider_safe_scaffold.dart';
 import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
@@ -11,7 +12,7 @@ class RiderDocumentsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final profile = RiderRegistrationService.instance.currentProfile;
-    return Scaffold(
+    return RiderSafeScaffold(
       appBar: AppBar(title: const Text('Rider credentials')),
       backgroundColor: AgrisellColors.homeBackground,
       body: ListView(

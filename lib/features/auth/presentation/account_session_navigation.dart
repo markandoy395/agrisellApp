@@ -15,15 +15,16 @@ abstract final class AccountSessionNavigation {
   }
 
   static Future<void> logout(BuildContext context) async {
-    await AuthSessionService.instance.clear();
+    final identifier = AuthSessionService.instance.currentAccount?.email;
     if (!context.mounted) return;
-    final savedAccounts = await AuthSessionService.instance.availableAccounts();
-    if (!context.mounted) return;
-    final destination = savedAccounts.isEmpty
-        ? const LoginScreen()
-        : const AccountSwitcherScreen(allowBack: false);
     Navigator.of(context).pushAndRemoveUntil(
-      agrisellPageRoute<void>(builder: (_) => destination),
+      agrisellPageRoute<void>(
+        settings: const RouteSettings(name: 'auth.login'),
+        builder: (_) => LoginScreen(
+          initialIdentifier: identifier ?? '',
+          signOutOnOpen: true,
+        ),
+      ),
       (route) => false,
     );
   }

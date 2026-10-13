@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -188,7 +189,7 @@ class _RiderMapScreenState extends State<RiderMapScreen> {
   void _showMapMessage(String message) {
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ).showAppSnackBar(SnackBar(content: Text(message)));
   }
 
   void _updateMapState(VoidCallback update) => setState(update);

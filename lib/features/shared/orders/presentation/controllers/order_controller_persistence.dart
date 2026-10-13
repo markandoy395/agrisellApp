@@ -21,6 +21,7 @@ extension OrderControllerPersistence on OrderController {
     } on Object {
       // A fresh load can still recover the last successfully saved snapshot.
     }
+    if (generation != _loadGeneration || _accountId != accountId) return;
     final savedOrders = await _repository.load(accountId);
     if (generation != _loadGeneration || _accountId != accountId) return;
     _orders

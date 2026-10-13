@@ -1,3 +1,4 @@
+import 'package:agresell_app/features/rider/presentation/widgets/rider_safe_scaffold.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -76,7 +77,7 @@ class _RiderHistoryScreenState extends State<RiderHistoryScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => RiderSafeScaffold(
     backgroundColor: AgrisellColors.homeBackground,
     body: Column(
       children: [
@@ -148,7 +149,6 @@ class _RiderHistoryScreenState extends State<RiderHistoryScreen> {
       ],
     ),
   );
-
 
   Future<void> _load() => _controller.loadHistory(riderId: widget.riderId);
 

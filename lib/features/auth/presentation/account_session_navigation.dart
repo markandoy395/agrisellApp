@@ -4,6 +4,7 @@ import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/presentation/screens/account_switcher_screen.dart';
 import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/logout_confirmation_dialog.dart';
 
 abstract final class AccountSessionNavigation {
   static Future<void> openSwitcher(BuildContext context) async {
@@ -14,9 +15,16 @@ abstract final class AccountSessionNavigation {
     );
   }
 
-  static Future<void> logout(BuildContext context) async {
-    final identifier = AuthSessionService.instance.currentAccount?.email;
+  static Future<void> logout(
+    BuildContext context, {
+    Future<bool> Function()? beforeLogout,
+  }) async {
+    if (!await showLogoutConfirmationDialog(context) || !context.mounted) {
+      return;
+    }
+    if (beforeLogout != null && !await beforeLogout()) return;
     if (!context.mounted) return;
+    final identifier = AuthSessionService.instance.currentAccount?.email;
     Navigator.of(context).pushAndRemoveUntil(
       agrisellPageRoute<void>(
         settings: const RouteSettings(name: 'auth.login'),

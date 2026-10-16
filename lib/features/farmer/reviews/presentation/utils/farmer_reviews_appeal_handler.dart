@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -29,7 +30,7 @@ abstract final class FarmerReviewsAppealHandler {
     );
 
     if (submitted == true && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showAppSnackBar(
         SnackBar(
           content: Text(
             'Report for "${review.commodityName}" review submitted to moderators.',
@@ -63,7 +64,7 @@ abstract final class FarmerReviewsAppealHandler {
     );
 
     if (submitted == true && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showAppSnackBar(
         SnackBar(
           content: Text(
             'Appeal for "${review.commodityName}" review submitted to administrators.',

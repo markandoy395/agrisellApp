@@ -1,13 +1,16 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 abstract final class RiderConversationListStyles {
   static final _textStyleActive = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 14,
     fontWeight: FontWeight.w800,
   );
   static final _textStyleInactive = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 14,
     fontWeight: FontWeight.w700,
@@ -21,6 +24,7 @@ abstract final class RiderConversationListStyles {
   );
 
   static const textStyle2 = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.surface,
     fontSize: 12,
     fontWeight: FontWeight.w700,

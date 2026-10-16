@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -81,7 +82,7 @@ class _SupportTicketDetailScreenState extends State<SupportTicketDetailScreen> {
       widget.ticketsController?.updateTicketInList(_controller.ticket);
       _scrollToBottom();
     } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showAppSnackBar(
         SnackBar(
           content: Text(_controller.errorMessage ?? 'Failed to send reply.'),
           backgroundColor: SupportTicketDetailStyles.errorBackground,

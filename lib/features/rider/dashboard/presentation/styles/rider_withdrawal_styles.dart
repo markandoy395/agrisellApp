@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -22,8 +23,8 @@ abstract final class RiderWithdrawalStyles {
   static const typeIconSize = 18.0;
   static const spinnerSize = 20.0;
   static const spinnerStrokeWidth = 2.0;
-  static const spinnerColor = Colors.white;
-  static const deleteColor = Colors.red;
+  static const spinnerColor = AgrisellColors.surface;
+  static const deleteColor = AgrisellColors.statusRedText;
   static const sheetPadding = EdgeInsets.fromLTRB(20, 16, 20, 24);
   static const emptyPadding = EdgeInsets.all(20);
   static const tilePadding = EdgeInsets.all(14);
@@ -51,34 +52,43 @@ abstract final class RiderWithdrawalStyles {
     borderRadius: BorderRadius.circular(4),
   );
   static const title = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 15,
     fontWeight: FontWeight.w800,
     color: AgrisellColors.headingGreen,
   );
   static const subtitle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
     color: AgrisellColors.mutedText,
   );
   static const accountDetails = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
     color: AgrisellColors.mutedText,
     fontWeight: FontWeight.w600,
   );
   static const fieldLabel = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 13,
     fontWeight: FontWeight.w700,
     color: AgrisellColors.brandBlack,
   );
   static const methodLabel = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 14,
     fontWeight: FontWeight.w800,
     color: AgrisellColors.brandBlack,
   );
   static const defaultLabel = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
     fontWeight: FontWeight.w700,
     letterSpacing: 0.3,
     color: AgrisellColors.authGreen,
   );
-  static const saveLabel = TextStyle(fontWeight: FontWeight.w700);
+  static const saveLabel = TextStyle(
+    fontFamily: AppTypography.fontFamily,
+    fontWeight: FontWeight.w700,
+  );
 }

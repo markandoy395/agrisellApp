@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -12,12 +13,14 @@ abstract final class RiderNearbyRequestSummaryStyles {
 
   // Typography
   static const TextStyle headerTitleStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 15,
-    fontWeight: FontWeight.w900,
+    fontWeight: FontWeight.w800,
   );
 
   static const TextStyle headerSubtitleStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
     height: 1.25,
@@ -25,24 +28,28 @@ abstract final class RiderNearbyRequestSummaryStyles {
   );
 
   static const TextStyle moreRequestsStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
     fontWeight: FontWeight.w700,
   );
 
   static const TextStyle itemTitleStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 13,
     fontWeight: FontWeight.w800,
   );
 
   static const TextStyle itemFeeStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.authGreen,
     fontSize: 12,
-    fontWeight: FontWeight.w900,
+    fontWeight: FontWeight.w800,
   );
 
   static const TextStyle itemAddressStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
     height: 1.2,
@@ -50,12 +57,14 @@ abstract final class RiderNearbyRequestSummaryStyles {
   );
 
   static const TextStyle emptyTitleStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 15,
-    fontWeight: FontWeight.w900,
+    fontWeight: FontWeight.w800,
   );
 
   static const TextStyle emptySubtitleStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
     height: 1.3,
@@ -63,6 +72,7 @@ abstract final class RiderNearbyRequestSummaryStyles {
   );
 
   static const TextStyle temporaryNoticeTextStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.statusOrangeText,
     fontSize: 12,
     height: 1.25,

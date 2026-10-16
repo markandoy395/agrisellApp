@@ -7,7 +7,6 @@ class RiderDeliveryRequestCardContent extends StatelessWidget {
     required this.onAccept,
     super.key,
   });
-
   final RiderDeliveryRequestCard card;
   final bool acceptanceOpen;
   final VoidCallback onAccept;
@@ -15,149 +14,123 @@ class RiderDeliveryRequestCardContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final request = card.request;
-    final priority = riderRequestPriorityStyle(request.priority);
-    return RiderSurfaceCard(
+    return Container(
+      decoration: RiderDeliveriesDesignStyles.card,
+      padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _header(request, priority),
-          const SizedBox(height: 12),
-          RiderRequestDetailLine(
-            icon: Icons.storefront_outlined,
-            text: 'Seller: ${request.sellerName}',
-          ),
-          RiderRequestDetailLine(
-            icon: Icons.place_outlined,
-            text: 'Pick up from: ${request.pickupLocation.address}',
-          ),
-          RiderRequestDetailLine(
-            icon: Icons.location_on_outlined,
-            text: 'Deliver to: ${request.deliveryLocation.address}',
-          ),
-          RiderRequestDetailLine(
-            icon: card.isPickupInsideRegisteredServiceArea
-                ? Icons.verified_outlined
-                : Icons.location_off_outlined,
-            text: card.isPickupInsideRegisteredServiceArea
-                ? 'Pickup is inside your registered service area'
-                : 'Pickup is outside your registered service area',
-          ),
-          const SizedBox(height: 9),
-          RiderRequestSummaryChips(
+          RiderDeliveryCardHeader(
             request: request,
+            showPriority: true,
             pickupDistanceKm: card.pickupDistanceKm ?? request.routeDistanceKm,
             pickupTravelMinutes:
                 card.pickupTravelMinutes ?? request.routeEstimatedTravelMinutes,
-            usesRegisteredLocationEstimate: card.usesRegisteredLocationEstimate,
           ),
-          if (request.handlingRequirements.isNotEmpty) _handling(request),
-          const SizedBox(height: 7),
-          Text(_vehicleSummary(request), style: _metaStyle),
+          const SizedBox(height: 14),
+          RiderDeliveryAddressPair(request: request),
+          const Divider(height: 24),
+          Wrap(
+            spacing: 16,
+            runSpacing: 8,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'PHP ${request.deliveryFee.toStringAsFixed(2)}',
+                    style: RiderDeliveriesDesignStyles.earning,
+                  ),
+                  Text(
+                    'Est. earning',
+                    style: RiderDeliveriesDesignStyles.caption,
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    card.isPickupInsideRegisteredServiceArea
+                        ? 'Pickup in service area'
+                        : 'Pickup outside service area',
+                    style: RiderDeliveriesDesignStyles.label,
+                  ),
+                  Text(
+                    _vehicleSummary(request),
+                    style: RiderDeliveriesDesignStyles.caption,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          if (card.usesRegisteredLocationEstimate)
+            Text(
+              'Estimated from your registered service location',
+              style: RiderDeliveriesDesignStyles.caption,
+            ),
+          if (request.handlingRequirements.isNotEmpty)
+            Text(
+              request.handlingRequirements
+                  .map((item) => item.type.label)
+                  .join(' | '),
+              style: RiderDeliveriesDesignStyles.caption,
+            ),
           const SizedBox(height: 12),
-          _actions(context, request),
-          if (card.onHide != null) _hideAction(context),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed:
+                      card.onViewDetails ??
+                      () => showRiderRequestDetails(context, request),
+                  style: RiderDeliveriesDesignStyles.secondary,
+                  child: const Text('View details'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Tooltip(
+                  message: card.canAccept
+                      ? 'Review and confirm this delivery.'
+                      : 'You must be Online, Available, and have current GPS to accept.',
+                  child: FilledButton(
+                    onPressed:
+                        card.canAccept &&
+                            card.onAccept != null &&
+                            !card.isAccepting &&
+                            !acceptanceOpen
+                        ? onAccept
+                        : null,
+                    style: RiderDeliveriesDesignStyles.primary,
+                    child: Text(card.isAccepting ? 'Processing...' : 'Accept'),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (card.onHide != null)
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () =>
+                    showRiderRequestHideDialog(context, onHide: card.onHide!),
+                icon: const Icon(Icons.visibility_off_outlined, size: 16),
+                label: const Text('Hide this request'),
+              ),
+            ),
         ],
       ),
     );
   }
-
-  Widget _header(DeliveryRequest request, RiderRequestPriorityStyle priority) =>
-      Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          RiderRequestProductImage(
-            url: request.productImageUrl,
-            productName: request.productName,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  request.productName,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: RiderDeliveryRequestCardContentStyles.textStyle,
-                ),
-                const SizedBox(height: 5),
-                Text('Order ${request.orderNumber}', style: _metaStyle),
-              ],
-            ),
-          ),
-          RiderStatusPill(
-            label: priority.label,
-            backgroundColor: priority.background,
-            foregroundColor: priority.foreground,
-          ),
-        ],
-      );
-
-  Widget _handling(DeliveryRequest request) => Padding(
-    padding: const EdgeInsets.only(top: 7),
-    child: Text(
-      request.handlingRequirements.map((item) => item.type.label).join(' | '),
-      style: _metaStyle,
-    ),
-  );
-
-  Widget _actions(BuildContext context, DeliveryRequest request) => Row(
-    children: [
-      Expanded(
-        child: OutlinedButton(
-          onPressed:
-              card.onViewDetails ??
-              () => showRiderRequestDetails(context, request),
-          style: _outlinedStyle,
-          child: const Text('View details'),
-        ),
-      ),
-      const SizedBox(width: 8),
-      Expanded(
-        child: Tooltip(
-          message: card.canAccept
-              ? 'Review and confirm this delivery.'
-              : 'You must be Online, Available, and have current GPS to accept.',
-          child: FilledButton(
-            onPressed:
-                card.canAccept &&
-                    card.onAccept != null &&
-                    !card.isAccepting &&
-                    !acceptanceOpen
-                ? onAccept
-                : null,
-            style: _filledStyle,
-            child: Text(card.isAccepting ? 'Processing...' : 'Accept'),
-          ),
-        ),
-      ),
-    ],
-  );
-
-  Widget _hideAction(BuildContext context) => Align(
-    alignment: Alignment.centerRight,
-    child: TextButton.icon(
-      onPressed: () =>
-          showRiderRequestHideDialog(context, onHide: card.onHide!),
-      icon: const Icon(Icons.visibility_off_outlined, size: 16),
-      label: const Text('Hide this request'),
-    ),
-  );
 }
-
-const _metaStyle = SharedPresentationStyles.mutedCaptionSemibold;
-
-final _outlinedStyle = RiderDeliveryRequestCardContentStyles.buttonStyle;
-
-final _filledStyle = RiderDeliveryRequestCardContentStyles.buttonStyle2;
 
 String _vehicleSummary(DeliveryRequest request) {
   final vehicles = request.requiredVehicleTypes.isEmpty
       ? 'Any compatible vehicle'
       : request.requiredVehicleTypes.map((item) => item.label).join(', ');
-  final requiredCapacity = request.requiredCapacityKg ?? request.totalWeightKg;
-  final capacity = requiredCapacity == null
-      ? 'capacity confirmed'
-      : '${requiredCapacity.toStringAsFixed(0)} kg capacity confirmed';
-  return 'Vehicle compatible: $vehicles | $capacity';
+  final capacity = request.requiredCapacityKg ?? request.totalWeightKg;
+  return capacity == null
+      ? vehicles
+      : '$vehicles | ${capacity.toStringAsFixed(0)} kg';
 }

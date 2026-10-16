@@ -1,11 +1,11 @@
-import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import '../../domain/delivery_stage.dart';
+import '../widgets/rider_deliveries_header.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_location_controller.dart';
-import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_tabs.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_history_list.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_request_list.dart';
@@ -22,6 +22,9 @@ class RiderDeliveriesScreen extends StatelessWidget {
     this.onOpenAppSettings,
     this.onOpenProfile,
     this.onOpenConversation,
+    this.onOpenMap,
+    this.onOpenNotifications,
+    this.unreadNotifications = 0,
     super.key,
   });
 
@@ -34,28 +37,34 @@ class RiderDeliveriesScreen extends StatelessWidget {
   final VoidCallback? onOpenAppSettings;
   final VoidCallback? onOpenProfile;
   final Future<bool> Function(String deliveryId)? onOpenConversation;
+  final VoidCallback? onOpenMap;
+  final VoidCallback? onOpenNotifications;
+  final int unreadNotifications;
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
-      child: ColoredBox(
+      child: Material(
         color: AgrisellColors.homeBackground,
         child: Column(
           children: [
-            const RiderPageHeader(
-              title: 'Deliveries',
-              subtitle: 'Requests, active trips, and delivery history',
-            ),
-            const TabBar(
-              labelColor: AgrisellColors.authGreen,
-              unselectedLabelColor: AgrisellColors.mutedText,
-              labelStyle: SharedPresentationStyles.captionExtraBold,
-              tabs: [
-                Tab(text: 'Requests'),
-                Tab(text: 'Active'),
-                Tab(text: 'History'),
-              ],
+            AnimatedBuilder(
+              animation: deliveryController,
+              builder: (context, _) => RiderDeliveriesHeader(
+                onOpenNotifications: onOpenNotifications,
+                unreadNotifications: unreadNotifications,
+                requestCount: deliveryController.requests
+                    .where((item) => item.stage == DeliveryStage.readyForPickup)
+                    .length,
+                activeCount: deliveryController.requests
+                    .where(
+                      (item) =>
+                          item.stage != DeliveryStage.readyForPickup &&
+                          !item.stage.isTerminal,
+                    )
+                    .length,
+              ),
             ),
             AnimatedBuilder(
               animation: deliveryController,
@@ -82,6 +91,8 @@ class RiderDeliveriesScreen extends StatelessWidget {
                       riderId: riderId,
                       locationController: locationController,
                       onOpenConversation: onOpenConversation,
+                      onOpenMap: onOpenMap,
+                      capacityKg: profile?.capacityKg,
                     ),
                     RiderHistoryList(controller: deliveryController),
                   ],

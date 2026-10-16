@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -19,12 +20,14 @@ abstract final class RiderApplicationCardStyles {
   );
 
   static const referenceLabel = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
     fontWeight: FontWeight.w700,
   );
 
   static const referenceValue = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 12,
     fontWeight: FontWeight.w700,
@@ -40,18 +43,21 @@ abstract final class RiderApplicationCardStyles {
   );
 
   static const statusTitle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 15,
     fontWeight: FontWeight.w800,
   );
 
   static const body = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
     height: 1.35,
   );
 
   static const reviewedDate = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
     fontStyle: FontStyle.italic,
@@ -66,6 +72,7 @@ abstract final class RiderApplicationCardStyles {
   );
 
   static const cardTitle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 13,
     fontWeight: FontWeight.w800,
@@ -84,6 +91,7 @@ abstract final class RiderApplicationCardStyles {
   );
 
   static const documentTitle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 13,
     fontWeight: FontWeight.w700,
@@ -103,12 +111,14 @@ abstract final class RiderApplicationCardStyles {
   );
 
   static const rejectedBadgeText = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.statusRedText,
     fontSize: 12,
     fontWeight: FontWeight.w700,
   );
 
   static const caption = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
   );
@@ -124,6 +134,7 @@ abstract final class RiderApplicationCardStyles {
   );
 
   static const documentReasonText = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.statusRedText,
     fontSize: 12,
     height: 1.35,

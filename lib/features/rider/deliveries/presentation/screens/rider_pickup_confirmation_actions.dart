@@ -2,26 +2,35 @@ part of 'rider_pickup_confirmation_screen.dart';
 
 extension _PickupConfirmationActions on _RiderPickupConfirmationScreenState {
   Future<void> _capture(PickupConfirmationMethod method) async {
+    if (_busy) return;
+    _setCapturing(true);
     try {
-      final reference = switch (method) {
-        PickupConfirmationMethod.productPhoto ||
-        PickupConfirmationMethod.packagePhoto => await _storage.capturePhoto(
-          deliveryId: widget.request.id,
-          method: method,
-        ),
-        _ => await _storage.saveAttestation(
-          deliveryId: widget.request.id,
-          method: method,
-        ),
-      };
-      if (reference != null) _setProof(method, reference);
+      final reference = method.requiresImage
+          ? await _storage.capturePhoto(
+              deliveryId: widget.request.id,
+              method: method,
+            )
+          : await _storage.saveAttestation(
+              deliveryId: widget.request.id,
+              method: method,
+            );
+      if (reference != null)
+        _setProof(
+          method,
+          reference,
+          imagePath: method.requiresImage
+              ? _storage.lastCapturedImagePath
+              : null,
+        );
     } on PickupProofStorageException catch (error) {
       _setError(error.message);
+    } finally {
+      _setCapturing(false);
     }
   }
 
   Future<void> _submit(PickupConfiguration config) async {
-    if (_submitting) return;
+    if (_busy) return;
     _setSubmitting(true);
     await _refreshPickupLocation(requestPermission: true);
     final locationState = widget.locationController?.state;
@@ -93,43 +102,6 @@ extension _PickupConfirmationActions on _RiderPickupConfirmationScreenState {
     }
   }
 
-  Future<void> _reportProblem() async {
-    final draft = await showRiderPickupProblemDialog(context);
-    if (draft == null || !mounted) return;
-    final location = widget.controller.currentRiderLocation;
-    if (location == null) {
-      _setError('A location is required to report this pickup problem.');
-      return;
-    }
-    String? photo;
-    try {
-      photo = await _storage.capturePhoto(
-        deliveryId: widget.request.id,
-        method: PickupConfirmationMethod.productPhoto,
-      );
-    } on PickupProofStorageException catch (error) {
-      _setError(error.message);
-      return;
-    }
-    final report = await widget.controller.reportPickupProblem(
-      PickupProblemReport(
-        id: 'pickup-problem-${DateTime.now().microsecondsSinceEpoch}',
-        deliveryId: widget.request.id,
-        riderId: widget.riderId,
-        kind: draft.kind,
-        reportedAt: DateTime.now(),
-        location: location,
-        notes: draft.notes,
-        photoReferences: photo == null ? const [] : [photo],
-      ),
-    );
-    _setError(
-      report == null
-          ? 'Pickup problem could not be saved.'
-          : 'Problem saved. Contact support before continuing pickup.',
-    );
-  }
-
   PickupConditionChecklist _condition() => PickupConditionChecklist(
     correctProduct: _checks[_checkLabels[0]] ?? false,
     correctQuantity: _checks[_checkLabels[1]] ?? false,
@@ -154,13 +126,5 @@ const _checkLabels = [
   'Product fits the vehicle',
   'Handling instructions received',
 ];
-bool _requiresProof(PickupConfirmationMethod method) => !{
-  PickupConfirmationMethod.confirmationCode,
-  PickupConfirmationMethod.qrCode,
-  PickupConfirmationMethod.quantityConfirmation,
-  PickupConfirmationMethod.weightConfirmation,
-}.contains(method);
-String _methodLabel(PickupConfirmationMethod method) =>
-    'Add ${method.name} proof';
 String _quantityFrom(String value) =>
     RegExp(r'\d+').firstMatch(value)?.group(0) ?? '';

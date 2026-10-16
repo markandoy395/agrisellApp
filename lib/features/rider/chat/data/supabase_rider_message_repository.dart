@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:agresell_app/features/shared/chat/data/chat_rpc.dart';
+import 'package:agresell_app/features/shared/chat/domain/chat_limits.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -88,20 +90,20 @@ class SupabaseRiderMessageRepository implements RiderMessageRepository {
     required RiderMessageDraft draft,
   }) async {
     try {
-      final value = await _client.rpc<Object?>(
-        'send_rider_delivery_message',
-        params: {
-          'p_conversation_id': draft.conversationId,
-          'p_body': draft.body.trim(),
-          'p_kind': draft.kind.name,
-          'p_attachment_reference': draft.attachmentReference,
-          'p_idempotency_key': draft.idempotencyKey,
-        },
-      );
+      if (ChatLimits.length(draft.body) > ChatLimits.messageCharacters) {
+        throw const RiderMessageRepositoryException(ChatLimits.lengthError);
+      }
+      final value = await ChatRpc.call(_client, 'send_rider_delivery_message', {
+        'p_conversation_id': draft.conversationId,
+        'p_body': draft.body.trim(),
+        'p_kind': draft.kind.name,
+        'p_attachment_reference': draft.attachmentReference,
+        'p_idempotency_key': draft.idempotencyKey,
+      });
       return _message(_map(value));
     } on PostgrestException catch (error) {
       throw RiderMessageRepositoryException(
-        error.message,
+        ChatLimits.serverError(error.code) ?? error.message,
         isOffline: _offlineCode(error.code),
       );
     }

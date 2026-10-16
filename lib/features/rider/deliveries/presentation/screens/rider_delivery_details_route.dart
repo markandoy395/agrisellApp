@@ -1,11 +1,11 @@
 part of 'rider_delivery_details_screen.dart';
 
 extension _RiderDeliveryDetailsRoute on _RiderDeliveryDetailsScreenState {
-  Future<void> _openGoogleMapsRoute() async {
-    final destination = _request.deliveryLocation;
+  Future<void> _openGoogleMapsRoute({DeliveryLocation? destination}) async {
+    destination ??= _request.deliveryLocation;
     if (!GoogleMapsRoute.hasValidDestination(destination)) {
       _showMessage(
-        "The buyer's saved delivery coordinates are unavailable. "
+        'The saved destination coordinates are unavailable. '
         'Update the delivery location before opening the route.',
       );
       return;

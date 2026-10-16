@@ -1,11 +1,9 @@
-import 'package:agresell_app/features/rider/dashboard/presentation/styles/rider_dashboard_header_styles.dart';
-import 'package:flutter/material.dart';
-
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
-import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
-import 'package:agresell_app/features/rider/presentation/rider_availability_presentation.dart';
-import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
-import 'package:agresell_app/features/shared/widgets/profile/safe_circle_avatar.dart';
+import 'package:flutter/material.dart';
+import '../../../profile/domain/rider_profile.dart';
+import '../../../presentation/rider_availability_presentation.dart';
+import '../../../../shared/widgets/profile/safe_circle_avatar.dart';
+import '../styles/rider_home_design_styles.dart';
 
 class RiderDashboardHeader extends StatelessWidget {
   const RiderDashboardHeader({
@@ -15,7 +13,6 @@ class RiderDashboardHeader extends StatelessWidget {
     required this.onOpenNotifications,
     super.key,
   });
-
   final RiderProfile? profile;
   final RiderAvailability workStatus;
   final int unreadNotifications;
@@ -23,80 +20,117 @@ class RiderDashboardHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final firstName = profile?.firstName.trim();
-    final statusLabel = _compactStatusLabel(workStatus);
-    final subtitle = profile == null
-        ? 'Current work status: ${workStatus.displayLabel}'
-        : '${profile!.vehicleType.label} ${_plateLabel(profile!.vehiclePlateNumber)}';
-    return RiderPageHeader(
-      title: firstName == null || firstName.isEmpty
-          ? 'Hello, Rider'
-          : 'Hello, $firstName',
-      subtitle: subtitle,
-      action: Row(
-        mainAxisSize: MainAxisSize.min,
+    final name = profile?.firstName.trim();
+    final vehicle = profile?.vehicleType.label ?? 'Your delivery partner';
+    final plate = profile?.vehiclePlateNumber.trim() ?? '';
+    return Container(
+      decoration: RiderHomeDesignStyles.headerBackground,
+      padding: EdgeInsets.fromLTRB(
+        18,
+        MediaQuery.paddingOf(context).top + 18,
+        18,
+        18,
+      ),
+      child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-            decoration: RiderDashboardHeaderStyles.containerDecoration,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
+          SafeCircleAvatar(
+            radius: 28,
+            imageUrl: profile?.profilePhotoUrl,
+            backgroundColor: AgrisellColors.surface,
+            fallback: const Icon(
+              Icons.person_rounded,
+              color: RiderHomeDesignStyles.green,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(workStatus.icon, color: AgrisellColors.surface, size: 15),
-                const SizedBox(width: 6),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 76),
+                Text(
+                  'Hello, ${name == null || name.isEmpty ? 'Rider' : name}',
+                  style: RiderHomeDesignStyles.greeting,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 3),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.two_wheeler_rounded,
+                      color: AgrisellColors.surface,
+                      size: 15,
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        '$vehicle${plate.isEmpty ? '' : ' • $plate'}',
+                        style: RiderHomeDesignStyles.whiteCaption,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 5),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
+                  decoration: RiderHomeDesignStyles.status(workStatus.isOnline),
                   child: Text(
-                    statusLabel,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: RiderDashboardHeaderStyles.statuslabelText,
+                    workStatus.isOnline ? 'Online' : workStatus.displayLabel,
+                    style: RiderHomeDesignStyles.statusText,
                   ),
                 ),
               ],
             ),
           ),
           const SizedBox(width: 8),
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              IconButton(
-                tooltip: unreadNotifications == 0
-                    ? 'Notifications'
-                    : '$unreadNotifications unread notifications',
-                onPressed: onOpenNotifications,
-                style: RiderDashboardHeaderStyles.iconButtonStyle,
-                icon: const Icon(Icons.notifications_none_rounded),
-              ),
-              if (unreadNotifications > 0)
-                Positioned(
-                  right: 3,
-                  top: 3,
-                  child: Container(
-                    constraints: const BoxConstraints(
-                      minWidth: 18,
-                      minHeight: 18,
+          Semantics(
+            button: true,
+            label: '$unreadNotifications unread notifications',
+            child: InkWell(
+              onTap: onOpenNotifications,
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.all(6),
+                child: Column(
+                  children: [
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        const Icon(
+                          Icons.notifications_rounded,
+                          color: AgrisellColors.accentBlue,
+                          size: 30,
+                        ),
+                        if (unreadNotifications > 0)
+                          Positioned(
+                            right: -5,
+                            top: -4,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: RiderHomeDesignStyles.badge,
+                              child: Text(
+                                unreadNotifications > 99
+                                    ? '99+'
+                                    : '$unreadNotifications',
+                                style: RiderHomeDesignStyles.badgeText,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    alignment: Alignment.center,
-                    decoration: RiderDashboardHeaderStyles.containerDecoration2,
-                    child: Text(
-                      unreadNotifications > 9 ? '9+' : '$unreadNotifications',
-                      style: RiderDashboardHeaderStyles.textStyle,
+                    const SizedBox(height: 5),
+                    const Text(
+                      'Notifications',
+                      style: RiderHomeDesignStyles.whiteCaption,
                     ),
-                  ),
+                  ],
                 ),
-            ],
-          ),
-          const SizedBox(width: 8),
-          SafeCircleAvatar(
-            radius: 19,
-            backgroundColor: AgrisellColors.surface.withValues(alpha: 0.2),
-            imageUrl: profile?.profilePhotoUrl,
-            fallback: const Icon(
-              Icons.person_rounded,
-              color: AgrisellColors.surface,
-              size: 21,
+              ),
             ),
           ),
         ],
@@ -104,21 +138,3 @@ class RiderDashboardHeader extends StatelessWidget {
     );
   }
 }
-
-String _plateLabel(String value) {
-  final plate = value.trim();
-  return plate.isEmpty ? '' : ' - $plate';
-}
-
-String _compactStatusLabel(RiderAvailability status) => switch (status) {
-  RiderAvailability.onlineAvailable => 'Online',
-  RiderAvailability.reviewingDeliveryRequest => 'Reviewing',
-  RiderAvailability.deliveryReserved => 'Reserved',
-  RiderAvailability.goingToPickup => 'Pickup',
-  RiderAvailability.waitingAtPickup => 'At Pickup',
-  RiderAvailability.productPickedUp => 'Picked Up',
-  RiderAvailability.goingToBuyer => 'Delivery',
-  RiderAvailability.waitingAtDeliveryLocation => 'At Drop-off',
-  RiderAvailability.temporarilyUnavailable => 'Unavailable',
-  _ => status.displayLabel,
-};

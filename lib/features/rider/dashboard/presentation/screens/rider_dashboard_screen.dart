@@ -2,7 +2,7 @@ import 'dart:async';
 import '../widgets/rider_earning_guide.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import '../styles/rider_home_design_styles.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/rider/profile/presentation/screens/rider_vehicle_screen.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_capacity_setup_banner.dart';
@@ -69,20 +69,29 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
   @override
   void initState() {
     super.initState();
-    final riderId = widget.riderId;
-    if (riderId != null) {
-      unawaited(widget.dashboardController.load(riderId: riderId));
-    }
+    _scheduleDashboardLoad();
   }
 
   @override
   void didUpdateWidget(covariant RiderDashboardScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.riderId != widget.riderId && widget.riderId != null) {
-      unawaited(
-        widget.dashboardController.load(riderId: widget.riderId!, force: true),
-      );
+    if (oldWidget.riderId != widget.riderId ||
+        oldWidget.dashboardController != widget.dashboardController) {
+      _scheduleDashboardLoad(force: true);
     }
+  }
+
+  void _scheduleDashboardLoad({bool force = false}) {
+    final riderId = widget.riderId;
+    final controller = widget.dashboardController;
+    if (riderId == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted ||
+          widget.riderId != riderId ||
+          widget.dashboardController != controller)
+        return;
+      unawaited(controller.load(riderId: riderId, force: force));
+    });
   }
 
   Future<void> _refresh() async {
@@ -98,55 +107,68 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final dashboard = widget.dashboardController;
-    final availability = widget.availabilityController;
     return ColoredBox(
-      color: AgrisellColors.homeBackground,
-      child: Column(
-        children: [
-          AnimatedBuilder(
-            animation: Listenable.merge([dashboard, availability]),
-            builder: (context, _) => RiderDashboardHeader(
-              profile: widget.profile,
-              workStatus: availability.availability,
-              unreadNotifications: dashboard.metrics.unreadNotificationCount,
-              onOpenNotifications: widget.onOpenNotifications,
-            ),
-          ),
-          Expanded(
-            child: AnimatedBuilder(
-              animation: Listenable.merge([
-                dashboard,
-                availability,
-                availability.locationController,
-                widget.deliveryController,
-              ]),
-              builder: (context, _) => LayoutBuilder(
-                builder: (context, constraints) {
-                  final sidePadding = constraints.maxWidth > 760
-                      ? (constraints.maxWidth - 760) / 2 + 18
-                      : 16.0;
-                  return RefreshIndicator(
+      color: RiderHomeDesignStyles.background,
+      child: AnimatedBuilder(
+        animation: Listenable.merge([
+          widget.dashboardController,
+          widget.availabilityController,
+          widget.availabilityController.locationController,
+          widget.deliveryController,
+        ]),
+        builder: (context, _) => LayoutBuilder(
+          builder: (context, constraints) {
+            final side = constraints.maxWidth > 760
+                ? (constraints.maxWidth - 760) / 2 + 14
+                : 14.0;
+            final cards = _content();
+            return Column(
+              children: [
+                RiderDashboardHeader(
+                  profile: widget.profile,
+                  workStatus: widget.availabilityController.availability,
+                  unreadNotifications: widget
+                      .dashboardController
+                      .metrics
+                      .unreadNotificationCount,
+                  onOpenNotifications: widget.onOpenNotifications,
+                ),
+                Stack(
+                  children: [
+                    const Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: 26,
+                      child: DecoratedBox(
+                        decoration: RiderHomeDesignStyles.header,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: side),
+                      child: RiderAvailabilityCard(
+                        controller: widget.availabilityController,
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: RefreshIndicator(
                     onRefresh: _refresh,
-                    child: ListView(
+                    child: ListView.builder(
+                      padding: EdgeInsets.fromLTRB(side, 14, side, 24),
                       physics: const AlwaysScrollableScrollPhysics(
                         parent: ClampingScrollPhysics(),
                       ),
-                      scrollCacheExtent: const ScrollCacheExtent.pixels(10000),
-                      padding: EdgeInsets.fromLTRB(
-                        sidePadding,
-                        16,
-                        sidePadding,
-                        156,
-                      ),
-                      children: _content(),
+                      itemCount: cards.length,
+                      itemBuilder: (context, index) => cards[index],
                     ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

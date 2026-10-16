@@ -11,7 +11,6 @@ import 'package:agresell_app/features/shared/products/domain/product_sale_status
 
 class FarmerProductEditFormPanel extends StatelessWidget {
   const FarmerProductEditFormPanel({
-    required this.bottomInset,
     required this.nameController,
     required this.priceController,
     required this.weightController,
@@ -39,7 +38,6 @@ class FarmerProductEditFormPanel extends StatelessWidget {
     super.key,
   });
 
-  final double bottomInset;
   final TextEditingController nameController;
   final TextEditingController priceController;
   final TextEditingController weightController;
@@ -69,55 +67,66 @@ class FarmerProductEditFormPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: FarmerProductEditFormPanelStyles.panelDecoration,
-      child: SingleChildScrollView(
-        padding: FarmerProductEditFormPanelStyles.panelPadding(bottomInset),
-        child: Column(
-          children: [
-            ProductEditDiscountBanner(
-              activeSaleNotice: activeSaleNotice,
-              isFarmerDiscount: isFarmerDiscount,
-              onManageDiscount: onManageDiscount,
-              onRemoveDiscount: onRemoveDiscount,
+      child: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: FarmerProductEditFormPanelStyles.panelPadding,
+              child: Column(
+                children: [
+                  ProductEditDiscountBanner(
+                    activeSaleNotice: activeSaleNotice,
+                    isFarmerDiscount: isFarmerDiscount,
+                    onManageDiscount: onManageDiscount,
+                    onRemoveDiscount: onRemoveDiscount,
+                  ),
+                  ProductEditNameRow(controller: nameController),
+                  FarmerProductEditFormPanelStyles.rowSpacing,
+                  ProductEditPriceRow(controller: priceController),
+                  FarmerProductEditFormPanelStyles.rowSpacing,
+                  ProductEditWeightRow(controller: weightController),
+                  FarmerProductEditFormPanelStyles.rowSpacing,
+                  ProductEditHarvestDateRow(
+                    day: day,
+                    month: month,
+                    year: year,
+                    productionStage: productionStage,
+                    sellingOption: saleStatus,
+                    onDayChanged: onDayChanged,
+                    onMonthChanged: onMonthChanged,
+                    onYearChanged: onYearChanged,
+                  ),
+                  FarmerProductEditFormPanelStyles.rowSpacing,
+                  ProductEditCategoryRow(
+                    category: category,
+                    categories: categories,
+                    onChanged: onCategoryChanged,
+                  ),
+                  FarmerProductEditFormPanelStyles.rowSpacing,
+                  ProductEditProductionStageRow(
+                    value: productionStage,
+                    onChanged: onProductionStageChanged,
+                  ),
+                  FarmerProductEditFormPanelStyles.rowSpacing,
+                  ProductEditSaleStatusRow(
+                    value: saleStatus,
+                    productionStage: productionStage,
+                    onChanged: onSaleStatusChanged,
+                  ),
+                  FarmerProductEditFormPanelStyles.actionSpacing,
+                  ProductEditStatusButton(isSold: isSold, onTap: onStatusTap),
+                ],
+              ),
             ),
-            ProductEditNameRow(controller: nameController),
-            FarmerProductEditFormPanelStyles.rowSpacing,
-            ProductEditPriceRow(controller: priceController),
-            FarmerProductEditFormPanelStyles.rowSpacing,
-            ProductEditWeightRow(controller: weightController),
-            FarmerProductEditFormPanelStyles.rowSpacing,
-            ProductEditHarvestDateRow(
-              day: day,
-              month: month,
-              year: year,
-              productionStage: productionStage,
-              sellingOption: saleStatus,
-              onDayChanged: onDayChanged,
-              onMonthChanged: onMonthChanged,
-              onYearChanged: onYearChanged,
+          ),
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: FarmerProductEditFormPanelStyles.footerPadding,
+              child: ProductEditFormActions(onCancel: onCancel, onSave: onSave),
             ),
-            FarmerProductEditFormPanelStyles.rowSpacing,
-            ProductEditCategoryRow(
-              category: category,
-              categories: categories,
-              onChanged: onCategoryChanged,
-            ),
-            FarmerProductEditFormPanelStyles.rowSpacing,
-            ProductEditProductionStageRow(
-              value: productionStage,
-              onChanged: onProductionStageChanged,
-            ),
-            FarmerProductEditFormPanelStyles.rowSpacing,
-            ProductEditSaleStatusRow(
-              value: saleStatus,
-              productionStage: productionStage,
-              onChanged: onSaleStatusChanged,
-            ),
-            FarmerProductEditFormPanelStyles.actionSpacing,
-            ProductEditStatusButton(isSold: isSold, onTap: onStatusTap),
-            FarmerProductEditFormPanelStyles.actionSpacing,
-            ProductEditFormActions(onCancel: onCancel, onSave: onSave),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -5,7 +5,7 @@ import 'package:agresell_app/features/rider/chat/domain/rider_communication_mode
 import 'package:agresell_app/features/rider/chat/domain/rider_conversation_access.dart';
 import 'package:agresell_app/features/rider/chat/presentation/controllers/rider_messages_controller.dart';
 import 'package:agresell_app/features/rider/chat/presentation/widgets/rider_chat_panel.dart';
-import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_detail_header.dart';
+import 'package:agresell_app/features/rider/chat/presentation/widgets/rider_conversation_header.dart';
 import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_profile_intro.dart';
 import 'package:agresell_app/features/rider/deliveries/data/rider_offline_action_queue.dart';
 import 'support/memory_offline_queue_repository.dart';
@@ -56,11 +56,18 @@ void main() {
       expect(controller.messages.last.body, "I'm outside.");
       expect(find.byType(ChatProfileIntro), findsNothing);
       expect(
-        tester.widget<ChatDetailHeader>(find.byType(ChatDetailHeader)).isEmpty,
-        isFalse,
+        tester
+            .widget<RiderConversationHeader>(
+              find.byType(RiderConversationHeader),
+            )
+            .conversation
+            .id,
+        conversation.id,
       );
       {
-        await tester.tap(find.text('Safety'));
+        await tester.tap(find.byTooltip('Conversation options'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Safety and support'));
         await tester.pumpAndSettle();
         expect(find.text('Safety & Emergency Support'), findsOneWidget);
       }

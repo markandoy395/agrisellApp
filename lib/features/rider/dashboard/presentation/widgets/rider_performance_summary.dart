@@ -1,5 +1,7 @@
 import 'package:agresell_app/features/rider/dashboard/presentation/styles/rider_performance_summary_styles.dart';
 import 'package:flutter/material.dart';
+import '../styles/rider_home_design_styles.dart';
+import '../styles/rider_reference_styles.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_dashboard_state.dart';
@@ -48,6 +50,7 @@ class RiderPerformanceSummary extends StatelessWidget {
         ),
     ];
     return RiderSurfaceCard(
+      decoration: RiderHomeDesignStyles.card,
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,17 +72,43 @@ class RiderPerformanceSummary extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          if (rows.isEmpty)
-            const Text(
-              'Performance data is not available yet.',
-              style: RiderPerformanceSummaryStyles
-                  .performanceDataIsNotAvailableText,
-            )
-          else
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [for (final row in rows) _PerformanceChip(item: row)],
+          if (rows.isEmpty) ...[
+            const Center(
+              child: Icon(
+                Icons.bar_chart_rounded,
+                size: 64,
+                color: AgrisellColors.mutedText,
+              ),
+            ),
+            const Center(
+              child: Text(
+                'Performance data is not available yet.',
+                style: RiderPerformanceSummaryStyles
+                    .performanceDataIsNotAvailableText,
+              ),
+            ),
+          ] else
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final columns =
+                    constraints.maxWidth < 300 ||
+                        MediaQuery.textScalerOf(context).scale(12) > 16
+                    ? 2
+                    : rows.length;
+                return Wrap(
+                  spacing: 8,
+                  runSpacing: 12,
+                  children: [
+                    for (final row in rows)
+                      SizedBox(
+                        width:
+                            (constraints.maxWidth - (columns - 1) * 8) /
+                            columns,
+                        child: _PerformanceChip(item: row),
+                      ),
+                  ],
+                );
+              },
             ),
         ],
       ),
@@ -95,20 +124,33 @@ class _PerformanceChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Semantics(
     label: '${item.label}: ${item.value}',
-    child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: RiderPerformanceSummaryStyles.containerDecoration,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(item.icon, color: AgrisellColors.authGreen, size: 16),
-          const SizedBox(width: 6),
-          Text(
-            '${item.label}: ${item.value}',
-            style: RiderPerformanceSummaryStyles.textStyle,
-          ),
-        ],
-      ),
+    child: Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              item.icon,
+              color: item.icon == Icons.star_rate_rounded
+                  ? AgrisellColors.accentOrange
+                  : item.icon == Icons.cancel_outlined
+                  ? RiderHomeDesignStyles.red
+                  : AgrisellColors.authGreen,
+              size: 18,
+            ),
+            const SizedBox(width: 5),
+            Flexible(
+              child: Text(item.value, style: RiderReferenceStyles.value),
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+        Text(
+          item.label,
+          textAlign: TextAlign.center,
+          style: RiderReferenceStyles.small,
+        ),
+      ],
     ),
   );
 }

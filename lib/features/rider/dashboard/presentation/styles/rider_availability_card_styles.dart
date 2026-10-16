@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -16,17 +17,17 @@ abstract final class RiderAvailabilityCardStyles {
 
   static Color iconColor(RiderAvailability availability) =>
       availability.canReceiveRequests
-          ? AgrisellColors.statusGreenText
-          : availability.isHandlingDelivery
-          ? AgrisellColors.statusBlueText
-          : AgrisellColors.mutedText;
+      ? AgrisellColors.statusGreenText
+      : availability.isHandlingDelivery
+      ? AgrisellColors.statusBlueText
+      : AgrisellColors.mutedText;
 
   static Color iconBackground(RiderAvailability availability) =>
       availability.canReceiveRequests
-          ? AgrisellColors.statusGreenBackground
-          : availability.isHandlingDelivery
-          ? AgrisellColors.statusBlueBackground
-          : AgrisellColors.deliveryGray.withValues(alpha: 0.75);
+      ? AgrisellColors.statusGreenBackground
+      : availability.isHandlingDelivery
+      ? AgrisellColors.statusBlueBackground
+      : AgrisellColors.deliveryGray.withValues(alpha: 0.75);
 
   static BoxDecoration iconBoxDecoration(RiderAvailability availability) =>
       BoxDecoration(
@@ -36,13 +37,15 @@ abstract final class RiderAvailabilityCardStyles {
 
   // Shift Copy
   static const workStatusTitleStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 15,
     height: 1.1,
-    fontWeight: FontWeight.w900,
+    fontWeight: FontWeight.w800,
   );
 
   static const workStatusSubtitleStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
     height: 1.3,
@@ -109,6 +112,7 @@ abstract final class RiderAvailabilityCardStyles {
   );
 
   static const noticeTextStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.statusOrangeText,
     fontSize: 12,
     height: 1.25,
@@ -116,6 +120,7 @@ abstract final class RiderAvailabilityCardStyles {
   );
 
   static const warningTextStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.statusOrangeText,
     fontSize: 12,
     height: 1.3,

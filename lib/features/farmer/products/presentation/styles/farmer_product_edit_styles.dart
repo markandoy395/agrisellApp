@@ -10,8 +10,16 @@ abstract final class FarmerProductEditStyles {
     foregroundColor: Colors.white,
   );
 
-  static double calculateImageHeight(double screenWidth) =>
-      (screenWidth * 0.84).clamp(292.0, 360.0);
+  static double calculateImageHeight(
+    double screenWidth, {
+    bool keyboardVisible = false,
+    double availableHeight = double.infinity,
+  }) {
+    final normalHeight = (screenWidth * 0.84).clamp(292.0, 360.0);
+    return keyboardVisible
+        ? normalHeight.clamp(0.0, availableHeight * 0.4)
+        : normalHeight;
+  }
 
   static const panelOverlap = 28.0;
 }

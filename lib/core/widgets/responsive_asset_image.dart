@@ -51,6 +51,8 @@ class ResponsiveAssetImage extends StatelessWidget {
   Widget build(BuildContext context) {
     final explicitWidth = _validExtent(width);
     final explicitHeight = _validExtent(height);
+    // A single explicit dimension must preserve the image's intrinsic ratio.
+    // The parent's loose opposite constraint is not the image's target size.
     if (explicitWidth != null || explicitHeight != null) {
       return _buildImage(context, explicitWidth, explicitHeight);
     }
@@ -114,8 +116,8 @@ class ResponsiveAssetImage extends StatelessWidget {
         gaplessPlayback: gaplessPlayback,
         cacheWidth: cacheWidth,
         cacheHeight: cacheHeight,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) {
+        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+          if (wasSynchronouslyLoaded || frame != null) {
             return child;
           }
 

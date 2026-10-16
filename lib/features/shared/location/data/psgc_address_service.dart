@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class PsgcAddressOption {
@@ -59,30 +60,31 @@ class PsgcAddressService implements PhilippineAddressLookup {
           .get(Uri.parse('$baseUrl$path'))
           .timeout(const Duration(seconds: 12));
       if (response.statusCode != 200) return const [];
-      final decoded = jsonDecode(response.body);
-      final values = decoded is Map<String, Object?>
-          ? decoded['data']
-          : decoded;
-      if (values is! List) return const [];
-      return values
-          .whereType<Map>()
-          .map(
-            (value) => PsgcAddressOption(
-              code: _text(value['code']),
-              name: _text(value['name']),
-              province: _placeName(value['province'] ?? value['province_name']),
-              provinceCode: _placeCode(
-                value['province'] ?? value['province_code'],
-              ),
-              region: _placeName(value['region'] ?? value['region_name']),
-            ),
-          )
-          .where((option) => option.code.isNotEmpty && option.name.isNotEmpty)
-          .toList(growable: false);
+      return await compute(_parseAddressOptions, response.bodyBytes);
     } on Exception {
       return const [];
     }
   }
+}
+
+// Decode and construct the complete result off the UI isolate on native targets.
+List<PsgcAddressOption> _parseAddressOptions(Uint8List bytes) {
+  final decoded = jsonDecode(utf8.decode(bytes));
+  final values = decoded is Map<String, Object?> ? decoded['data'] : decoded;
+  if (values is! List) return const [];
+  return values
+      .whereType<Map>()
+      .map(
+        (value) => PsgcAddressOption(
+          code: _text(value['code']),
+          name: _text(value['name']),
+          province: _placeName(value['province'] ?? value['province_name']),
+          provinceCode: _placeCode(value['province'] ?? value['province_code']),
+          region: _placeName(value['region'] ?? value['region_name']),
+        ),
+      )
+      .where((option) => option.code.isNotEmpty && option.name.isNotEmpty)
+      .toList(growable: false);
 }
 
 String _text(Object? value) => value?.toString().trim() ?? '';

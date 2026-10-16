@@ -59,11 +59,15 @@ extension _RiderHomeProfileLifecycle on _RiderHomeScreenState {
   }
 
   Future<void> _initializeRiderState() async {
-    if (AgrisellSupabase.isInitialized) {
-      if (mounted) _updateState(() => _profileLoading = true);
+    if (AgrisellSupabase.isInitialized || widget.profileLoader != null) {
       try {
-        final profile = await RiderRegistrationService.instance
-            .loadCurrentProfile(force: true);
+        final loadProfile =
+            widget.profileLoader ??
+            () => RiderRegistrationService.instance.loadCurrentProfile(
+              force: true,
+            );
+        final profile = await loadProfile();
+        if (!mounted) return;
         _profile = profile;
         _riderId = profile?.id;
         _locationController.setCurrentRiderId(_riderId);
@@ -72,14 +76,16 @@ extension _RiderHomeProfileLifecycle on _RiderHomeScreenState {
             ? 'The Rider profile could not be found.'
             : null;
       } on RiderRegistrationException catch (error) {
+        if (!mounted) return;
         _profileError = error.message;
       } finally {
-        if (mounted) _updateState(() => _profileLoading = false);
+        if (mounted) _updateState(() {});
       }
       if (_riderId == null) return;
     }
     final riderId = _riderId ?? '';
     await _deliveryController.restore(riderId: riderId);
+    if (!mounted || (_riderId ?? '') != riderId) return;
     await Future.wait([
       _availabilityController.initialize(riderId: riderId),
       _dashboardController.load(riderId: riderId),

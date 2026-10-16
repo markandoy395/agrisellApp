@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../../domain/rider_wallet.dart';
 
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/features/rider/dashboard/data/rider_analytics_repository.dart';
@@ -26,6 +27,8 @@ class RiderAnalyticsController extends ChangeNotifier {
   String? _earningsError;
   String? _historyError;
   String? _ratingsError;
+  RiderWallet? wallet;
+  String? walletError;
 
   RiderAnalyticsLoadState get earningsState => _earningsState;
   RiderAnalyticsLoadState get historyState => _historyState;
@@ -96,10 +99,31 @@ class RiderAnalyticsController extends ChangeNotifier {
 
   Future<void> loadWithdrawalMethods({required String riderId}) async {
     try {
-      _withdrawalMethods =
-          await _repository.fetchWithdrawalMethods(riderId: riderId);
+      _withdrawalMethods = await _repository.fetchWithdrawalMethods(
+        riderId: riderId,
+      );
       notifyListeners();
     } catch (_) {}
+  }
+
+  Future<void> loadWallet({required String riderId}) async {
+    wallet = null;
+    walletError = null;
+    try {
+      final repository = _repository;
+      if (repository is! RiderWalletRepository) {
+        throw StateError('Wallet unavailable');
+      }
+      wallet = await (repository as RiderWalletRepository).fetchWallet();
+      _withdrawalRequests = await _repository.fetchWithdrawalRequests(
+        riderId: riderId,
+      );
+    } catch (_) {
+      wallet = null;
+      _withdrawalRequests = const [];
+      walletError = 'Cash-out balance could not be verified. Please retry.';
+    }
+    notifyListeners();
   }
 
   Future<RiderWithdrawalMethod> saveWithdrawalMethod({
@@ -139,8 +163,9 @@ class RiderAnalyticsController extends ChangeNotifier {
 
   Future<void> loadWithdrawalRequests({required String riderId}) async {
     try {
-      _withdrawalRequests =
-          await _repository.fetchWithdrawalRequests(riderId: riderId);
+      _withdrawalRequests = await _repository.fetchWithdrawalRequests(
+        riderId: riderId,
+      );
       notifyListeners();
     } catch (_) {}
   }

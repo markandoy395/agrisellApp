@@ -71,39 +71,43 @@ void main() {
       expect(ids.length, 8);
     });
 
-    test('loadMore enforces concurrency lock preventing redundant calls', () async {
-      final completer = Completer<({List<HomeProduct> products, bool hasMore})>();
-      final repo = _AsyncPaginatedRepository(completer);
-      final controller = HomeProductCatalogController(
-        repository: repo,
-        pageSize: 2,
-      );
-      addTearDown(controller.dispose);
+    test(
+      'loadMore enforces concurrency lock preventing redundant calls',
+      () async {
+        final completer =
+            Completer<({List<HomeProduct> products, bool hasMore})>();
+        final repo = _AsyncPaginatedRepository(completer);
+        final controller = HomeProductCatalogController(
+          repository: repo,
+          pageSize: 2,
+        );
+        addTearDown(controller.dispose);
 
-      // Complete initial load
-      await controller.load();
-      expect(controller.products.length, 2);
+        // Complete initial load
+        await controller.load();
+        expect(controller.products.length, 2);
 
-      // Trigger loadMore but don't finish yet
-      final firstLoadMore = controller.loadMore();
-      expect(controller.isLoadingMore, isTrue);
+        // Trigger loadMore but don't finish yet
+        final firstLoadMore = controller.loadMore();
+        expect(controller.isLoadingMore, isTrue);
 
-      // Second trigger while first is still inflight should be ignored
-      final secondLoadMore = controller.loadMore();
-      expect(repo.pageCalls, 2); // 1 for initial load, 1 for firstLoadMore
+        // Second trigger while first is still inflight should be ignored
+        final secondLoadMore = controller.loadMore();
+        expect(repo.pageCalls, 2); // 1 for initial load, 1 for firstLoadMore
 
-      // Complete the inflight request
-      completer.complete((
-        products: [testHomeProducts[2], testHomeProducts[3]],
-        hasMore: true,
-      ));
-      await firstLoadMore;
-      await secondLoadMore;
+        // Complete the inflight request
+        completer.complete((
+          products: [testHomeProducts[2], testHomeProducts[3]],
+          hasMore: true,
+        ));
+        await firstLoadMore;
+        await secondLoadMore;
 
-      expect(controller.isLoadingMore, isFalse);
-      expect(controller.products.length, 4);
-      expect(repo.pageCalls, 2); // Didn't increment from the second trigger
-    });
+        expect(controller.isLoadingMore, isFalse);
+        expect(controller.products.length, 4);
+        expect(repo.pageCalls, 2); // Didn't increment from the second trigger
+      },
+    );
 
     test('hasMore becomes false when reaching end of catalog', () async {
       final smallCatalog = testHomeProducts.take(3).toList();
@@ -176,55 +180,63 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('triggers onLoadMore when scrolled near the bottom (80% depth)', (
-      tester,
-    ) async {
-      await tester.binding.setSurfaceSize(const Size(430, 932));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
+    testWidgets(
+      'triggers onLoadMore when scrolled near the bottom (80% depth)',
+      (tester) async {
+        await tester.binding.setSurfaceSize(const Size(430, 932));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
 
-      final bannerController = PageController();
-      final searchController = TextEditingController();
-      final browseController = HomeProductBrowseController();
-      addTearDown(() {
-        bannerController.dispose();
-        searchController.dispose();
-        browseController.dispose();
-      });
+        final bannerController = PageController();
+        final searchController = TextEditingController();
+        final browseController = HomeProductBrowseController();
+        addTearDown(() {
+          bannerController.dispose();
+          searchController.dispose();
+          browseController.dispose();
+        });
 
-      var loadMoreTriggered = false;
+        var loadMoreTriggered = false;
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: HomeProductScrollView(
-              bannerController: bannerController,
-              searchController: searchController,
-              browseController: browseController,
-              products: testHomeProducts.take(8).toList(),
-              saleProducts: const [],
-              onBannerTap: (_) {},
-              onViewAllSales: () {},
-              onShowFilters: () {},
-              onReset: () {},
-              onProductTap: (_) {},
-              onRefresh: () async {},
-              isLoadingMore: false,
-              hasMore: true,
-              onLoadMore: () {
-                loadMoreTriggered = true;
-              },
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: HomeProductScrollView(
+                bannerController: bannerController,
+                searchController: searchController,
+                browseController: browseController,
+                products: testHomeProducts.take(8).toList(),
+                saleProducts: testHomeProducts,
+                onBannerTap: (_) {},
+                onViewAllSales: () {},
+                onShowFilters: () {},
+                onReset: () {},
+                onProductTap: (_) {},
+                onRefresh: () async {},
+                isLoadingMore: false,
+                hasMore: true,
+                onLoadMore: () {
+                  loadMoreTriggered = true;
+                },
+              ),
             ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      // Drag significantly down to exceed 80% scroll depth
-      await tester.drag(find.byType(CustomScrollView), const Offset(0, -900));
-      await tester.pumpAndSettle();
+        await tester.drag(
+          find.byKey(const ValueKey('home-sale-products-list')),
+          const Offset(-1000, 0),
+        );
+        await tester.pumpAndSettle();
+        expect(loadMoreTriggered, isFalse);
 
-      expect(loadMoreTriggered, isTrue);
-    });
+        // Drag significantly down to exceed 80% scroll depth
+        await tester.drag(find.byType(CustomScrollView), const Offset(0, -900));
+        await tester.pumpAndSettle();
+
+        expect(loadMoreTriggered, isTrue);
+      },
+    );
   });
 }
 

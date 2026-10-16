@@ -8,32 +8,39 @@ extension _SupabaseRiderDeliveryCompletion on SupabaseRiderDeliveryRepository {
       command.previousStatus,
       command.newStatus,
     );
-    if (command.previousStatus.databaseValue ==
-        command.newStatus.databaseValue) {
-      final current = _snapshot(
-        await _requiredBundle(command.deliveryId),
-        command.riderId,
-      );
-      final event = DeliveryStatusEvent(
-        eventId: command.idempotencyKey,
-        deliveryId: command.deliveryId,
-        previousStatus: command.previousStatus,
-        newStatus: command.newStatus,
-        riderId: command.riderId,
-        timestamp: DateTime.now(),
-        latitude: command.location?.latitude,
-        longitude: command.location?.longitude,
-        note: command.note,
-        source: command.source,
-        syncStatus: DeliveryEventSyncStatus.synchronized,
-      );
-      return DeliveryStatusSnapshot(
-        request: current.request,
-        currentStatus: command.newStatus,
-        events: [...current.events, event],
-      );
-    }
     try {
+      if (command.previousStatus.databaseValue ==
+          command.newStatus.databaseValue) {
+        final current = _snapshot(
+          await _requiredBundle(command.deliveryId),
+          command.riderId,
+        );
+        if (!current.request.isAssignedTo(command.riderId)) {
+          throw const DeliveryDomainException.unauthorized();
+        }
+        if (current.currentStatus.databaseValue !=
+            command.previousStatus.databaseValue) {
+          throw const DeliveryDomainException.synchronizationConflict();
+        }
+        final event = DeliveryStatusEvent(
+          eventId: command.idempotencyKey,
+          deliveryId: command.deliveryId,
+          previousStatus: command.previousStatus,
+          newStatus: command.newStatus,
+          riderId: command.riderId,
+          timestamp: DateTime.now(),
+          latitude: command.location?.latitude,
+          longitude: command.location?.longitude,
+          note: command.note,
+          source: command.source,
+          syncStatus: DeliveryEventSyncStatus.synchronized,
+        );
+        return DeliveryStatusSnapshot(
+          request: current.request,
+          currentStatus: command.newStatus,
+          events: [...current.events, event],
+        );
+      }
       await _dataSource.updateDeliveryStatus(
         deliveryId: command.deliveryId,
         previousStatus: command.previousStatus,
@@ -95,42 +102,56 @@ extension _SupabaseRiderDeliveryCompletion on SupabaseRiderDeliveryRepository {
         code: DeliveryErrorCode.invalidProof,
       );
     }
-    for (final entry in command.proofReferences.entries.where(
-      (entry) => const {
-        PickupConfirmationMethod.productPhoto,
-        PickupConfirmationMethod.packagePhoto,
-        PickupConfirmationMethod.farmerSignature,
-      }.contains(entry.key),
-    )) {
-      await _savePickupReference(command, entry.key, entry.value);
-    }
-    if (command.confirmationCode?.trim().isNotEmpty ?? false) {
-      await _dataSource.saveConfirmationCode(
+    try {
+      for (final entry in command.proofReferences.entries.where(
+        (entry) => entry.key.requiresImage,
+      )) {
+        await _savePickupReference(command, entry.key, entry.value);
+      }
+      if (command.confirmationCode?.trim().isNotEmpty ?? false) {
+        await _dataSource.saveConfirmationCode(
+          deliveryId: command.deliveryId,
+          stage: DeliveryProofStage.pickup,
+          code: command.confirmationCode!,
+        );
+      }
+      final bundle = await _requiredBundle(command.deliveryId);
+      await _dataSource.completePickupStatus(
         deliveryId: command.deliveryId,
-        stage: DeliveryProofStage.pickup,
-        code: command.confirmationCode!,
+        previousStatus: bundle.delivery.deliveryStatus,
+        idempotencyKey: command.idempotencyKey,
+        command: command,
+      );
+      for (final reference in command.proofReferences.values) {
+        await _removeLocalProof(reference);
+        _pendingPickupRemoteReferences.remove(reference);
+      }
+      final snapshot = _snapshot(
+        await _requiredBundle(command.deliveryId),
+        command.riderId,
+      );
+      return PickupCompletionResult(
+        status: snapshot,
+        proofReferences: command.proofReferences.values.toList(),
+        buyerNotified: true,
+      );
+    } on DeliveryDataException catch (error) {
+      throw DeliveryTransitionException(
+        error.message,
+        code: switch (error.type) {
+          DeliveryDataFailureType.offline || DeliveryDataFailureType.timeout =>
+            DeliveryErrorCode.networkUnavailable,
+          DeliveryDataFailureType.authentication ||
+          DeliveryDataFailureType.authorization =>
+            DeliveryErrorCode.unauthorizedOperation,
+          DeliveryDataFailureType.conflict =>
+            DeliveryErrorCode.synchronizationConflict,
+          DeliveryDataFailureType.storage ||
+          DeliveryDataFailureType.validation => DeliveryErrorCode.invalidProof,
+          _ => DeliveryErrorCode.invalidStatusTransition,
+        },
       );
     }
-    final bundle = await _requiredBundle(command.deliveryId);
-    await _dataSource.completePickupStatus(
-      deliveryId: command.deliveryId,
-      previousStatus: bundle.delivery.deliveryStatus,
-      idempotencyKey: command.idempotencyKey,
-      command: command,
-    );
-    for (final reference in command.proofReferences.values) {
-      await _removeLocalProof(reference);
-      _pendingPickupRemoteReferences.remove(reference);
-    }
-    final snapshot = _snapshot(
-      await _requiredBundle(command.deliveryId),
-      command.riderId,
-    );
-    return PickupCompletionResult(
-      status: snapshot,
-      proofReferences: command.proofReferences.values.toList(),
-      buyerNotified: true,
-    );
   }
 
   Future<void> _savePickupReference(
@@ -138,6 +159,13 @@ extension _SupabaseRiderDeliveryCompletion on SupabaseRiderDeliveryRepository {
     PickupConfirmationMethod method,
     String reference,
   ) async {
+    if (reference.startsWith('protected://')) {
+      throw const DeliveryTransitionException(
+        'This saved pickup proof has no image. Retake its photo or remove '
+        'the optional proof, then complete pickup again.',
+        code: DeliveryErrorCode.invalidProof,
+      );
+    }
     final type = method == PickupConfirmationMethod.farmerSignature
         ? DeliveryProofType.riderSignature
         : DeliveryProofType.productPhoto;

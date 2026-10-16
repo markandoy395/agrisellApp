@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -17,6 +18,7 @@ abstract final class RiderDeliveryDetailsStyles {
   static const double waybillButtonIconSize = 16.0;
 
   static const TextStyle waybillButtonText = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontWeight: FontWeight.w700,
     fontSize: 12,
   );

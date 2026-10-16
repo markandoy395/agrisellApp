@@ -1,7 +1,6 @@
-import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/utils/notification_date_group.dart';
+import 'package:agresell_app/features/shared/notifications/presentation/widgets/notification_grouped_list.dart';
 import 'package:agresell_app/features/rider/chat/domain/rider_notification.dart';
 import 'package:agresell_app/features/rider/chat/presentation/widgets/rider_notification_card.dart';
 import 'package:agresell_app/features/shared/notifications/presentation/widgets/notification_state_view.dart';
@@ -30,50 +29,19 @@ class RiderNotificationList extends StatelessWidget {
             'Delivery requests, messages, payments, and account updates will appear here.',
       );
     }
-    final groups = _groupNotifications(notifications);
-    return ListView(
+    return NotificationGroupedList<RiderNotification>(
+      items: notifications,
+      dateOf: (item) => item.createdAt,
       padding: const EdgeInsets.fromLTRB(14, 4, 14, 30),
-      children: [
-        for (final group in NotificationDateGroup.values)
-          if (groups[group] case final items? when items.isNotEmpty) ...[
-            _GroupLabel(label: group.label),
-            for (final notification in items) ...[
-              RiderNotificationCard(
-                key: ValueKey(notification.id),
-                notification: notification,
-                onTap: () => onOpen(notification),
-                onToggleRead: () => onToggleRead(notification),
-                onDelete: notification.canDelete && onDelete != null
-                    ? () => onDelete!(notification)
-                    : null,
-              ),
-              const SizedBox(height: 10),
-            ],
-          ],
-      ],
+      itemBuilder: (context, notification) => RiderNotificationCard(
+        key: ValueKey(notification.id),
+        notification: notification,
+        onTap: () => onOpen(notification),
+        onToggleRead: () => onToggleRead(notification),
+        onDelete: notification.canDelete && onDelete != null
+            ? () => onDelete!(notification)
+            : null,
+      ),
     );
   }
-
-  Map<NotificationDateGroup, List<RiderNotification>> _groupNotifications(
-    List<RiderNotification> items,
-  ) {
-    final result = <NotificationDateGroup, List<RiderNotification>>{};
-    for (final item in items) {
-      result
-          .putIfAbsent(NotificationDateGroup.from(item.createdAt), () => [])
-          .add(item);
-    }
-    return result;
-  }
-}
-
-class _GroupLabel extends StatelessWidget {
-  const _GroupLabel({required this.label});
-  final String label;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(4, 14, 4, 8),
-    child: Text(label, style: SharedPresentationStyles.headingBodyExtraBold),
-  );
 }

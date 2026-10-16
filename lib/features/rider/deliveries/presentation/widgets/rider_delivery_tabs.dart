@@ -1,18 +1,13 @@
-import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
-import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_tabs_styles.dart';
 import 'package:flutter/material.dart';
-
-import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
-import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
-import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
-import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_location_controller.dart';
-import 'package:agresell_app/features/rider/deliveries/presentation/screens/rider_delivery_details_screen.dart';
-import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_progress_timeline.dart';
-import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
-import 'package:agresell_app/features/rider/presentation/widgets/rider_state_cards.dart';
-import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_request_details.dart';
-import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_batch_delivery_summary.dart';
+import '../../domain/delivery_request.dart';
+import '../../domain/delivery_stage.dart';
+import '../controllers/rider_delivery_controller.dart';
+import '../controllers/rider_location_controller.dart';
+import '../screens/rider_delivery_details_screen.dart';
+import '../../../presentation/widgets/rider_state_cards.dart';
+import 'rider_active_trip_card.dart';
+import 'rider_active_trip_summary.dart';
 
 class RiderActiveDeliveryList extends StatelessWidget {
   const RiderActiveDeliveryList({
@@ -20,13 +15,16 @@ class RiderActiveDeliveryList extends StatelessWidget {
     required this.riderId,
     this.locationController,
     this.onOpenConversation,
+    this.onOpenMap,
+    this.capacityKg,
     super.key,
   });
-
   final RiderDeliveryController controller;
   final String? riderId;
   final RiderLocationController? locationController;
   final Future<bool> Function(String deliveryId)? onOpenConversation;
+  final VoidCallback? onOpenMap;
+  final double? capacityKg;
 
   @override
   Widget build(BuildContext context) {
@@ -45,90 +43,46 @@ class RiderActiveDeliveryList extends StatelessWidget {
       );
     }
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 156),
-      itemCount: active.length + (active.length > 1 ? 1 : 0),
-      separatorBuilder: (_, _) => const SizedBox(height: 10),
+      key: const PageStorageKey('rider-active-list'),
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
+      itemCount: active.length + 1,
+      separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
-        if (active.length > 1 && index == 0) {
-          return RiderBatchDeliverySummary(
+        if (index == 0) {
+          return RiderActiveTripSummary(
             deliveries: active,
             plan: controller.batchPlan,
+            capacityKg: capacityKg,
           );
         }
-        final deliveryIndex = active.length > 1 ? index - 1 : index;
-        return _ActiveDeliveryCard(
-          request: active[deliveryIndex],
-          controller: controller,
-          riderId: riderId,
-          locationController: locationController,
-          onOpenConversation: onOpenConversation,
+        final request = active[index - 1];
+        return RiderActiveTripCard(
+          key: ValueKey(request.id),
+          request: request,
+          status: controller.statusFor(request),
+          onManage: riderId == null ? null : () => _manage(context, request),
+          onMap: riderId == null || onOpenMap == null
+              ? null
+              : () {
+                  controller.selectActiveDelivery(request.id);
+                  onOpenMap!();
+                },
         );
       },
     );
   }
-}
 
-class _ActiveDeliveryCard extends StatelessWidget {
-  const _ActiveDeliveryCard({
-    required this.request,
-    required this.controller,
-    required this.riderId,
-    this.locationController,
-    this.onOpenConversation,
-  });
-
-  final DeliveryRequest request;
-  final RiderDeliveryController controller;
-  final String? riderId;
-  final RiderLocationController? locationController;
-  final Future<bool> Function(String deliveryId)? onOpenConversation;
-
-  @override
-  Widget build(BuildContext context) {
-    return RiderSurfaceCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            request.productName,
-            style: SharedPresentationStyles.headingSubtitleExtraBold,
-          ),
-          const SizedBox(height: 10),
-          RiderRequestDetailLine(
-            icon: Icons.place_outlined,
-            text: 'Pick up from: ${request.pickupLocation.address}',
-          ),
-          RiderRequestDetailLine(
-            icon: Icons.location_on_outlined,
-            text: 'Deliver to: ${request.deliveryLocation.address}',
-          ),
-          const SizedBox(height: 8),
-          RiderDeliveryProgressTimeline(
-            currentStatus: controller.statusFor(request),
-            events: controller.statusEventsFor(request.id),
-          ),
-          const SizedBox(height: 12),
-          FilledButton(
-            onPressed: riderId == null
-                ? null
-                : () {
-                    controller.selectActiveDelivery(request.id);
-                    Navigator.of(context).push(
-                      agrisellPageRoute<void>(
-                        builder: (_) => RiderDeliveryDetailsScreen(
-                          request: request,
-                          controller: controller,
-                          riderId: riderId!,
-                          locationController: locationController,
-                          onOpenConversation: onOpenConversation,
-                        ),
-                      ),
-                    );
-                  },
-            style: RiderDeliveryTabsStyles.filledButtonStyle,
-            child: const Text('Manage delivery'),
-          ),
-        ],
+  void _manage(BuildContext context, DeliveryRequest request) {
+    controller.selectActiveDelivery(request.id);
+    Navigator.of(context).push(
+      agrisellPageRoute<void>(
+        builder: (_) => RiderDeliveryDetailsScreen(
+          request: request,
+          controller: controller,
+          riderId: riderId!,
+          locationController: locationController,
+          onOpenConversation: onOpenConversation,
+        ),
       ),
     );
   }
@@ -141,7 +95,6 @@ class RiderDeliveryTabEmptyState extends StatelessWidget {
     required this.icon,
     super.key,
   });
-
   final String title;
   final String message;
   final IconData icon;

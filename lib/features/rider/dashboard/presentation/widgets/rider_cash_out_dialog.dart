@@ -9,6 +9,7 @@ import 'rider_cash_out_balance_card.dart';
 import 'rider_cash_out_destination_picker.dart';
 import 'rider_cash_out_form_controls.dart';
 import 'rider_cash_out_header.dart';
+import '../utils/rider_payout_request_key.dart';
 
 class RiderCashOutDialog extends StatefulWidget {
   const RiderCashOutDialog({
@@ -34,6 +35,8 @@ class _RiderCashOutDialogState extends State<RiderCashOutDialog> {
   RiderWithdrawalMethod? _selectedMethod;
   bool _isSubmitting = false;
   String? _errorMessage;
+  String _requestKey = newRiderPayoutRequestKey();
+  String? _lastSubmission;
 
   @override
   void initState() {
@@ -45,8 +48,10 @@ class _RiderCashOutDialogState extends State<RiderCashOutDialog> {
   void _initMethods() {
     final methods = widget.controller.withdrawalMethods;
     if (methods.isNotEmpty) {
-      _selectedMethod =
-          methods.firstWhere((m) => m.isDefault, orElse: () => methods.first);
+      _selectedMethod = methods.firstWhere(
+        (m) => m.isDefault,
+        orElse: () => methods.first,
+      );
     }
   }
 
@@ -58,7 +63,7 @@ class _RiderCashOutDialogState extends State<RiderCashOutDialog> {
   }
 
   void _setAmount(double amount) {
-    _amountController.text = amount.toStringAsFixed(0);
+    _amountController.text = amount.toStringAsFixed(2);
   }
 
   Future<void> _submit() async {
@@ -74,8 +79,15 @@ class _RiderCashOutDialogState extends State<RiderCashOutDialog> {
     });
 
     final amount = double.tryParse(_amountController.text.trim()) ?? 0.0;
+    final signature =
+        '$amount:${_selectedMethod!.methodId}:${_notesController.text.trim()}';
+    if (_lastSubmission != null && _lastSubmission != signature) {
+      _requestKey = newRiderPayoutRequestKey();
+    }
+    _lastSubmission = signature;
     final request = RiderWithdrawalRequest(
-      requestId: '',
+      requestId: _requestKey,
+      withdrawalMethodId: _selectedMethod!.methodId,
       amount: amount,
       payoutMethod: _selectedMethod!.payoutMethod,
       accountName: _selectedMethod!.accountName,
@@ -117,9 +129,7 @@ class _RiderCashOutDialogState extends State<RiderCashOutDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                RiderCashOutHeader(
-                  onClose: () => Navigator.of(context).pop(),
-                ),
+                RiderCashOutHeader(onClose: () => Navigator.of(context).pop()),
                 const SizedBox(height: RiderCashOutDialogStyles.sectionGap),
                 RiderCashOutBalanceCard(
                   availableEarnings: widget.availableEarnings,

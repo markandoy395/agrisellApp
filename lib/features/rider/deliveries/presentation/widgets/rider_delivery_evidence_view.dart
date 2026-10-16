@@ -1,89 +1,126 @@
-import 'package:agresell_app/core/services/authenticated_storage_image.dart';
-import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-
+import 'package:agresell_app/core/services/authenticated_storage_image.dart';
 import '../../data/delivery_proof_storage.dart';
+import '../../data/pickup_proof_storage.dart';
+import '../../data/rider_proof_image_reference.dart';
 import '../../domain/delivery_proof.dart';
-import '../../../presentation/widgets/rider_page_widgets.dart';
+import '../styles/rider_delivery_reference_styles.dart';
+import 'rider_detail_card.dart';
 
 class RiderDeliveryEvidenceView extends StatelessWidget {
   const RiderDeliveryEvidenceView({required this.proof, super.key});
-
   final DeliveryProof proof;
-
   @override
-  Widget build(BuildContext context) => RiderSurfaceCard(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Delivery evidence',
-          style: SharedPresentationStyles.bodyExtraBold,
-        ),
-        const SizedBox(height: 8),
-        _EvidenceImage(reference: proof.secureReference),
-        const SizedBox(height: 8),
-        Text(_metadata, style: SharedPresentationStyles.captionSemibold),
-      ],
-    ),
+  Widget build(BuildContext context) => RiderDetailSection(
+    title: 'Delivery evidence',
+    icon: Icons.camera_alt_outlined,
+    children: [
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: SizedBox(
+              width: 74,
+              height: 74,
+              child: _EvidenceImage(reference: proof.secureReference),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  proof.type == DeliveryProofType.productPhoto
+                      ? 'Pickup photo'
+                      : 'Delivery photo',
+                  style: RiderDeliveryReferenceStyles.strongCaption,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  riderDetailDate(context, proof.capturedAt),
+                  style: RiderDeliveryReferenceStyles.caption,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  proof.latitude == null || proof.longitude == null
+                      ? 'GPS unavailable'
+                      : 'GPS: ${proof.latitude!.toStringAsFixed(5)}, ${proof.longitude!.toStringAsFixed(5)}',
+                  style: RiderDeliveryReferenceStyles.caption,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ],
   );
-
-  String get _metadata {
-    final captured = proof.capturedAt.toLocal();
-    final location = proof.latitude == null || proof.longitude == null
-        ? 'GPS unavailable'
-        : 'GPS ${proof.latitude!.toStringAsFixed(5)}, '
-              '${proof.longitude!.toStringAsFixed(5)}';
-    return 'Captured ${captured.year}-${_two(captured.month)}-'
-        '${_two(captured.day)} ${_two(captured.hour)}:${_two(captured.minute)}'
-        ' â€¢ $location';
-  }
-
-  String _two(int value) => value.toString().padLeft(2, '0');
 }
 
-class _EvidenceImage extends StatelessWidget {
+class _EvidenceImage extends StatefulWidget {
   const _EvidenceImage({required this.reference});
-
   final String reference;
+  @override
+  State<_EvidenceImage> createState() => _EvidenceImageState();
+}
+
+class _EvidenceImageState extends State<_EvidenceImage> {
+  Future<Uint8List?>? _local;
+  String? get _url => riderProofImageUrl(widget.reference);
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  void didUpdateWidget(covariant _EvidenceImage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.reference != widget.reference) _load();
+  }
+
+  void _load() => _local = _url != null ? null : _readLocal();
+
+  Future<Uint8List?> _readLocal() async {
+    if (widget.reference.startsWith('local-secure://pickup/')) {
+      final file = await PickupProofStorage().resolveLocalPhoto(
+        widget.reference,
+      );
+      return file?.readAsBytes();
+    }
+    return DeliveryProofStorage().readLocalEvidence(widget.reference);
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (reference.startsWith('http://') || reference.startsWith('https://')) {
-      return _previewable(
-        context,
-        authenticatedNetworkImage(
-          reference,
-          fit: BoxFit.cover,
-          errorBuilder: _error,
-        ),
+    if (_url != null)
+      return authenticatedNetworkImage(
+        _url!,
+        fit: BoxFit.cover,
+        cacheWidth: 222,
+        errorBuilder: _error,
       );
-    }
     return FutureBuilder<Uint8List?>(
-      future: DeliveryProofStorage().readLocalEvidence(reference),
+      key: ValueKey(widget.reference),
+      future: _local,
       builder: (context, snapshot) {
         final bytes = snapshot.data;
         if (bytes == null) return _error(context, Object(), null);
-        return _previewable(context, Image.memory(bytes, fit: BoxFit.cover));
+        return Image.memory(
+          bytes,
+          fit: BoxFit.cover,
+          cacheWidth: 222,
+          errorBuilder: _error,
+        );
       },
     );
   }
 
-  Widget _previewable(BuildContext context, Widget image) => ClipRRect(
-    borderRadius: BorderRadius.circular(10),
-    child: SizedBox(width: double.infinity, height: 180, child: image),
-  );
-
-  Widget _error(BuildContext context, Object error, StackTrace? stackTrace) =>
-      const SizedBox(
-        height: 80,
-        child: Center(
-          child: Text(
-            'Evidence preview is temporarily unavailable.',
-            style: SharedPresentationStyles.caption,
-          ),
-        ),
+  Widget _error(BuildContext context, Object error, StackTrace? stack) =>
+      Semantics(
+        label: 'Evidence preview is temporarily unavailable',
+        child: const Center(child: Icon(Icons.hide_image_outlined)),
       );
 }

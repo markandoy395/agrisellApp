@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/features/rider/dashboard/domain/rider_availability.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/styles/rider_availability_card_styles.dart';
-import 'package:agresell_app/features/rider/presentation/rider_availability_presentation.dart';
 
 class RiderShiftIcon extends StatelessWidget {
   const RiderShiftIcon({required this.availability, super.key});
@@ -15,10 +14,9 @@ class RiderShiftIcon extends StatelessWidget {
       width: RiderAvailabilityCardStyles.iconBoxSize,
       height: RiderAvailabilityCardStyles.iconBoxSize,
       alignment: Alignment.center,
-      decoration:
-          RiderAvailabilityCardStyles.iconBoxDecoration(availability),
+      decoration: RiderAvailabilityCardStyles.iconBoxDecoration(availability),
       child: Icon(
-        availability.icon,
+        Icons.sensors_rounded,
         color: RiderAvailabilityCardStyles.iconColor(availability),
         size: RiderAvailabilityCardStyles.iconSize,
       ),

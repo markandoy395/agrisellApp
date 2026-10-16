@@ -19,9 +19,12 @@ part 'rider_route_controller_metrics.dart';
 enum RiderRouteState { idle, loading, ready, stale, error }
 
 class RiderRouteController extends ChangeNotifier {
-  RiderRouteController({RiderRoutingService? service, RiderRouteCache? cache})
-    : _service = service ?? OsrmRiderRoutingService(),
-      _cache = cache ?? RiderRouteCache();
+  RiderRouteController({
+    RiderRoutingService? service,
+    RiderRouteCache? cache,
+    this.requestTimeout = const Duration(seconds: 10),
+  }) : _service = service ?? OsrmRiderRoutingService(),
+       _cache = cache ?? RiderRouteCache();
 
   static const _offRouteThresholdMeters = 100.0;
   static const _requestMovementThresholdMeters = 60.0;
@@ -32,6 +35,9 @@ class RiderRouteController extends ChangeNotifier {
 
   final RiderRoutingService _service;
   final RiderRouteCache _cache;
+  final Duration requestTimeout;
+  bool _isDisposed = false;
+  String? _lastDestinationKey;
   RiderRouteState _state = RiderRouteState.idle;
   List<RiderRoutePlan> _routes = const [];
   int _selectedIndex = 0;
@@ -62,7 +68,6 @@ class RiderRouteController extends ChangeNotifier {
   DateTime? get routeUpdatedAt => _routeUpdatedAt;
   String? get navigationDestinationLabel => _mapDestinationLabel;
 
-
   void setConnectivity(bool isOnline) {
     if (_isOnline == isOnline) return;
     _isOnline = isOnline;
@@ -70,18 +75,7 @@ class RiderRouteController extends ChangeNotifier {
       _state = _routes.isEmpty ? RiderRouteState.error : RiderRouteState.stale;
       _errorMessage = 'Offline. The last saved route remains visible.';
     }
-    notifyListeners();
-  }
-
-  Future<void> restore() async {
-    final cached = await _cache.load();
-    if (cached == null) return;
-    _routes = cached.routes;
-    _selectedIndex = cached.selectedIndex;
-    _selectedRequestId = activeRoute?.requestId;
-    _state = RiderRouteState.stale;
-    _routeUpdatedAt = activeRoute?.calculatedAt;
-    notifyListeners();
+    _notify();
   }
 
   Future<void> synchronize({
@@ -116,7 +110,12 @@ class RiderRouteController extends ChangeNotifier {
     final destination = request == null
         ? mapDestination
         : riderRouteDestination(request);
-    if (destination == null) return;
+    if (destination == null) {
+      _state = RiderRouteState.error;
+      _errorMessage = 'Destination coordinates are unavailable.';
+      _notify();
+      return;
+    }
     final origin = DeliveryRoutePoint(
       latitude: location.latitude,
       longitude: location.longitude,
@@ -127,7 +126,8 @@ class RiderRouteController extends ChangeNotifier {
         ? targetId
         : '$targetId:${riderRouteUsesDeliveryLocation(request) ? 'delivery' : 'pickup'}';
     final current = activeRoute;
-    final destinationChanged = current?.destinationKey != destinationKey;
+    final destinationChanged =
+        (current?.destinationKey ?? _lastDestinationKey) != destinationKey;
     if (destinationChanged && current?.requestId != targetId) {
       _routes = const [];
       _selectedIndex = 0;
@@ -135,7 +135,7 @@ class RiderRouteController extends ChangeNotifier {
     if (!_isOnline) {
       _state = _routes.isEmpty ? RiderRouteState.error : RiderRouteState.stale;
       _errorMessage = 'Offline. The last saved route remains visible.';
-      notifyListeners();
+      _notify();
       return;
     }
     final offRoute =
@@ -170,8 +170,18 @@ class RiderRouteController extends ChangeNotifier {
       );
       return;
     }
-    notifyListeners();
+    _notify();
   }
 
-  void _notify() => notifyListeners();
+  void _notify() {
+    if (!_isDisposed) notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    _latestGeneration++;
+    _pendingRequest = null;
+    super.dispose();
+  }
 }

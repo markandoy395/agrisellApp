@@ -1,6 +1,19 @@
 part of 'rider_route_controller.dart';
 
 extension RiderRouteControllerActions on RiderRouteController {
+  Future<void> restore() async {
+    final generation = _latestGeneration;
+    final cached = await _cache.load();
+    if (_isDisposed || generation != _latestGeneration || cached == null)
+      return;
+    _routes = cached.routes;
+    _selectedIndex = cached.selectedIndex;
+    _selectedRequestId = activeRoute?.requestId;
+    _state = RiderRouteState.stale;
+    _routeUpdatedAt = activeRoute?.calculatedAt;
+    _notify();
+  }
+
   void clear() {
     _latestGeneration++;
     _pendingRequest = null;
@@ -8,6 +21,7 @@ extension RiderRouteControllerActions on RiderRouteController {
     _selectedIndex = 0;
     _selectedRequestId = null;
     _lastRequestOrigin = null;
+    _lastDestinationKey = null;
     _lastLocation = null;
     _routeUpdatedAt = null;
     _state = RiderRouteState.idle;
@@ -56,14 +70,19 @@ extension RiderRouteControllerActions on RiderRouteController {
   Future<void> refreshRoute({
     required RiderDeviceLocation location,
     required List<DeliveryRequest> requests,
-  }) => _refreshRoute(location: location, requests: requests);
+    bool includeAlternatives = false,
+  }) => _refreshRoute(
+    location: location,
+    requests: requests,
+    includeAlternatives: includeAlternatives,
+  );
 
   void selectRoute(int index) {
     if (index < 0 || index >= _routes.length || index == _selectedIndex) return;
     _selectedIndex = index;
     _state = RiderRouteState.ready;
     _notify();
-    unawaited(_cache.save(_routes, _selectedIndex));
+    unawaited(_saveRoutes());
   }
 
   DeliveryRoutePoint displayPoint(RiderDeviceLocation location) {

@@ -15,6 +15,7 @@ import 'package:agresell_app/features/buyer/cart/presentation/controllers/basket
 import 'package:agresell_app/features/buyer/home/presentation/controllers/farmer_follow_controller.dart';
 import 'package:agresell_app/features/rider/profile/data/rider_registration_service.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/order_controller.dart';
+import 'package:agresell_app/features/shared/products/data/home_product_snapshot_cache.dart';
 
 export 'package:agresell_app/features/auth/domain/auth_session_models.dart';
 

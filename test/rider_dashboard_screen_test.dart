@@ -33,6 +33,11 @@ void main() {
     gate.complete();
     await tester.pumpAndSettle();
     expect(find.textContaining('No active delivery'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('No nearby requests'),
+      250,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('No nearby requests'), findsOneWidget);
   });
 
@@ -134,11 +139,19 @@ void main() {
     await _pumpDashboard(tester, fixture);
     await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(
+      find.text('2 active deliveries'),
+      250,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('2 active deliveries'), findsOneWidget);
-    expect(find.textContaining('Tomatoes'), findsOneWidget);
+    expect(find.textContaining('Tomatoes'), findsWidgets);
     expect(find.textContaining('Carrots'), findsOneWidget);
-    await tester.drag(find.byType(ListView), const Offset(0, -600));
-    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Active now'),
+      250,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('Active now'), findsOneWidget);
     expect(find.text('2'), findsWidgets);
   });
@@ -192,8 +205,11 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsNothing);
     expect(find.text('Work status'), findsOneWidget);
 
-    await tester.drag(find.byType(ListView), const Offset(0, -500));
-    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Today at a glance'),
+      250,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('Today at a glance'), findsOneWidget);
 
     saveGate.complete();

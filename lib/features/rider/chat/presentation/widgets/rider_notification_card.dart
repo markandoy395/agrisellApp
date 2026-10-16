@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/features/shared/notifications/presentation/widgets/notification_card_layout.dart';
 
 import 'package:agresell_app/core/utils/notification_date_label.dart';
 import 'package:agresell_app/features/rider/chat/domain/rider_notification.dart';
@@ -57,8 +58,7 @@ class _RiderNotificationCardState extends State<RiderNotificationCard> {
     final isRead = widget.notification.isRead;
     return Semantics(
       button: true,
-      label:
-          '${widget.notification.title}, ${isRead ? 'read' : 'unread'}',
+      label: '${widget.notification.title}, ${isRead ? 'read' : 'unread'}',
       hint: 'Opens the related update',
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
@@ -75,33 +75,29 @@ class _RiderNotificationCardState extends State<RiderNotificationCard> {
             onTap: widget.onTap,
             child: Padding(
               padding: RiderNotificationCardStyles.padding,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: RiderNotificationCardStyles.iconContainerSize,
-                    height: RiderNotificationCardStyles.iconContainerSize,
-                    decoration: RiderNotificationCardStyles.iconDecoration(
-                      style.color,
-                    ),
-                    child: Icon(
-                      style.icon,
-                      color: style.color,
-                      size: RiderNotificationCardStyles.iconSize,
-                    ),
+              child: NotificationCardLayout(
+                leading: Container(
+                  width: RiderNotificationCardStyles.iconContainerSize,
+                  height: RiderNotificationCardStyles.iconContainerSize,
+                  decoration: RiderNotificationCardStyles.iconDecoration(
+                    style.color,
                   ),
-                  const SizedBox(width: 11),
-                  Expanded(child: _content(style)),
-                  RiderNotificationCardActions(
-                    notification: widget.notification,
-                    onToggleRead: widget.onToggleRead,
-                    onDelete: widget.onDelete,
-                    isExpandable: _isExpandable,
-                    isExpanded: _isExpanded,
-                    onToggleExpand: () =>
-                        setState(() => _isExpanded = !_isExpanded),
+                  child: Icon(
+                    style.icon,
+                    color: style.color,
+                    size: RiderNotificationCardStyles.iconSize,
                   ),
-                ],
+                ),
+                content: _content(style),
+                actions: RiderNotificationCardActions(
+                  notification: widget.notification,
+                  onToggleRead: widget.onToggleRead,
+                  onDelete: widget.onDelete,
+                  isExpandable: _isExpandable,
+                  isExpanded: _isExpanded,
+                  onToggleExpand: () =>
+                      setState(() => _isExpanded = !_isExpanded),
+                ),
               ),
             ),
           ),
@@ -118,8 +114,6 @@ class _RiderNotificationCardState extends State<RiderNotificationCard> {
           Expanded(
             child: Text(
               widget.notification.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
               style: RiderNotificationCardStyles.titleStyle(
                 widget.notification.isRead,
               ),
@@ -155,8 +149,6 @@ class _RiderNotificationCardState extends State<RiderNotificationCard> {
         curve: Curves.easeOutCubic,
         child: Text(
           _displayedMessage,
-          maxLines: _isExpanded ? null : 2,
-          overflow: _isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
           style: RiderNotificationCardStyles.messageStyle,
         ),
       ),

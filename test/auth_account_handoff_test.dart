@@ -130,6 +130,31 @@ void main() {
       await tester.runAsync(() async {
         await tester.tap(find.text('Log out'));
       });
+      await tester.pumpAndSettle();
+      expect(find.text('Are you sure you want to log out?'), findsOneWidget);
+      expect(AuthSessionService.instance.isAuthenticated, isTrue);
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(find.byType(LoginScreen), findsNothing);
+      expect(AuthSessionService.instance.currentAccount?.id, active.id);
+      expect(AuthSessionService.instance.isAuthenticated, isTrue);
+      await tester.tap(find.text('Log out'));
+      await tester.pumpAndSettle();
+      await tester.tapAt(const Offset(5, 5));
+      await tester.pumpAndSettle();
+      expect(find.byType(LoginScreen), findsNothing);
+      expect(AuthSessionService.instance.isAuthenticated, isTrue);
+      await tester.tap(find.text('Log out'));
+      await tester.pumpAndSettle();
+      await key.currentState!.maybePop();
+      await tester.pumpAndSettle();
+      expect(find.byType(LoginScreen), findsNothing);
+      expect(AuthSessionService.instance.isAuthenticated, isTrue);
+      await tester.tap(find.text('Log out'));
+      await tester.pumpAndSettle();
+      await tester.runAsync(() async {
+        await tester.tap(find.widgetWithText(FilledButton, 'Log out'));
+      });
       await tester.pump();
       await tester.runAsync(() async {
         await Future<void>.delayed(Duration.zero);

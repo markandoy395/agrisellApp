@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -15,9 +16,7 @@ abstract final class RiderNotificationCardStyles {
   }) => BoxDecoration(
     color: isRead ? AgrisellColors.surface : styleColor.withValues(alpha: 0.07),
     borderRadius: BorderRadius.circular(borderRadiusValue),
-    border: Border.all(
-      color: isRead ? AgrisellColors.borderLine : styleColor,
-    ),
+    border: Border.all(color: isRead ? AgrisellColors.borderLine : styleColor),
     boxShadow: [
       BoxShadow(
         color: AgrisellColors.brandBlack.withValues(alpha: 0.055),
@@ -32,12 +31,11 @@ abstract final class RiderNotificationCardStyles {
     borderRadius: BorderRadius.circular(13),
   );
 
-  static BoxDecoration unreadDotDecoration(Color styleColor) => BoxDecoration(
-    color: styleColor,
-    shape: BoxShape.circle,
-  );
+  static BoxDecoration unreadDotDecoration(Color styleColor) =>
+      BoxDecoration(color: styleColor, shape: BoxShape.circle);
 
   static TextStyle titleStyle(bool isRead) => TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 13,
     height: 1.25,
@@ -45,18 +43,21 @@ abstract final class RiderNotificationCardStyles {
   );
 
   static TextStyle typeLabelStyle(Color styleColor) => TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: styleColor,
     fontSize: 12,
     fontWeight: FontWeight.w700,
   );
 
   static const dateLabelStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
     fontWeight: FontWeight.w600,
   );
 
   static const messageStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.brandBlack,
     fontSize: 12,
     height: 1.35,

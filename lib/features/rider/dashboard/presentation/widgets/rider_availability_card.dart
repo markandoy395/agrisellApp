@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'rider_environment_row.dart';
+import '../styles/rider_home_design_styles.dart';
 
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_availability.dart';
@@ -23,6 +25,7 @@ class RiderAvailabilityCard extends StatelessWidget {
     final availability = controller.displayedAvailability;
     final warning = controller.warning;
     return RiderSurfaceCard(
+      decoration: RiderHomeDesignStyles.card,
       padding: RiderAvailabilityCardStyles.cardPadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,6 +49,10 @@ class RiderAvailabilityCard extends StatelessWidget {
                 onChanged: (value) => _setAvailability(context, value),
               ),
             ],
+          ),
+          RiderEnvironmentRow(
+            gps: controller.gpsStatus,
+            internet: controller.internetStatus,
           ),
           if (controller.usesTemporaryData) ...[
             const SizedBox(height: 10),

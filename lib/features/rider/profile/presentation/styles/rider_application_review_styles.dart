@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -36,10 +37,11 @@ abstract final class RiderApplicationReviewStyles {
 
   static Color sectionColor(RiderReviewSectionVariant variant) =>
       variant == RiderReviewSectionVariant.rejection
-          ? AgrisellColors.statusRedText
-          : AgrisellColors.statusOrangeText;
+      ? AgrisellColors.statusRedText
+      : AgrisellColors.statusOrangeText;
 
   static const rejectionHeading = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.statusRedText,
     fontSize: 12,
     fontWeight: FontWeight.w800,
@@ -52,10 +54,11 @@ abstract final class RiderApplicationReviewStyles {
 
   static TextStyle sectionHeading(RiderReviewSectionVariant variant) =>
       variant == RiderReviewSectionVariant.rejection
-          ? rejectionHeading
-          : noteHeading;
+      ? rejectionHeading
+      : noteHeading;
 
   static const rejectionBody = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 13,
     height: 1.4,
@@ -63,6 +66,7 @@ abstract final class RiderApplicationReviewStyles {
   );
 
   static const noteBody = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 13,
     height: 1.4,

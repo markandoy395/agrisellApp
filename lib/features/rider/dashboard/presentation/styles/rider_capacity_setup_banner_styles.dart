@@ -1,9 +1,11 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 abstract final class RiderCapacitySetupBannerStyles {
   static const padding = EdgeInsets.all(14);
   static const title = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 15,
     fontWeight: FontWeight.w700,
     color: AgrisellColors.headingGreen,

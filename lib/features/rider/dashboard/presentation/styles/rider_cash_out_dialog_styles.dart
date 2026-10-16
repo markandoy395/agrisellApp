@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -51,77 +52,91 @@ abstract final class RiderCashOutDialogStyles {
 
   // Text Styles
   static const TextStyle headerTitle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 15,
     fontWeight: FontWeight.w800,
     color: AgrisellColors.headingGreen,
   );
 
   static const TextStyle headerSubtitle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
     color: AgrisellColors.mutedText,
   );
 
   static const TextStyle balanceLabel = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
     color: AgrisellColors.brandBlack,
     fontWeight: FontWeight.w700,
   );
 
   static const TextStyle balanceSubtitle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
     color: AgrisellColors.mutedText,
   );
 
   static const TextStyle balanceValue = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 15,
     fontWeight: FontWeight.w900,
     color: AgrisellColors.authGreen,
   );
 
   static const TextStyle errorText = TextStyle(
-    color: Colors.red,
+    fontFamily: AppTypography.fontFamily,
+    color: AgrisellColors.statusRedText,
     fontSize: 12,
     fontWeight: FontWeight.w600,
   );
 
   static const TextStyle sectionLabel = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 13,
     fontWeight: FontWeight.w700,
     color: AgrisellColors.brandBlack,
   );
 
   static const TextStyle emptyMethodText = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
     fontWeight: FontWeight.w600,
   );
 
   static const TextStyle methodDropdownText = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 13,
   );
 
   static const TextStyle amountPrefix = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontWeight: FontWeight.w700,
     color: AgrisellColors.headingGreen,
   );
 
   static const TextStyle quickChipLabel = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
     fontWeight: FontWeight.w700,
   );
 
   static const TextStyle quickChipAllLabel = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
     fontWeight: FontWeight.w800,
     color: AgrisellColors.authGreen,
   );
 
   static const TextStyle cancelButtonText = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.brandBlack,
     fontWeight: FontWeight.w700,
   );
 
   static const TextStyle submitButtonText = TextStyle(
-    color: Colors.white,
+    fontFamily: AppTypography.fontFamily,
+    color: AgrisellColors.surface,
     fontWeight: FontWeight.w700,
   );
 
@@ -141,7 +156,7 @@ abstract final class RiderCashOutDialogStyles {
   );
 
   static final BoxDecoration errorBannerDecoration = BoxDecoration(
-    color: const Color(0xFFFDE8E8),
+    color: AgrisellColors.statusRedBackground,
     borderRadius: BorderRadius.circular(errorRadius),
   );
 

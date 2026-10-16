@@ -7,6 +7,7 @@ import 'package:agresell_app/features/buyer/home/presentation/styles/home_produc
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/buyer_home_categories.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_banner_carousel.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_catalog_footer.dart';
+import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_catalog_status.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_deals_quick_banner.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_empty_catalog_sliver.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_entrance_animation.dart';
@@ -59,9 +60,11 @@ class HomeProductScrollView extends StatelessWidget {
   final bool hasMore;
 
   bool _onScrollNotification(ScrollNotification notification) {
+    if (notification.depth != 0) return false;
+    if (notification.metrics.axis != Axis.vertical) return false;
+    if (isLoadingMore || !hasMore || isLoading || loadFailed) return false;
     final maxScroll = notification.metrics.maxScrollExtent;
-    if (maxScroll > 0 &&
-        (notification.metrics.pixels / maxScroll) >= 0.80) {
+    if (maxScroll > 0 && (notification.metrics.pixels / maxScroll) >= 0.80) {
       onLoadMore?.call();
     }
     return false;
@@ -70,8 +73,9 @@ class HomeProductScrollView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final horizontalPadding =
-        HomeProductScrollViewStyles.horizontalPadding(width);
+    final horizontalPadding = HomeProductScrollViewStyles.horizontalPadding(
+      width,
+    );
     final contentPadding = HomeProductScrollViewStyles.contentPadding(width);
     final contentGap = HomeProductScrollViewStyles.contentGap(width);
     final bannerHeight = HomeProductScrollViewStyles.bannerHeight(width);
@@ -95,8 +99,7 @@ class HomeProductScrollView extends StatelessWidget {
                 pinned: true,
                 delegate: HomePinnedSearchHeaderDelegate(
                   horizontalPadding: horizontalPadding,
-                  bottomGap:
-                      HomeProductScrollViewStyles.searchBottomGap(width),
+                  bottomGap: HomeProductScrollViewStyles.searchBottomGap(width),
                   searchController: searchController,
                   activeFilterCount: browseController.activeFilterCount,
                   searchSuggestions:
@@ -157,7 +160,9 @@ class HomeProductScrollView extends StatelessWidget {
                   ),
                 ),
               ),
-              if (isLoading)
+              if (products.isNotEmpty && (isLoading || loadFailed))
+                HomeCatalogStatus(failed: loadFailed),
+              if (isLoading && products.isEmpty)
                 SliverPadding(
                   padding: EdgeInsets.symmetric(horizontal: contentPadding),
                   sliver: const HomeProductGridSkeleton(),
@@ -182,11 +187,7 @@ class HomeProductScrollView extends StatelessWidget {
                   productCount: products.length,
                 ),
               ],
-              const SliverToBoxAdapter(
-                child: SizedBox(
-                  height: HomeProductScrollViewStyles.bottomSpacerHeight,
-                ),
-              ),
+              const HomeCatalogBottomSpacer(),
             ],
           ),
         ),

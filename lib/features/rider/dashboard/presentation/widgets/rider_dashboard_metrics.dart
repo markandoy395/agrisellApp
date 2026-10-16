@@ -1,6 +1,7 @@
 import 'package:agresell_app/features/rider/dashboard/presentation/styles/rider_dashboard_metric_tile_styles.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/styles/rider_dashboard_metrics_cards_styles.dart';
 import 'package:flutter/material.dart';
+import '../styles/rider_home_design_styles.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_dashboard_state.dart';
@@ -37,7 +38,9 @@ class RiderDashboardMetricsGrid extends StatelessWidget {
     final items = <_MetricData>[
       _MetricData(
         label: 'Completed',
-        value: '${metrics.todayCompletedDeliveries}',
+        value: todaySummaryAvailable
+            ? '${metrics.todayCompletedDeliveries}'
+            : '—',
         icon: Icons.task_alt_outlined,
         accentColor: AgrisellColors.statusGreenText,
         backgroundColor: AgrisellColors.statusGreenBackground,
@@ -51,7 +54,9 @@ class RiderDashboardMetricsGrid extends StatelessWidget {
       ),
       _MetricData(
         label: 'Issues',
-        value: '${metrics.cancelledOrFailedDeliveries ?? 0}',
+        value: todaySummaryAvailable
+            ? '${metrics.cancelledOrFailedDeliveries ?? 0}'
+            : '—',
         icon: Icons.report_problem_outlined,
         accentColor: AgrisellColors.statusOrangeText,
         backgroundColor: AgrisellColors.statusOrangeBackground,
@@ -60,26 +65,47 @@ class RiderDashboardMetricsGrid extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final columns = constraints.maxWidth >= 560 ? 3 : 1;
-            final width =
-                (constraints.maxWidth -
-                    (columns - 1) *
-                        RiderDashboardMetricsStyles.gridItemSpacing) /
-                columns;
-            return Wrap(
-              spacing: RiderDashboardMetricsStyles.gridItemSpacing,
-              runSpacing: RiderDashboardMetricsStyles.gridItemSpacing,
-              children: [
-                for (final item in items)
-                  SizedBox(
-                    width: width,
-                    child: _MetricTile(data: item),
+        RiderSurfaceCard(
+          decoration: RiderHomeDesignStyles.card,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                children: [
+                  Icon(
+                    Icons.location_on_rounded,
+                    color: RiderHomeDesignStyles.green,
+                    size: 20,
                   ),
-              ],
-            );
-          },
+                  SizedBox(width: 6),
+                  Text('Today at a glance', style: RiderHomeDesignStyles.title),
+                ],
+              ),
+              const SizedBox(height: 10),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final columns =
+                      MediaQuery.textScalerOf(context).scale(12) > 18 ? 1 : 3;
+                  final width =
+                      (constraints.maxWidth -
+                          (columns - 1) *
+                              RiderDashboardMetricsStyles.gridItemSpacing) /
+                      columns;
+                  return Wrap(
+                    spacing: RiderDashboardMetricsStyles.gridItemSpacing,
+                    runSpacing: RiderDashboardMetricsStyles.gridItemSpacing,
+                    children: [
+                      for (final item in items)
+                        SizedBox(
+                          width: width,
+                          child: _MetricTile(data: item),
+                        ),
+                    ],
+                  );
+                },
+              ),
+            ],
+          ),
         ),
         RiderDashboardMetricsStyles.verticalGap,
         _EarningsCard(

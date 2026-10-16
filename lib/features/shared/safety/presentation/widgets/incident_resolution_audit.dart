@@ -24,16 +24,21 @@ class IncidentResolutionAudit extends StatelessWidget {
               color: IncidentTrackingStyles.green,
             ),
             const SizedBox(width: 6),
-            const Text(
-              'ADMIN RESOLUTION AUDIT NOTE',
-              style: IncidentTrackingStyles.auditTitle,
-            ),
-            if (incident.resolvedBy != null) ...[
-              Text(
-                ' • by ${incident.resolvedBy}',
-                style: IncidentTrackingStyles.auditAuthor,
+            Expanded(
+              child: Text.rich(
+                TextSpan(
+                  text: 'ADMIN RESOLUTION AUDIT NOTE',
+                  style: IncidentTrackingStyles.auditTitle,
+                  children: [
+                    if (incident.resolvedBy != null)
+                      TextSpan(
+                        text: ' • by ${incident.resolvedBy}',
+                        style: IncidentTrackingStyles.auditAuthor,
+                      ),
+                  ],
+                ),
               ),
-            ],
+            ),
           ],
         ),
         const SizedBox(height: 6),

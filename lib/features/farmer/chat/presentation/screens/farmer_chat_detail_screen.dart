@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -63,7 +64,7 @@ class _FarmerChatDetailScreenState extends State<FarmerChatDetailScreen> {
         'Your reply was not sent. Tap the message to retry.';
     ScaffoldMessenger.of(context)
       ..clearSnackBars()
-      ..showSnackBar(SnackBar(content: Text(error)));
+      ..showAppSnackBar(SnackBar(content: Text(error)));
   }
 
   Future<void> _scrollAfterFrame() async {

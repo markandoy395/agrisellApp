@@ -1,9 +1,11 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_analytics_models.dart';
 
 abstract final class RiderEarningsHistoryStyles {
   static TextStyle textStyle(RiderEarningEntry entry) => TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: entry.netAmount < 0
         ? AgrisellColors.statusRedText
         : AgrisellColors.authGreen,

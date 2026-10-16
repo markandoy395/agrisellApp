@@ -1,7 +1,6 @@
-import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/utils/notification_date_group.dart';
+import 'package:agresell_app/features/shared/notifications/presentation/widgets/notification_grouped_list.dart';
 import 'package:agresell_app/features/shared/notifications/domain/notification_category.dart';
 import 'package:agresell_app/features/shared/notifications/presentation/widgets/notification_state_view.dart';
 import 'package:agresell_app/features/shared/orders/domain/home_notification.dart';
@@ -46,34 +45,21 @@ class NotificationFeed extends StatelessWidget {
         ),
       );
     }
-    final groups = _group(filtered);
     final reduceMotion =
         MediaQuery.maybeOf(context)?.disableAnimations ?? false;
-    final list = ListView(
-      key: ValueKey(filtered.map((item) => item.id).join('|')),
-      padding: EdgeInsets.fromLTRB(
-        14,
-        4,
-        14,
-        150 + MediaQuery.paddingOf(context).bottom,
+    final list = NotificationGroupedList<HomeNotification>(
+      key: ValueKey(filter),
+      items: filtered,
+      dateOf: (item) => item.createdAt,
+      padding: const EdgeInsets.fromLTRB(14, 4, 14, 24),
+      itemBuilder: (context, item) => NotificationListItem(
+        key: ValueKey(item.id),
+        item: item,
+        isRead: controller.isRead(item),
+        onTap: () => onOpen(item),
+        onToggleRead: () => onToggleRead(item),
+        onDelete: () => onDelete(item),
       ),
-      children: [
-        for (final group in NotificationDateGroup.values)
-          if (groups[group] case final items? when items.isNotEmpty) ...[
-            _GroupHeader(label: group.label),
-            for (final item in items) ...[
-              NotificationListItem(
-                key: ValueKey(item.id),
-                item: item,
-                isRead: controller.isRead(item),
-                onTap: () => onOpen(item),
-                onToggleRead: () => onToggleRead(item),
-                onDelete: () => onDelete(item),
-              ),
-              const SizedBox(height: 10),
-            ],
-          ],
-      ],
     );
     if (reduceMotion) return list;
     return AnimatedSwitcher(
@@ -83,28 +69,4 @@ class NotificationFeed extends StatelessWidget {
       child: list,
     );
   }
-
-  Map<NotificationDateGroup, List<HomeNotification>> _group(
-    List<HomeNotification> notifications,
-  ) {
-    final result = <NotificationDateGroup, List<HomeNotification>>{};
-    for (final notification in notifications) {
-      final date = notification.createdAt ?? DateTime.now();
-      result
-          .putIfAbsent(NotificationDateGroup.from(date), () => [])
-          .add(notification);
-    }
-    return result;
-  }
-}
-
-class _GroupHeader extends StatelessWidget {
-  const _GroupHeader({required this.label});
-  final String label;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(4, 14, 4, 8),
-    child: Text(label, style: SharedPresentationStyles.headingBodyExtraBold),
-  );
 }

@@ -47,10 +47,8 @@ abstract final class RiderEarningsActionsHandler {
   }) {
     Navigator.of(context).push(
       agrisellPageRoute<void>(
-        builder: (_) => RiderRatingsScreen(
-          riderId: riderId,
-          controller: controller,
-        ),
+        builder: (_) =>
+            RiderRatingsScreen(riderId: riderId, controller: controller),
       ),
     );
   }
@@ -65,10 +63,8 @@ abstract final class RiderEarningsActionsHandler {
       isScrollControlled: true,
       backgroundColor: RiderEarningsStyles.modalBackgroundColor,
       shape: RiderEarningsStyles.modalShape,
-      builder: (_) => RiderWithdrawalMethodsSheet(
-        riderId: riderId,
-        controller: controller,
-      ),
+      builder: (_) =>
+          RiderWithdrawalMethodsSheet(riderId: riderId, controller: controller),
     );
   }
 
@@ -79,6 +75,19 @@ abstract final class RiderEarningsActionsHandler {
     required Future<void> Function() onReload,
     required bool Function() isMounted,
   }) async {
+    await controller.loadWallet(riderId: riderId);
+    if (!isMounted()) return;
+    final wallet = controller.wallet;
+    if (wallet == null || wallet.available <= 0) {
+      ScaffoldMessenger.of(context).showAppSnackBar(
+        SnackBar(
+          content: Text(
+            controller.walletError ?? 'No earnings available for cash out.',
+          ),
+        ),
+      );
+      return;
+    }
     await controller.loadWithdrawalMethods(riderId: riderId);
     if (!isMounted()) return;
 
@@ -103,9 +112,7 @@ abstract final class RiderEarningsActionsHandler {
       builder: (_) => RiderCashOutDialog(
         riderId: riderId,
         controller: controller,
-        availableEarnings: controller.earnings.summary.netEarnings > 0
-            ? controller.earnings.summary.netEarnings
-            : 0,
+        availableEarnings: wallet.available,
       ),
     );
 
@@ -131,9 +138,7 @@ abstract final class RiderEarningsActionsHandler {
   }) async {
     await controller.loadHistory(riderId: riderId);
     if (!isMounted()) return;
-    final matches = controller.history.where(
-      (entry) => entry.id == deliveryId,
-    );
+    final matches = controller.history.where((entry) => entry.id == deliveryId);
     if (matches.isEmpty) {
       ScaffoldMessenger.of(context).showAppSnackBar(
         const SnackBar(content: Text('Delivery history is unavailable.')),

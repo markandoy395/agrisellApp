@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -16,12 +17,14 @@ abstract final class RiderRegistrationStyles {
 
   // Typography
   static const TextStyle headerTitleStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.authGreen,
     fontSize: 15,
     fontWeight: FontWeight.w800,
   );
 
   static const TextStyle errorMessageStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.statusRedText,
     fontSize: 12,
   );

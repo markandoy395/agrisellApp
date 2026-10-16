@@ -151,8 +151,6 @@ extension _RiderDeliveryConfirmationActions
   }
 
   void _message(String value) {
-    ScaffoldMessenger.of(
-      context,
-    ).showAppSnackBar(SnackBar(content: Text(value)));
+    showRiderDeliveryMessage(context, value);
   }
 }

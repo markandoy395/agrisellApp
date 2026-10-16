@@ -9,6 +9,28 @@ import 'package:http/testing.dart';
 
 void main() {
   test(
+    'alternatives are requested only through the explicit alternative service',
+    () async {
+      late Uri requested;
+      final service = OsrmRiderRoutingService(
+        client: MockClient((request) async {
+          requested = request.url;
+          return http.Response(jsonEncode(_response), 200);
+        }),
+      );
+      await service.withAlternatives().findRoutes(
+        requestId: 'delivery-1',
+        destinationKey: 'delivery-1:pickup',
+        origin: const DeliveryRoutePoint(latitude: 8.48, longitude: 124.65),
+        destination: const DeliveryRoutePoint(
+          latitude: 8.49,
+          longitude: 124.66,
+        ),
+      );
+      expect(requested.queryParameters['alternatives'], '3');
+    },
+  );
+  test(
     'OSRM response creates road geometry, options, and directions',
     () async {
       late Uri requestedUri;
@@ -31,6 +53,7 @@ void main() {
 
       expect(requestedUri.queryParameters['geometries'], 'geojson');
       expect(requestedUri.queryParameters['steps'], 'true');
+      expect(requestedUri.queryParameters['alternatives'], 'false');
       expect(routes, hasLength(2));
       expect(routes.first.preference, RiderRoutePreference.fastest);
       expect(routes.last.preference, RiderRoutePreference.shortest);

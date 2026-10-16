@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { handleApiRequest } from "./handler.ts";
 import { BodyTooLarge, boundedBody } from "../_shared/request_body.ts";
+import { chatLimits } from "./chat_limits.ts";
 
 const config = {
   projectUrl: "https://project.supabase.co",
@@ -24,6 +25,39 @@ const request = (route = "users", options = {}) =>
     `https://project.supabase.co/functions/v1/application-api/rest/${route}?select=id`,
     { headers: { authorization: "Bearer user-token" }, ...options },
   );
+
+test("chat quotas use verified identity, persist failed attempts and count Unicode", async () => {
+  const backend=client();
+  const body=(text)=>new TextEncoder().encode(JSON.stringify({conversation_id:12,body:text,owner_id:"spoof"}));
+  assert.equal(await chatLimits(backend,"owner-a","rpc/send_marketplace_message",body("😀".repeat(500))),null);
+  assert.deepEqual(backend.calls.map(c=>[c.params.p_scope,c.params.p_limit,c.params.p_window_seconds]),[
+    ["chat-send-attempt-day",100,86400],["chat-send-attempt-minute",10,60]]);
+  assert.match(backend.calls[0].params.p_key_hash,/^[a-f0-9]{64}$/);
+  const before=backend.calls.length;
+  const invalid=await chatLimits(backend,"owner-a","rpc/send_marketplace_message",body("😀".repeat(501)));
+  assert.equal(invalid.status,400);
+  assert.equal(backend.calls.length,before+1); // Invalid requests still consume the daily counter.
+});
+
+test("chat exhaustion returns 429/Retry-After and never forwards",async()=>{
+  let sends=0;
+  const backend=client();
+  backend.rpc=async(name,params)=>({data:[{allowed:params.p_scope!=="chat-send-attempt-minute",retry_after_seconds:42}],error:null});
+  const result=await handleApiRequest(request("rpc/send_rider_delivery_message",{
+    method:"POST",body:JSON.stringify({p_conversation_id:"7:seller",p_body:"Hello"})}),
+    backend,config,async()=>{sends++;return Response.json({});});
+  assert.equal(result.status,429);
+  assert.equal(result.headers.get("retry-after"),"42");
+  assert.equal(sends,0);
+});
+
+test("chat quota infrastructure fails closed; new-thread attempts have their own window",async()=>{
+  assert.equal((await chatLimits(client({error:{}}),"owner-a","rpc/send_marketplace_message",new Uint8Array())).status,503);
+  const backend=client();
+  assert.equal(await chatLimits(backend,"owner-a","rpc/start_marketplace_conversation",new TextEncoder().encode('{"farm_id":1}')),null);
+  assert.equal(backend.calls[0].params.p_scope,"chat-start-attempt-day");
+  assert.equal(backend.calls[0].params.p_window_seconds,86400);
+});
 
 test("caller JWT is retained; spoofed gateway markers and keys are replaced", async () => {
   const backend = client();

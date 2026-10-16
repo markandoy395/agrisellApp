@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -7,11 +8,13 @@ abstract final class RiderWithdrawalControlStyles {
   static const selectedIconColor = AgrisellColors.authGreen;
   static const unselectedIconColor = AgrisellColors.mutedText;
   static const selectedTypeLabel = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
     fontWeight: FontWeight.w700,
     color: AgrisellColors.authGreen,
   );
   static const unselectedTypeLabel = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
     fontWeight: FontWeight.w700,
     color: AgrisellColors.brandBlack,
@@ -44,7 +47,7 @@ abstract final class RiderWithdrawalControlStyles {
   );
   static final saveButton = ElevatedButton.styleFrom(
     backgroundColor: AgrisellColors.authGreen,
-    foregroundColor: Colors.white,
+    foregroundColor: AgrisellColors.surface,
     padding: const EdgeInsets.symmetric(vertical: 12),
     shape: RoundedRectangleBorder(borderRadius: controlRadius),
   );

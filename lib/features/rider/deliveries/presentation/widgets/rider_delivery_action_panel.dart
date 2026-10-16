@@ -64,6 +64,7 @@ class RiderDeliveryActionPanel extends StatelessWidget {
     final nextStage = request.stage.next;
     if (nextStage == null) return const SizedBox.shrink();
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _button('Mark ${nextStage.label}', true, () => onAdvance(nextStage)),
@@ -84,6 +85,7 @@ class RiderDeliveryActionPanel extends StatelessWidget {
         next == DeliveryStatus.productPickedUp ||
         next == DeliveryStatus.productDelivered;
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _button(
@@ -91,6 +93,10 @@ class RiderDeliveryActionPanel extends StatelessWidget {
               ? 'Updating...'
               : next == DeliveryStatus.productDelivered
               ? 'Confirm product handover'
+              : next == DeliveryStatus.arrivedAtPickup
+              ? 'Arrive at pickup location'
+              : next == DeliveryStatus.arrivedAtDelivery
+              ? 'Arrive at delivery location'
               : 'Mark ${next.displayLabel}',
           true,
           next == DeliveryStatus.productPickedUp

@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -9,11 +10,13 @@ abstract final class RiderActiveDeliverySummaryStyles {
 
   // Empty state styles
   static const emptyTitleStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 15,
-    fontWeight: FontWeight.w900,
+    fontWeight: FontWeight.w800,
   );
   static const emptySubtitleStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
     height: 1.3,
@@ -27,11 +30,13 @@ abstract final class RiderActiveDeliverySummaryStyles {
 
   // Active delivery header
   static const productNameStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 15,
-    fontWeight: FontWeight.w900,
+    fontWeight: FontWeight.w800,
   );
   static const orderNumberStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
     fontWeight: FontWeight.w800,
@@ -47,12 +52,14 @@ abstract final class RiderActiveDeliverySummaryStyles {
     border: Border.all(color: AgrisellColors.borderLine),
   );
   static const nextActionTitleStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 12,
     height: 1.25,
     fontWeight: FontWeight.w800,
   );
   static const nextActionDeadlineStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
     height: 1.25,
@@ -68,12 +75,14 @@ abstract final class RiderActiveDeliverySummaryStyles {
   static const routeStopIconColor = AgrisellColors.authGreen;
   static const routeStopIconSize = 17.0;
   static const routeStopLabelStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
     height: 1.1,
     fontWeight: FontWeight.w800,
   );
   static const routeStopValueStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 12,
     height: 1.25,

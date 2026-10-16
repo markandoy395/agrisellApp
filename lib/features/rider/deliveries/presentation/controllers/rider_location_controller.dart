@@ -53,7 +53,6 @@ class RiderLocationController extends ChangeNotifier {
            ),
        _gateway = gateway ?? GeolocatorGpsLocationGateway(),
        _clock = clock ?? DateTime.now;
-  static const _cachedLocationMaxAge = Duration(minutes: 2);
   final RiderLocationOutbox _outbox;
   final GpsLocationGateway _gateway;
   final DateTime Function() _clock;
@@ -63,7 +62,9 @@ class RiderLocationController extends ChangeNotifier {
   StreamSubscription<Position>? _positionSubscription;
   Timer? _freshnessTimer;
   Future<void>? _trackingStart;
+  Future<void>? _refreshRequest;
   var _trackingRequested = false;
+  var _isDisposed = false;
   var _liveSharingEnabled = false;
   var _isApproximate = false;
   LocationPermission? _permission;
@@ -101,7 +102,7 @@ class RiderLocationController extends ChangeNotifier {
     if (riderId != null) _currentRiderId = riderId;
     _lastPublished = null;
     if (_positionSubscription != null) unawaited(_restartTrackingStream());
-    notifyListeners();
+    _notify();
   }
 
   void setCurrentRiderId(String? riderId) {
@@ -111,10 +112,12 @@ class RiderLocationController extends ChangeNotifier {
   }
 
   Future<void> startTracking() {
+    if (_isDisposed) return Future.value();
     _trackingRequested = true;
-    return _trackingStart ??= _startTracking().whenComplete(
-      () => _trackingStart = null,
-    );
+    // Register the pending start before loading notifications can re-enter.
+    return _trackingStart ??= Future<void>.microtask(
+      _startTracking,
+    ).whenComplete(() => _trackingStart = null);
   }
 
   Future<void> stopTracking() async {
@@ -134,13 +137,24 @@ class RiderLocationController extends ChangeNotifier {
     return _outbox.sync();
   }
 
-  Future<void> refresh({bool requestPermission = false}) =>
-      _refreshLocation(requestPermission: requestPermission);
+  Future<void> refresh({bool requestPermission = false}) {
+    final existing = _refreshRequest;
+    if (existing != null) return existing;
+    // Loading listeners may call refresh again before the first await.
+    final request = Future<void>.microtask(
+      () => _refreshLocation(requestPermission: requestPermission),
+    );
+    _refreshRequest = request;
+    return request.whenComplete(() {
+      if (identical(_refreshRequest, request)) _refreshRequest = null;
+    });
+  }
 
   bool get _needsLocationRefresh {
     final location = _location;
     return location == null ||
-        _clock().difference(location.timestamp) > _cachedLocationMaxAge;
+        _clock().difference(location.timestamp) >
+            RiderLocationQualityRules.maxAge;
   }
 
   void _setUnavailableState(RiderLocationState state) {
@@ -150,10 +164,12 @@ class RiderLocationController extends ChangeNotifier {
         state == RiderLocationState.permissionDeniedForever) {
       _location = null;
     }
-    notifyListeners();
+    _notify();
   }
 
-  void _notify() => notifyListeners();
+  void _notify() {
+    if (!_isDisposed) notifyListeners();
+  }
 
   void _setError(
     String message, {
@@ -161,11 +177,12 @@ class RiderLocationController extends ChangeNotifier {
   }) {
     _errorMessage = message;
     if (_location == null) _state = state;
-    notifyListeners();
+    _notify();
   }
 
   @override
   void dispose() {
+    _isDisposed = true;
     _freshnessTimer?.cancel();
     unawaited(stopTracking());
     super.dispose();

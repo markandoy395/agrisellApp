@@ -14,7 +14,7 @@ extension _BuyerChatScreenSend on _BuyerChatScreenState {
         'Your message was not sent. Tap the message to retry.';
     ScaffoldMessenger.of(context)
       ..clearSnackBars()
-      ..showSnackBar(SnackBar(content: Text(error)));
+      ..showAppSnackBar(SnackBar(content: Text(error)));
   }
 
   Future<void> _scrollAfterFrame() async {

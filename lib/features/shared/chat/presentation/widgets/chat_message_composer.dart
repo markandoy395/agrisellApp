@@ -1,5 +1,5 @@
 export 'package:agresell_app/features/shared/chat/presentation/styles/chat_message_composer_styles.dart';
-import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import 'chat_message_field.dart';
 import 'package:agresell_app/features/shared/chat/presentation/styles/chat_message_composer_styles.dart';
 import 'package:flutter/material.dart';
 import '../styles/chat_reference_styles.dart';
@@ -26,14 +26,12 @@ class ChatMessageComposer extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: TextField(
+            child: ChatMessageField(
               controller: controller,
               minLines: style.minLines,
               maxLines: style.maxLines,
-              maxLength: 1000,
-              onSubmitted: (_) => onSend(),
-              textInputAction: TextInputAction.send,
-              style: SharedPresentationStyles.body,
+              enabled: !isSending,
+              onSend: onSend,
               decoration: ChatMessageComposerStyles.textFieldStyle(style),
             ),
           ),

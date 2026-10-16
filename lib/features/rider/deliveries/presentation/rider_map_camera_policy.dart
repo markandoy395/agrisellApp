@@ -56,7 +56,7 @@ abstract final class RiderMapCameraPolicy {
       (viewport.width * 0.08).clamp(0, 40).toDouble(),
       (viewport.height * 0.18).clamp(0, 120).toDouble(),
       (viewport.width * 0.08).clamp(0, 40).toDouble(),
-      (viewport.height * 0.30).clamp(0, 220).toDouble(),
+      (viewport.height * 0.52).clamp(0, viewport.height * 0.52).toDouble(),
     );
   }
 }

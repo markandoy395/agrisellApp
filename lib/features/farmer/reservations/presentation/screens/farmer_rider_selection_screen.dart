@@ -10,6 +10,7 @@ import 'package:agresell_app/features/farmer/reservations/domain/farmer_rider_ca
 import 'package:agresell_app/features/farmer/reservations/domain/farmer_rider_request.dart';
 import 'package:agresell_app/features/farmer/reservations/presentation/widgets/farmer_rider_candidate_card.dart';
 import 'package:agresell_app/features/farmer/reservations/presentation/widgets/farmer_rider_confirmation_dialog.dart';
+import '../widgets/farmer_delivery_fee_dialog.dart';
 import 'package:agresell_app/features/farmer/reservations/presentation/widgets/farmer_rider_selection_states.dart';
 
 class FarmerRiderSelectionScreen extends StatefulWidget {
@@ -139,6 +140,12 @@ class _FarmerRiderSelectionScreenState
     FarmerRiderSelectionData selection,
     FarmerRiderCandidate rider,
   ) async {
+    final fee = await showFarmerDeliveryFeeDialog(
+      context,
+      initialFee: rider.proposedDeliveryFee,
+    );
+    if (fee == null || !mounted) return;
+    rider = rider.copyWith(proposedDeliveryFee: fee);
     final confirmed = await showFarmerRiderConfirmationDialog(
       context,
       rider: rider,

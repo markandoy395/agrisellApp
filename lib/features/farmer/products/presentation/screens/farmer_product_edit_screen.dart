@@ -53,8 +53,12 @@ class _FarmerProductEditScreenState extends State<FarmerProductEditScreen> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final imageHeight = FarmerProductEditStyles.calculateImageHeight(width);
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+    final imageHeight = FarmerProductEditStyles.calculateImageHeight(
+      width,
+      keyboardVisible: bottomInset > 0,
+      availableHeight: MediaQuery.sizeOf(context).height - bottomInset,
+    );
 
     return ListenableBuilder(
       listenable: _controller,
@@ -81,7 +85,6 @@ class _FarmerProductEditScreenState extends State<FarmerProductEditScreen> {
               right: 0,
               bottom: 0,
               child: FarmerProductEditFormPanel(
-                bottomInset: bottomInset,
                 nameController: _controller.nameController,
                 priceController: _controller.priceController,
                 weightController: _controller.weightController,

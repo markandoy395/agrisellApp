@@ -20,7 +20,7 @@ class HomeSaleProductsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final preview = products.take(previewLimit).toList(growable: false);
+    final previewCount = products.length.clamp(0, previewLimit);
     final screenWidth = MediaQuery.sizeOf(context).width;
     final cardWidth = screenWidth < 380 ? 166.0 : 178.0;
     final cardHeight = HomeProductCard.heightForWidth(screenWidth);
@@ -73,10 +73,10 @@ class HomeSaleProductsSection extends StatelessWidget {
               key: const ValueKey('home-sale-products-list'),
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 14),
-              itemCount: preview.length,
+              itemCount: previewCount,
               separatorBuilder: (_, _) => const SizedBox(width: 12),
               itemBuilder: (context, index) {
-                final product = preview[index];
+                final product = products[index];
                 return SizedBox(
                   width: cardWidth,
                   child: HomeProductCard(

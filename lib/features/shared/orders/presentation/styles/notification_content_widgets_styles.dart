@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 abstract final class NotificationContentWidgetsStyles {
+  static final readAllButton = TextButton.styleFrom(
+    minimumSize: const Size(48, 48),
+    maximumSize: Size.infinite,
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+  );
+
   static final containerDecoration = BoxDecoration(
     color: AgrisellColors.surface,
     borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),

@@ -1,12 +1,10 @@
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:flutter/material.dart';
 
 import '../styles/rider_cash_out_dialog_styles.dart';
 
 class RiderCashOutErrorBanner extends StatelessWidget {
-  const RiderCashOutErrorBanner({
-    required this.message,
-    super.key,
-  });
+  const RiderCashOutErrorBanner({required this.message, super.key});
 
   final String message;
 
@@ -20,14 +18,11 @@ class RiderCashOutErrorBanner extends StatelessWidget {
           const Icon(
             Icons.error_outline,
             size: RiderCashOutDialogStyles.errorIconSize,
-            color: Colors.red,
+            color: AgrisellColors.statusRedText,
           ),
           const SizedBox(width: RiderCashOutDialogStyles.errorContentGap),
           Expanded(
-            child: Text(
-              message,
-              style: RiderCashOutDialogStyles.errorText,
-            ),
+            child: Text(message, style: RiderCashOutDialogStyles.errorText),
           ),
         ],
       ),
@@ -36,10 +31,7 @@ class RiderCashOutErrorBanner extends StatelessWidget {
 }
 
 class RiderCashOutNotesField extends StatelessWidget {
-  const RiderCashOutNotesField({
-    required this.controller,
-    super.key,
-  });
+  const RiderCashOutNotesField({required this.controller, super.key});
 
   final TextEditingController controller;
 
@@ -102,7 +94,7 @@ class RiderCashOutActions extends StatelessWidget {
                     height: RiderCashOutDialogStyles.spinnerSize,
                     child: CircularProgressIndicator(
                       strokeWidth: RiderCashOutDialogStyles.spinnerStroke,
-                      color: Colors.white,
+                      color: AgrisellColors.surface,
                     ),
                   )
                 : const Text(

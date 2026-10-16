@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -56,7 +57,7 @@ class _RiderSignUpScreenState extends State<RiderSignUpScreen> {
                         onPressed: () => unawaited(_requestExit()),
                         icon: const Icon(
                           Icons.arrow_back_rounded,
-                          color: Colors.white,
+                          color: AgrisellColors.surface,
                         ),
                       ),
                       const Expanded(

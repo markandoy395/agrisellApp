@@ -1,97 +1,77 @@
-import 'package:agresell_app/features/shared/chat/presentation/styles/chat_reference_styles.dart';
-import 'package:agresell_app/features/shared/chat/presentation/models/chat_participant_data.dart';
-import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_detail_header.dart';
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_safe_scaffold.dart';
 import 'package:agresell_app/features/shared/safety/presentation/widgets/app_safety_sheet.dart';
-import 'package:agresell_app/core/widgets/app_snack_bar.dart';
-
-import 'package:agresell_app/features/rider/chat/domain/rider_communication_models.dart';
-import 'package:agresell_app/features/rider/chat/presentation/controllers/rider_messages_controller.dart';
-import 'package:agresell_app/features/rider/chat/presentation/widgets/rider_chat_actions.dart';
-import 'package:agresell_app/features/rider/chat/presentation/widgets/rider_chat_messages.dart';
-import 'package:agresell_app/features/rider/chat/presentation/widgets/rider_message_composer.dart';
+import 'package:agresell_app/features/shared/chat/presentation/models/chat_participant_data.dart';
+import '../../domain/rider_communication_models.dart';
+import '../controllers/rider_messages_controller.dart';
+import '../styles/rider_messaging_design_styles.dart';
+import 'rider_chat_actions.dart';
+import 'rider_chat_messages.dart';
+import 'rider_conversation_header.dart';
+import 'rider_message_composer.dart';
+import 'rider_protected_chat_banner.dart';
+import 'rider_text_quick_replies.dart';
 
 class RiderConversationPanel extends StatelessWidget {
   const RiderConversationPanel({
     required this.controller,
     required this.quickReplies,
     this.onAction,
-    this.onAttachmentRequested,
     super.key,
   });
-
   final RiderMessagesController controller;
   final List<RiderQuickReply> quickReplies;
   final RiderCommunicationActionCallback? onAction;
-  final RiderCommunicationAttachmentCallback? onAttachmentRequested;
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: controller,
-      builder: (context, _) {
-        final conversation = controller.selectedConversation;
-        if (conversation == null) return const SizedBox.shrink();
-        return RiderSafeScaffold(
-          backgroundColor: ChatReferenceStyles.background,
-          body: Column(
-            children: [
-              ChatDetailHeader(
-                participant: riderChatParticipant(conversation),
-                subtitle: conversation.party.label + ' / Delivery chat',
-                isEmpty: controller.messages.isEmpty,
-                style: ChatReferenceStyles.header(
-                  MediaQuery.paddingOf(context).top,
-                ),
-                onBack: () => Navigator.of(context).pop(),
-                onCall: onAction == null || !controller.canCompose
-                    ? null
-                    : () => _runAction(
-                        context,
-                        RiderCommunicationActionType.call,
-                      ),
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: controller,
+    builder: (context, _) {
+      final conversation = controller.selectedConversation;
+      if (conversation == null) return const SizedBox.shrink();
+      return RiderSafeScaffold(
+        backgroundColor: RiderMessagingDesignStyles.background,
+        body: Column(
+          children: [
+            RiderConversationHeader(
+              conversation: conversation,
+              onSafety: () => _openSafety(context),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
+              child: RiderProtectedChatBanner(
+                deliveryId: conversation.deliveryId,
               ),
-              Expanded(child: RiderMessageBody(controller: controller)),
-              if (quickReplies.isNotEmpty)
-                RiderQuickReplyRow(
-                  replies: quickReplies,
-                  enabled: controller.canCompose && !controller.isSending,
-                  onSelected: controller.send,
-                ),
-              RiderConversationActionRow(
-                enabled: controller.canCompose,
-                onAction: (type) => _runAction(context, type),
-                onOutside: () => controller.send("I'm outside."),
+            ),
+            Expanded(child: RiderMessageBody(controller: controller)),
+            if (MediaQuery.viewInsetsOf(context).bottom == 0)
+              const Padding(
+                padding: EdgeInsets.fromLTRB(18, 8, 18, 4),
+                child: RiderProtectedChatBanner(compact: true),
               ),
-              if (controller.messageError case final message?)
-                RiderMessageError(message: message),
-              RiderMessageComposer(
-                enabled: controller.canCompose,
-                isSending: controller.isSending,
-                onSend: controller.send,
-                onAttach: onAttachmentRequested == null
-                    ? null
-                    : () => _runAction(
-                        context,
-                        RiderCommunicationActionType.attachPhoto,
-                      ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+            RiderTextQuickReplies(
+              replies: quickReplies,
+              enabled: controller.canCompose && !controller.isSending,
+              onSend: controller.send,
+            ),
+            if (controller.messageError case final message?)
+              RiderMessageError(message: message),
+            RiderMessageComposer(
+              enabled: controller.canCompose,
+              isSending: controller.isSending,
+              onSend: controller.send,
+            ),
+          ],
+        ),
+      );
+    },
+  );
 
-  Future<void> _runAction(
-    BuildContext context,
-    RiderCommunicationActionType type,
-  ) async {
+  Future<void> _openSafety(BuildContext context) async {
     final conversation = controller.selectedConversation;
     if (conversation == null) return;
-    if (type == RiderCommunicationActionType.contactSupport &&
-        onAction == null) {
+    if (onAction == null) {
       await showAppSafetySheet(
         context: context,
         role: 'rider',
@@ -99,63 +79,25 @@ class RiderConversationPanel extends StatelessWidget {
       );
       return;
     }
-    final accepted = await controller.requestAction(type);
+    final accepted = await controller.requestAction(
+      RiderCommunicationActionType.contactSupport,
+    );
     if (!context.mounted) return;
     if (!accepted) {
       ScaffoldMessenger.of(context).showAppSnackBar(
         SnackBar(
-          content: Text(controller.messageError ?? 'Action unavailable.'),
+          content: Text(controller.messageError ?? 'Support is unavailable.'),
         ),
       );
       return;
     }
-    final action = RiderCommunicationAction(
-      type: type,
-      conversationId: conversation.id,
-      deliveryId: conversation.deliveryId,
+    await onAction!(
+      RiderCommunicationAction(
+        type: RiderCommunicationActionType.contactSupport,
+        conversationId: conversation.id,
+        deliveryId: conversation.deliveryId,
+      ),
     );
-    final needsAttachment =
-        type == RiderCommunicationActionType.attachPhoto ||
-        type == RiderCommunicationActionType.shareLocation;
-    if (needsAttachment) {
-      final attachmentRequested = onAttachmentRequested;
-      if (attachmentRequested == null) {
-        _showActionMessage(
-          context,
-          '${riderActionLabel(type)} is unavailable.',
-        );
-        return;
-      }
-      final reference = await attachmentRequested(action);
-      if (reference == null || !context.mounted) return;
-      final sent = type == RiderCommunicationActionType.attachPhoto
-          ? await controller.sendPhoto(reference)
-          : await controller.sendLocation(reference);
-      if (!context.mounted) return;
-      _showActionMessage(
-        context,
-        sent
-            ? '${riderActionLabel(type)} sent.'
-            : 'Attachment could not be sent.',
-      );
-      return;
-    }
-
-    final runAction = onAction;
-    if (runAction == null) {
-      _showActionMessage(context, '${riderActionLabel(type)} is unavailable.');
-      return;
-    }
-    await runAction(action);
-    if (context.mounted) {
-      _showActionMessage(context, '${riderActionLabel(type)} opened.');
-    }
-  }
-
-  void _showActionMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showAppSnackBar(SnackBar(content: Text(message)));
   }
 }
 
@@ -169,5 +111,5 @@ ChatParticipantData riderChatParticipant(RiderConversation conversation) =>
           .map((part) => part.isEmpty ? '' : part[0])
           .join()
           .toUpperCase(),
-      imageSemanticLabel: conversation.participantLabel + ' profile',
+      imageSemanticLabel: '${conversation.participantLabel} profile',
     );

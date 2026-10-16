@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../styles/rider_home_design_styles.dart';
+import '../styles/rider_reference_styles.dart';
 
 import 'package:agresell_app/features/rider/dashboard/presentation/styles/rider_nearby_request_summary_styles.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_nearby_empty_summary.dart';
@@ -22,6 +24,7 @@ class RiderNearbyRequestSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     final preview = requests.take(3).toList();
     return RiderSurfaceCard(
+      decoration: RiderHomeDesignStyles.card,
       padding: RiderNearbyRequestSummaryStyles.cardPadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,30 +34,46 @@ class RiderNearbyRequestSummary extends StatelessWidget {
           else ...[
             Row(
               children: [
-                const RiderNearbyQueueIcon(),
-                const SizedBox(width: 12),
+                const Icon(
+                  Icons.notifications_active_rounded,
+                  color: RiderReferenceStyles.green,
+                  size: 22,
+                ),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const Text(
+                        'Ready for pickup',
+                        style: RiderReferenceStyles.title,
+                      ),
                       Text(
                         '${requests.length} request${requests.length == 1 ? '' : 's'} nearby',
                         style: RiderNearbyRequestSummaryStyles.headerTitleStyle,
                       ),
                       const SizedBox(height: 3),
-                      const Text(
-                        'Pickups ready for review in your area.',
-                        style:
-                            RiderNearbyRequestSummaryStyles.headerSubtitleStyle,
-                      ),
                     ],
                   ),
                 ),
+                TextButton(
+                  onPressed: onOpenList,
+                  style: RiderReferenceStyles.linkButton,
+                  child: const Text('View all ›'),
+                ),
               ],
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'Pickups ready for review in your area.',
+              style: RiderReferenceStyles.caption,
             ),
             const SizedBox(height: 14),
             for (final request in preview) ...[
-              RiderNearbyRequestPreview(request: request),
+              InkWell(
+                onTap: onOpenList,
+                child: RiderNearbyRequestPreview(request: request),
+              ),
               if (request != preview.last)
                 const Divider(
                   height: RiderNearbyRequestSummaryStyles.dividerHeight,
@@ -71,7 +90,8 @@ class RiderNearbyRequestSummary extends StatelessWidget {
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
-              child: OutlinedButton.icon(
+              child: TextButton.icon(
+                style: RiderReferenceStyles.neutralButton,
                 onPressed: onOpenList,
                 icon: const Icon(Icons.arrow_forward_rounded, size: 18),
                 label: const Text('View all requests'),

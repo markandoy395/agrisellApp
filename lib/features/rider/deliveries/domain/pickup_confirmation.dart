@@ -17,6 +17,15 @@ enum PickupConfirmationMethod {
   farmerSignature,
 }
 
+extension PickupConfirmationMethodDetails on PickupConfirmationMethod {
+  bool get requiresImage => switch (this) {
+    PickupConfirmationMethod.productPhoto ||
+    PickupConfirmationMethod.packagePhoto ||
+    PickupConfirmationMethod.farmerSignature => true,
+    _ => false,
+  };
+}
+
 class PickupConfiguration {
   const PickupConfiguration({
     required this.requiredMethods,

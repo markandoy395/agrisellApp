@@ -129,7 +129,11 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.text('Rider map'), findsOneWidget);
+    expect(find.text('Map'), findsOneWidget);
+    await tester.tap(find.byTooltip('Map options'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Focus map'));
+    await tester.pumpAndSettle();
     expect(find.text('All'), findsOneWidget);
     expect(find.text('Deliveries'), findsOneWidget);
     expect(find.text('Farmers'), findsOneWidget);
@@ -141,6 +145,8 @@ void main() {
         findsOneWidget,
       );
     }
+    await tester.tap(find.byTooltip('Close map options'));
+    await tester.pumpAndSettle();
     expect(find.byIcon(Icons.inventory_2_rounded), findsWidgets);
     expect(find.byIcon(Icons.agriculture_rounded), findsWidgets);
     expect(find.byIcon(Icons.local_shipping_rounded), findsWidgets);
@@ -274,9 +280,10 @@ void main() {
       findsNothing,
     );
 
-    await tester.tap(find.byTooltip('Refresh location'));
-    await tester.pump();
-    await tester.pump();
+    await tester.tap(find.byTooltip('Work status and GPS'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Refresh location').last);
+    await tester.pumpAndSettle();
 
     expect(repository.calls, 2);
     expect(

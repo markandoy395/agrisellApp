@@ -77,7 +77,7 @@ class RiderRequestList extends StatelessWidget {
         child: ListView.separated(
           key: const PageStorageKey<String>('rider-request-list'),
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(14, 14, 14, 156),
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
           itemCount: _itemCount(requests.length, access),
           separatorBuilder: (_, _) => const SizedBox(height: 10),
           itemBuilder: (context, index) =>
@@ -160,6 +160,9 @@ class RiderRequestList extends StatelessWidget {
   RiderRequestAccessCard _accessCard(RiderRequestAccessState state) =>
       RiderRequestAccessCard(
         state: state,
+        isCheckingLocation:
+            locationController?.state == RiderLocationState.idle ||
+            locationController?.state == RiderLocationState.loading,
         onRetryLocation: onRetryLocation,
         onOpenLocationSettings: onOpenLocationSettings,
         onOpenAppSettings: onOpenAppSettings,

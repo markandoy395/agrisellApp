@@ -1,9 +1,16 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 /// Predefined style constants for the rider delivery confirmation screen and form.
 abstract final class RiderDeliveryConfirmationStyles {
+  static const footerPadding = EdgeInsets.fromLTRB(14, 8, 14, 12);
+  static final submitButton = FilledButton.styleFrom(
+    minimumSize: const Size(double.infinity, 48),
+    maximumSize: Size.infinite,
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+  );
   // Screen Styles
   static const Color background = AgrisellColors.homeBackground;
   static const Color closeIconColor = AgrisellColors.surface;
@@ -12,27 +19,40 @@ abstract final class RiderDeliveryConfirmationStyles {
 
   // Text Styles
   static const TextStyle requiredProofTitle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 14,
     fontWeight: FontWeight.w800,
   );
 
-  static const TextStyle bulletText = TextStyle(fontSize: 12);
+  static const TextStyle bulletText = TextStyle(
+    fontFamily: AppTypography.fontFamily,
+    fontSize: 12,
+  );
 
-  static const TextStyle recipientLabel = TextStyle(fontSize: 12);
+  static const TextStyle recipientLabel = TextStyle(
+    fontFamily: AppTypography.fontFamily,
+    fontSize: 12,
+  );
 
   static const TextStyle recipientValue = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 13,
     fontWeight: FontWeight.w700,
   );
 
-  static const TextStyle recipientHelper = TextStyle(fontSize: 12);
+  static const TextStyle recipientHelper = TextStyle(
+    fontFamily: AppTypography.fontFamily,
+    fontSize: 12,
+  );
 
   static const TextStyle buyerConfirmationTitle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 13,
     fontWeight: FontWeight.w700,
   );
 
   static const TextStyle gpsText = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
     fontWeight: FontWeight.w600,
   );

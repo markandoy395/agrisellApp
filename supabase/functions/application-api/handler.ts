@@ -1,6 +1,7 @@
 import { enforceRateLimit, type RateLimitClient } from "../_shared/rate_limit.ts";
 import { apiRoute, sensitivePolicy, upstreamHeaders } from "./policy.ts";
 import { BodyTooLarge, boundedBody } from "../_shared/request_body.ts";
+import { chatLimits } from "./chat_limits.ts";
 
 type GatewayClient = RateLimitClient & {
   auth: {
@@ -58,6 +59,8 @@ export async function handleApiRequest(
       if (limited) return respond(limited);
     }
     const body = ["GET", "HEAD"].includes(request.method) ? undefined : await boundedBody(request);
+    const chatLimit = await chatLimits(client, identity, route, body);
+    if (chatLimit) return respond(chatLimit);
     const upstream = new URL(`/rest/v1/${route}`, config.projectUrl);
     upstream.search = new URL(request.url).search;
     return respond(

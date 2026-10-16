@@ -67,9 +67,8 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
 
-  # Material icon glyphs are bundled as a project asset. This keeps every
-  # `Icons.*` reference working without an external icon package.
-  uses-material-design: false
+  # Use Flutter's standard font so release builds can tree-shake unused glyphs.
+  uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
   assets:
@@ -95,9 +94,6 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: MaterialIcons
-      fonts:
-        - asset: assets/fonts/MaterialIcons-Regular.otf
     - family: Poppins
       fonts:
         - asset: assets/fonts/Poppins/Poppins-Regular.ttf

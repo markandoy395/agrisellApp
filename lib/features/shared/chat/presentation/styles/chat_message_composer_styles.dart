@@ -3,7 +3,7 @@ import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
 abstract final class ChatMessageComposerStyles {
   static InputDecoration textFieldStyle(ChatMessageComposerStyle style) =>
-      style.inputDecoration.copyWith(hintText: style.hintText, counterText: '');
+      style.inputDecoration.copyWith(hintText: style.hintText);
 
   static final iconButtonStyle = IconButton.styleFrom(
     backgroundColor: AgrisellColors.authGreen,

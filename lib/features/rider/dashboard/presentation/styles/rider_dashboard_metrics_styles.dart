@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -10,13 +11,15 @@ abstract final class RiderDashboardMetricsStyles {
   static final tileRadius = BorderRadius.circular(12);
 
   static const tileValueStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 15,
     height: 1,
-    fontWeight: FontWeight.w900,
+    fontWeight: FontWeight.w800,
   );
 
   static const tileLabelStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
     height: 1.1,
@@ -32,13 +35,15 @@ abstract final class RiderDashboardMetricsStyles {
   static const earningsBoxColor = AgrisellColors.limeSoft;
 
   static const earningsValueStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 15,
     height: 1.1,
-    fontWeight: FontWeight.w900,
+    fontWeight: FontWeight.w800,
   );
 
   static const earningsSubtitleStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
     height: 1.25,
@@ -48,7 +53,11 @@ abstract final class RiderDashboardMetricsStyles {
   // Count action button
   static final countActionButtonStyle = OutlinedButton.styleFrom(
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-    textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+    textStyle: const TextStyle(
+      fontFamily: AppTypography.fontFamily,
+      fontSize: 12,
+      fontWeight: FontWeight.w800,
+    ),
   );
 
   static const countActionIconSize = 17.0;

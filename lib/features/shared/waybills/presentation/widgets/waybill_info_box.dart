@@ -28,17 +28,18 @@ class WaybillInfoBox extends StatelessWidget {
           children: [
             Icon(icon, size: 14, color: AgrisellColors.authGreen),
             const SizedBox(width: 4),
-            Text(
-              title.toUpperCase(),
-              style: DeliveryWaybillStyles.infoBoxTitle,
+            Expanded(
+              child: Text(
+                title.toUpperCase(),
+                style: DeliveryWaybillStyles.infoBoxTitle,
+              ),
             ),
           ],
         ),
         const SizedBox(height: 4),
-        ...lines.map((line) => Text(
-          line,
-          style: DeliveryWaybillStyles.infoBoxLine,
-        )),
+        ...lines.map(
+          (line) => Text(line, style: DeliveryWaybillStyles.infoBoxLine),
+        ),
       ],
     ),
   );

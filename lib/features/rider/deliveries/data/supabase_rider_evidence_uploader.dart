@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:agresell_app/features/rider/deliveries/data/supabase_delivery_data_source.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_proof.dart';
+import 'pickup_proof_storage.dart';
 
 class SupabaseRiderEvidenceUploader {
   const SupabaseRiderEvidenceUploader(this._dataSource);
@@ -19,8 +20,18 @@ class SupabaseRiderEvidenceUploader {
     if (!reference.startsWith('local-secure://')) return reference;
     final fileName = _fileName(reference);
     final root = await getApplicationDocumentsDirectory();
-    final file = File('${root.path}/delivery_proofs/$fileName');
-    if (!await file.exists()) {
+    final uri = Uri.tryParse(reference);
+    if (uri?.pathSegments.firstOrNull != deliveryId ||
+        uri?.host != stage.name) {
+      throw const DeliveryDataException(
+        DeliveryDataFailureType.validation,
+        'The saved photo does not belong to this delivery stage.',
+      );
+    }
+    final file = uri?.host == 'pickup'
+        ? await PickupProofStorage().resolveLocalPhoto(reference)
+        : File('${root.path}/delivery_proofs/$fileName');
+    if (file == null || !await file.exists()) {
       throw const DeliveryDataException(
         DeliveryDataFailureType.storage,
         'The offline Rider evidence is no longer available.',
@@ -56,8 +67,10 @@ class SupabaseRiderEvidenceUploader {
     if (!reference.startsWith('local-secure://')) return;
     final fileName = _fileName(reference);
     final root = await getApplicationDocumentsDirectory();
-    final file = File('${root.path}/delivery_proofs/$fileName');
-    if (await file.exists()) await file.delete();
+    final file = Uri.tryParse(reference)?.host == 'pickup'
+        ? await PickupProofStorage().resolveLocalPhoto(reference)
+        : File('${root.path}/delivery_proofs/$fileName');
+    if (file != null && await file.exists()) await file.delete();
   }
 
   String _fileName(String reference) {

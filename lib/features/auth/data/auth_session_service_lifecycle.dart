@@ -85,7 +85,8 @@ extension AuthSessionServiceLifecycle on AuthSessionService {
     }
   }
 
-  void _clearAccountState() {
+  void _clearAccountState({bool clearSnapshot = true}) {
+    if (clearSnapshot) unawaited(HomeProductSnapshotCache.instance.clear());
     BasketController.instance.unload();
     FarmerFollowController.instance.unload();
     OrderController.instance.unload();
@@ -95,7 +96,7 @@ extension AuthSessionServiceLifecycle on AuthSessionService {
   void clearMemoryForTesting() {
     _currentAccountId = null;
     _currentAccountRemembered = false;
-    _clearAccountState();
+    _clearAccountState(clearSnapshot: false);
     _notifySessionChanged();
   }
 }

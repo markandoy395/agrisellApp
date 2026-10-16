@@ -2,6 +2,7 @@ part of 'rider_location_controller.dart';
 
 extension RiderLocationControllerRefresh on RiderLocationController {
   Future<void> _refreshLocation({bool requestPermission = false}) async {
+    if (_isDisposed) return;
     final isInitialLoad = _location == null;
     if (isInitialLoad) _state = RiderLocationState.loading;
     _errorMessage = null;
@@ -31,6 +32,7 @@ extension RiderLocationControllerRefresh on RiderLocationController {
       } on Exception {
         _isApproximate = false;
       }
+      if (_isDisposed) return;
       final position = await _gateway.currentPosition(
         settings: _currentLocationSettings,
       );

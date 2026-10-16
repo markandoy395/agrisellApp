@@ -26,6 +26,96 @@ void main() {
     expect(controller.quality, RiderLocationQuality.accurate);
   });
 
+  test('concurrent refresh and tracking share one GPS request', () async {
+    final gateway = _Gateway();
+    final controller = RiderLocationController(gateway: gateway);
+    addTearDown(controller.dispose);
+    await Future.wait([controller.refresh(), controller.startTracking()]);
+    expect(gateway.positionCalls, 1);
+    expect(gateway.streamStarts, 1);
+  });
+
+  test('location listeners can re-enter tracking without recursion', () async {
+    final gateway = _Gateway();
+    final controller = RiderLocationController(gateway: gateway);
+    addTearDown(controller.dispose);
+    final starts = <Future<void>>[];
+    var notifications = 0;
+    controller.addListener(() {
+      notifications++;
+      // Mirrors location -> request environment -> map navigation listeners.
+      starts.add(controller.startTracking());
+    });
+
+    await controller.startTracking();
+    await Future.wait(starts);
+
+    expect(notifications, 2);
+    expect(controller.state, RiderLocationState.ready);
+    expect(gateway.positionCalls, 1);
+    expect(gateway.streamStarts, 1);
+  });
+
+  test('loading listeners share the pending refresh', () async {
+    final gateway = _Gateway();
+    final controller = RiderLocationController(gateway: gateway);
+    addTearDown(controller.dispose);
+    final refreshes = <Future<void>>[];
+    controller.addListener(() => refreshes.add(controller.refresh()));
+
+    await controller.refresh();
+    await Future.wait(refreshes);
+
+    expect(refreshes, hasLength(2));
+    expect(gateway.positionCalls, 1);
+    expect(controller.state, RiderLocationState.ready);
+  });
+
+  test('stopping before a queued start prevents GPS work', () async {
+    final gateway = _Gateway();
+    final controller = RiderLocationController(gateway: gateway);
+    addTearDown(controller.dispose);
+
+    final pending = controller.startTracking();
+    await controller.stopTracking();
+    await pending;
+
+    expect(gateway.positionCalls, 0);
+    expect(gateway.streamStarts, 0);
+  });
+
+  test(
+    'tracking refreshes a fix older than the accepted freshness window',
+    () async {
+      var now = DateTime.now().subtract(const Duration(minutes: 1));
+      final gateway = _Gateway(position: _position(timestamp: now));
+      final controller = RiderLocationController(
+        gateway: gateway,
+        clock: () => now,
+      );
+      addTearDown(controller.dispose);
+      await controller.refresh();
+      now = now.add(const Duration(minutes: 1));
+      gateway.position = _position(timestamp: now);
+      await controller.startTracking();
+      expect(gateway.positionCalls, 2);
+      expect(controller.location?.timestamp, now);
+    },
+  );
+
+  test('a GPS fix arriving after disposal is ignored', () async {
+    final gateway = _Gateway()..positionGate = Completer<Position>();
+    final controller = RiderLocationController(gateway: gateway);
+    final pending = controller.refresh();
+    while (gateway.positionCalls == 0) {
+      await Future<void>.delayed(Duration.zero);
+    }
+    controller.dispose();
+    gateway.positionGate!.complete(_position());
+    await pending;
+    expect(controller.location, isNull);
+  });
+
   test('unavailable Android speed and heading are normalized', () async {
     final gateway = _Gateway(position: _position(speed: -1, heading: -1));
     final controller = RiderLocationController(gateway: gateway);
@@ -176,20 +266,23 @@ class _Gateway implements GpsLocationGateway {
   final LocationPermission permission;
   final LocationPermission requestedPermission;
   final LocationAccuracyStatus accuracyStatus;
-  final Position position;
+  Position position;
+  Completer<Position>? positionGate;
   final Object? currentError;
   final positions = StreamController<Position>.broadcast();
   var permissionRequests = 0;
   var streamStarts = 0;
+  var positionCalls = 0;
 
   @override
   Future<LocationPermission> checkPermission() async => permission;
 
   @override
   Future<Position> currentPosition({required LocationSettings settings}) async {
+    positionCalls++;
     final error = currentError;
     if (error != null) throw error;
-    return position;
+    return positionGate == null ? position : await positionGate!.future;
   }
 
   @override

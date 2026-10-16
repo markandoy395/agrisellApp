@@ -37,6 +37,7 @@ void main() {
     expect(repository, isA<RiderDeliveryRepository>());
     expect(values, hasLength(1));
     expect(values.single.id, '7');
+    expect(values.single.productImageUrl, 'https://example.test/product.jpg');
     expect(values.single.pickupLocation.address, 'Carmen Market');
     expect(values.single.deliveryLocation.address, 'Uptown Buyer');
     expect(values.single.deliveryFee, 0);
@@ -72,20 +73,16 @@ void main() {
     );
     addTearDown(client.dispose);
 
-    final values = await SupabaseDeliveryDataSource(client)
-        .getNearbyDeliveries(
-          const RiderDeliverySearch(
-            latitude: 8.48,
-            longitude: 124.65,
-            radiusKm: 12,
-          ),
-        );
+    final values = await SupabaseDeliveryDataSource(client).getNearbyDeliveries(
+      const RiderDeliverySearch(
+        latitude: 8.48,
+        longitude: 124.65,
+        radiusKm: 12,
+      ),
+    );
 
     expect(values, hasLength(1));
-    expect(
-      captured.url.path,
-      endsWith('/rpc/current_rider_nearby_deliveries'),
-    );
+    expect(captured.url.path, endsWith('/rpc/current_rider_nearby_deliveries'));
     final body = jsonDecode(captured.body) as Map<String, dynamic>;
     expect(body['p_latitude'], 8.48);
     expect(body['p_longitude'], 124.65);
@@ -95,6 +92,7 @@ void main() {
 }
 
 const _availableDelivery = <String, Object?>{
+  'product_image_url': 'https://example.test/product.jpg',
   'delivery_id': 7,
   'order_id': 9,
   'delivery_status': 'available',

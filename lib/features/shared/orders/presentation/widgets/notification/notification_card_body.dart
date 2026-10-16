@@ -30,8 +30,6 @@ class NotificationCardBody extends StatelessWidget {
           Expanded(
             child: Text(
               item.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
               style: NotificationListItemStyles.titleStyle(isRead: isRead),
             ),
           ),
@@ -71,8 +69,6 @@ class NotificationCardBody extends StatelessWidget {
         curve: Curves.easeOutCubic,
         child: Text(
           displayedDescription,
-          maxLines: isExpanded ? null : 2,
-          overflow: isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
           style: NotificationListItemStyles.descriptionStyle,
         ),
       ),

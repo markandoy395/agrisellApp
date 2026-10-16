@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/features/shared/notifications/presentation/widgets/notification_card_layout.dart';
 
 import 'package:agresell_app/features/shared/orders/domain/home_notification.dart';
 import 'package:agresell_app/features/shared/orders/presentation/styles/notification_list_item_styles.dart';
@@ -77,31 +78,25 @@ class _NotificationListItemState extends State<NotificationListItem> {
             onTap: widget.onTap,
             child: Padding(
               padding: NotificationListItemStyles.cardPadding,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  NotificationTypeIcon(style: style),
-                  const SizedBox(width: 11),
-                  Expanded(
-                    child: NotificationCardBody(
-                      item: widget.item,
-                      isRead: widget.isRead,
-                      isExpanded: _isExpanded,
-                      displayedDescription: _displayedDescription,
-                      style: style,
-                    ),
-                  ),
-                  NotificationCardActions(
-                    title: widget.item.title,
-                    isRead: widget.isRead,
-                    isExpandable: _isExpandable,
-                    isExpanded: _isExpanded,
-                    onToggleRead: widget.onToggleRead,
-                    onDelete: widget.onDelete,
-                    onToggleExpanded: () =>
-                        setState(() => _isExpanded = !_isExpanded),
-                  ),
-                ],
+              child: NotificationCardLayout(
+                leading: NotificationTypeIcon(style: style),
+                content: NotificationCardBody(
+                  item: widget.item,
+                  isRead: widget.isRead,
+                  isExpanded: _isExpanded,
+                  displayedDescription: _displayedDescription,
+                  style: style,
+                ),
+                actions: NotificationCardActions(
+                  title: widget.item.title,
+                  isRead: widget.isRead,
+                  isExpandable: _isExpandable,
+                  isExpanded: _isExpanded,
+                  onToggleRead: widget.onToggleRead,
+                  onDelete: widget.onDelete,
+                  onToggleExpanded: () =>
+                      setState(() => _isExpanded = !_isExpanded),
+                ),
               ),
             ),
           ),

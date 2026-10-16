@@ -16,6 +16,7 @@ open class MainActivity : FlutterActivity() {
     }
 
     private var pendingPhoneResult: MethodChannel.Result? = null
+    private var waybillPrinter: WaybillPrinter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -28,6 +29,12 @@ open class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        waybillPrinter = WaybillPrinter(this).also { printer ->
+            MethodChannel(
+                flutterEngine.dartExecutor.binaryMessenger,
+                "agrisell/waybill_print",
+            ).setMethodCallHandler(printer::handle)
+        }
         MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
             "agrisell/device_phone_number",
@@ -38,6 +45,12 @@ open class MainActivity : FlutterActivity() {
             }
             requestPhoneNumber(result)
         }
+    }
+
+    override fun onDestroy() {
+        waybillPrinter?.dispose()
+        waybillPrinter = null
+        super.onDestroy()
     }
 
     private fun requestPhoneNumber(result: MethodChannel.Result) {

@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/features/shared/orders/presentation/styles/order_acceptance_deadline_card_styles.dart';
 import 'dart:async';
 
@@ -136,8 +137,10 @@ class _OrderAcceptanceDeadlineCardState
 
   void _showInfo(BuildContext context, String message) {
     final messenger = ScaffoldMessenger.of(context);
-    messenger.clearSnackBars();
-    messenger.showSnackBar(SnackBar(content: Text(message)));
+    messenger.showAppSnackBar(
+      SnackBar(content: Text(message)),
+      duration: const Duration(seconds: 6),
+    );
   }
 
   String _expiredMessage(OrderPaymentStatus status) => switch (status) {

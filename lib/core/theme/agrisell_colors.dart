@@ -52,6 +52,16 @@ abstract final class AgrisellColors {
   static const statusPurpleText = Color(0xFF6A4A8F);
   static const statusPurpleBackground = Color(0xFFF4EEF9);
 
+  // Translucent effects derived from the brand and semantic palette above.
+  static const shadowStrong = Color(0x330B0B0B);
+  static const shadowMedium = Color(0x240B0B0B);
+  static const shadowButton = Color(0x260B0B0B);
+  static const shadowLight = Color(0x0A0B0B0B);
+  static const greenGlow = Color(0x331F7A3F);
+  static const greenGlowSoft = Color(0x1F1F7A3F);
+  static const surfaceOverlay = Color(0x33FFFFFF);
+  static const routeRadar = Color(0x33245F8F);
+
   // Navigation follows the app's light appearance on every device theme.
   static Color systemNavigationBar(Brightness _) => surface;
 }

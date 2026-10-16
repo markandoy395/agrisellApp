@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -51,28 +52,33 @@ abstract final class RiderMapStyles {
 
   // --- Typography & Text Styles ---
   static const toolbarTitle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontWeight: FontWeight.w800,
   );
 
   static const toolbarSubtitle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
   );
 
   static const errorText = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.statusOrangeText,
     fontSize: 12,
     fontWeight: FontWeight.w600,
   );
 
   static const chipLabel = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 12,
     fontWeight: FontWeight.w700,
   );
 
   static const activeCardBadge = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.statusOrangeText,
     fontSize: 12,
     fontWeight: FontWeight.w700,
@@ -80,6 +86,7 @@ abstract final class RiderMapStyles {
   );
 
   static const activeCardProduct = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 12,
     fontWeight: FontWeight.w700,

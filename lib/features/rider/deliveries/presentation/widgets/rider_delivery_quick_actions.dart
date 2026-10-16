@@ -1,5 +1,6 @@
-import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_quick_actions_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import '../styles/rider_delivery_reference_styles.dart';
 
 class RiderDeliveryQuickActions extends StatelessWidget {
   const RiderDeliveryQuickActions({
@@ -21,10 +22,25 @@ class RiderDeliveryQuickActions extends StatelessWidget {
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
       final actions = [
-        _Action(icon: Icons.route_outlined, label: 'Route', onTap: onRoute),
+        _Action(
+          icon: Icons.route_outlined,
+          label: 'Route',
+          onTap: onRoute,
+          color: AgrisellColors.authGreen,
+        ),
         _Action(icon: Icons.chat_outlined, label: 'Message', onTap: onMessage),
-        _Action(icon: Icons.flag_outlined, label: 'Problem', onTap: onProblem),
-        _Action(icon: Icons.sos_outlined, label: 'Safety', onTap: onSafety),
+        _Action(
+          icon: Icons.report_problem_rounded,
+          label: 'Problem',
+          onTap: onProblem,
+          color: AgrisellColors.statusRedText,
+        ),
+        _Action(
+          icon: Icons.shield_rounded,
+          label: 'Safety',
+          onTap: onSafety,
+          color: AgrisellColors.statusOrangeText,
+        ),
         if (onWaybill != null)
           _Action(
             key: const Key('rider-quick-action-waybill'),
@@ -55,21 +71,23 @@ class _Action extends StatelessWidget {
     required this.icon,
     required this.label,
     this.onTap,
+    this.color = AgrisellColors.statusBlueText,
     super.key,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback? onTap;
+  final Color color;
 
   @override
   Widget build(BuildContext context) => OutlinedButton(
     onPressed: onTap,
-    style: RiderDeliveryQuickActionsStyles.outlinedButtonStyle,
+    style: RiderDeliveryReferenceStyles.quickAction(color),
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 18),
+        Icon(icon, size: 26),
         const SizedBox(height: 3),
         Text(label, textAlign: TextAlign.center),
       ],

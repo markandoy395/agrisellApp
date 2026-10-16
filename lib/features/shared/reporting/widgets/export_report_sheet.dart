@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 
@@ -78,7 +79,7 @@ class _ExportReportSheetState extends State<ExportReportSheet> {
     if (!mounted) return;
     setState(() => _isCopied = true);
 
-    ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showAppSnackBar(
       SnackBar(
         content: Text(
           'CSV data copied to clipboard (${widget.rows.length} rows)',
@@ -113,7 +114,7 @@ class _ExportReportSheetState extends State<ExportReportSheet> {
         _isSaving = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showAppSnackBar(
         SnackBar(
           content: Text('Saved to ${file.path.split("/").last}'),
           backgroundColor: AgrisellColors.authGreen,

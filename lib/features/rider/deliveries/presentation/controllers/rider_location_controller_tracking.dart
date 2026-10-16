@@ -2,10 +2,13 @@ part of 'rider_location_controller.dart';
 
 extension _RiderLocationTracking on RiderLocationController {
   Future<void> _startTracking() async {
-    if (_positionSubscription != null) return;
+    if (_isDisposed || !_trackingRequested || _positionSubscription != null) {
+      return;
+    }
     unawaited(_outbox.sync());
     if (_needsLocationRefresh) await refresh();
-    if (!_trackingRequested ||
+    if (_isDisposed ||
+        !_trackingRequested ||
         _location == null ||
         _positionSubscription != null) {
       return;
@@ -54,6 +57,7 @@ extension _RiderLocationTracking on RiderLocationController {
   }
 
   void _setPosition(Position position) {
+    if (_isDisposed) return;
     if (!_isUsablePositionSample(position)) return;
     final location = RiderDeviceLocation(
       latitude: position.latitude,

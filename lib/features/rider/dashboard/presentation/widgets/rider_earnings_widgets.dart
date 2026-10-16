@@ -54,7 +54,7 @@ class RiderEarningsSummaryCard extends StatelessWidget {
                         icon: const Icon(
                           Icons.payments_rounded,
                           size: 13,
-                          color: Colors.white,
+                          color: AgrisellColors.surface,
                         ),
                         label: const Text(
                           'Cash Out',

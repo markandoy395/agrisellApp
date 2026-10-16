@@ -2,6 +2,9 @@ import 'dart:async';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
 import 'package:flutter/material.dart';
+import '../../domain/rider_map_visibility.dart';
+import 'package:agresell_app/core/utils/agrisell_page_route.dart';
+import 'rider_delivery_details_screen.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -29,6 +32,7 @@ import 'package:agresell_app/features/rider/deliveries/presentation/widgets/ride
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
 
 part 'rider_map_screen_sync.dart';
+part 'rider_map_screen_content.dart';
 part 'rider_map_screen_view_state.dart';
 part 'rider_map_road_access.dart';
 part 'rider_map_marker_actions.dart';
@@ -47,6 +51,9 @@ class RiderMapScreen extends StatefulWidget {
     this.availabilityController,
     this.mapDiscoveryRepository,
     this.roadAccessService,
+    this.onOpenNotifications,
+    this.unreadNotifications = 0,
+    this.onOpenConversation,
     super.key,
   });
 
@@ -59,6 +66,9 @@ class RiderMapScreen extends StatefulWidget {
   final RiderAvailabilityController? availabilityController;
   final RiderMapDiscoveryRepository? mapDiscoveryRepository;
   final RiderRoadAccessService? roadAccessService;
+  final VoidCallback? onOpenNotifications;
+  final int unreadNotifications;
+  final Future<bool> Function(String deliveryId)? onOpenConversation;
 
   @override
   State<RiderMapScreen> createState() => _RiderMapScreenState();
@@ -79,6 +89,7 @@ class _RiderMapScreenState extends State<RiderMapScreen> {
   var _mapReady = false;
   var _viewRestoreCompleted = false;
   var _filter = RiderMapFilter.all;
+  var _visibility = const RiderMapVisibility();
   var _mapZoom = 15.0;
   var _navigationActive = false;
   var _followRider = true;
@@ -151,40 +162,7 @@ class _RiderMapScreenState extends State<RiderMapScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(
-    animation: Listenable.merge([
-      _locationController,
-      widget.deliveryController,
-      _routeController,
-    ]),
-    builder: (context, _) => RiderMapContent(
-      controller: _locationController,
-      mapController: _mapController,
-      requests: widget.deliveryController.requests,
-      farms: _nearbyFarms,
-      roadAccessConnections: _roadAccessConnections,
-      farmDiscoveryError: _farmDiscoveryError,
-      farmsLoading: _farmSearchLoading,
-      routeController: _routeController,
-      riderId: widget.profile?.id,
-      filter: _filter,
-      mapZoom: _mapZoom,
-      discoveryRadiusKm:
-          widget.profile?.serviceRadiusKm ??
-          RiderDeliverySearch.defaultRadiusKm,
-      navigationActive: _navigationActive,
-      onFilterChanged: _changeMapFilter,
-      onMarkerTap: (request, kind) => unawaited(_openMarker(request, kind)),
-      onFarmTap: (farm) => unawaited(_openFarm(farm)),
-      onNavigateActive: (request) => unawaited(_startNavigation(request)),
-      onExitNavigation: _exitNavigation,
-      onRecenter: _recenter,
-      onRefresh: () => unawaited(_refreshMapDiscovery()),
-      onOpenList: widget.onOpenList,
-      onMapReady: _onMapReady,
-      onPositionChanged: _onPositionChanged,
-    ),
-  );
+  Widget build(BuildContext context) => _buildMapScreen(context);
 
   void _showMapMessage(String message) {
     ScaffoldMessenger.of(

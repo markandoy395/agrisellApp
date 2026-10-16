@@ -61,7 +61,6 @@ extension _RiderHomeNavigation on _RiderHomeScreenState {
             builder: (_) => RiderConversationPanel(
               controller: _messagesController,
               quickReplies: RiderQuickReply.defaults,
-              onAttachmentRequested: _captureCommunicationAttachment,
             ),
           ),
         );
@@ -87,7 +86,6 @@ extension _RiderHomeNavigation on _RiderHomeScreenState {
         builder: (_) => RiderConversationPanel(
           controller: _messagesController,
           quickReplies: RiderQuickReply.defaults,
-          onAttachmentRequested: _captureCommunicationAttachment,
         ),
       ),
     );

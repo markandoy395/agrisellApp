@@ -9,6 +9,7 @@ import 'package:agresell_app/features/shared/notifications/domain/notification_c
 import 'package:agresell_app/features/shared/notifications/domain/notification_load_state.dart';
 import 'package:agresell_app/features/shared/notifications/presentation/widgets/notification_filter_tabs.dart';
 import 'package:agresell_app/features/shared/notifications/presentation/widgets/notification_state_view.dart';
+import 'package:agresell_app/features/shared/notifications/presentation/widgets/notification_layout.dart';
 import 'package:agresell_app/features/shared/orders/data/home_notification_repository.dart';
 import 'package:agresell_app/features/shared/orders/domain/home_notification.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/notification_controller.dart';
@@ -145,8 +146,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
               .where((notification) => !_controller.isRead(notification))
               .length;
           _reportUnreadCount(unreadCount);
-          return Column(
-            children: [
+          return NotificationLayout(
+            header: [
               NotificationHeader(unreadCount: unreadCount),
               NotificationFilterTabs(
                 selected: _filter,
@@ -159,13 +160,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     ? null
                     : () => _confirmClearAll(notifications),
               ),
-              Expanded(child: _content(notifications, loadState)),
             ],
+            body: _content(notifications, loadState),
           );
         },
       ),
     );
   }
-
-
 }

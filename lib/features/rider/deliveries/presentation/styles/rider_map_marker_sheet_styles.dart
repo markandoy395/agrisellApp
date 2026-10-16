@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -13,32 +14,38 @@ abstract final class RiderMapMarkerSheetStyles {
 
   // Text Styles
   static const TextStyle titleTextStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 15,
     fontWeight: FontWeight.w800,
   );
 
   static const TextStyle subtitleTextStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
   );
 
   static const TextStyle chipTextStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
   );
 
   static const TextStyle detailLabelTextStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
     fontWeight: FontWeight.w700,
   );
 
   static const TextStyle detailValueTextStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
     height: 1.35,
   );
 
   static const TextStyle priorityWarningTextStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.statusOrangeText,
     fontSize: 12,
     height: 1.35,

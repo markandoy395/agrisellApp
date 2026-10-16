@@ -30,7 +30,7 @@ class RiderCashOutAmountField extends StatelessWidget {
           controller: controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
           ],
           decoration: RiderCashOutDialogStyles.inputDecoration(
             hintText: 'Enter amount (e.g. 500)',
@@ -42,10 +42,13 @@ class RiderCashOutAmountField extends StatelessWidget {
               return 'Please enter an amount';
             }
             final parsed = double.tryParse(value.trim());
-            if (parsed == null || parsed <= 0) {
+            if (parsed == null ||
+                !parsed.isFinite ||
+                parsed <= 0 ||
+                !RegExp(r'^\d+(\.\d{1,2})?$').hasMatch(value.trim())) {
               return 'Please enter a valid amount greater than 0';
             }
-            if (availableEarnings > 0 && parsed > availableEarnings) {
+            if (parsed > availableEarnings) {
               return 'Amount exceeds available earnings (${formatRiderCurrency(availableEarnings)})';
             }
             return null;

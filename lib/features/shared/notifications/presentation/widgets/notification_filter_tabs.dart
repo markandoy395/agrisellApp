@@ -19,7 +19,15 @@ class NotificationFilterTabs extends StatefulWidget {
 }
 
 class _NotificationFilterTabsState extends State<NotificationFilterTabs> {
-  final _scrollController = ScrollController();
+  final _tabKeys = {
+    for (final filter in NotificationFilter.values) filter: GlobalKey(),
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollToSelected();
+  }
 
   @override
   void didUpdateWidget(covariant NotificationFilterTabs oldWidget) {
@@ -29,63 +37,58 @@ class _NotificationFilterTabsState extends State<NotificationFilterTabs> {
     }
   }
 
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
   void _scrollToSelected() {
-    final index = NotificationFilter.values.indexOf(widget.selected);
-    if (index == -1 || !_scrollController.hasClients) return;
-    const approximateChipWidth = 80.0;
-    final targetOffset = (index * approximateChipWidth) - 80.0;
-    final clampedOffset = targetOffset.clamp(
-      0.0,
-      _scrollController.position.maxScrollExtent,
-    );
-    _scrollController.animateTo(
-      clampedOffset,
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeInOut,
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final tabContext = _tabKeys[widget.selected]?.currentContext;
+      if (tabContext == null) return;
+      // Only move the horizontal strip, leaving the feed's scroll intact.
+      Scrollable.of(tabContext).position.ensureVisible(
+        tabContext.findRenderObject()!,
+        alignment: 0.5,
+        duration: MediaQuery.disableAnimationsOf(context)
+            ? Duration.zero
+            : const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 50,
-      child: ListView.separated(
-        controller: _scrollController,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-        scrollDirection: Axis.horizontal,
-        itemCount: NotificationFilter.values.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
-          final filter = NotificationFilter.values[index];
+    return SingleChildScrollView(
+      primary: false,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: NotificationFilter.values.map((filter) {
           final isSelected = filter == widget.selected;
-          return Semantics(
-            button: true,
-            selected: isSelected,
-            label: 'Show ${filter.label.toLowerCase()} notifications',
-            child: ChoiceChip(
-              label: Text(filter.label),
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Semantics(
+              key: _tabKeys[filter],
+              button: true,
               selected: isSelected,
-              showCheckmark: false,
-              onSelected: (_) => widget.onSelected(filter),
-              backgroundColor: AgrisellColors.surface,
-              selectedColor: AgrisellColors.authGreen,
-              side: BorderSide(
-                color: isSelected
-                    ? AgrisellColors.authGreen
-                    : AgrisellColors.borderLine,
+              label: 'Show ${filter.label.toLowerCase()} notifications',
+              child: ChoiceChip(
+                label: Text(filter.label),
+                selected: isSelected,
+                showCheckmark: false,
+                onSelected: (_) => widget.onSelected(filter),
+                backgroundColor: AgrisellColors.surface,
+                selectedColor: AgrisellColors.authGreen,
+                side: BorderSide(
+                  color: isSelected
+                      ? AgrisellColors.authGreen
+                      : AgrisellColors.borderLine,
+                ),
+                labelStyle: NotificationFilterTabsStyles.textStyle(isSelected),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                visualDensity: VisualDensity.compact,
               ),
-              labelStyle: NotificationFilterTabsStyles.textStyle(isSelected),
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              visualDensity: VisualDensity.compact,
             ),
           );
-        },
+        }).toList(),
       ),
     );
   }

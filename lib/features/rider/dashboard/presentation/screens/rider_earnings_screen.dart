@@ -1,6 +1,7 @@
 import 'package:agresell_app/features/rider/presentation/widgets/rider_safe_scaffold.dart';
 import 'dart:async';
 import '../widgets/rider_earning_guide.dart';
+import '../widgets/rider_wallet_card.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/features/rider/dashboard/domain/rider_analytics_models.dart';
@@ -79,6 +80,11 @@ class _RiderEarningsScreenState extends State<RiderEarningsScreen> {
               children: [
                 const RiderEarningGuide(),
                 RiderEarningsStyles.cardSpacing,
+                RiderWalletCard(
+                  controller: _controller,
+                  onRetry: () => unawaited(_load()),
+                ),
+                RiderEarningsStyles.cardSpacing,
                 RiderEarningsPeriodChips(
                   selectedPeriod: _period,
                   onSelected: _selectPeriod,
@@ -143,6 +149,10 @@ class _RiderEarningsScreenState extends State<RiderEarningsScreen> {
     await _load();
   }
 
-  Future<void> _load() =>
-      _controller.loadEarnings(riderId: widget.riderId, dateRange: _dateRange);
+  Future<void> _load() async {
+    await Future.wait([
+      _controller.loadEarnings(riderId: widget.riderId, dateRange: _dateRange),
+      _controller.loadWallet(riderId: widget.riderId),
+    ]);
+  }
 }

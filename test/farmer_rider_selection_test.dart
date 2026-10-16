@@ -260,6 +260,10 @@ void main() {
 
     await tester.tap(find.text('Select rider').first);
     await tester.pumpAndSettle();
+    expect(find.text('Set the delivery fee'), findsOneWidget);
+    await tester.enterText(find.byType(TextFormField), '65.50');
+    await tester.tap(find.text('Review request'));
+    await tester.pumpAndSettle();
     expect(find.text('Confirm rider request'), findsOneWidget);
     expect(
       find.text('The rider must accept before this order is assigned.'),
@@ -270,6 +274,7 @@ void main() {
     await tester.tap(find.text('Send request'));
     await tester.pumpAndSettle();
     expect(repository.requestedRider?.name, 'Ana Rider');
+    expect(repository.requestedRider?.proposedDeliveryFee, 65.50);
   });
 
   testWidgets('screen shows every eligible Rider nearest first', (
@@ -364,6 +369,9 @@ void main() {
     expect(find.text('2.5 km from pickup'), findsOneWidget);
     expect(find.text('Book offline rider'), findsOneWidget);
     await tester.tap(find.text('Book offline rider'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField), '75.00');
+    await tester.tap(find.text('Review request'));
     await tester.pumpAndSettle();
 
     expect(

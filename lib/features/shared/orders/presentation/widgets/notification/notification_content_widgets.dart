@@ -75,40 +75,61 @@ class OrderUpdatesBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              'Order Updates',
-              style: SharedPresentationStyles.headingBodyBold,
-            ),
-          ),
-          TextButton(
-            onPressed: unreadCount == 0 ? null : onReadAll,
-            child: const Text('Read All'),
-          ),
-          PopupMenuButton<_NotificationBulkAction>(
-            tooltip: 'Notification options',
-            onSelected: (action) {
-              if (action == _NotificationBulkAction.clearAll) {
-                onClearAll?.call();
-              }
-            },
-            itemBuilder: (_) => const [
-              PopupMenuItem(
-                value: _NotificationBulkAction.clearAll,
-                child: Row(
-                  children: [
-                    Icon(Icons.delete_sweep_outlined, size: 19),
-                    SizedBox(width: 10),
-                    Text('Clear all'),
-                  ],
-                ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final title = Text(
+            'Order Updates',
+            style: SharedPresentationStyles.headingBodyBold,
+          );
+          final actions = Wrap(
+            alignment: WrapAlignment.end,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              TextButton(
+                style: NotificationContentWidgetsStyles.readAllButton,
+                onPressed: unreadCount == 0 ? null : onReadAll,
+                child: const Text('Read All'),
+              ),
+              PopupMenuButton<_NotificationBulkAction>(
+                tooltip: 'Notification options',
+                onSelected: (action) {
+                  if (action == _NotificationBulkAction.clearAll) {
+                    onClearAll?.call();
+                  }
+                },
+                itemBuilder: (_) => const [
+                  PopupMenuItem(
+                    value: _NotificationBulkAction.clearAll,
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete_sweep_outlined, size: 19),
+                        SizedBox(width: 10),
+                        Text('Clear all'),
+                      ],
+                    ),
+                  ),
+                ],
+                icon: const Icon(Icons.more_horiz_rounded, size: 22),
               ),
             ],
-            icon: const Icon(Icons.more_horiz_rounded, size: 22),
-          ),
-        ],
+          );
+          if (constraints.maxWidth < 340 ||
+              MediaQuery.textScalerOf(context).scale(14) > 20) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                title,
+                Align(alignment: Alignment.centerRight, child: actions),
+              ],
+            );
+          }
+          return Row(
+            children: [
+              Expanded(child: title),
+              actions,
+            ],
+          );
+        },
       ),
     );
   }

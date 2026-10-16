@@ -54,6 +54,7 @@ Image authenticatedNetworkImage(
   int? cacheWidth,
   int? cacheHeight,
   ImageLoadingBuilder? loadingBuilder,
+  ImageFrameBuilder? frameBuilder,
   ImageErrorWidgetBuilder? errorBuilder,
 }) => Image.network(
   authenticatedStorageUrl(url),
@@ -71,5 +72,6 @@ Image authenticatedNetworkImage(
   cacheWidth: cacheWidth,
   cacheHeight: cacheHeight,
   loadingBuilder: loadingBuilder,
+  frameBuilder: frameBuilder,
   errorBuilder: errorBuilder,
 );

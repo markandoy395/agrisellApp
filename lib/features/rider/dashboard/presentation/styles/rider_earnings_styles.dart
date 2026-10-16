@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -21,41 +22,48 @@ abstract final class RiderEarningsStyles {
 
   // Typography
   static const TextStyle chipLabelStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
     fontWeight: FontWeight.w700,
   );
 
   static const TextStyle netEarningsStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.authGreen,
     fontSize: 15,
     fontWeight: FontWeight.w800,
   );
 
   static const TextStyle netEarningsSubtextStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
     fontWeight: FontWeight.w600,
   );
 
   static const TextStyle manageMethodsTextStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
     fontWeight: FontWeight.w700,
     color: AgrisellColors.authGreen,
   );
 
   static const TextStyle cashOutTextStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
     fontWeight: FontWeight.w800,
-    color: Colors.white,
+    color: AgrisellColors.surface,
   );
 
   static const TextStyle breakdownLabelStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 12,
     fontWeight: FontWeight.w600,
   );
 
   static TextStyle breakdownValueStyle([Color? color]) => TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: color ?? AgrisellColors.headingGreen,
     fontSize: 12,
     fontWeight: FontWeight.w800,

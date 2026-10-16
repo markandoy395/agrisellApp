@@ -39,6 +39,7 @@ extension _SupabaseRiderDeliveryMapping on SupabaseRiderDeliveryRepository {
       id: delivery.deliveryId,
       orderNumber: 'Order #${delivery.orderId}',
       productName: _requestText(bundle.raw['goods_summary']) ?? 'Farm produce',
+      productImageUrl: _requestText(bundle.raw['product_image_url']),
       sellerName: _requestText(bundle.raw['seller_name']) ?? 'Farmer',
       buyerName: _requestText(bundle.raw['buyer_name']) ?? 'Buyer',
       pickupLocation: pickup,

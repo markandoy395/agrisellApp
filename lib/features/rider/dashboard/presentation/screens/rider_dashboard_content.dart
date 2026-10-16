@@ -14,11 +14,6 @@ extension _RiderDashboardContent on _RiderDashboardScreenState {
         .where((request) => request.stage == DeliveryStage.readyForPickup)
         .toList();
     return [
-      if (widget.profile case final profile?
-          when !profile.hasCargoCapacity) ...[
-        RiderCapacitySetupBanner(onSetCapacity: _openCapacitySetup),
-        const SizedBox(height: 14),
-      ],
       RiderDashboardStateBanner(
         dashboard: widget.dashboardController,
         availability: widget.availabilityController,
@@ -40,24 +35,28 @@ extension _RiderDashboardContent on _RiderDashboardScreenState {
         ),
       ),
       const SizedBox(height: 14),
-      RiderAvailabilityCard(controller: widget.availabilityController),
       if (_showEarningsSnapshot) ...[
-        const SizedBox(height: 10),
         _RiderEarningsSnapshot(
           amount: widget.dashboardController.metrics.todayEstimatedEarnings,
           pendingAmount: widget.dashboardController.metrics.pendingEarnings,
+          online: widget.availabilityController.availability.isOnline,
+          onTap: widget.onOpenEarnings,
         ),
       ],
-      const SizedBox(height: 18),
-      const RiderSectionTitle(title: 'Your next move'),
-      const SizedBox(height: 10),
+      const SizedBox(height: 12),
       if (active.length <= 1)
         RiderActiveDeliverySummary(
           delivery: active.firstOrNull,
           onContinue: widget.onOpenDeliveries,
           onOpenMap: widget.onOpenMap,
         )
-      else
+      else ...[
+        RiderActiveDeliverySummary(
+          delivery: active.first,
+          onContinue: widget.onOpenDeliveries,
+          onOpenMap: widget.onOpenMap,
+        ),
+        const SizedBox(height: 12),
         RiderActiveBatchSummary(
           deliveries: active,
           plan: delivery.batchPlan,
@@ -67,24 +66,14 @@ extension _RiderDashboardContent on _RiderDashboardScreenState {
             widget.onOpenDeliveries();
           },
         ),
-      const SizedBox(height: 18),
-      RiderSectionTitle(
-        title: 'Ready for pickup',
-        action: TextButton.icon(
-          onPressed: widget.onOpenDeliveries,
-          icon: const Icon(Icons.list_alt_rounded, size: 17),
-          label: const Text('View all'),
-        ),
-      ),
-      const SizedBox(height: 10),
+      ],
+      const SizedBox(height: 12),
       RiderNearbyRequestSummary(
         requests: nearby,
         isTemporary: delivery.usesTemporaryData,
         onOpenList: widget.onOpenDeliveries,
       ),
-      const SizedBox(height: 18),
-      const RiderSectionTitle(title: 'Today at a glance'),
-      const SizedBox(height: 10),
+      const SizedBox(height: 12),
       RiderDashboardMetricsGrid(
         metrics: widget.dashboardController.metrics,
         activeDeliveryCount: active.length,
@@ -95,13 +84,18 @@ extension _RiderDashboardContent on _RiderDashboardScreenState {
         onOpenMessages: widget.onOpenMessages,
         onOpenNotifications: widget.onOpenNotifications,
       ),
-      const SizedBox(height: 18),
+      const SizedBox(height: 12),
       RiderEarningGuide(onOpenEarnings: widget.onOpenEarnings),
-      const SizedBox(height: 18),
+      const SizedBox(height: 12),
       RiderPerformanceSummary(
         profile: widget.profile,
         metrics: widget.dashboardController.metrics,
       ),
+      if (widget.profile case final profile?
+          when !profile.hasCargoCapacity) ...[
+        const SizedBox(height: 14),
+        RiderCapacitySetupBanner(onSetCapacity: _openCapacitySetup),
+      ],
       const SizedBox(height: 14),
       _RiderSafetySupportCard(onTap: widget.onSafetySupport),
     ];
@@ -111,7 +105,5 @@ extension _RiderDashboardContent on _RiderDashboardScreenState {
     return widget.dashboardController.sectionUnavailable(name);
   }
 
-  bool get _showEarningsSnapshot =>
-      !_sectionUnavailable('Earnings') &&
-      widget.dashboardController.metrics.todayEstimatedEarnings > 0;
+  bool get _showEarningsSnapshot => !_sectionUnavailable('Earnings');
 }

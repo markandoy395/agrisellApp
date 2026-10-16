@@ -37,8 +37,10 @@ extension _RiderProfileLogout on _RiderProfileScreenState {
   }
 
   Future<void> _logout() async {
-    if (!await _canLeaveAccount(RiderAccountExitAction.logout)) return;
-    if (mounted) await AccountSessionNavigation.logout(context);
+    await AccountSessionNavigation.logout(
+      context,
+      beforeLogout: () => _canLeaveAccount(RiderAccountExitAction.logout),
+    );
   }
 
   Future<void> _switchAccount() async {

@@ -106,11 +106,14 @@ class _FarmerDiscountDialogContentState
   @override
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: _form,
-    builder: (context, _) => FarmerDiscountForm(
-      form: _form,
-      onPickStartDate: _pickStartDate,
-      onPickEndDate: _pickEndDate,
-      onSave: _save,
+    builder: (context, _) => Padding(
+      padding: FarmerDiscountDialogStyles.keyboardPadding(context),
+      child: FarmerDiscountForm(
+        form: _form,
+        onPickStartDate: _pickStartDate,
+        onPickEndDate: _pickEndDate,
+        onSave: _save,
+      ),
     ),
   );
 }

@@ -72,11 +72,22 @@ void registerRiderDashboardSummaryCases() {
     refreshGate.complete();
     await refresh;
     await tester.pumpAndSettle();
-    await tester.drag(find.byType(ListView), const Offset(0, -500));
-    await tester.pumpAndSettle();
-    expect(find.text('PHP 0.00'), findsWidgets);
-    expect(find.text('Messages (0)'), findsOneWidget);
-    expect(find.text('Notifications (0)'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Open'),
+      250,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(
+      find.text('Earnings will appear after completed deliveries.'),
+      findsOneWidget,
+    );
+    await tester.scrollUntilVisible(
+      find.text('Messages'),
+      150,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Messages'), findsOneWidget);
+    expect(find.text('Notifications'), findsNWidgets(2));
   });
 
   testWidgets('metrics expose counts, earnings, communication, and safety', (
@@ -115,10 +126,28 @@ void registerRiderDashboardSummaryCases() {
     expect(find.text('PHP 100.00 pending'), findsOneWidget);
     await tester.drag(find.byType(ListView), const Offset(0, -500));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Open'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Open'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Open'));
-    await tester.tap(find.text('Messages (2)'));
-    await tester.tap(find.text('Notifications (4)'));
-    await tester.drag(find.byType(ListView), const Offset(0, -300));
+    await tester.scrollUntilVisible(
+      find.text('Messages'),
+      150,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Messages'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Messages'));
+    await tester.tap(find.text('Notifications').last);
+    await tester.scrollUntilVisible(
+      find.text('Safety and support'),
+      250,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.text('Safety and support'));
 
@@ -126,7 +155,12 @@ void registerRiderDashboardSummaryCases() {
     expect(messagesOpened, isTrue);
     expect(notificationsOpened, isTrue);
     expect(safetyOpened, isTrue);
-    expect(find.textContaining('On-time rate: 96.0%'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('On-time rate'),
+      -150,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('96.0%'), findsOneWidget);
   });
 
   testWidgets('pull to refresh performs one lightweight dashboard request', (

@@ -15,6 +15,7 @@ import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widg
 import 'package:agresell_app/features/shared/notifications/domain/notification_category.dart';
 import 'package:agresell_app/features/shared/notifications/presentation/widgets/notification_filter_tabs.dart';
 import 'package:agresell_app/features/shared/notifications/presentation/widgets/notification_state_view.dart';
+import 'package:agresell_app/features/shared/notifications/presentation/widgets/notification_layout.dart';
 
 class RiderNotificationsScreen extends StatefulWidget {
   const RiderNotificationsScreen({
@@ -59,8 +60,8 @@ class _RiderNotificationsScreenState extends State<RiderNotificationsScreen> {
     backgroundColor: AgrisellColors.homeBackground,
     body: AnimatedBuilder(
       animation: _controller,
-      builder: (context, _) => Column(
-        children: [
+      builder: (context, _) => NotificationLayout(
+        header: [
           RiderPageHeader(
             title: 'Notifications',
             subtitle: _controller.unreadCount == 0
@@ -96,8 +97,8 @@ class _RiderNotificationsScreenState extends State<RiderNotificationsScreen> {
             selected: _filter,
             onSelected: (value) => setState(() => _filter = value),
           ),
-          Expanded(child: _content()),
         ],
+        body: _content(),
       ),
     ),
   );

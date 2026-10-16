@@ -50,16 +50,18 @@ class RiderSurfaceCard extends StatelessWidget {
   const RiderSurfaceCard({
     required this.child,
     this.padding = const EdgeInsets.all(14),
+    this.decoration,
     super.key,
   });
 
   final Widget child;
   final EdgeInsetsGeometry padding;
+  final Decoration? decoration;
 
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: RiderPageWidgetsStyles.decoratedBoxDecoration,
+      decoration: decoration ?? RiderPageWidgetsStyles.decoratedBoxDecoration,
       child: Padding(padding: padding, child: child),
     );
   }

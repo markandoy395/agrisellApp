@@ -180,6 +180,61 @@ void main() {
     },
   );
 
+  for (final bottomInset in [0.0, 24.0, 48.0]) {
+    testWidgets('save stays above navigation inset $bottomInset and keyboard', (
+      tester,
+    ) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(390, 700);
+      tester.view.viewPadding = FakeViewPadding(bottom: bottomInset);
+      tester.view.padding = FakeViewPadding(bottom: bottomInset);
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AgrisellTheme.light,
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () => showFarmerDiscountDialog(
+                  context,
+                  farmId: 10,
+                  initialProduct: product,
+                  discountRepository: repository,
+                ),
+                child: const Text('Open'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+      final save = find.byType(ElevatedButton);
+      expect(save.hitTestable(), findsOneWidget);
+      expect(tester.getRect(save).bottom, lessThanOrEqualTo(676 - bottomInset));
+
+      await tester.tap(find.byType(TextField).first);
+      tester.view.viewInsets = const FakeViewPadding(bottom: 300);
+      tester.view.padding = FakeViewPadding.zero;
+      await tester.pumpAndSettle();
+      expect(save.hitTestable(), findsOneWidget);
+      expect(tester.getRect(save).bottom, lessThanOrEqualTo(376));
+      await tester.ensureVisible(find.byType(TextField).last);
+      await tester.pumpAndSettle();
+      expect(save.hitTestable(), findsOneWidget);
+      await tester.tap(save);
+      await tester.pumpAndSettle();
+      expect(repository.saved, isNull);
+      expect(tester.takeException(), isNull);
+
+      tester.view.viewInsets = FakeViewPadding.zero;
+      tester.view.padding = FakeViewPadding(bottom: bottomInset);
+      await tester.pumpAndSettle();
+      expect(tester.getRect(save).bottom, lessThanOrEqualTo(676 - bottomInset));
+      expect(save.hitTestable(), findsOneWidget);
+    });
+  }
+
   for (final editing in [false, true]) {
     testWidgets(
       'dialog ${editing ? 'updates' : 'creates'} and returns discount',

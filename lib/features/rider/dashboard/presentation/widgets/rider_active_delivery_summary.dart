@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../styles/rider_home_design_styles.dart';
+import '../styles/rider_reference_styles.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
@@ -29,10 +31,36 @@ class RiderActiveDeliverySummary extends StatelessWidget {
       return RiderNoActiveDeliveryCard(onContinue: onContinue);
     }
     return RiderSurfaceCard(
+      decoration: RiderHomeDesignStyles.card,
       padding: RiderActiveDeliverySummaryStyles.activeCardPadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              Icon(
+                Icons.local_shipping_rounded,
+                size: 18,
+                color: RiderHomeDesignStyles.green,
+              ),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Your next move',
+                  style: RiderHomeDesignStyles.title,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: RiderReferenceStyles.progressBadge,
+                child: const Text(
+                  'In progress',
+                  style: RiderReferenceStyles.progressText,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -42,24 +70,16 @@ class RiderActiveDeliverySummary extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            active.productName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: RiderActiveDeliverySummaryStyles
-                                .productNameStyle,
-                          ),
-                        ),
-                        RiderActiveDeliverySummaryStyles.spacingTitleOrder,
-                        Text(
-                          active.orderNumber,
-                          style: RiderActiveDeliverySummaryStyles
-                              .orderNumberStyle,
-                        ),
-                      ],
+                    Text(
+                      active.productName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: RiderActiveDeliverySummaryStyles.productNameStyle,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      active.orderNumber,
+                      style: RiderActiveDeliverySummaryStyles.orderNumberStyle,
                     ),
                     RiderActiveDeliverySummaryStyles.spacingTitlePills,
                     Wrap(
@@ -69,18 +89,13 @@ class RiderActiveDeliverySummary extends StatelessWidget {
                         RiderStatusPill(
                           label: active.stage.label,
                           icon: Icons.route_outlined,
-                          backgroundColor:
-                              AgrisellColors.statusGreenBackground,
+                          backgroundColor: AgrisellColors.statusGreenBackground,
                           foregroundColor: AgrisellColors.statusGreenText,
                         ),
                         if (active.deliveryFee > 0)
-                          RiderStatusPill(
-                            label:
-                                'PHP ${active.deliveryFee.toStringAsFixed(2)}',
-                            icon: Icons.payments_outlined,
-                            backgroundColor:
-                                AgrisellColors.statusBlueBackground,
-                            foregroundColor: AgrisellColors.statusBlueText,
+                          Text(
+                            'PHP ${active.deliveryFee.toStringAsFixed(2)}',
+                            style: RiderReferenceStyles.fee,
                           ),
                       ],
                     ),
@@ -105,21 +120,19 @@ class RiderActiveDeliverySummary extends StatelessWidget {
           Container(
             width: double.infinity,
             padding: RiderActiveDeliverySummaryStyles.nextActionPadding,
-            decoration:
-                RiderActiveDeliverySummaryStyles.nextActionBoxDecoration,
+            decoration: RiderReferenceStyles.nextMove,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Next: ${RiderActiveDeliveryFormatters.nextAction(active.stage)}',
-                  style:
-                      RiderActiveDeliverySummaryStyles.nextActionTitleStyle,
+                  style: RiderActiveDeliverySummaryStyles.nextActionTitleStyle,
                 ),
                 RiderActiveDeliverySummaryStyles.spacingNextActionTexts,
                 Text(
                   'Pickup deadline: ${RiderActiveDeliveryFormatters.deadline(active.pickupDeadline)}',
-                  style: RiderActiveDeliverySummaryStyles
-                      .nextActionDeadlineStyle,
+                  style:
+                      RiderActiveDeliverySummaryStyles.nextActionDeadlineStyle,
                 ),
               ],
             ),
@@ -129,14 +142,17 @@ class RiderActiveDeliverySummary extends StatelessWidget {
             children: [
               Expanded(
                 child: FilledButton.icon(
+                  style: RiderHomeDesignStyles.primaryButton,
                   onPressed: onContinue,
                   icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                  iconAlignment: IconAlignment.end,
                   label: const Text('Continue delivery'),
                 ),
               ),
               if (RiderActiveDeliveryFormatters.canOpenMap(active)) ...[
                 RiderActiveDeliverySummaryStyles.spacingActions,
                 OutlinedButton.icon(
+                  style: RiderHomeDesignStyles.secondaryButton,
                   onPressed: onOpenMap,
                   icon: const Icon(Icons.map_outlined, size: 18),
                   label: const Text('Map'),

@@ -69,9 +69,10 @@ class NotificationStateView extends StatelessWidget {
                 ],
                 if (hasAction) ...[
                   const SizedBox(height: 16),
-                  SizedBox(
-                    height: 38,
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 48),
                     child: OutlinedButton.icon(
+                      style: NotificationStateViewStyles.retryButton,
                       onPressed: onAction,
                       icon: const Icon(Icons.refresh_rounded, size: 17),
                       label: Text(actionLabel!),

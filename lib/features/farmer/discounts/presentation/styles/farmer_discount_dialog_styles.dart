@@ -106,6 +106,11 @@ abstract final class FarmerDiscountDialogStyles {
 
   static const bodyPadding = EdgeInsets.fromLTRB(20, 16, 20, 24);
 
+  static const footerPadding = EdgeInsets.fromLTRB(20, 12, 20, 24);
+
+  static EdgeInsets keyboardPadding(BuildContext context) =>
+      EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom);
+
   static const dateButtonPadding = EdgeInsets.symmetric(
     horizontal: 10,
     vertical: 10,

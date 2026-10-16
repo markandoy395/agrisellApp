@@ -6,6 +6,7 @@ import 'package:agresell_app/features/rider/deliveries/presentation/screens/ride
 import 'package:agresell_app/features/shared/chat/domain/marketplace_conversation.dart';
 import 'package:agresell_app/features/shared/widgets/navigation/custom_bottom_nav_tab.dart';
 import 'package:flutter/material.dart';
+import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_home_bottom_nav.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -123,6 +124,12 @@ Future<List<FrameTiming>> _measureFrames(Future<void> Function() action) async {
 }
 
 Finder _navigationTab(String label) {
+  if (find.byType(RiderHomeBottomNav).evaluate().isNotEmpty) {
+    return find.descendant(
+      of: find.byType(RiderHomeBottomNav),
+      matching: find.text(label),
+    );
+  }
   return find.byWidgetPredicate(
     (widget) => widget is CustomBottomNavTab && widget.item.label == label,
     description: 'bottom navigation tab labeled $label',
@@ -165,6 +172,10 @@ void _recordRegressionMetrics(
     ..['first_view_elapsed_millis'] = firstViewElapsed.inMilliseconds
     ..['ui_frames_over_16_67ms'] = uiOverBudget
     ..['raster_frames_over_16_67ms'] = rasterOverBudget
+    ..['ui_frames_over_8_33ms'] = buildTimes.where((time) => time > 8333).length
+    ..['raster_frames_over_8_33ms'] = rasterTimes
+        .where((time) => time > 8333)
+        .length
     ..['ui_frames_over_33_33ms'] = uiSignificantlySlow
     ..['raster_frames_over_33_33ms'] = rasterSignificantlySlow;
   binding.reportData ??= <String, dynamic>{};

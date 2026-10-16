@@ -1,10 +1,8 @@
 import 'package:agresell_app/main_styles.dart';
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
-
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/core/services/app_font_size_controller.dart';
 import 'package:agresell_app/core/services/push_notification_service.dart';
@@ -15,6 +13,7 @@ import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/core/widgets/system_ui_scope.dart';
 import 'package:agresell_app/core/widgets/app_font_size_scope.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
+import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/presentation/auth_dashboard_router.dart';
 import 'package:agresell_app/features/auth/presentation/auth_role_gate.dart';
 import 'package:agresell_app/features/auth/presentation/auth_navigation_scope.dart';
@@ -33,14 +32,24 @@ Future<void> main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   _configureImageCache();
   unawaited(AgrisellSystemUi.applyAppSystemUi());
-  await Future.wait<Object?>([
-    AppFontSizeController.instance.load(),
-    _initializeFirebase(),
-  ]);
+  unawaited(AppFontSizeController.instance.load());
   final supabaseInitialization = AgrisellSupabase.initialize();
 
   runApp(AgrisellApp(supabaseInitialization: supabaseInitialization));
-  unawaited(PushNotificationService.instance.initialize());
+  unawaited(_initializeNotifications());
+}
+
+Future<void> _initializeNotifications() async {
+  try {
+    await _initializeFirebase();
+    await PushNotificationService.instance.initialize();
+    final account = AuthSessionService.instance.currentAccount;
+    if (AuthSessionService.instance.isAuthenticated && account != null) {
+      await PushNotificationService.instance.registerForUser(account.id);
+    }
+  } on Object {
+    // Optional messaging must not prevent startup or produce an unhandled error.
+  }
 }
 
 Future<void> _initializeFirebase() async {

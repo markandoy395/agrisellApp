@@ -35,6 +35,26 @@ extension RiderMessagesControllerSending on RiderMessagesController {
   }
 
   Future<bool> sendDraft(RiderMessageDraft draft) async {
+    if (_isSending) return false;
+    final queued = _offlineQueue.actions
+        .where(
+          (action) =>
+              action.riderId == _riderId &&
+              action.type == OfflineDeliveryActionType.message &&
+              action.status != OfflineDeliveryActionStatus.synchronized &&
+              action.status != OfflineDeliveryActionStatus.cancelled,
+        )
+        .length;
+    if (queued >= ChatLimits.messagesPerAccountDay) {
+      _setSendError(
+        'Your offline message queue is full. Reconnect before sending more.',
+      );
+      return false;
+    }
+    if (ChatLimits.length(draft.body) > ChatLimits.messageCharacters) {
+      _setSendError(ChatLimits.lengthError);
+      return false;
+    }
     final riderId = _riderId;
     final conversation = _selectedConversation;
     if (riderId == null ||

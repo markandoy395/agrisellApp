@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/waybills/domain/delivery_waybill.dart';
@@ -12,14 +13,25 @@ abstract final class WaybillSheetActions {
     DeliveryWaybill waybill,
   ) async {
     try {
-      await WaybillHtmlService.openPrintableWaybill(waybill);
-    } catch (e) {
+      final opened = await WaybillHtmlService.openPrintableWaybill(waybill);
+      if (!opened && context.mounted) {
+        _printUnavailable(context);
+      }
+    } catch (_) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not open print dialog: $e')),
-        );
+        _printUnavailable(context);
       }
     }
+  }
+
+  static void _printUnavailable(BuildContext context) {
+    ScaffoldMessenger.of(context).showAppSnackBar(
+      const SnackBar(
+        content: Text(
+          'Could not open the print dialog. Close the waybill and try again.',
+        ),
+      ),
+    );
   }
 
   static Future<void> downloadWaybill(
@@ -29,17 +41,19 @@ abstract final class WaybillSheetActions {
     try {
       final file = await WaybillHtmlService.saveWaybillHtml(waybill);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showAppSnackBar(
           SnackBar(
             content: Text('Waybill saved to ${file.path}'),
             backgroundColor: AgrisellColors.forestGreen,
           ),
         );
       }
-    } catch (e) {
+    } catch (_) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not save waybill: $e')),
+        ScaffoldMessenger.of(context).showAppSnackBar(
+          const SnackBar(
+            content: Text('Could not save the waybill. Try again.'),
+          ),
         );
       }
     }
@@ -52,7 +66,7 @@ abstract final class WaybillSheetActions {
     final text = WaybillHtmlService.formatPlainText(waybill);
     await Clipboard.setData(ClipboardData(text: text));
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showAppSnackBar(
         const SnackBar(
           content: Text('Waybill details copied to clipboard'),
           backgroundColor: AgrisellColors.forestGreen,

@@ -7,6 +7,7 @@ class _QueuedRouteRequest {
     required this.destinationKey,
     required this.origin,
     required this.destination,
+    this.includeAlternatives = false,
   });
 
   final int generation;
@@ -14,12 +15,14 @@ class _QueuedRouteRequest {
   final String destinationKey;
   final DeliveryRoutePoint origin;
   final DeliveryRoutePoint destination;
+  final bool includeAlternatives;
 }
 
 extension _RiderRouteRequests on RiderRouteController {
   Future<void> _refreshRoute({
     required RiderDeviceLocation location,
     required List<DeliveryRequest> requests,
+    bool includeAlternatives = false,
   }) async {
     if (!_isOnline) {
       _errorMessage = 'Connect to the internet to refresh the road route.';
@@ -38,6 +41,7 @@ extension _RiderRouteRequests on RiderRouteController {
         ),
         destination: mapDestination,
         force: true,
+        includeAlternatives: includeAlternatives,
       );
       return;
     }
@@ -55,6 +59,7 @@ extension _RiderRouteRequests on RiderRouteController {
       ),
       destination: destination,
       force: true,
+      includeAlternatives: includeAlternatives,
     );
   }
 
@@ -64,6 +69,7 @@ extension _RiderRouteRequests on RiderRouteController {
     required DeliveryRoutePoint origin,
     required DeliveryRoutePoint destination,
     bool force = false,
+    bool includeAlternatives = false,
   }) {
     final running = _requestInFlight;
     if (running != null &&
@@ -77,6 +83,7 @@ extension _RiderRouteRequests on RiderRouteController {
       destinationKey: destinationKey,
       origin: origin,
       destination: destination,
+      includeAlternatives: includeAlternatives,
     );
     _pendingRequest = request;
     if (running != null) return running;
@@ -85,6 +92,7 @@ extension _RiderRouteRequests on RiderRouteController {
       if (identical(_requestInFlight, operation)) {
         _requestInFlight = null;
         _inFlightDestinationKey = null;
+        _notify();
       }
     });
     _requestInFlight = operation;
@@ -101,18 +109,26 @@ extension _RiderRouteRequests on RiderRouteController {
   }
 
   Future<void> _loadRoutes(_QueuedRouteRequest request) async {
+    if (_isDisposed) return;
+    _lastDestinationKey = request.destinationKey;
     _lastAttempt = DateTime.now();
     _lastRequestOrigin = request.origin;
     _state = RiderRouteState.loading;
     _errorMessage = null;
     _notify();
     try {
-      final routes = await _service.findRoutes(
-        requestId: request.requestId,
-        destinationKey: request.destinationKey,
-        origin: request.origin,
-        destination: request.destination,
-      );
+      final service =
+          request.includeAlternatives && _service is OsrmRiderRoutingService
+          ? _service.withAlternatives()
+          : _service;
+      final routes = await service
+          .findRoutes(
+            requestId: request.requestId,
+            destinationKey: request.destinationKey,
+            origin: request.origin,
+            destination: request.destination,
+          )
+          .timeout(requestTimeout);
       if (request.generation != _latestGeneration) return;
       if (routes.isEmpty) {
         throw const RiderRoutingException('No road route found.');
@@ -125,14 +141,28 @@ extension _RiderRouteRequests on RiderRouteController {
       if (_selectedIndex < 0) _selectedIndex = 0;
       _state = RiderRouteState.ready;
       _routeUpdatedAt = DateTime.now();
-      await _cache.save(_routes, _selectedIndex);
+      // Rendering a valid road route must not wait for platform storage.
+      _notify();
+      unawaited(_saveRoutes());
     } on Exception catch (error) {
       if (request.generation != _latestGeneration) return;
       _state = _routes.isEmpty ? RiderRouteState.error : RiderRouteState.stale;
-      _errorMessage = error is RiderRoutingException
+      _errorMessage = error is TimeoutException
+          ? 'Route request timed out. Tap Retry route to try again.'
+          : error is RiderRoutingException
           ? error.message
           : 'Route update failed. The saved route will remain visible.';
     }
     if (request.generation == _latestGeneration) _notify();
+  }
+
+  Future<void> _saveRoutes() async {
+    try {
+      await _cache
+          .save(_routes, _selectedIndex)
+          .timeout(const Duration(seconds: 2));
+    } on Exception {
+      // A storage failure does not invalidate an already calculated road route.
+    }
   }
 }

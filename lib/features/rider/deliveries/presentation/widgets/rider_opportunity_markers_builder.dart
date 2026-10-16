@@ -96,6 +96,9 @@ abstract final class RiderOpportunityMarkersBuilder {
       child: RiderMapIconMarker(
         icon: RiderMapFilter.deliveries.icon,
         label: 'Available pickup: ${request.productName}',
+        caption: request.sellerName.isNotEmpty
+            ? request.sellerName
+            : request.productName,
         offset: offset,
         onTap: () => onMarkerTap(request, RiderMapMarkerKind.availableDelivery),
       ),

@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 
 import 'package:agresell_app/features/shared/products/data/home_product_repository.dart';
+import 'package:agresell_app/features/shared/products/data/home_product_snapshot_cache.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 
 enum HomeProductCatalogStatus { idle, loading, ready, error }
@@ -35,30 +37,53 @@ class HomeProductCatalogController extends ChangeNotifier {
   Future<void> load() async {
     if (_isDisposed) return;
     final generation = ++_loadGeneration;
+    final owner = HomeProductSnapshotCache.authenticatedOwner();
     _status = HomeProductCatalogStatus.loading;
     _error = null;
     _hasMore = true;
     _isLoadingMore = false;
     notifyListeners();
+    unawaited(_restoreSnapshot(generation, owner));
 
     try {
       final page = await _repository.loadProductsPage(
         limit: pageSize,
         offset: 0,
       );
-      if (_isDisposed || generation != _loadGeneration) return;
+      if (!_isCurrent(generation, owner)) return;
       _products
         ..clear()
         ..addAll(page.products);
       _hasMore = page.hasMore;
       _status = HomeProductCatalogStatus.ready;
     } on Object catch (error) {
-      if (_isDisposed || generation != _loadGeneration) return;
-      _products.clear();
+      if (!_isCurrent(generation, owner)) return;
       _error = error;
       _status = HomeProductCatalogStatus.error;
     }
     notifyListeners();
+  }
+
+  bool _isCurrent(int generation, String? owner) =>
+      !_isDisposed &&
+      generation == _loadGeneration &&
+      owner == HomeProductSnapshotCache.authenticatedOwner();
+
+  Future<void> _restoreSnapshot(int generation, String? owner) async {
+    try {
+      final page = await _repository.loadCachedProductsPage(limit: pageSize);
+      if (page == null ||
+          !_isCurrent(generation, owner) ||
+          _status != HomeProductCatalogStatus.loading ||
+          _products.isNotEmpty) {
+        return;
+      }
+      _products.addAll(page.products);
+      _hasMore = page.hasMore;
+      notifyListeners();
+    } on Object {
+      // A snapshot is optional; the network request is already running.
+    }
   }
 
   Future<void> loadMore() async {
@@ -70,6 +95,7 @@ class HomeProductCatalogController extends ChangeNotifier {
     }
 
     final generation = _loadGeneration;
+    final owner = HomeProductSnapshotCache.authenticatedOwner();
     _isLoadingMore = true;
     notifyListeners();
 
@@ -78,17 +104,17 @@ class HomeProductCatalogController extends ChangeNotifier {
         limit: pageSize,
         offset: _products.length,
       );
-      if (_isDisposed || generation != _loadGeneration) return;
+      if (!_isCurrent(generation, owner)) return;
 
       final existingIds = _products.map((p) => p.id).toSet();
       final fresh = page.products.where((p) => !existingIds.contains(p.id));
       _products.addAll(fresh);
       _hasMore = page.hasMore && page.products.isNotEmpty;
     } on Object catch (error) {
-      if (_isDisposed || generation != _loadGeneration) return;
+      if (!_isCurrent(generation, owner)) return;
       _error = error;
     } finally {
-      if (!_isDisposed && generation == _loadGeneration) {
+      if (_isCurrent(generation, owner)) {
         _isLoadingMore = false;
         notifyListeners();
       }

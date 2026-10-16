@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../styles/rider_home_design_styles.dart';
 
 import 'package:agresell_app/features/rider/dashboard/domain/rider_availability.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_dashboard_state.dart';
@@ -21,18 +22,22 @@ class RiderShiftCopy extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Work status',
-          style: RiderAvailabilityCardStyles.workStatusTitleStyle,
-        ),
+        const Text('Work status', style: RiderHomeDesignStyles.caption),
         const SizedBox(height: 5),
         Text(
-          RiderAvailabilityCardStyles.statusSummary(
-            availability: availability,
-            gpsStatus: gpsStatus,
-            internetStatus: internetStatus,
-          ),
-          maxLines: 1,
+          RiderAvailabilityCardStyles.availabilityLabel(availability),
+          style: RiderHomeDesignStyles.title,
+        ),
+        const SizedBox(height: 3),
+        Text(
+          availability.canReceiveRequests
+              ? 'Available for deliveries'
+              : availability.isHandlingDelivery
+              ? 'Continue your current delivery'
+              : availability == RiderAvailability.offline
+              ? 'Turn on to start receiving deliveries'
+              : 'Delivery availability is paused',
+          maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: RiderAvailabilityCardStyles.workStatusSubtitleStyle,
         ),

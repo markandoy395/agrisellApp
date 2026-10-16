@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
@@ -9,6 +10,7 @@ abstract final class RiderDashboardHeaderStyles {
   );
 
   static const statuslabelText = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.surface,
     fontSize: 12,
     fontWeight: FontWeight.w800,
@@ -26,6 +28,7 @@ abstract final class RiderDashboardHeaderStyles {
   );
 
   static const textStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.brandBlack,
     fontSize: 12,
     height: 1,

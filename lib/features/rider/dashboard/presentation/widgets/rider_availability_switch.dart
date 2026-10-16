@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/features/rider/dashboard/presentation/styles/rider_availability_card_styles.dart';
@@ -21,8 +22,10 @@ class RiderAvailabilitySwitch extends StatelessWidget {
       button: true,
       child: Switch.adaptive(
         value: isOnline,
-        activeThumbColor: RiderAvailabilityCardStyles.activeThumbColor,
-        activeTrackColor: RiderAvailabilityCardStyles.activeTrackColor,
+        activeThumbColor: AgrisellColors.surface,
+        activeTrackColor: RiderAvailabilityCardStyles.activeThumbColor,
+        inactiveThumbColor: AgrisellColors.surface,
+        inactiveTrackColor: AgrisellColors.deliveryGray,
         onChanged: isBusy ? null : onChanged,
       ),
     );

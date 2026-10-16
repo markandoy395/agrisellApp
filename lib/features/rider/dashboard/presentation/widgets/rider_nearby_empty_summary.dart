@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'rider_empty_illustration.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/styles/rider_nearby_request_summary_styles.dart';
@@ -25,15 +26,18 @@ class RiderNearbyEmptySummary extends StatelessWidget {
                   'No nearby requests',
                   style: RiderNearbyRequestSummaryStyles.emptyTitleStyle,
                 ),
-                SizedBox(height: 4),
-                Text(
-                  'Stay online to be matched with ready farm pickups.',
-                  style: RiderNearbyRequestSummaryStyles.emptySubtitleStyle,
-                ),
               ],
             ),
           ),
         ],
+      ),
+      const RiderEmptyIllustration(),
+      const Center(
+        child: Text(
+          'Stay online to be matched with ready farm pickups.',
+          textAlign: TextAlign.center,
+          style: RiderNearbyRequestSummaryStyles.emptySubtitleStyle,
+        ),
       ),
       const SizedBox(height: 14),
       SizedBox(

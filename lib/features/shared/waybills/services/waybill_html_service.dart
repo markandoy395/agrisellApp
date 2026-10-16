@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -20,27 +23,26 @@ class WaybillHtmlService {
 
   static Future<bool> openPrintableWaybill(DeliveryWaybill waybill) async {
     final html = generateHtml(waybill);
-    final uri = Uri.dataFromString(
-      html,
-      mimeType: 'text/html',
-      encoding: utf8,
-    );
-    try {
-      return await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } catch (_) {
-      final file = await saveWaybillHtml(waybill);
-      return await launchUrl(
-        Uri.file(file.path),
-        mode: LaunchMode.externalApplication,
-      );
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+      return await const MethodChannel(
+            'agrisell/waybill_print',
+          ).invokeMethod<bool>('printHtml', {
+            'html': html,
+            'jobName': 'AgriSell Waybill ${waybill.orderId}',
+          }) ??
+          false;
     }
+    final uri = Uri.dataFromString(html, mimeType: 'text/html', encoding: utf8);
+    return launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   static Future<File> saveWaybillHtml(DeliveryWaybill waybill) async {
     final html = generateHtml(waybill);
     final dir = await getTemporaryDirectory();
-    final sanitizedId =
-        waybill.orderId.replaceAll(RegExp(r'[^a-zA-Z0-9_\-]'), '_');
+    final sanitizedId = waybill.orderId.replaceAll(
+      RegExp(r'[^a-zA-Z0-9_\-]'),
+      '_',
+    );
     final file = File('${dir.path}/waybill_$sanitizedId.html');
     return await file.writeAsString(html, flush: true);
   }

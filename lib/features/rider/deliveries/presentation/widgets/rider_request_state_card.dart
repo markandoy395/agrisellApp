@@ -6,6 +6,7 @@ import 'package:agresell_app/features/rider/presentation/widgets/rider_state_car
 class RiderRequestAccessCard extends StatelessWidget {
   const RiderRequestAccessCard({
     required this.state,
+    this.isCheckingLocation = false,
     this.onRetryLocation,
     this.onOpenLocationSettings,
     this.onOpenAppSettings,
@@ -13,6 +14,7 @@ class RiderRequestAccessCard extends StatelessWidget {
     super.key,
   });
   final RiderRequestAccessState state;
+  final bool isCheckingLocation;
   final VoidCallback? onRetryLocation;
   final VoidCallback? onOpenLocationSettings;
   final VoidCallback? onOpenAppSettings;
@@ -20,6 +22,13 @@ class RiderRequestAccessCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (isCheckingLocation &&
+        state == RiderRequestAccessState.locationUnavailable) {
+      return const RiderLoadingStateCard(
+        title: 'Finding your location',
+        message: 'Waiting for a current GPS fix. Keep location enabled.',
+      );
+    }
     final content = switch (state) {
       RiderRequestAccessState.unauthenticated => (
         'Sign in required',

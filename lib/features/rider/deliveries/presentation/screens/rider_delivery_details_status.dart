@@ -87,7 +87,7 @@ extension _RiderDeliveryDetailsStatus on _RiderDeliveryDetailsScreenState {
     }
     _showMessage(
       result.isSuccess
-          ? '${result.request!.stage.label} recorded.'
+          ? '${nextStatus.displayLabel} recorded.'
           : result.message ?? 'Delivery could not be updated.',
     );
   }

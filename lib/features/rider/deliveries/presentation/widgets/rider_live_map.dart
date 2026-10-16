@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../domain/rider_map_visibility.dart';
+import 'rider_map_attribution.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -10,6 +12,7 @@ import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_map_marker_builder.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_map_polyline_builder.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_map_types.dart';
+import 'rider_map_poi_markers.dart';
 import 'package:agresell_app/features/shared/routing/domain/delivery_route.dart';
 
 export 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_map_types.dart';
@@ -32,6 +35,7 @@ class RiderLiveMap extends StatelessWidget {
     required this.onFarmTap,
     required this.onMapReady,
     required this.onPositionChanged,
+    this.visibility = const RiderMapVisibility(),
     super.key,
   });
 
@@ -50,6 +54,7 @@ class RiderLiveMap extends StatelessWidget {
   final ValueChanged<RiderNearbyFarm> onFarmTap;
   final VoidCallback onMapReady;
   final PositionCallback onPositionChanged;
+  final RiderMapVisibility visibility;
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +64,17 @@ class RiderLiveMap extends StatelessWidget {
     );
 
     final roadAccessLayer = RiderMapPolylineBuilder.buildRoadAccessLayer(
-      connections: roadAccessConnections,
+      connections: roadAccessConnections
+          .where(
+            (connection) => switch (connection.kind) {
+              RiderRoadAccessKind.rider => true,
+              RiderRoadAccessKind.farmer => visibility.farms,
+              RiderRoadAccessKind.delivery =>
+                visibility.pickups || visibility.active,
+              RiderRoadAccessKind.buyer => visibility.dropOffs,
+            },
+          )
+          .toList(growable: false),
       filter: filter,
     );
 
@@ -79,7 +94,14 @@ class RiderLiveMap extends StatelessWidget {
       mapController: mapController,
       onMarkerTap: onMarkerTap,
       onFarmTap: onFarmTap,
+      visibility: visibility,
     );
+
+    final tileUrl = switch (visibility.mapViewType) {
+      RiderMapViewType.defaultView => RiderLiveMapStyles.osmTileUrl,
+      RiderMapViewType.satellite => RiderLiveMapStyles.satelliteTileUrl,
+      RiderMapViewType.terrain => RiderLiveMapStyles.terrainTileUrl,
+    };
 
     return FlutterMap(
       mapController: mapController,
@@ -93,17 +115,21 @@ class RiderLiveMap extends StatelessWidget {
       ),
       children: [
         TileLayer(
-          urlTemplate: RiderLiveMapStyles.osmTileUrl,
+          urlTemplate: tileUrl,
           userAgentPackageName: RiderLiveMapStyles.osmUserAgent,
         ),
         if (roadAccessLayer != null) roadAccessLayer,
         if (routesLayer != null) routesLayer,
-        MarkerLayer(markers: markerBuilder.buildMarkers(displayedRiderPoint)),
-        const RichAttributionWidget(
-          attributions: [
-            TextSourceAttribution(RiderLiveMapStyles.osmAttribution),
+        MarkerLayer(
+          markers: [
+            ...markerBuilder.buildMarkers(displayedRiderPoint),
+            ...RiderMapPoiMarkers.build(
+              center: displayedRiderPoint,
+              visible: visibility.pointsOfInterest,
+            ),
           ],
         ),
+        const RiderMapAttribution(),
       ],
     );
   }

@@ -48,3 +48,5 @@ legitimate completed delivery and its payout status. Hosted deployment and these
 full-schema assertions have not been performed in this task.
 
 Local full-schema assertion attempt on 2026-10-13 failed with ECONNREFUSED at 127.0.0.1:54322. The local Supabase database is not running; the remaining project-wide SQL assertions require that environment.
+
+Rider payment flow (2026-10-15, deployment pending): owner-scoped current_rider_wallet and submit_rider_payout_request use independent session/gateway guards, server method snapshots, account locks and private default-deny delivery allocations. Direct payout inserts and legacy rider submission are revoked; admin payment transitions require service-role backend access and completed transfer references. All parameters are bound/static SQL. See docs/rider_payment_flow.md for accounting, verification and rollout limits.

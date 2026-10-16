@@ -34,17 +34,18 @@ class RiderWithdrawalMethod {
   bool get isGcash => payoutMethod == 'gcash';
   bool get isBank => payoutMethod == 'bank_transfer';
 
-  String get methodLabel => isGcash ? 'GCash' : (bankName.isNotEmpty ? bankName : 'Bank Transfer');
+  String get methodLabel =>
+      isGcash ? 'GCash' : (bankName.isNotEmpty ? bankName : 'Bank Transfer');
 
   Map<String, Object?> toJson() => {
-        'methodId': methodId,
-        'payoutMethod': payoutMethod,
-        'accountName': accountName,
-        'accountNumber': accountNumber,
-        'bankName': bankName,
-        'isDefault': isDefault,
-        'createdAt': createdAt?.toIso8601String(),
-      };
+    'methodId': methodId,
+    'payoutMethod': payoutMethod,
+    'accountName': accountName,
+    'accountNumber': accountNumber,
+    'bankName': bankName,
+    'isDefault': isDefault,
+    'createdAt': createdAt?.toIso8601String(),
+  };
 }
 
 class RiderWithdrawalRequest {
@@ -59,6 +60,8 @@ class RiderWithdrawalRequest {
     this.notes = '',
     this.rejectionReason = '',
     this.createdAt,
+    this.withdrawalMethodId,
+    this.payoutReference = '',
   });
 
   factory RiderWithdrawalRequest.fromJson(Map<String, Object?> json) {
@@ -70,6 +73,7 @@ class RiderWithdrawalRequest {
       accountNumber: json['accountNumber']?.toString() ?? '',
       bankName: json['bankName']?.toString() ?? '',
       status: json['status']?.toString() ?? 'pending',
+      payoutReference: json['payoutReference']?.toString() ?? '',
       notes: json['notes']?.toString() ?? '',
       rejectionReason: json['rejectionReason']?.toString() ?? '',
       createdAt: json['createdAt'] != null
@@ -79,6 +83,8 @@ class RiderWithdrawalRequest {
   }
 
   final String requestId;
+  final String? withdrawalMethodId;
+  final String payoutReference;
   final double amount;
   final String payoutMethod;
   final String accountName;
@@ -98,22 +104,22 @@ class RiderWithdrawalRequest {
       payoutMethod == 'bank_transfer' ? 'Bank Transfer' : 'GCash';
 
   String get statusLabel => switch (status.toLowerCase()) {
-        'paid' => 'Paid',
-        'approved' => 'Approved',
-        'rejected' => 'Rejected',
-        _ => 'Pending Approval',
-      };
+    'paid' => 'Paid',
+    'approved' => 'Approved',
+    'rejected' => 'Rejected',
+    _ => 'Pending Approval',
+  };
 
   Map<String, Object?> toJson() => {
-        'requestId': requestId,
-        'amount': amount,
-        'payoutMethod': payoutMethod,
-        'accountName': accountName,
-        'accountNumber': accountNumber,
-        'bankName': bankName,
-        'status': status,
-        'notes': notes,
-        'rejectionReason': rejectionReason,
-        'createdAt': createdAt?.toIso8601String(),
-      };
+    'requestId': requestId,
+    'amount': amount,
+    'payoutMethod': payoutMethod,
+    'accountName': accountName,
+    'accountNumber': accountNumber,
+    'bankName': bankName,
+    'status': status,
+    'notes': notes,
+    'rejectionReason': rejectionReason,
+    'createdAt': createdAt?.toIso8601String(),
+  };
 }

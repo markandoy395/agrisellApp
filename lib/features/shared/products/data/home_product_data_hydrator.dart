@@ -4,6 +4,18 @@ import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/features/shared/products/data/home_product_format.dart';
 
 abstract final class HomeProductDataHydrator {
+  static Future<(List<Map<String, dynamic>>, Map<int, Map<String, dynamic>>)>
+  hydrate(List<Map<String, dynamic>> rows) async {
+    final results = await Future.wait<Object>([
+      withInventorySummaries(rows),
+      loadFarms(rows),
+    ]);
+    return (
+      results[0] as List<Map<String, dynamic>>,
+      results[1] as Map<int, Map<String, dynamic>>,
+    );
+  }
+
   static Future<Map<int, Map<String, dynamic>>> loadFarms(
     List<Map<String, dynamic>> commodities,
   ) async {

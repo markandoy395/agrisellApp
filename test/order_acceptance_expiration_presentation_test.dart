@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:agresell_app/core/widgets/app_snack_bar_panel.dart';
+import 'package:agresell_app/core/theme/agrisell_theme.dart';
 
 import 'package:agresell_app/features/farmer/reservations/presentation/widgets/farmer_order_workflow_card.dart';
 import 'package:agresell_app/features/shared/orders/domain/order_payment.dart';
@@ -8,36 +10,70 @@ import 'package:agresell_app/features/shared/orders/presentation/controllers/ord
 import 'package:agresell_app/features/shared/orders/presentation/widgets/order_acceptance_deadline_card.dart';
 
 void main() {
-  testWidgets('buyer sees a compact accessible acceptance countdown', (
-    tester,
-  ) async {
-    final order = _order(
-      expiresAt: DateTime.now().add(const Duration(hours: 2, minutes: 5)),
-    );
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: SizedBox(
-            width: 320,
-            child: OrderAcceptanceDeadlineCard(
-              order: order,
-              audience: OrderDeadlineAudience.buyer,
+  for (final audience in OrderDeadlineAudience.values) {
+    testWidgets('$audience sees a shared compact acceptance message', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(320, 640);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final order = _order(
+        expiresAt: DateTime.now().add(const Duration(hours: 2, minutes: 5)),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AgrisellTheme.light,
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: const TextScaler.linear(1.5)),
+            child: child!,
+          ),
+          home: Scaffold(
+            body: SizedBox(
+              width: 320,
+              child: OrderAcceptanceDeadlineCard(
+                order: order,
+                audience: audience,
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
 
-    expect(find.textContaining('left'), findsOneWidget);
-    expect(find.bySemanticsLabel(RegExp('left')), findsOneWidget);
-    await tester.tap(find.byKey(const ValueKey('order-deadline-info')));
-    await tester.pump();
-    expect(
-      find.textContaining('Waiting for the farmer to respond.'),
-      findsOneWidget,
-    );
-    expect(tester.takeException(), isNull);
-  });
+      expect(find.textContaining('left'), findsOneWidget);
+      expect(find.bySemanticsLabel(RegExp('left')), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('order-deadline-info')));
+      await tester.pumpAndSettle();
+      expect(
+        find.textContaining(
+          audience == OrderDeadlineAudience.buyer
+              ? 'Waiting for the farmer to respond.'
+              : 'Accept the order before this time.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.byType(AppSnackBarPanel), findsOneWidget);
+      final panel = find
+          .descendant(
+            of: find.byType(AppSnackBarPanel),
+            matching: find.byType(Material),
+          )
+          .first;
+      expect(tester.getTopLeft(panel).dx, 12);
+      expect(tester.getBottomRight(panel).dx, 308);
+      expect(tester.getSize(panel).height, lessThan(180));
+      expect(
+        tester.widget<SnackBar>(find.byType(SnackBar)).backgroundColor,
+        Colors.transparent,
+      );
+      await tester.tap(find.byTooltip('Close'));
+      await tester.pumpAndSettle();
+      expect(find.byType(AppSnackBarPanel), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets('farmer reviews payment without restoring an expired order', (
     tester,

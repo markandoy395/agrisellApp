@@ -31,38 +31,57 @@ extension _RiderHomeTabs on _RiderHomeScreenState {
         ),
       ),
       RiderHomeScreen.deliveriesNavIndex => RiderKeepAliveTab(
-        child: RiderDeliveriesScreen(
-          profile: profile,
-          deliveryController: _deliveryController,
-          riderId: _riderId,
-          locationController: _locationController,
-          onRetryLocation: () => unawaited(
-            _availabilityController.refreshEnvironment(refreshLocation: true),
+        child: AnimatedBuilder(
+          animation: _dashboardController,
+          builder: (context, _) => RiderDeliveriesScreen(
+            profile: profile,
+            deliveryController: _deliveryController,
+            riderId: _riderId,
+            locationController: _locationController,
+            onRetryLocation: () => unawaited(
+              _availabilityController.refreshEnvironment(refreshLocation: true),
+            ),
+            onOpenLocationSettings: () =>
+                unawaited(_locationController.openLocationSettings()),
+            onOpenAppSettings: () =>
+                unawaited(_locationController.openAppSettings()),
+            onOpenProfile: () => _selectTab(RiderHomeScreen.profileNavIndex),
+            onOpenConversation: _openDeliveryConversation,
+            onOpenMap: () => _selectTab(RiderHomeScreen.mapNavIndex),
+            onOpenNotifications: _openNotifications,
+            unreadNotifications:
+                _dashboardController.metrics.unreadNotificationCount,
           ),
-          onOpenLocationSettings: () =>
-              unawaited(_locationController.openLocationSettings()),
-          onOpenAppSettings: () =>
-              unawaited(_locationController.openAppSettings()),
-          onOpenProfile: () => _selectTab(RiderHomeScreen.profileNavIndex),
-          onOpenConversation: _openDeliveryConversation,
         ),
       ),
       RiderHomeScreen.mapNavIndex => RiderKeepAliveTab(
-        child: RiderMapScreen(
-          profile: profile,
-          deliveryController: _deliveryController,
-          locationController: _locationController,
-          availabilityController: _availabilityController,
-          isActive: _activeIndex == RiderHomeScreen.mapNavIndex,
-          onOpenList: () => _selectTab(RiderHomeScreen.homeNavIndex),
+        child: AnimatedBuilder(
+          animation: _dashboardController,
+          builder: (context, _) => RiderMapScreen(
+            profile: profile,
+            deliveryController: _deliveryController,
+            locationController: _locationController,
+            availabilityController: _availabilityController,
+            isActive: _activeIndex == RiderHomeScreen.mapNavIndex,
+            onOpenList: () => _selectTab(RiderHomeScreen.deliveriesNavIndex),
+            onOpenNotifications: _openNotifications,
+            unreadNotifications:
+                _dashboardController.metrics.unreadNotificationCount,
+            onOpenConversation: _openDeliveryConversation,
+          ),
         ),
       ),
       RiderHomeScreen.messagesNavIndex => RiderKeepAliveTab(
-        child: RiderMessagesScreen(
-          riderId: _riderId ?? '',
-          controller: _messagesController,
-          access: _conversationAccess,
-          onAttachmentRequested: _captureCommunicationAttachment,
+        child: AnimatedBuilder(
+          animation: _dashboardController,
+          builder: (context, _) => RiderMessagesScreen(
+            riderId: _riderId ?? '',
+            controller: _messagesController,
+            access: _conversationAccess,
+            onOpenNotifications: _openNotifications,
+            unreadNotifications:
+                _dashboardController.metrics.unreadNotificationCount,
+          ),
         ),
       ),
       RiderHomeScreen.profileNavIndex => RiderKeepAliveTab(
@@ -89,61 +108,6 @@ extension _RiderHomeTabs on _RiderHomeScreenState {
     },
     supportAuthorized: (_riderId ?? '').isNotEmpty,
   );
-
-  Future<String?> _captureCommunicationAttachment(
-    RiderCommunicationAction action,
-  ) async {
-    final activeId = _deliveryController.requests
-        .where(
-          (request) =>
-              request.isAssignedTo(_riderId ?? '') && !request.stage.isTerminal,
-        )
-        .firstOrNull
-        ?.id;
-    final deliveryId = action.deliveryId ?? activeId;
-    if (deliveryId == null) {
-      _showCommunicationMessage(
-        'An active delivery is required to share an attachment.',
-      );
-      return null;
-    }
-    if (action.type == RiderCommunicationActionType.shareLocation &&
-        _deliveryController.currentRiderLocation == null) {
-      _showCommunicationMessage(
-        'Current GPS location is unavailable. Enable precise location and try again.',
-      );
-      return null;
-    }
-    try {
-      return switch (action.type) {
-        RiderCommunicationActionType.attachPhoto =>
-          await _communicationStorage.capturePhoto(deliveryId: deliveryId),
-        RiderCommunicationActionType.shareLocation =>
-          _deliveryController.currentRiderLocation == null
-              ? null
-              : await _communicationStorage.saveAttestation(
-                  deliveryId: deliveryId,
-                  method: DeliveryConfirmationMethod.gpsLocation,
-                ),
-        RiderCommunicationActionType.call ||
-        RiderCommunicationActionType.contactSupport => null,
-      };
-    } on DeliveryProofStorageException catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showAppSnackBar(SnackBar(content: Text(error.message)));
-      }
-      return null;
-    }
-  }
-
-  void _showCommunicationMessage(String message) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showAppSnackBar(SnackBar(content: Text(message)));
-  }
 
   void _openEarnings() {
     Navigator.of(context).push(

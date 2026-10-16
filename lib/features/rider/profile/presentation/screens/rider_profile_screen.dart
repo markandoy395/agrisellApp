@@ -9,11 +9,13 @@ import 'package:agresell_app/features/auth/presentation/account_session_navigati
 import 'package:agresell_app/features/rider/profile/data/rider_registration_service.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_account_exit_policy.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
-import 'package:agresell_app/features/rider/profile/presentation/styles/rider_profile_screen_styles.dart';
+import '../styles/rider_profile_design_styles.dart';
+import '../widgets/rider_profile_design_components.dart';
+import '../widgets/rider_profile_empty_state.dart';
+import 'rider_sign_up_screen.dart';
 import 'package:agresell_app/features/rider/dashboard/presentation/controllers/rider_analytics_controller.dart';
 import 'package:agresell_app/features/rider/safety/presentation/controllers/rider_safety_controller.dart';
-import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
-import 'package:agresell_app/features/rider/presentation/widgets/rider_state_cards.dart';
+
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_password_dialog.dart';
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_profile_edit_dialog.dart';
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_profile_overview.dart';
@@ -29,6 +31,7 @@ import 'package:agresell_app/features/rider/dashboard/presentation/screens/rider
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
 
 part 'rider_profile_logout.dart';
+part 'rider_profile_content.dart';
 
 enum _RiderProfileMode { overview, settings }
 
@@ -97,87 +100,7 @@ class _RiderProfileScreenState extends State<RiderProfileScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final profile = _profile;
-    return ColoredBox(
-      color: RiderProfileScreenStyles.backgroundColor,
-      child: Column(
-        children: [
-          RiderPageHeader(
-            title: 'Rider profile',
-            subtitle: 'Account, vehicle, documents, and safety',
-            action: IconButton(
-              tooltip: 'Settings',
-              constraints: RiderProfileScreenStyles.settingsConstraints,
-              padding: RiderProfileScreenStyles.settingsIconPadding,
-              color: RiderProfileScreenStyles.settingsIconColor,
-              iconSize: RiderProfileScreenStyles.settingsIconSize,
-              onPressed: () => _setMode(_RiderProfileMode.settings),
-              icon: const Icon(Icons.settings_rounded),
-            ),
-          ),
-          Expanded(
-            child: profile == null
-                ? const Center(
-                    child: Padding(
-                      padding: RiderProfileScreenStyles.emptyStatePadding,
-                      child: RiderEmptyStateCard(
-                        title: 'No rider profile',
-                        message:
-                            'Complete rider registration to view account and vehicle details.',
-                        icon: Icons.person_outline_rounded,
-                      ),
-                    ),
-                  )
-                : AnimatedBuilder(
-                    animation: Listenable.merge([_analytics, _safety]),
-                    builder: (context, _) {
-                      if (_mode == _RiderProfileMode.settings) {
-                        return RiderSettingsPanel(
-                          profile: profile,
-                          onEditProfile: _editProfile,
-                          onVehicle: () => _open(const RiderVehicleScreen()),
-                          onDocuments: () =>
-                              _open(const RiderDocumentsScreen()),
-                          onChangePassword: _changePassword,
-                          onSafety: _openSafety,
-                          onIncidentHistory: _openIncidentHistory,
-                          onSupport: () => _open(const SupportCenterScreen()),
-                          onSwitchAccount: _switchAccount,
-                          onLogout: _logout,
-                          onBack: () => _setMode(_RiderProfileMode.overview),
-                        );
-                      }
-                      return RiderProfileOverview(
-                        profile: profile,
-                        performance: _analytics.ratings.summary,
-                        onEarnings: () => _open(
-                          RiderEarningsScreen(
-                            riderId: profile.id,
-                            controller: _analytics,
-                          ),
-                        ),
-                        onHistory: () => _open(
-                          RiderHistoryScreen(
-                            riderId: profile.id,
-                            controller: _analytics,
-                            deliveryController: widget.deliveryController,
-                          ),
-                        ),
-                        onRatings: () => _open(
-                          RiderRatingsScreen(
-                            riderId: profile.id,
-                            controller: _analytics,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => _buildProfile(context);
 
   void _setMode(_RiderProfileMode mode) {
     if (_mode == mode) return;

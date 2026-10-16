@@ -1,6 +1,8 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'rider_profile_design_styles.dart';
 
 abstract final class RiderProfileEditStyles {
   // Drag Handle
@@ -28,21 +30,25 @@ abstract final class RiderProfileEditStyles {
 
   // Typography
   static const TextStyle titleStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 15,
     fontWeight: FontWeight.w700,
   );
 
   static const TextStyle subtitleStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
     color: AgrisellColors.mutedText,
   );
 
   static const TextStyle sectionHeaderStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     fontSize: 14,
     fontWeight: FontWeight.w700,
   );
 
   static const TextStyle errorTextStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.statusRedText,
     fontSize: 12,
   );
@@ -50,11 +56,11 @@ abstract final class RiderProfileEditStyles {
   // Buttons
   static final ButtonStyle actionButtonStyle = OutlinedButton.styleFrom(
     minimumSize: const Size.fromHeight(38),
-  );
+  ).merge(RiderProfileDesignStyles.secondary);
 
   static final ButtonStyle saveButtonStyle = FilledButton.styleFrom(
     minimumSize: const Size.fromHeight(38),
-  );
+  ).merge(RiderProfileDesignStyles.primary);
 
   // Spacings
   static const SizedBox spacingSmall = SizedBox(height: 4);

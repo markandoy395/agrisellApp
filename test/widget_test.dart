@@ -307,10 +307,13 @@ void main() {
     await _pumpUntilFound(tester, find.text('Logout'));
     await _ensureVisibleCentered(tester, find.text('Logout'));
     await tester.tap(find.text('Logout'));
-    await _pumpUntilFound(
-      tester,
-      find.widgetWithText(TextField, 'Email or phone number'),
-    );
+    await tester.pumpAndSettle();
+    expect(find.text('Are you sure you want to log out?'), findsOneWidget);
+    await tester.runAsync(() async {
+      await tester.tap(find.widgetWithText(FilledButton, 'Log out'));
+    });
+    await tester.pumpAndSettle();
+    await _pumpUntilFound(tester, find.text('Email or phone number'));
     expect(find.text('Log In'), findsAtLeastNWidgets(1));
     expect(find.text('Email or phone number'), findsOneWidget);
   });

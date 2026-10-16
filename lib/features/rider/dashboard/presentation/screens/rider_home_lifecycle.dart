@@ -29,6 +29,9 @@ extension _RiderHomeLifecycle on _RiderHomeScreenState {
     if (state == AppLifecycleState.resumed) {
       _isAppInForeground = true;
       _syncLiveLocationSharing();
+      if (_lastTrackingRequested == true) {
+        unawaited(_refreshForegroundLocation());
+      }
       final backgroundedAt = _backgroundedAt;
       _backgroundedAt = null;
       final shouldRefreshRiderState =
@@ -84,41 +87,6 @@ extension _RiderHomeLifecycle on _RiderHomeScreenState {
     if (_lastCompletedToday == count) return;
     _lastCompletedToday = count;
     _dashboardController.applyLocalCompletedToday(count);
-  }
-
-  void _syncLiveLocationSharing() {
-    final riderId = _riderId;
-    final active = riderId == null
-        ? null
-        : _deliveryController.requests
-              .where(
-                (request) =>
-                    request.isAssignedTo(riderId) && !request.stage.isTerminal,
-              )
-              .firstOrNull;
-    final allowed =
-        active != null &&
-        riderId != null &&
-        RiderLiveLocationAccess.authorize(
-          request: active,
-          riderId: riderId,
-          status: _deliveryController.statusFor(active),
-        ).allowed;
-    _locationController.setLiveSharing(
-      allowed,
-      deliveryId: allowed ? active.id : null,
-      riderId: allowed ? riderId : null,
-    );
-    final shouldTrack =
-        allowed ||
-        (_isAppInForeground && _activeIndex == RiderHomeScreen.mapNavIndex);
-    if (_lastTrackingRequested == shouldTrack) return;
-    _lastTrackingRequested = shouldTrack;
-    if (shouldTrack) {
-      unawaited(_locationController.startTracking());
-    } else {
-      unawaited(_locationController.stopTracking());
-    }
   }
 
   void _syncRequestEnvironment() {

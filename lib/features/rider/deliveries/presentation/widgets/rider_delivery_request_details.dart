@@ -1,5 +1,5 @@
 import 'package:agresell_app/features/rider/presentation/widgets/rider_safe_sheet.dart';
-import 'package:agresell_app/core/services/authenticated_storage_image.dart';
+import 'package:agresell_app/features/rider/presentation/widgets/rider_product_image.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_request_details_styles.dart';
 import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
@@ -18,40 +18,8 @@ class RiderRequestProductImage extends StatelessWidget {
   final String productName;
 
   @override
-  Widget build(BuildContext context) {
-    final imagePath = url?.trim();
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
-      child: SizedBox(
-        width: 56,
-        height: 56,
-        child: imagePath == null || imagePath.isEmpty
-            ? _imageFallback
-            : imagePath.startsWith('http://') ||
-                  imagePath.startsWith('https://')
-            ? authenticatedNetworkImage(
-                imagePath,
-                fit: BoxFit.cover,
-                semanticLabel: '$productName product image',
-                errorBuilder: (_, _, _) => _imageFallback,
-              )
-            : Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
-                semanticLabel: '$productName product image',
-                errorBuilder: (_, _, _) => _imageFallback,
-              ),
-      ),
-    );
-  }
-
-  Widget get _imageFallback => Semantics(
-    label: '$productName product image unavailable',
-    child: const ColoredBox(
-      color: AgrisellColors.limeSoft,
-      child: Icon(Icons.inventory_2_outlined),
-    ),
-  );
+  Widget build(BuildContext context) =>
+      RiderProductImage(source: url, productName: productName);
 }
 
 class RiderRequestDetailLine extends StatelessWidget {

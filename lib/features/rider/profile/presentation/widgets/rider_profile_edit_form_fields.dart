@@ -1,5 +1,7 @@
 import 'package:agresell_app/features/rider/profile/presentation/styles/rider_profile_edit_form_fields_styles.dart';
 import 'package:flutter/material.dart';
+import '../styles/rider_profile_design_styles.dart';
+import 'package:agresell_app/features/shared/widgets/profile/safe_circle_avatar.dart';
 
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
 import 'package:agresell_app/features/rider/profile/presentation/styles/rider_profile_edit_styles.dart';
@@ -56,6 +58,16 @@ class RiderProfileEditFormFields extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Center(
+          child: SafeCircleAvatar(
+            radius: 46,
+            imageUrl: profile.profilePhotoUrl,
+            fallback: const Icon(Icons.person_outline_rounded, size: 42),
+          ),
+        ),
+        const SizedBox(height: 20),
+        Text('Personal information', style: RiderProfileDesignStyles.title),
+        const SizedBox(height: 12),
         _field('First name', firstNameController, TextInputType.name),
         _field('Last name', lastNameController, TextInputType.name),
         _field('Contact number', contactController, TextInputType.phone),

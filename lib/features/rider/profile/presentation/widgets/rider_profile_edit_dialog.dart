@@ -9,6 +9,8 @@ import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_p
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_profile_edit_header.dart';
 import 'package:agresell_app/features/shared/location/data/gps_location_gateway.dart';
 
+part 'rider_profile_edit_save.dart';
+
 Future<RiderProfile?> showRiderProfileEditDialog(
   BuildContext context,
   RiderProfile profile, {
@@ -31,6 +33,7 @@ class _RiderProfileEditSheet extends StatefulWidget {
 }
 
 class _RiderProfileEditSheetState extends State<_RiderProfileEditSheet> {
+  void _updateUi(VoidCallback change) => setState(change);
   late final _firstName = TextEditingController(text: widget.profile.firstName);
   late final _lastName = TextEditingController(text: widget.profile.lastName);
   late final _contact = TextEditingController(
@@ -85,100 +88,42 @@ class _RiderProfileEditSheetState extends State<_RiderProfileEditSheet> {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    height: MediaQuery.sizeOf(context).height * .92,
-    child: Padding(
-      padding: RiderProfileEditStyles.sheetPadding(context),
-      child: Column(
-        children: [
-          const RiderProfileEditHeader(),
-          RiderProfileEditStyles.spacingLarge,
-          Expanded(
-            child: SingleChildScrollView(
-              child: RiderProfileEditFormFields(
-                profile: widget.profile,
-                firstNameController: _firstName,
-                lastNameController: _lastName,
-                contactController: _contact,
-                streetController: _street,
-                provinceController: _province,
-                cityController: _city,
-                barangayController: _barangay,
-                postalController: _postal,
-                licenseController: _license,
-                plateController: _plate,
-                error: _error,
-                onPsgcChanged: () => setState(() {}),
+    height: MediaQuery.sizeOf(context).height,
+    child: SafeArea(
+      child: Padding(
+        padding: RiderProfileEditStyles.sheetPadding(context),
+        child: Column(
+          children: [
+            const RiderProfileEditHeader(),
+            RiderProfileEditStyles.spacingLarge,
+            Expanded(
+              child: SingleChildScrollView(
+                child: RiderProfileEditFormFields(
+                  profile: widget.profile,
+                  firstNameController: _firstName,
+                  lastNameController: _lastName,
+                  contactController: _contact,
+                  streetController: _street,
+                  provinceController: _province,
+                  cityController: _city,
+                  barangayController: _barangay,
+                  postalController: _postal,
+                  licenseController: _license,
+                  plateController: _plate,
+                  error: _error,
+                  onPsgcChanged: () => setState(() {}),
+                ),
               ),
             ),
-          ),
-          RiderProfileEditStyles.spacingLarge,
-          RiderProfileEditActions(
-            isSaving: _isSaving,
-            onCancel: () => Navigator.pop(context),
-            onSave: _save,
-          ),
-        ],
+            RiderProfileEditStyles.spacingLarge,
+            RiderProfileEditActions(
+              isSaving: _isSaving,
+              onCancel: () => Navigator.pop(context),
+              onSave: _save,
+            ),
+          ],
+        ),
       ),
     ),
   );
-
-  Future<void> _save() async {
-    final isValid = RiderProfileSaveCoordinator.validate(
-      profile: widget.profile,
-      firstName: _firstName.text,
-      lastName: _lastName.text,
-      contact: _contact.text,
-      license: _license.text,
-      plate: _plate.text,
-      street: _street.text,
-      province: _province.text,
-      city: _city.text,
-      barangay: _barangay.text,
-    );
-    if (!isValid) {
-      setState(
-        () => _error = 'Complete the rider details and official address.',
-      );
-      return;
-    }
-    setState(() {
-      _isSaving = true;
-      _error = null;
-    });
-    try {
-      final position =
-          await RiderProfileLocationCoordinator.captureCurrentLocation(
-            _gpsGateway,
-          );
-      _latitude = position.latitude;
-      _longitude = position.longitude;
-      if (!mounted) return;
-      Navigator.pop(
-        context,
-        RiderProfileSaveCoordinator.buildUpdatedProfile(
-          original: widget.profile,
-          firstName: _firstName.text,
-          lastName: _lastName.text,
-          contact: _contact.text,
-          license: _license.text,
-          plate: _plate.text,
-          street: _street.text,
-          province: _province.text,
-          city: _city.text,
-          barangay: _barangay.text,
-          postal: _postal.text,
-          latitude: _latitude,
-          longitude: _longitude,
-        ),
-      );
-    } catch (error) {
-      if (mounted) {
-        setState(
-          () => _error = error.toString().replaceFirst('Exception: ', ''),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isSaving = false);
-    }
-  }
 }

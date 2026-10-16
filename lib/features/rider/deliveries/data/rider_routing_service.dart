@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:agresell_app/features/rider/deliveries/data/rider_osrm_parser.dart';
+import 'package:agresell_app/features/rider/deliveries/data/rider_osrm_response_decoder.dart';
 import 'package:agresell_app/features/shared/routing/domain/delivery_route.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_road_access.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/rider_route_plan.dart';
@@ -32,12 +33,29 @@ class DisabledRiderRoadAccessService implements RiderRoadAccessService {
 
 class OsrmRiderRoutingService
     implements RiderRoutingService, RiderRoadAccessService {
-  OsrmRiderRoutingService({http.Client? client, Uri? endpoint})
-    : _client = client ?? http.Client(),
-      _endpoint = endpoint ?? Uri.parse('https://router.project-osrm.org');
+  OsrmRiderRoutingService({
+    http.Client? client,
+    Uri? endpoint,
+    this.includeAlternatives = false,
+  }) : _client = client ?? http.Client(),
+       _endpoint =
+           endpoint ??
+           Uri.parse(
+             const String.fromEnvironment(
+               'RIDER_ROUTING_URL',
+               defaultValue: 'https://router.project-osrm.org',
+             ),
+           );
 
   final http.Client _client;
   final Uri _endpoint;
+  final bool includeAlternatives;
+
+  OsrmRiderRoutingService withAlternatives() => OsrmRiderRoutingService(
+    client: _client,
+    endpoint: _endpoint,
+    includeAlternatives: true,
+  );
   final Map<String, ({DateTime storedAt, RiderRoadAccessSnap snap})>
   _roadAccessCache = {};
 
@@ -60,8 +78,8 @@ class OsrmRiderRoutingService
     final uri = _endpoint
         .resolve('/route/v1/driving/$coordinates')
         .replace(
-          queryParameters: const {
-            'alternatives': '3',
+          queryParameters: {
+            'alternatives': includeAlternatives ? '3' : 'false',
             'steps': 'true',
             'geometries': 'geojson',
             'overview': 'full',
@@ -71,7 +89,7 @@ class OsrmRiderRoutingService
     try {
       final response = await _client
           .get(uri, headers: const {'Accept': 'application/json'})
-          .timeout(const Duration(seconds: 12));
+          .timeout(const Duration(seconds: 8));
       if (response.statusCode == 429) {
         throw const RiderRoutingException(
           'Road routing is busy. Keep the saved route and try again shortly.',
@@ -82,11 +100,11 @@ class OsrmRiderRoutingService
           'Road routing service is unavailable.',
         );
       }
-      return parseOsrmRiderRoutes(
-        jsonDecode(response.body),
+      return await compute(decodeOsrmRiderResponse, (
+        bytes: response.bodyBytes,
         requestId: requestId,
         destinationKey: destinationKey,
-      );
+      ));
     } on RiderRoutingException {
       rethrow;
     } on TimeoutException {

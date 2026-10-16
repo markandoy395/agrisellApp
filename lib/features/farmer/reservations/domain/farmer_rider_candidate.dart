@@ -52,29 +52,31 @@ class FarmerRiderCandidate {
   bool get canReceiveRequest =>
       hasRequestableAvailability && isRequestable && destinationSupported;
 
-  FarmerRiderCandidate copyWith({String? profileImageUrl}) =>
-      FarmerRiderCandidate(
-        id: id,
-        name: name,
-        profilePhotoPath: profilePhotoPath,
-        profileImageUrl: profileImageUrl ?? this.profileImageUrl,
-        barangay: barangay,
-        municipality: municipality,
-        sameBarangay: sameBarangay,
-        sameMunicipality: sameMunicipality,
-        availabilityStatus: availabilityStatus,
-        isRequestable: isRequestable,
-        distanceKm: distanceKm,
-        estimatedArrivalMinutes: estimatedArrivalMinutes,
-        currentLocationUpdatedAt: currentLocationUpdatedAt,
-        locationIsFresh: locationIsFresh,
-        destinationSupported: destinationSupported,
-        deliveryDistanceKm: deliveryDistanceKm,
-        activeDeliveryCount: activeDeliveryCount,
-        rating: rating,
-        completedDeliveries: completedDeliveries,
-        proposedDeliveryFee: proposedDeliveryFee,
-      );
+  FarmerRiderCandidate copyWith({
+    String? profileImageUrl,
+    double? proposedDeliveryFee,
+  }) => FarmerRiderCandidate(
+    id: id,
+    name: name,
+    profilePhotoPath: profilePhotoPath,
+    profileImageUrl: profileImageUrl ?? this.profileImageUrl,
+    barangay: barangay,
+    municipality: municipality,
+    sameBarangay: sameBarangay,
+    sameMunicipality: sameMunicipality,
+    availabilityStatus: availabilityStatus,
+    isRequestable: isRequestable,
+    distanceKm: distanceKm,
+    estimatedArrivalMinutes: estimatedArrivalMinutes,
+    currentLocationUpdatedAt: currentLocationUpdatedAt,
+    locationIsFresh: locationIsFresh,
+    destinationSupported: destinationSupported,
+    deliveryDistanceKm: deliveryDistanceKm,
+    activeDeliveryCount: activeDeliveryCount,
+    rating: rating,
+    completedDeliveries: completedDeliveries,
+    proposedDeliveryFee: proposedDeliveryFee ?? this.proposedDeliveryFee,
+  );
 }
 
 const offlineRiderBookingMinutes = 45;

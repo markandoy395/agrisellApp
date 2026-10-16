@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'waybill_preview_header.dart';
+import 'waybill_amount_row.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/waybills/domain/delivery_waybill.dart';
@@ -9,10 +11,7 @@ import 'package:agresell_app/features/shared/waybills/services/waybill_html_serv
 /// Renders the printable waybill card containing customer, courier, routing,
 /// package items, and total pricing info.
 class WaybillPreviewCard extends StatelessWidget {
-  const WaybillPreviewCard({
-    required this.waybill,
-    super.key,
-  });
+  const WaybillPreviewCard({required this.waybill, super.key});
 
   final DeliveryWaybill waybill;
 
@@ -24,7 +23,7 @@ class WaybillPreviewCard extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildHeaderRow(),
+        WaybillPreviewHeader(waybill: waybill),
         const SizedBox(height: 10),
         _buildBarcode(),
         const SizedBox(height: 14),
@@ -37,42 +36,12 @@ class WaybillPreviewCard extends StatelessWidget {
     ),
   );
 
-  Widget _buildHeaderRow() => Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            waybill.waybillNumber,
-            style: DeliveryWaybillStyles.waybillNumber,
-          ),
-          Text(
-            'Order ORD-${waybill.orderId}',
-            style: DeliveryWaybillStyles.orderNumber,
-          ),
-        ],
-      ),
-      Container(
-        padding: DeliveryWaybillStyles.badgePadding,
-        decoration: DeliveryWaybillStyles.badgeDecoration(
-          isCod: waybill.isCod,
-        ),
-        child: Text(
-          waybill.isCod ? 'CASH ON DELIVERY' : 'PREPAID',
-          style: DeliveryWaybillStyles.badgeTextStyle(
-            isCod: waybill.isCod,
-          ),
-        ),
-      ),
-    ],
-  );
-
   Widget _buildBarcode() => Container(
     width: double.infinity,
     padding: DeliveryWaybillStyles.barcodePadding,
     decoration: DeliveryWaybillStyles.barcodeDecoration,
-    child: const Center(
+    child: const FittedBox(
+      fit: BoxFit.scaleDown,
       child: Text(
         '||| | |||| || | |||| |||||',
         style: DeliveryWaybillStyles.barcodeText,
@@ -123,8 +92,7 @@ class WaybillPreviewCard extends StatelessWidget {
           'Collect COD: ${WaybillHtmlService.formatCurrency(waybill.codAmount)}',
       ],
     ),
-    if (waybill.instructions != null &&
-        waybill.instructions!.isNotEmpty) ...[
+    if (waybill.instructions != null && waybill.instructions!.isNotEmpty) ...[
       const SizedBox(height: 8),
       WaybillInfoBox(
         title: 'Handling & Instructions',
@@ -142,37 +110,21 @@ class WaybillPreviewCard extends StatelessWidget {
         style: DeliveryWaybillStyles.packageItemsHeading,
       ),
       const SizedBox(height: 6),
-      ...waybill.items.map((item) => Padding(
-        padding: DeliveryWaybillStyles.itemRowPadding,
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                '${item.name} (${item.quantityDescription})',
-                style: DeliveryWaybillStyles.itemName,
-              ),
-            ),
-            Text(
-              WaybillHtmlService.formatCurrency(item.total),
-              style: DeliveryWaybillStyles.itemTotal,
-            ),
-          ],
+      ...waybill.items.map(
+        (item) => Padding(
+          padding: DeliveryWaybillStyles.itemRowPadding,
+          child: WaybillAmountRow(
+            label: '${item.name} (${item.quantityDescription})',
+            amount: WaybillHtmlService.formatCurrency(item.total),
+          ),
         ),
-      )),
+      ),
     ],
   );
 
-  Widget _buildTotalRow() => Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      const Text(
-        'Total Amount',
-        style: DeliveryWaybillStyles.totalAmountLabel,
-      ),
-      Text(
-        WaybillHtmlService.formatCurrency(waybill.totalAmount),
-        style: DeliveryWaybillStyles.totalAmountValue,
-      ),
-    ],
+  Widget _buildTotalRow() => WaybillAmountRow(
+    label: 'Total Amount',
+    amount: WaybillHtmlService.formatCurrency(waybill.totalAmount),
+    isTotal: true,
   );
 }

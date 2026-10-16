@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:agresell_app/core/widgets/app_snack_bar.dart';
+import '../utils/rider_delivery_message.dart';
+import '../widgets/rider_delivery_confirmation_footer.dart';
 
 import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_confirmation_styles.dart';
 import 'package:agresell_app/features/rider/deliveries/data/delivery_proof_storage.dart';
@@ -107,6 +108,12 @@ class _RiderDeliveryConfirmationScreenState
       // The list accounts for the keyboard so focused cash fields remain
       // reachable without making the outer Column overflow on short screens.
       resizeToAvoidBottomInset: false,
+      bottomNavigationBar: _configuration == null
+          ? null
+          : RiderDeliveryConfirmationFooter(
+              isSubmitting: _submitting,
+              onSubmit: _submit,
+            ),
       body: Column(
         children: [
           RiderPageHeader(
@@ -163,7 +170,6 @@ class _RiderDeliveryConfirmationScreenState
       onBuyerConfirmed: _setBuyerConfirmed,
       onCaptureSignature: _captureSignature,
       onCapturePhoto: _capturePhoto,
-      onSubmit: _submit,
       cashCollectionSection: _cashCollectionSection,
     );
   }

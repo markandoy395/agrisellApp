@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
@@ -8,7 +9,7 @@ abstract final class RiderPageWidgetsStyles {
   );
 
   static const titleText = TextStyle(
-    fontFamily: 'Poppins',
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.surface,
     fontSize: 15,
     height: 1.1,
@@ -16,7 +17,7 @@ abstract final class RiderPageWidgetsStyles {
   );
 
   static final valueText = TextStyle(
-    fontFamily: 'Poppins',
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.surface.withValues(alpha: 0.9),
     fontSize: 15,
     height: 1.2,
@@ -37,6 +38,7 @@ abstract final class RiderPageWidgetsStyles {
   );
 
   static const titleText2 = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontSize: 14,
     height: 1.1,

@@ -1,52 +1,70 @@
 part of 'package:agresell_app/features/rider/dashboard/presentation/screens/rider_dashboard_screen.dart';
 
 class _RiderEarningsSnapshot extends StatelessWidget {
-  const _RiderEarningsSnapshot({required this.amount, this.pendingAmount});
+  const _RiderEarningsSnapshot({
+    required this.amount,
+    this.pendingAmount,
+    required this.online,
+    required this.onTap,
+  });
+
+  final bool online;
+  final VoidCallback onTap;
 
   final double amount;
   final double? pendingAmount;
 
   @override
-  Widget build(BuildContext context) => RiderSurfaceCard(
-    padding: RiderDashboardContentStyles.cardPadding,
-    child: Row(
-      children: [
-        Container(
-          width: 38,
-          height: 38,
-          alignment: Alignment.center,
-          decoration: RiderDashboardContentStyles.earningsIconDecoration,
-          child: const Icon(
+  Widget build(BuildContext context) => InkWell(
+    onTap: onTap,
+    borderRadius: BorderRadius.circular(16),
+    child: Container(
+      decoration: RiderHomeDesignStyles.earnings(online),
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Icon(
             Icons.account_balance_wallet_outlined,
-            color: AgrisellColors.authGreen,
-            size: 20,
+            color: online
+                ? RiderHomeDesignStyles.green
+                : RiderHomeDesignStyles.muted,
+            size: 32,
           ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'PHP ${amount.toStringAsFixed(2)}',
-                style: RiderDashboardContentStyles.earningsAmountStyle,
-              ),
-              const SizedBox(height: 3),
-              const Text(
-                'Estimated earnings today',
-                style: RiderDashboardContentStyles.earningsLabelStyle,
-              ),
-              if (pendingAmount != null) ...[
-                const SizedBox(height: 3),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Text(
-                  'PHP ${pendingAmount!.toStringAsFixed(2)} pending',
-                  style: RiderDashboardContentStyles.earningsPendingStyle,
+                  'PHP ${amount.toStringAsFixed(2)}',
+                  style: RiderHomeDesignStyles.amount,
                 ),
+                const SizedBox(height: 3),
+                const Text(
+                  'Estimated earnings today',
+                  style: RiderDashboardContentStyles.earningsLabelStyle,
+                ),
+                if (pendingAmount != null && pendingAmount! > 0) ...[
+                  const SizedBox(height: 3),
+                  Text(
+                    'PHP ${pendingAmount!.toStringAsFixed(2)} pending',
+                    style: RiderDashboardContentStyles.earningsPendingStyle,
+                  ),
+                ],
+                if (pendingAmount == 0)
+                  const Text(
+                    'No pending earnings',
+                    style: RiderHomeDesignStyles.caption,
+                  ),
               ],
-            ],
+            ),
           ),
-        ),
-      ],
+          const Icon(
+            Icons.chevron_right_rounded,
+            color: RiderHomeDesignStyles.green,
+          ),
+        ],
+      ),
     ),
   );
 }
@@ -62,6 +80,7 @@ class _RiderSafetySupportCard extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: RiderSurfaceCard(
+        decoration: RiderHomeDesignStyles.card,
         padding: RiderDashboardContentStyles.cardPadding,
         child: Row(
           children: [
@@ -71,8 +90,8 @@ class _RiderSafetySupportCard extends StatelessWidget {
               alignment: Alignment.center,
               decoration: RiderDashboardContentStyles.safetyIconDecoration,
               child: const Icon(
-                Icons.shield_outlined,
-                color: AgrisellColors.statusBlueText,
+                Icons.shield_rounded,
+                color: RiderHomeDesignStyles.green,
                 size: 22,
               ),
             ),

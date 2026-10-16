@@ -1,6 +1,13 @@
 part of 'rider_messages_controller.dart';
 
 extension RiderMessagesControllerOffline on RiderMessagesController {
+  List<RiderChatMessage> get pendingTextMessages => [
+    for (final conversation in conversations)
+      ..._pendingMessages(
+        conversation.id,
+      ).where((message) => message.kind == RiderMessageKind.text),
+  ];
+
   Future<bool> requestAction(RiderCommunicationActionType type) async {
     final riderId = _riderId;
     final conversation = _selectedConversation;

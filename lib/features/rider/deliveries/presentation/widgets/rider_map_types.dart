@@ -20,7 +20,7 @@ extension RiderMapFilterDetails on RiderMapFilter {
     RiderMapFilter.deliveries => Icons.inventory_2_rounded,
     RiderMapFilter.farmers => Icons.agriculture_rounded,
     RiderMapFilter.assigned => Icons.local_shipping_rounded,
-    RiderMapFilter.nearby => Icons.navigation_rounded,
+    RiderMapFilter.nearby => Icons.radar_rounded,
   };
 }
 

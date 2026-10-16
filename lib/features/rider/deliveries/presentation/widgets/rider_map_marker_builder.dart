@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../domain/rider_map_visibility.dart';
+import 'rider_map_drop_off_markers.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -25,6 +27,7 @@ class RiderMapMarkerBuilder {
     required this.mapController,
     required this.onMarkerTap,
     required this.onFarmTap,
+    this.visibility = const RiderMapVisibility(),
   });
 
   static const double nearbyFilterRadiusKm = 5.0;
@@ -41,6 +44,7 @@ class RiderMapMarkerBuilder {
   final MapController mapController;
   final RiderMapMarkerCallback onMarkerTap;
   final ValueChanged<RiderNearbyFarm> onFarmTap;
+  final RiderMapVisibility visibility;
 
   List<Marker> buildMarkers(LatLng displayedRiderPoint) {
     final assigned = requests
@@ -63,21 +67,18 @@ class RiderMapMarkerBuilder {
         .take(maximumOpportunityMarkers)
         .toList(growable: false);
 
-    final showAssigned =
-        filter == RiderMapFilter.all ||
+    final showAssigned = filter == RiderMapFilter.all ||
         filter == RiderMapFilter.assigned ||
         filter == RiderMapFilter.nearby;
-    final showDeliveries =
-        filter == RiderMapFilter.all ||
+    final showDeliveries = filter == RiderMapFilter.all ||
         filter == RiderMapFilter.deliveries ||
         filter == RiderMapFilter.nearby;
-    final showFarmers =
-        filter == RiderMapFilter.all ||
+    final showFarmers = filter == RiderMapFilter.all ||
         filter == RiderMapFilter.farmers ||
         filter == RiderMapFilter.nearby;
 
     return [
-      if (showDeliveries)
+      if (showDeliveries && visibility.pickups)
         ...RiderOpportunityMarkersBuilder.build(
           opportunities: opportunities,
           mapZoom: mapZoom,
@@ -85,8 +86,10 @@ class RiderMapMarkerBuilder {
           filter: filter,
           onMarkerTap: onMarkerTap,
         ),
-      if (showFarmers) ..._farmerMarkers(),
-      if (showAssigned)
+      if (showFarmers && visibility.farms) ..._farmerMarkers(),
+      if (showAssigned && visibility.dropOffs)
+        ...riderMapDropOffMarkers(assigned, activeVisible: visibility.active),
+      if (showAssigned && visibility.active)
         for (final request in assigned)
           if (_destination(request).hasCoordinates)
             Marker(
@@ -101,6 +104,9 @@ class RiderMapMarkerBuilder {
                 label: request.stage.isDeliveryLeg
                     ? 'Assigned delivery destination'
                     : 'Assigned pickup: ${request.sellerName}',
+                caption: request.stage.isDeliveryLeg
+                    ? request.deliveryLocation.address
+                    : request.sellerName,
                 prominent: true,
                 tapExtent: RiderLiveMapStyles.prominentMarkerExtent,
                 onTap: () =>
@@ -109,12 +115,13 @@ class RiderMapMarkerBuilder {
             ),
       Marker(
         point: displayedRiderPoint,
-        width: RiderLiveMapStyles.prominentMarkerExtent,
-        height: RiderLiveMapStyles.prominentMarkerExtent,
+        width: RiderLiveMapStyles.radarRadius,
+        height: RiderLiveMapStyles.radarRadius,
         child: const RiderMapIconMarker(
           icon: Icons.navigation_rounded,
           label: 'Your current location',
           prominent: true,
+          tapExtent: RiderLiveMapStyles.radarRadius,
         ),
       ),
     ];
@@ -140,6 +147,7 @@ class RiderMapMarkerBuilder {
       child: RiderMapIconMarker(
         icon: RiderMapFilter.farmers.icon,
         label: 'Farmer pickup: ${farm.name}',
+        caption: farm.name,
         offset: offset,
         onTap: () => onFarmTap(farm),
       ),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import '../domain/chat_limits.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -69,6 +70,9 @@ class SupabaseMarketplaceMessagingRepository
     required String text,
   }) async {
     try {
+      if (!ChatLimits.valid(text)) {
+        throw const MarketplaceMessagingException(ChatLimits.lengthError);
+      }
       final response = await remote.call(
         'send_marketplace_message',
         parameters: {'conversation_id': _id(conversationId), 'body': text},
@@ -76,6 +80,14 @@ class SupabaseMarketplaceMessagingRepository
       final row = _map(response);
       if (row == null) throw const FormatException('Missing message response');
       return MarketplaceMessage.fromJson(row);
+    } on MarketplaceMessagingException {
+      rethrow;
+    } on PostgrestException catch (error) {
+      throw MarketplaceMessagingException(
+        ChatLimits.serverError(error.code) ??
+            'Your message was not sent. Tap it to retry.',
+        error,
+      );
     } on Object catch (error) {
       throw MarketplaceMessagingException(
         'Your message was not sent. Tap it to retry.',
@@ -101,6 +113,12 @@ class SupabaseMarketplaceMessagingRepository
       final id = response?.toString() ?? '';
       if (id.isEmpty) throw const FormatException('Missing conversation id');
       return id;
+    } on PostgrestException catch (error) {
+      throw MarketplaceMessagingException(
+        ChatLimits.serverError(error.code) ??
+            'We could not open a conversation with this farmer.',
+        error,
+      );
     } on Object catch (error) {
       throw MarketplaceMessagingException(
         'We could not open a conversation with this farmer.',

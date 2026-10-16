@@ -1,9 +1,9 @@
-import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
+import '../styles/rider_profile_design_styles.dart';
+import '../widgets/rider_vehicle_overview.dart';
 import '../widgets/rider_vehicle_edit_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
-import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/profile/data/rider_registration_service.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_vehicle.dart';
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_capacity_editor.dart';
@@ -22,55 +22,36 @@ class _RiderVehicleScreenState extends State<RiderVehicleScreen> {
   @override
   Widget build(BuildContext context) {
     final vehicle = RiderRegistrationService.instance.currentVehicle;
-    return Scaffold(
-      appBar: AppBar(title: const Text('Vehicle details')),
-      backgroundColor: AgrisellColors.homeBackground,
-      body: vehicle == null
-          ? const Center(child: Text('No Rider vehicle is available.'))
-          : RiderVehicleContent(
-              children: [
-                RiderCapacityEditor(
-                  vehicle: vehicle,
-                  onSave: (capacity) async {
-                    await RiderRegistrationService.instance.saveCapacity(
-                      capacity,
-                    );
-                    if (mounted) setState(() {});
-                  },
-                ),
-                _row('Type', vehicle.vehicleType),
-                _row('Brand', vehicle.vehicleBrand ?? 'Not provided'),
-                _row('Model', vehicle.vehicleModel),
-                _row('Color', vehicle.vehicleColor),
-                _row('Plate number', vehicle.plateNumber),
-                _row(
-                  'Registration number',
-                  vehicle.registrationNumber ?? 'Not provided',
-                ),
-                _row(
-                  'Capacity',
-                  vehicle.capacityKg > 0
-                      ? '${vehicle.capacityKg} kg'
-                      : 'Set your cargo capacity',
-                ),
-                _row('Verification', vehicle.verificationStatus.name),
-                const SizedBox(height: 12),
-                FilledButton.icon(
-                  onPressed: _saving ? null : () => _edit(vehicle),
-                  icon: const Icon(Icons.edit_outlined, size: 18),
-                  label: Text(_saving ? 'Saving...' : 'Edit vehicle'),
-                ),
-              ],
-            ),
+    return Theme(
+      data: Theme.of(
+        context,
+      ).copyWith(appBarTheme: RiderProfileDesignStyles.appBar),
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Vehicle details')),
+        backgroundColor: RiderProfileDesignStyles.background,
+        body: vehicle == null
+            ? const Center(child: Text('No Rider vehicle is available.'))
+            : RiderVehicleContent(
+                children: [
+                  RiderVehicleOverview(
+                    vehicle: vehicle,
+                    onEdit: _saving ? null : () => _edit(vehicle),
+                  ),
+                  const SizedBox(height: 16),
+                  RiderCapacityEditor(
+                    vehicle: vehicle,
+                    onSave: (capacity) async {
+                      await RiderRegistrationService.instance.saveCapacity(
+                        capacity,
+                      );
+                      if (mounted) setState(() {});
+                    },
+                  ),
+                ],
+              ),
+      ),
     );
   }
-
-  Widget _row(String label, String value) => Card(
-    child: ListTile(
-      title: Text(label, style: SharedPresentationStyles.caption),
-      subtitle: Text(value, style: SharedPresentationStyles.bodyBold),
-    ),
-  );
 
   Future<void> _edit(RiderVehicle vehicle) async {
     final values = await showDialog<List<String>>(

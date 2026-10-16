@@ -1,5 +1,11 @@
 import 'package:agresell_app/features/rider/presentation/widgets/rider_safe_scaffold.dart';
-import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_pickup_methods_section_styles.dart';
+import '../styles/rider_pickup_design_styles.dart';
+import '../styles/rider_delivery_reference_styles.dart';
+import '../widgets/rider_detail_card.dart';
+import '../widgets/rider_pickup_reference_cards.dart';
+import '../widgets/rider_pickup_proof_tile.dart';
+import '../widgets/rider_pickup_product_proof.dart';
+import '../widgets/rider_pickup_feedback.dart';
 import 'dart:async';
 import 'dart:math';
 
@@ -8,18 +14,21 @@ import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/deliveries/data/pickup_proof_storage.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
-import 'package:agresell_app/features/rider/deliveries/domain/delivery_request_metadata.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_status_update.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/pickup_confirmation.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_location_controller.dart';
-import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_pickup_confirmation_styles.dart';
+
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_pickup_problem_dialog.dart';
 
 part 'rider_pickup_confirmation_actions.dart';
 part 'rider_pickup_location_refresh.dart';
 part 'rider_pickup_confirmation_sections.dart';
 part 'rider_pickup_methods_section.dart';
+part 'rider_pickup_recovery.dart';
+part 'rider_pickup_content.dart';
+part 'rider_pickup_problem_actions.dart';
+part 'rider_pickup_gps_section.dart';
 
 class RiderPickupConfirmationScreen extends StatefulWidget {
   const RiderPickupConfirmationScreen({
@@ -27,6 +36,7 @@ class RiderPickupConfirmationScreen extends StatefulWidget {
     required this.riderId,
     required this.controller,
     this.locationController,
+    this.proofStorage,
     super.key,
   });
 
@@ -34,6 +44,7 @@ class RiderPickupConfirmationScreen extends StatefulWidget {
   final String riderId;
   final RiderDeliveryController controller;
   final RiderLocationController? locationController;
+  final PickupProofStorage? proofStorage;
 
   @override
   State<RiderPickupConfirmationScreen> createState() =>
@@ -47,16 +58,21 @@ class _RiderPickupConfirmationScreenState
   final _quantity = TextEditingController();
   final _weight = TextEditingController();
   final _proofs = <PickupConfirmationMethod, String>{};
+  final _photoPaths = <PickupConfirmationMethod, String>{};
   final _checks = <String, bool>{};
-  final _storage = PickupProofStorage();
+  late final _storage = widget.proofStorage ?? PickupProofStorage();
   final _idempotencyKey = Random.secure().nextInt(1 << 32).toString();
   PickupConfiguration? _configuration;
   String? _error;
   List<PickupValidationIssue> _validationIssues = const [];
   var _submitting = false;
   var _refreshingLocation = false;
-  Timer? _waitingTimer;
-  var _now = DateTime.now();
+
+  var _obscureCode = true;
+  var _capturing = false;
+  var _reporting = false;
+  var _problemSaved = false;
+  bool get _busy => _submitting || _capturing || _reporting;
 
   @override
   void initState() {
@@ -87,71 +103,17 @@ class _RiderPickupConfirmationScreenState
     _qr.dispose();
     _quantity.dispose();
     _weight.dispose();
-    _waitingTimer?.cancel();
+
     widget.locationController?.removeListener(_locationChanged);
     super.dispose();
   }
 
-  String get _recoveryScope => 'pickupConfirmation:${widget.request.id}';
-
-  void _restoreRecovery() {
-    final saved = widget.controller.recoveryDataFor(_recoveryScope);
-    _quantity.text = saved['quantity'] as String? ?? '';
-    _weight.text = saved['weight'] as String? ?? '';
-    _checks.addAll(Map<String, bool>.from(saved['checks'] as Map? ?? const {}));
-    final proofs = Map<String, Object?>.from(
-      saved['proofs'] as Map? ?? const <String, Object?>{},
-    );
-    for (final entry in proofs.entries) {
-      _proofs[PickupConfirmationMethod.values.byName(entry.key)] =
-          entry.value as String;
-    }
-  }
-
-  void _saveRecovery() => unawaited(
-    widget.controller.saveRecoveryData(_recoveryScope, {
-      'quantity': _quantity.text,
-      'weight': _weight.text,
-      'checks': _checks,
-      'proofs': _proofs.map((key, value) => MapEntry(key.name, value)),
-    }),
-  );
-
   @override
-  Widget build(BuildContext context) {
-    final config = _configuration;
-    return RiderSafeScaffold(
-      backgroundColor: AgrisellColors.homeBackground,
-      appBar: AppBar(title: const Text('Confirm pickup')),
-      body: config == null
-          ? Center(
-              child: _error == null
-                  ? const CircularProgressIndicator()
-                  : Text(_error!),
-            )
-          : ListView(
-              padding: const EdgeInsets.all(14),
-              children: [
-                _summary(),
-                const SizedBox(height: 12),
-                _methods(config),
-                const SizedBox(height: 12),
-                _checklist(),
-                const SizedBox(height: 12),
-                _action(config),
-              ],
-            ),
-    );
-  }
+  Widget build(BuildContext context) => _buildPickup(context);
 
   void _setConfiguration(PickupConfiguration value) {
     if (!mounted) return;
     setState(() => _configuration = value);
-    if (widget.controller.pickupWaitingStartedAt != null) {
-      _waitingTimer ??= Timer.periodic(const Duration(seconds: 1), (_) {
-        if (mounted) setState(() => _now = DateTime.now());
-      });
-    }
   }
 
   void _setError(String? value) {
@@ -176,8 +138,16 @@ class _RiderPickupConfirmationScreenState
     _saveRecovery();
   }
 
-  void _setProof(PickupConfirmationMethod method, String value) {
-    if (mounted) setState(() => _proofs[method] = value);
+  void _setProof(
+    PickupConfirmationMethod method,
+    String value, {
+    String? imagePath,
+  }) {
+    if (!mounted) return;
+    setState(() {
+      _proofs[method] = value;
+      if (imagePath != null) _photoPaths[method] = imagePath;
+    });
     _saveRecovery();
   }
 
@@ -193,5 +163,33 @@ class _RiderPickupConfirmationScreenState
     final location = widget.locationController?.location;
     widget.controller.updateCurrentRiderLocation(location);
     if (mounted) setState(() {});
+  }
+
+  void _toggleCodeVisibility() => setState(() => _obscureCode = !_obscureCode);
+  void _removeProof(PickupConfirmationMethod method) {
+    setState(() {
+      _proofs.remove(method);
+      _photoPaths.remove(method);
+    });
+    _saveRecovery();
+  }
+
+  void _setCapturing(bool value) {
+    if (mounted) setState(() => _capturing = value);
+  }
+
+  void _setReporting(bool value) {
+    if (mounted) setState(() => _reporting = value);
+  }
+
+  void _setProblemSaved(bool value) {
+    if (mounted)
+      setState(() {
+        _problemSaved = value;
+        if (value) {
+          _error = null;
+          _validationIssues = const [];
+        }
+      });
   }
 }

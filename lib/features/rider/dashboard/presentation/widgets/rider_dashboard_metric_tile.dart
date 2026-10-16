@@ -7,40 +7,36 @@ class _MetricTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => RiderSurfaceCard(
-    padding: RiderDashboardMetricsStyles.tilePadding,
-    child: Row(
+    decoration: RiderHomeDesignStyles.card,
+    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+    child: Column(
       children: [
-        Container(
-          width: RiderDashboardMetricsStyles.tileSize,
-          height: RiderDashboardMetricsStyles.tileSize,
-          alignment: Alignment.center,
-          decoration: RiderDashboardMetricTileStyles.containerDecoration(
-            data.backgroundColor,
-          ),
-          child: Icon(
-            data.icon,
-            color: data.accentColor,
-            size: RiderDashboardMetricsStyles.tileIconSize,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 26,
+              height: 26,
+              alignment: Alignment.center,
+              decoration: RiderDashboardMetricTileStyles.containerDecoration(
+                data.backgroundColor,
+              ),
+              child: Icon(
+                data.icon,
+                color: data.accentColor,
+                size: RiderDashboardMetricsStyles.tileIconSize,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(data.value, style: RiderHomeDesignStyles.metric),
+          ],
         ),
-        RiderDashboardMetricsStyles.horizontalGap,
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                data.value,
-                style: RiderDashboardMetricsStyles.tileValueStyle,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                data.label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: RiderDashboardMetricsStyles.tileLabelStyle,
-              ),
-            ],
-          ),
+        const SizedBox(height: 6),
+        Text(
+          data.label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: RiderHomeDesignStyles.metricLabel,
         ),
       ],
     ),

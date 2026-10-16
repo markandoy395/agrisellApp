@@ -20,6 +20,9 @@ class PickupProofStorage {
   static const _maxBytes = 8 * 1024 * 1024;
   final ImagePicker _picker;
   final bool failUploads;
+  String? _lastCapturedImagePath;
+  // Ephemeral camera preview; proof submission still uses its protected reference.
+  String? get lastCapturedImagePath => _lastCapturedImagePath;
 
   Future<String?> capturePhoto({
     required String deliveryId,
@@ -30,7 +33,13 @@ class PickupProofStorage {
       imageQuality: 88,
     );
     if (image == null) return null;
-    return saveImage(deliveryId: deliveryId, method: method, image: image);
+    final reference = await saveImage(
+      deliveryId: deliveryId,
+      method: method,
+      image: image,
+    );
+    _lastCapturedImagePath = image.path;
+    return reference;
   }
 
   Future<String> saveImage({
@@ -84,11 +93,38 @@ class PickupProofStorage {
     required String deliveryId,
     required PickupConfirmationMethod method,
   }) async {
+    if (method.requiresImage) {
+      throw const PickupProofStorageException(
+        'Capture a photo for this pickup proof.',
+      );
+    }
     if (failUploads) {
       throw const PickupProofStorageException('Proof upload failed.');
     }
     final id = '${method.name}-${DateTime.now().microsecondsSinceEpoch}';
     return 'protected://pickup/$deliveryId/$id';
+  }
+
+  Future<File?> resolveLocalPhoto(String reference) async {
+    final uri = Uri.tryParse(reference);
+    if (uri == null ||
+        uri.scheme != 'local-secure' ||
+        uri.host != 'pickup' ||
+        uri.hasQuery ||
+        uri.hasFragment ||
+        uri.pathSegments.length != 2) {
+      return null;
+    }
+    final name = uri.pathSegments.last;
+    if (!RegExp(
+      r'^pickup-(productPhoto|packagePhoto|farmerSignature)-[0-9]+\.(jpg|jpeg|png|webp)$',
+    ).hasMatch(name))
+      return null;
+    final root = await getApplicationDocumentsDirectory();
+    final file = File('${root.path}/$name');
+    if (!await file.exists()) return null;
+    final length = await file.length();
+    return length > 0 && length <= _maxBytes ? file : null;
   }
 }
 

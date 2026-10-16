@@ -41,7 +41,7 @@ abstract final class AgrisellButtonThemes {
   static TextButtonThemeData get textButtonTheme => TextButtonThemeData(
     style: TextButton.styleFrom(
       minimumSize: const Size(48, 38),
-      maximumSize: const Size(double.infinity, 40),
+      // Selection toolbar buttons require at least 48px of height.
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
       textStyle: AppTypography.button,
     ),

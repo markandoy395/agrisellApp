@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../../domain/chat_limits.dart';
 
 import 'package:agresell_app/features/shared/chat/data/marketplace_messaging_repository.dart';
 import 'package:agresell_app/features/shared/chat/domain/marketplace_conversation.dart';
@@ -107,7 +108,12 @@ class MarketplaceMessagingController extends ChangeNotifier {
 
   Future<bool> sendMessage(String conversationId, String rawText) async {
     final text = rawText.trim();
-    if (text.isEmpty || text.length > 1000 || isSending(conversationId)) {
+    if (!ChatLimits.valid(rawText)) {
+      _messageErrors[conversationId] = ChatLimits.lengthError;
+      notifyListeners();
+      return false;
+    }
+    if (isSending(conversationId)) {
       return false;
     }
     final previousConversation = _conversation(conversationId);

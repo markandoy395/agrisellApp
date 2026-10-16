@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:flutter_map/flutter_map.dart';
 
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
@@ -9,12 +10,18 @@ import 'package:agresell_app/features/rider/deliveries/domain/rider_road_access.
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_location_controller.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_route_controller.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/rider_map_camera_policy.dart';
-import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_map_styles.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_live_map.dart';
-import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_map_controls.dart';
+import '../../domain/rider_map_visibility.dart';
+import '../../domain/delivery_status.dart';
+import 'rider_map_toolbar.dart';
+import 'rider_map_options_sheet.dart';
+import 'rider_map_maneuver_banner.dart';
+import 'rider_map_discovery_sheet.dart';
+import 'rider_map_navigation_sheet.dart';
+import 'rider_map_status_control.dart';
+import 'rider_map_floating_controls.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_map_location_fallback.dart';
-import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_map_overlays.dart';
-import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_route_panel.dart';
+part 'rider_map_content_layout.dart';
 
 class RiderMapContent extends StatelessWidget {
   const RiderMapContent({
@@ -41,6 +48,15 @@ class RiderMapContent extends StatelessWidget {
     required this.onOpenList,
     required this.onMapReady,
     required this.onPositionChanged,
+    this.visibility = const RiderMapVisibility(),
+    this.onVisibilityChanged,
+    this.online,
+    this.onOnlineChanged,
+    this.onOpenNotifications,
+    this.unreadNotifications = 0,
+    this.onOpenDelivery,
+    this.onMessage,
+    this.statusFor,
     super.key,
   });
 
@@ -68,104 +84,17 @@ class RiderMapContent extends StatelessWidget {
   final VoidCallback onMapReady;
   final PositionCallback onPositionChanged;
 
+  final RiderMapVisibility visibility;
+  final ValueChanged<RiderMapVisibility>? onVisibilityChanged;
+  final bool? online;
+  final ValueChanged<bool>? onOnlineChanged;
+  final VoidCallback? onOpenNotifications;
+  final int unreadNotifications;
+  final ValueChanged<DeliveryRequest>? onOpenDelivery;
+  final ValueChanged<DeliveryRequest>? onMessage;
+  final DeliveryStatus Function(DeliveryRequest)? statusFor;
+
   @override
-  Widget build(BuildContext context) {
-    final state = controller.state;
-    final location = controller.location;
-    final isLocationReady =
-        (state == RiderLocationState.ready ||
-            state == RiderLocationState.approximateLocation) &&
-        location != null;
-
-    if (!isLocationReady) {
-      return RiderMapLocationFallback(controller: controller);
-    }
-
-    final displayedPoint = routeController.displayPoint(location);
-    final riderPoint =
-        RiderMapCameraPolicy.isCoordinateValid(
-          displayedPoint.latitude,
-          displayedPoint.longitude,
-        )
-        ? displayedPoint
-        : DeliveryRoutePoint(
-            latitude: location.latitude,
-            longitude: location.longitude,
-          );
-    final active = requests
-        .where(
-          (request) =>
-              riderId != null &&
-              request.isAssignedTo(riderId!) &&
-              !request.stage.isTerminal,
-        )
-        .firstOrNull;
-
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: RiderLiveMap(
-            riderPoint: riderPoint,
-            routes: navigationActive ? routeController.routes : const [],
-            activeRoute: navigationActive ? routeController.activeRoute : null,
-            requests: requests,
-            farms: farms,
-            roadAccessConnections: roadAccessConnections,
-            mapController: mapController,
-            riderId: riderId,
-            filter: filter,
-            mapZoom: mapZoom,
-            discoveryRadiusKm: discoveryRadiusKm,
-            onMarkerTap: onMarkerTap,
-            onFarmTap: onFarmTap,
-            onMapReady: onMapReady,
-            onPositionChanged: onPositionChanged,
-          ),
-        ),
-        Positioned(
-          left: 12,
-          right: 12,
-          top: 0,
-          child: RiderMapTopOverlay(
-            discoveryRadiusKm: discoveryRadiusKm,
-            farmsLoading: farmsLoading,
-            filter: filter,
-            farmDiscoveryError: farmDiscoveryError,
-            activeRequest: active,
-            navigationActive: navigationActive,
-            onOpenList: onOpenList,
-            onRefresh: onRefresh,
-            onFilterChanged: onFilterChanged,
-            onNavigateActive: () {
-              if (active != null) onNavigateActive(active);
-            },
-          ),
-        ),
-        Positioned(
-          right: RiderMapStyles.controlsRight,
-          bottom: RiderMapStyles.controlsBottom(
-            navigationActive: navigationActive,
-          ),
-          child: RiderMapControls(
-            mapController: mapController,
-            onRecenter: onRecenter,
-          ),
-        ),
-        if (navigationActive)
-          Positioned(
-            left: 12,
-            right: 12,
-            bottom: RiderMapStyles.routePanelBottom,
-            child: RiderRoutePanel(
-              controller: routeController,
-              requests: requests,
-              location: location,
-              locationController: controller,
-              showRequestPicker: false,
-              onExitNavigation: onExitNavigation,
-            ),
-          ),
-      ],
-    );
-  }
+  Widget build(BuildContext context) =>
+      Material(color: AgrisellColors.homeBackground, child: _buildMap(context));
 }

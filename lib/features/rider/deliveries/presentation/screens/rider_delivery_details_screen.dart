@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 
 import 'package:flutter/material.dart';
+import '../widgets/rider_delivery_details_header.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:agresell_app/core/widgets/app_snack_bar.dart';
+import '../utils/rider_delivery_message.dart';
+import '../delivery_status_presentation.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_action_result.dart';
 import 'package:agresell_app/features/rider/deliveries/data/delivery_proof_storage.dart';
@@ -19,7 +21,7 @@ import 'package:agresell_app/features/rider/deliveries/presentation/widgets/ride
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_detail_utilities.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_action_panel.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_cancel_dialog.dart';
-import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_progress_timeline.dart';
+
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_quick_actions.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_problem_dialog.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_report_status_card.dart';
@@ -28,17 +30,26 @@ import 'package:agresell_app/features/rider/deliveries/presentation/widgets/ride
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_manual_arrival_dialog.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/screens/rider_pickup_confirmation_screen.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/screens/rider_delivery_confirmation_screen.dart';
-import 'package:agresell_app/features/rider/presentation/widgets/rider_page_widgets.dart';
+
 import 'package:agresell_app/features/rider/safety/presentation/widgets/rider_safety_report_dialog.dart';
 import 'package:agresell_app/features/rider/safety/presentation/controllers/rider_safety_report_controller.dart';
 import 'package:agresell_app/features/rider/safety/domain/rider_safety_report.dart';
-import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_request_overview.dart';
+
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_evidence_view.dart';
-import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_request_detail_sections.dart';
+
 import 'package:agresell_app/features/shared/waybills/presentation/widgets/delivery_waybill_sheet.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_delivery_details_styles.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/utils/rider_delivery_waybill_extension.dart';
 
+import '../styles/rider_delivery_reference_styles.dart';
+import '../widgets/rider_detail_card.dart';
+import '../widgets/rider_detail_product_card.dart';
+import '../widgets/rider_detail_location_card.dart';
+import '../widgets/rider_detail_earnings_card.dart';
+import '../widgets/rider_detail_other_information.dart';
+import '../widgets/rider_detail_route_preview.dart';
+import '../widgets/rider_detail_progress.dart';
+import '../widgets/rider_detail_delivery_information.dart';
 part 'rider_delivery_details_acceptance.dart';
 part 'rider_delivery_details_status.dart';
 part 'rider_delivery_details_content.dart';
@@ -155,11 +166,8 @@ class _RiderDeliveryDetailsScreenState
     );
   }
 
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showAppSnackBar(SnackBar(content: Text(message)));
-  }
+  void _showMessage(String message) =>
+      showRiderDeliveryMessage(context, message);
 
   Future<bool> _launchRoute(Uri uri) =>
       widget.routeLauncher?.call(uri) ??

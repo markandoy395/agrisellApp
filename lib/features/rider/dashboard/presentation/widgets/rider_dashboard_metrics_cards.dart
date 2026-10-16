@@ -13,6 +13,7 @@ class _EarningsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => RiderSurfaceCard(
+    decoration: RiderHomeDesignStyles.card,
     padding: RiderDashboardMetricsStyles.earningsPadding,
     child: Row(
       children: [
@@ -32,13 +33,16 @@ class _EarningsCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'PHP ${metrics.todayEstimatedEarnings.toStringAsFixed(2)}',
-                style: RiderDashboardMetricsStyles.earningsValueStyle,
-              ),
+              const Text('Earnings', style: RiderHomeDesignStyles.title),
+              const SizedBox(height: 4),
+              if (isAvailable && metrics.todayEstimatedEarnings > 0)
+                Text(
+                  'PHP ${metrics.todayEstimatedEarnings.toStringAsFixed(2)}',
+                  style: RiderDashboardMetricsStyles.earningsValueStyle,
+                ),
               const SizedBox(height: 4),
               Text(
-                !isAvailable
+                !isAvailable || metrics.todayEstimatedEarnings == 0
                     ? 'Earnings will appear after completed deliveries.'
                     : metrics.pendingEarnings == null
                     ? 'Estimated earnings today'
@@ -49,7 +53,13 @@ class _EarningsCard extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        TextButton(onPressed: onOpenEarnings, child: const Text('Open')),
+        TextButton.icon(
+          onPressed: onOpenEarnings,
+          style: RiderHomeDesignStyles.secondaryButton,
+          iconAlignment: IconAlignment.end,
+          icon: const Icon(Icons.chevron_right_rounded, size: 16),
+          label: const Text('Open'),
+        ),
       ],
     ),
   );
@@ -69,10 +79,39 @@ class _CountAction extends StatelessWidget {
   final VoidCallback onPressed;
 
   @override
-  Widget build(BuildContext context) => OutlinedButton.icon(
-    onPressed: onPressed,
-    icon: Icon(icon, size: RiderDashboardMetricsStyles.countActionIconSize),
-    label: Text('$label ($count)', overflow: TextOverflow.ellipsis),
-    style: RiderDashboardMetricsStyles.countActionButtonStyle,
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    label: '$label ($count)',
+    child: InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(16),
+      child: RiderSurfaceCard(
+        decoration: RiderHomeDesignStyles.card,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 18),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: label == 'Messages'
+                  ? AgrisellColors.statusBlueText
+                  : RiderHomeDesignStyles.red,
+            ),
+            const SizedBox(width: 6),
+            Expanded(child: Text(label, style: RiderHomeDesignStyles.body)),
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: RiderHomeDesignStyles.badge,
+              child: Text('$count', style: RiderHomeDesignStyles.badgeText),
+            ),
+            const Icon(
+              Icons.chevron_right_rounded,
+              size: 16,
+              color: RiderHomeDesignStyles.muted,
+            ),
+          ],
+        ),
+      ),
+    ),
   );
 }

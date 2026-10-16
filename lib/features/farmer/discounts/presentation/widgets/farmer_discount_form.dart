@@ -5,6 +5,7 @@ import 'farmer_discount_product_selector.dart';
 import 'farmer_discount_type_choice.dart';
 import 'farmer_discount_form_field.dart';
 import 'farmer_discount_date_button.dart';
+import 'farmer_discount_save_footer.dart';
 
 class FarmerDiscountForm extends StatelessWidget {
   const FarmerDiscountForm({
@@ -165,33 +166,14 @@ class FarmerDiscountForm extends StatelessWidget {
                       style: FarmerDiscountDialogStyles.error,
                     ),
                   ],
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 44,
-                    child: ElevatedButton(
-                      onPressed: form.isSaving ? null : onSave,
-                      style: FarmerDiscountDialogStyles.saveButton,
-                      child: form.isSaving
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: FarmerDiscountDialogStyles.white,
-                              ),
-                            )
-                          : Text(
-                              isEditing
-                                  ? 'Update Promotion'
-                                  : 'Save & Apply Discount',
-                              style: FarmerDiscountDialogStyles.saveLabel,
-                            ),
-                    ),
-                  ),
                 ],
               ),
             ),
+          ),
+          FarmerDiscountSaveFooter(
+            isSaving: form.isSaving,
+            isEditing: isEditing,
+            onSave: onSave,
           ),
         ],
       ),

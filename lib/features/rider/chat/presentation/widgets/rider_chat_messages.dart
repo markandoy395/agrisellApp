@@ -1,53 +1,76 @@
-import 'package:agresell_app/features/rider/chat/presentation/styles/rider_chat_messages_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_profile_intro.dart';
+import '../../domain/rider_communication_models.dart';
+import '../controllers/rider_messages_controller.dart';
+import '../styles/rider_chat_messages_styles.dart';
+import '../styles/rider_messaging_design_styles.dart';
 import 'rider_chat_panel.dart';
-
-import 'package:agresell_app/features/rider/chat/domain/rider_communication_models.dart';
-import 'package:agresell_app/features/rider/chat/presentation/controllers/rider_messages_controller.dart';
-import 'package:agresell_app/features/rider/presentation/widgets/rider_state_cards.dart';
 
 class RiderMessageBody extends StatelessWidget {
   const RiderMessageBody({required this.controller, super.key});
-
   final RiderMessagesController controller;
 
   @override
   Widget build(BuildContext context) {
-    if (controller.isLoadingMessages) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(18),
-          child: RiderLoadingStateCard(
-            title: 'Loading messages',
-            message: 'Getting this delivery conversation ready.',
-          ),
-        ),
-      );
-    }
+    if (controller.isLoadingMessages)
+      return const Center(child: CircularProgressIndicator());
     if (controller.messages.isEmpty) {
       final conversation = controller.selectedConversation!;
       return ListView(
         children: [
           ChatProfileIntro(
             participant: riderChatParticipant(conversation),
-            subtitle: conversation.party.label + ' / Delivery chat',
+            subtitle: '${conversation.party.label} / Delivery chat',
           ),
         ],
       );
     }
-
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
-      itemCount: controller.messages.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 8),
+    final messages = controller.messages;
+    return ListView.builder(
+      key: ValueKey(controller.selectedConversation?.id),
+      reverse: true,
+      padding: const EdgeInsets.fromLTRB(18, 8, 18, 12),
+      itemCount: messages.length,
       itemBuilder: (context, index) {
-        final message = controller.messages[index];
-        return RiderMessageBubble(
-          message: message,
-          onRetry: message.isFailed
-              ? () => controller.retryFailedMessage(message.id)
-              : null,
+        final position = messages.length - 1 - index;
+        final message = messages[position];
+        final date = DateUtils.dateOnly(message.sentAt.toLocal());
+        final showDate =
+            position == 0 ||
+            date != DateUtils.dateOnly(messages[position - 1].sentAt.toLocal());
+        return Column(
+          key: ValueKey(message.id),
+          children: [
+            if (showDate)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 28,
+                    vertical: 6,
+                  ),
+                  decoration: RiderChatMessagesStyles.day,
+                  child: Text(
+                    date == DateUtils.dateOnly(DateTime.now())
+                        ? 'TODAY'
+                        : MaterialLocalizations.of(
+                            context,
+                          ).formatShortDate(date),
+                    style: RiderMessagingDesignStyles.caption,
+                  ),
+                ),
+              ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 14),
+              child: RiderMessageBubble(
+                message: message,
+                onRetry: message.isFailed
+                    ? () => controller.retryFailedMessage(message.id)
+                    : null,
+              ),
+            ),
+          ],
         );
       },
     );
@@ -56,42 +79,87 @@ class RiderMessageBody extends StatelessWidget {
 
 class RiderMessageBubble extends StatelessWidget {
   const RiderMessageBubble({required this.message, this.onRetry, super.key});
-
   final RiderChatMessage message;
   final Future<bool> Function()? onRetry;
 
   @override
   Widget build(BuildContext context) {
     final sentByRider = message.sender == RiderMessageSender.rider;
+    final system =
+        message.sender == RiderMessageSender.system ||
+        message.kind == RiderMessageKind.deliveryUpdate ||
+        message.kind == RiderMessageKind.system;
+    final time = MaterialLocalizations.of(
+      context,
+    ).formatTimeOfDay(TimeOfDay.fromDateTime(message.sentAt.toLocal()));
+    if (system)
+      return Column(
+        children: [
+          Text('Delivery update', style: RiderMessagingDesignStyles.caption),
+          const SizedBox(height: 4),
+          Text(
+            '${riderMessageText(message)} · $time',
+            textAlign: TextAlign.center,
+            style: RiderMessagingDesignStyles.muted,
+          ),
+        ],
+      );
     return Align(
       alignment: sentByRider ? Alignment.centerRight : Alignment.centerLeft,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 270),
-        child: DecoratedBox(
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.sizeOf(context).width * .8,
+        ),
+        child: Container(
           decoration: RiderChatMessagesStyles.decoratedBoxDecoration(
             sentByRider,
           ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  riderMessageText(message),
-                  style: RiderChatMessagesStyles.textStyle(sentByRider),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                riderMessageText(message),
+                style: RiderMessagingDesignStyles.body,
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (sentByRider) ...[
+                    Icon(
+                      switch (message.status) {
+                        RiderMessageDeliveryStatus.read =>
+                          Icons.done_all_rounded,
+                        RiderMessageDeliveryStatus.delivered =>
+                          Icons.done_all_rounded,
+                        RiderMessageDeliveryStatus.pending =>
+                          Icons.schedule_rounded,
+                        RiderMessageDeliveryStatus.failed =>
+                          Icons.error_outline_rounded,
+                        _ => Icons.check_rounded,
+                      },
+                      size: 16,
+                      color: message.isFailed
+                          ? AgrisellColors.statusRedText
+                          : AgrisellColors.authGreen,
+                    ),
+                    const SizedBox(width: 6),
+                  ],
+                  Flexible(
+                    child: Text(
+                      sentByRider ? '$time · ${_statusLabel(message)}' : time,
+                      style: RiderChatMessagesStyles.textStyle2,
+                    ),
+                  ),
+                ],
+              ),
+              if (onRetry != null)
+                TextButton(
+                  onPressed: () => onRetry!(),
+                  child: const Text('Retry'),
                 ),
-                if (sentByRider)
-                  Text(
-                    _statusLabel(message),
-                    style: RiderChatMessagesStyles.textStyle2,
-                  ),
-                if (onRetry != null)
-                  TextButton(
-                    onPressed: () => onRetry!(),
-                    child: const Text('Retry'),
-                  ),
-              ],
-            ),
+            ],
           ),
         ),
       ),

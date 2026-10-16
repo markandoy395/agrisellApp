@@ -9,8 +9,8 @@ abstract final class FarmerProductEditFormPanelStyles {
     borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
   );
 
-  static EdgeInsets panelPadding(double bottomInset) =>
-      EdgeInsets.fromLTRB(25, 31, 25, 30 + bottomInset);
+  static const panelPadding = EdgeInsets.fromLTRB(25, 31, 25, 30);
+  static const footerPadding = EdgeInsets.fromLTRB(25, 12, 25, 24);
 
   static const rowSpacing = SizedBox(height: 20);
   static const actionSpacing = SizedBox(height: 36);
@@ -24,9 +24,7 @@ abstract final class FarmerProductEditFormPanelStyles {
   static final activeBannerDecoration = BoxDecoration(
     color: AgrisellColors.forestSoft,
     borderRadius: BorderRadius.circular(10),
-    border: Border.all(
-      color: AgrisellColors.authGreen.withValues(alpha: 0.3),
-    ),
+    border: Border.all(color: AgrisellColors.authGreen.withValues(alpha: 0.3)),
   );
 
   static const activeBannerTitleStyle = TextStyle(
@@ -57,9 +55,7 @@ abstract final class FarmerProductEditFormPanelStyles {
   static final inactiveBannerDecoration = BoxDecoration(
     color: AgrisellColors.homeBackground,
     borderRadius: BorderRadius.circular(10),
-    border: Border.all(
-      color: AgrisellColors.borderLine,
-    ),
+    border: Border.all(color: AgrisellColors.borderLine),
   );
 
   static const inactiveBannerTitleStyle = TextStyle(
@@ -79,9 +75,7 @@ abstract final class FarmerProductEditFormPanelStyles {
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
     minimumSize: Size.zero,
     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(6),
-    ),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
   );
 
   static const putOnSaleButtonTextStyle = TextStyle(

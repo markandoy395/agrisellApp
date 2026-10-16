@@ -1,3 +1,4 @@
+import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
@@ -90,7 +91,7 @@ class _CreateSupportTicketScreenState extends State<CreateSupportTicketScreen> {
     setState(() => _isSubmitting = false);
 
     if (created != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showAppSnackBar(
         CreateSupportTicketStyles.successSnackBar(created.ticketNumber),
       );
 
@@ -104,7 +105,7 @@ class _CreateSupportTicketScreenState extends State<CreateSupportTicketScreen> {
         ),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showAppSnackBar(
         CreateSupportTicketStyles.errorSnackBar(
           _controller.errorMessage ?? 'Failed to submit support ticket.',
         ),

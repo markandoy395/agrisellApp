@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-
-import 'package:agresell_app/core/theme/app_dropdown_style.dart';
-import 'package:agresell_app/features/rider/deliveries/domain/rider_request_query.dart';
-import 'package:agresell_app/features/rider/deliveries/presentation/styles/rider_request_filter_sheet_styles.dart';
-import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_request_filter_choices.dart';
+import '../../domain/rider_request_query.dart';
+import '../styles/rider_deliveries_design_styles.dart';
+import 'rider_request_filter_controls.dart';
+import 'rider_request_category_filter.dart';
 
 Future<RiderRequestFilters?> showRiderRequestFilterSheet(
   BuildContext context,
@@ -13,6 +12,7 @@ Future<RiderRequestFilters?> showRiderRequestFilterSheet(
   context: context,
   isScrollControlled: true,
   showDragHandle: true,
+  useSafeArea: true,
   builder: (_) =>
       _RiderRequestFilterSheet(initial: initial, categories: categories),
 );
@@ -31,6 +31,7 @@ class _RiderRequestFilterSheet extends StatefulWidget {
 }
 
 class _RiderRequestFilterSheetState extends State<_RiderRequestFilterSheet> {
+  final _form = GlobalKey<FormState>();
   late bool _urgent = widget.initial.urgentOnly;
   late bool _scheduled = widget.initial.scheduledOnly;
   late bool _perishable = widget.initial.perishableOnly;
@@ -43,131 +44,146 @@ class _RiderRequestFilterSheetState extends State<_RiderRequestFilterSheet> {
 
   @override
   Widget build(BuildContext context) => SafeArea(
+    top: false,
     child: Padding(
-      padding: RiderRequestFilterSheetStyles.sheetPadding(
-        MediaQuery.viewInsetsOf(context).bottom,
+      padding: EdgeInsets.fromLTRB(
+        18,
+        0,
+        18,
+        18 + MediaQuery.viewInsetsOf(context).bottom,
       ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Filter nearby requests',
-              style: RiderRequestFilterSheetStyles.headerTitleStyle,
-            ),
-            CheckboxListTile(
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Urgent only'),
-              value: _urgent,
-              onChanged: (value) => setState(() => _urgent = value ?? false),
-            ),
-            CheckboxListTile(
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Scheduled only'),
-              value: _scheduled,
-              onChanged: (value) => setState(() => _scheduled = value ?? false),
-            ),
-            CheckboxListTile(
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Perishable only'),
-              value: _perishable,
-              onChanged: (value) =>
-                  setState(() => _perishable = value ?? false),
-            ),
-            RiderRequestFilterSheetStyles.sectionSpacing,
-            RiderDoubleFilterChoices(
-              label: 'Maximum pickup distance',
-              value: _distance,
-              values: const [5, 10, 15],
-              formatLabel: (val) => '${val.round()} km',
-              onChanged: (val) => setState(() => _distance = val),
-            ),
-            if (widget.categories.isNotEmpty) ...[
-              RiderRequestFilterSheetStyles.sectionSpacing,
-              DropdownButtonFormField<String?>(
-                dropdownColor: AppDropdownStyle.menuColor,
-                borderRadius: AppDropdownStyle.menuBorderRadius,
-                style: AppDropdownStyle.textStyle,
-                iconEnabledColor: AppDropdownStyle.iconColor,
-                initialValue: _category,
-                decoration:
-                    RiderRequestFilterSheetStyles.categoryInputDecoration,
-                items: [
-                  const DropdownMenuItem(value: null, child: Text('Any')),
-                  for (final category in widget.categories)
-                    DropdownMenuItem(value: category, child: Text(category)),
-                ],
-                onChanged: (value) => setState(() => _category = value),
-              ),
-            ],
-            RiderRequestFilterSheetStyles.sectionSpacing,
-            RiderMinuteFilterChoices(
-              label: 'Pickup deadline within',
-              value: _pickupMinutes,
-              values: const [30, 60, 120],
-              onChanged: (value) => setState(() => _pickupMinutes = value),
-            ),
-            RiderMinuteFilterChoices(
-              label: 'Delivery deadline within',
-              value: _deliveryMinutes,
-              values: const [60, 120, 240],
-              onChanged: (value) => setState(() => _deliveryMinutes = value),
-            ),
-            RiderRequestFilterSheetStyles.sectionSpacing,
-            RiderDoubleFilterChoices(
-              label: 'Minimum estimated earning',
-              value: _minimumFee,
-              values: const [100, 150, 200],
-              formatLabel: (val) => 'PHP ${val.round()}',
-              onChanged: (val) => setState(() => _minimumFee = val),
-            ),
-            RiderRequestFilterSheetStyles.sectionSpacing,
-            RiderDoubleFilterChoices(
-              label: 'Maximum estimated earning',
-              value: _maximumFee,
-              values: const [150, 200, 250],
-              formatLabel: (val) => 'PHP ${val.round()}',
-              onChanged: (val) => setState(() => _maximumFee = val),
-            ),
-            RiderRequestFilterSheetStyles.actionSpacing,
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () =>
-                        Navigator.pop(context, const RiderRequestFilters()),
-                    child: const Text('Reset filters'),
-                  ),
-                ),
-                RiderRequestFilterSheetStyles.buttonSpacing,
-                Expanded(
-                  child: FilledButton(
-                    onPressed: () => Navigator.pop(
-                      context,
-                      RiderRequestFilters(
-                        urgentOnly: _urgent,
-                        scheduledOnly: _scheduled,
-                        perishableOnly: _perishable,
-                        maximumPickupDistanceKm: _distance,
-                        minimumFee: _minimumFee,
-                        maximumFee: _maximumFee,
-                        category: _category,
-                        pickupWithinMinutes: _pickupMinutes,
-                        deliveryWithinMinutes: _deliveryMinutes,
-                      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: SingleChildScrollView(
+              child: Form(
+                key: _form,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            'Filter nearby requests',
+                            style: RiderDeliveriesDesignStyles.title,
+                          ),
+                        ),
+                        IconButton(
+                          tooltip: 'Close filters',
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.close),
+                        ),
+                      ],
                     ),
-                    child: const Text('Apply filters'),
-                  ),
+                    _toggle(
+                      'Urgent only',
+                      Icons.error_outline,
+                      _urgent,
+                      (value) => setState(() => _urgent = value),
+                    ),
+                    _toggle(
+                      'Scheduled only',
+                      Icons.calendar_today_outlined,
+                      _scheduled,
+                      (value) => setState(() => _scheduled = value),
+                    ),
+                    _toggle(
+                      'Perishable only',
+                      Icons.eco_outlined,
+                      _perishable,
+                      (value) => setState(() => _perishable = value),
+                    ),
+                    const Divider(height: 24),
+                    RiderDistanceFilter(
+                      value: _distance,
+                      onChanged: (value) => setState(() => _distance = value),
+                    ),
+                    const SizedBox(height: 18),
+                    RiderRequestCategoryFilter(
+                      categories: widget.categories,
+                      value: _category,
+                      onChanged: (value) => setState(() => _category = value),
+                    ),
+                    const SizedBox(height: 18),
+                    RiderDeadlineFilter(
+                      label: 'Pickup deadline',
+                      value: _pickupMinutes,
+                      values: const [30, 60, 120],
+                      onChanged: (value) =>
+                          setState(() => _pickupMinutes = value),
+                    ),
+                    const SizedBox(height: 18),
+                    RiderDeadlineFilter(
+                      label: 'Delivery deadline',
+                      value: _deliveryMinutes,
+                      values: const [60, 120, 240],
+                      onChanged: (value) =>
+                          setState(() => _deliveryMinutes = value),
+                    ),
+                    const SizedBox(height: 18),
+                    RiderEarningFilter(
+                      label: 'Minimum estimated earning',
+                      value: _minimumFee,
+                      onChanged: (value) => _minimumFee = value,
+                    ),
+                    const SizedBox(height: 18),
+                    RiderEarningFilter(
+                      label: 'Maximum estimated earning',
+                      value: _maximumFee,
+                      onChanged: (value) => _maximumFee = value,
+                      validator: (value) =>
+                          value != null &&
+                              _minimumFee != null &&
+                              value < _minimumFee!
+                          ? 'Must be at least the minimum earning'
+                          : null,
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 14),
+          RiderRequestFilterActions(
+            onReset: () => Navigator.pop(context, const RiderRequestFilters()),
+            onApply: _apply,
+          ),
+        ],
       ),
     ),
   );
+
+  Widget _toggle(
+    String label,
+    IconData icon,
+    bool value,
+    ValueChanged<bool> onChanged,
+  ) => SwitchListTile(
+    contentPadding: EdgeInsets.zero,
+    secondary: Icon(icon),
+    title: Text(label, style: RiderDeliveriesDesignStyles.body),
+    value: value,
+    onChanged: onChanged,
+  );
+
+  void _apply() {
+    if (!_form.currentState!.validate()) return;
+    Navigator.pop(
+      context,
+      RiderRequestFilters(
+        urgentOnly: _urgent,
+        scheduledOnly: _scheduled,
+        perishableOnly: _perishable,
+        maximumPickupDistanceKm: _distance,
+        minimumFee: _minimumFee,
+        maximumFee: _maximumFee,
+        category: _category,
+        pickupWithinMinutes: _pickupMinutes,
+        deliveryWithinMinutes: _deliveryMinutes,
+      ),
+    );
+  }
 }

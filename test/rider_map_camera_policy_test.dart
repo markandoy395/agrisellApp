@@ -15,6 +15,7 @@ void main() {
 
         expect(padding.horizontal, lessThan(viewport.width));
         expect(padding.vertical, lessThan(viewport.height));
+        expect(padding.bottom, greaterThan(viewport.height * .46));
       }
     });
 

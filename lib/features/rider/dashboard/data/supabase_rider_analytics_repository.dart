@@ -6,12 +6,14 @@ import 'package:agresell_app/features/rider/dashboard/data/rider_delivery_analyt
 import 'package:agresell_app/features/rider/dashboard/domain/rider_analytics_models.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_history_models.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_rating_models.dart';
-import 'package:agresell_app/features/rider/dashboard/domain/rider_withdrawal_models.dart';
+import 'supabase_rider_withdrawals.dart';
 import 'package:agresell_app/features/rider/deliveries/data/rider_delivery_repository.dart';
 import 'package:agresell_app/features/rider/deliveries/data/supabase_delivery_data_source.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_completion.dart';
 
-class SupabaseRiderAnalyticsRepository implements RiderAnalyticsRepository {
+class SupabaseRiderAnalyticsRepository
+    with SupabaseRiderWithdrawals
+    implements RiderAnalyticsRepository {
   SupabaseRiderAnalyticsRepository({SupabaseClient? client})
     : _client = client ?? AgrisellSupabase.client {
     _deliveries = SupabaseRiderDeliveryRepository(
@@ -20,6 +22,8 @@ class SupabaseRiderAnalyticsRepository implements RiderAnalyticsRepository {
   }
 
   final SupabaseClient _client;
+  @override
+  SupabaseClient get payoutClient => _client;
   late final RiderDeliveryRepository _deliveries;
 
   @override
@@ -86,90 +90,6 @@ class SupabaseRiderAnalyticsRepository implements RiderAnalyticsRepository {
         'p_comment': submission.comment,
       },
     );
-  }
-
-  @override
-  Future<List<RiderWithdrawalMethod>> fetchWithdrawalMethods({
-    required String riderId,
-  }) async {
-    try {
-      final value = await _client.rpc<Object?>(
-        'current_user_withdrawal_methods',
-        params: {'p_user_role': 'rider'},
-      );
-      return _rows(value)
-          .map(RiderWithdrawalMethod.fromJson)
-          .toList(growable: false);
-    } catch (_) {
-      return const [];
-    }
-  }
-
-  @override
-  Future<RiderWithdrawalMethod> saveWithdrawalMethod({
-    required String riderId,
-    required RiderWithdrawalMethod method,
-  }) async {
-    final value = await _client.rpc<Object?>(
-      'save_user_withdrawal_method',
-      params: {
-        'p_payout_method': method.payoutMethod,
-        'p_account_name': method.accountName,
-        'p_account_number': method.accountNumber,
-        'p_bank_name': method.bankName.isNotEmpty ? method.bankName : null,
-        'p_is_default': method.isDefault,
-        'p_user_role': 'rider',
-      },
-    );
-    return RiderWithdrawalMethod.fromJson(_map(value));
-  }
-
-  @override
-  Future<void> deleteWithdrawalMethod({
-    required String riderId,
-    required String methodId,
-  }) async {
-    await _client.rpc<Object?>(
-      'delete_user_withdrawal_method',
-      params: {'p_method_id': methodId},
-    );
-  }
-
-  @override
-  Future<RiderWithdrawalRequest> submitWithdrawalRequest({
-    required String riderId,
-    required RiderWithdrawalRequest request,
-  }) async {
-    final value = await _client.rpc<Object?>(
-      'submit_payout_request',
-      params: {
-        'p_amount': request.amount,
-        'p_payout_method': request.payoutMethod,
-        'p_account_name': request.accountName,
-        'p_account_number': request.accountNumber,
-        'p_bank_name': request.bankName.isNotEmpty ? request.bankName : null,
-        'p_notes': request.notes.isNotEmpty ? request.notes : null,
-        'p_user_role': 'rider',
-      },
-    );
-    return RiderWithdrawalRequest.fromJson(_map(value));
-  }
-
-  @override
-  Future<List<RiderWithdrawalRequest>> fetchWithdrawalRequests({
-    required String riderId,
-  }) async {
-    try {
-      final value = await _client.rpc<Object?>(
-        'current_user_payout_requests',
-        params: {'p_user_role': 'rider'},
-      );
-      return _rows(value)
-          .map(RiderWithdrawalRequest.fromJson)
-          .toList(growable: false);
-    } catch (_) {
-      return const [];
-    }
   }
 
   Future<RiderDeliveryAnalyticsRepository> _deliveryDelegate(

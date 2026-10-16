@@ -28,7 +28,6 @@ class RiderDeliveryConfirmationForm extends StatelessWidget {
     required this.onBuyerConfirmed,
     required this.onCaptureSignature,
     required this.onCapturePhoto,
-    required this.onSubmit,
     this.cashCollectionSection,
     super.key,
   });
@@ -49,7 +48,6 @@ class RiderDeliveryConfirmationForm extends StatelessWidget {
   final ValueChanged<bool> onBuyerConfirmed;
   final VoidCallback onCaptureSignature;
   final VoidCallback onCapturePhoto;
-  final VoidCallback onSubmit;
   final Widget? cashCollectionSection;
 
   bool _requires(DeliveryConfirmationMethod method) =>
@@ -133,14 +131,6 @@ class RiderDeliveryConfirmationForm extends StatelessWidget {
                     '${location!.longitude.toStringAsFixed(5)} '
                     '(±${location!.accuracyMeters.toStringAsFixed(0)} m)',
           style: RiderDeliveryConfirmationStyles.gpsText,
-        ),
-      ),
-      const SizedBox(height: RiderDeliveryConfirmationStyles.spacing14),
-      SizedBox(
-        height: RiderDeliveryConfirmationStyles.submitButtonHeight,
-        child: FilledButton(
-          onPressed: isSubmitting ? null : onSubmit,
-          child: Text(isSubmitting ? 'Confirming...' : 'Complete delivery'),
         ),
       ),
     ],

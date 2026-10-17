@@ -63,4 +63,36 @@ void main() {
     expect(find.text('Set up your farm'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('skipping farm name closes dialog and returns empty string', (
+    tester,
+  ) async {
+    String? result;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => FilledButton(
+              onPressed: () async {
+                result = await showFarmCreationDialog(context);
+              },
+              child: const Text('Open'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+    expect(find.text('Skip'), findsOneWidget);
+
+    await tester.tap(find.text('Skip'));
+    await tester.pumpAndSettle();
+
+    expect(result, '');
+    expect(find.text('Set up your farm'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 }

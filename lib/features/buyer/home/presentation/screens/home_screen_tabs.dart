@@ -30,9 +30,7 @@ extension _HomeScreenTabs on _HomeScreenState {
           onUnreadCountChanged: _setNotificationUnreadCount,
         ),
       ),
-      HomeScreen.profileNavIndex => const _KeepAliveTab(
-        child: ProfileScreen(showSettingsIcon: true),
-      ),
+      HomeScreen.profileNavIndex => const _KeepAliveTab(child: ProfileScreen()),
       _ => const SizedBox.shrink(),
     };
   }

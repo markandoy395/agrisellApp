@@ -87,7 +87,10 @@ void main() {
     expect(account.extensionName, 'Jr.');
     expect(account.phoneNumber, '+639171234567');
     expect(account.dateOfBirth, '2000-01-01');
-    expect(account.shippingAddress, 'Purok 5, Lianga, Surigao del Sur');
+    expect(
+      account.shippingAddress,
+      'Purok 5, Barangay Poblacion, Lianga, Surigao del Sur, Philippines',
+    );
     expect(account.role, 'buyer');
     expect(find.byType(CustomBottomNavBar), findsOneWidget);
     expect(

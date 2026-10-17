@@ -22,12 +22,15 @@ class FarmerSignupGenderChoice extends StatelessWidget {
       children: [
         const Text('Gender', style: FarmerSignupGenderChoiceStyles.genderText),
         const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(child: _choice('Male')),
-            const SizedBox(width: 10),
-            Expanded(child: _choice('Female')),
-          ],
+        ValueListenableBuilder<TextEditingValue>(
+          valueListenable: controller,
+          builder: (context, _, _) => Row(
+            children: [
+              Expanded(child: _choice('Male')),
+              const SizedBox(width: 10),
+              Expanded(child: _choice('Female')),
+            ],
+          ),
         ),
       ],
     ),

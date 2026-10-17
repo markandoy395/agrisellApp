@@ -10,8 +10,8 @@ const riderBottomNavItems = [
   ),
   HomeBottomNavItem(
     label: 'Deliveries',
-    iconData: Icons.local_shipping_outlined,
-    activeIconData: Icons.local_shipping_rounded,
+    iconData: Icons.delivery_dining_outlined,
+    activeIconData: Icons.delivery_dining_rounded,
   ),
   HomeBottomNavItem(
     label: 'Map',
@@ -20,12 +20,12 @@ const riderBottomNavItems = [
   ),
   HomeBottomNavItem(
     label: 'Messages',
-    iconData: Icons.sms_outlined,
-    activeIconData: Icons.sms_rounded,
+    iconData: Icons.chat_bubble_outline_rounded,
+    activeIconData: Icons.chat_bubble_rounded,
   ),
   HomeBottomNavItem(
     label: 'Profile',
-    iconData: Icons.person_outline_rounded,
-    activeIconData: Icons.person_rounded,
+    iconData: Icons.account_circle_outlined,
+    activeIconData: Icons.account_circle_rounded,
   ),
 ];

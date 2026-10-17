@@ -11,6 +11,7 @@ class FarmerSignupControls extends StatelessWidget {
     required this.onPrevious,
     required this.onNext,
     required this.onLogin,
+    required this.onSkip,
     super.key,
   });
 
@@ -19,6 +20,7 @@ class FarmerSignupControls extends StatelessWidget {
   final VoidCallback onPrevious;
   final VoidCallback onNext;
   final VoidCallback onLogin;
+  final VoidCallback onSkip;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -54,16 +56,19 @@ class FarmerSignupControls extends StatelessWidget {
           ),
         ],
       ),
+      if (step == 2)
+        TextButton(
+          onPressed: isSubmitting ? null : onSkip,
+          style: FarmerSignUpStyles.loginButtonStyle,
+          child: const Text('Skip for now'),
+        ),
       const SizedBox(height: 16),
       const Row(
         children: [
           Expanded(child: Divider(color: AgrisellColors.borderLine)),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 14),
-            child: Text(
-              'OR',
-              style: FarmerSignUpStyles.orDividerTextStyle,
-            ),
+            child: Text('OR', style: FarmerSignUpStyles.orDividerTextStyle),
           ),
           Expanded(child: Divider(color: AgrisellColors.borderLine)),
         ],

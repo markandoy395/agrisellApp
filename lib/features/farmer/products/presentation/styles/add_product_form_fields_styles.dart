@@ -10,6 +10,23 @@ abstract final class AddProductFormFieldsStyles {
     fontWeight: FontWeight.w600,
   );
 
+  static const suffixIconConstraints = BoxConstraints(
+    minWidth: 40,
+    minHeight: 32,
+  );
+
+  static final sampleDescriptionButtonStyle = IconButton.styleFrom(
+    backgroundColor: AgrisellColors.forestSoft,
+    foregroundColor: AgrisellColors.authGreen,
+    padding: const EdgeInsets.all(6),
+    minimumSize: const Size(30, 30),
+    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+      side: const BorderSide(color: AgrisellColors.borderLine),
+    ),
+  );
+
   static InputDecoration inputDecoration(
     String? prefixText,
     String? suffixText,
@@ -18,13 +35,17 @@ abstract final class AddProductFormFieldsStyles {
     OutlineInputBorder value5,
     OutlineInputBorder value6,
     OutlineInputBorder value7,
-    OutlineInputBorder value8,
-  ) => InputDecoration(
+    OutlineInputBorder value8, {
+    Widget? suffixIcon,
+    BoxConstraints? suffixIconConstraints,
+  }) => InputDecoration(
     isDense: true,
     filled: true,
     fillColor: AgrisellColors.searchBackground,
     prefixText: prefixText,
     suffixText: suffixText,
+    suffixIcon: suffixIcon,
+    suffixIconConstraints: suffixIconConstraints,
     hintText: hintText,
     errorText: errorText,
     counterText: '',

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
@@ -14,6 +16,7 @@ import 'package:agresell_app/features/auth/presentation/widgets/auth_scaffold.da
 import 'package:agresell_app/features/auth/presentation/widgets/sign_up_credentials_step.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/sign_up_personal_info_step.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/sign_up_progress_bar.dart';
+import 'package:agresell_app/features/shared/location/data/psgc_address_service.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({
@@ -46,6 +49,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void initState() {
     super.initState();
     _coordinator = SignUpFlowCoordinator(role: widget.role);
+    unawaited(PsgcAddressService.instance.provinces());
+    unawaited(PsgcAddressService.instance.citiesMunicipalities());
     final initialEmail = widget.initialVerifiedEmail?.trim().toLowerCase();
     if (initialEmail != null && initialEmail.isNotEmpty) {
       _form.email.text = initialEmail;
@@ -112,7 +117,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       contactNumber: _form.contactNumber.text.trim(),
       dateOfBirth: _form.dateOfBirth.text.trim(),
       gender: _form.gender.text.trim(),
-      shippingAddress: _form.shippingAddress.text.trim(),
+      shippingAddress: _form.completeShippingAddress,
       agreesToPolicy: _agreesToPolicy,
     );
     if (validation != null) {
@@ -123,7 +128,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isSubmitting = true);
     try {
       final account = await _coordinator.registerBuyer(
-        data: _form.toAccountData(),
+        data: _form.toAccountData(acceptedPolicy: _agreesToPolicy),
       );
       if (!mounted) return;
       await _coordinator.finishSignUp(context, account: account);

@@ -1,8 +1,12 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'package:agresell_app/core/services/agrisell_supabase.dart';
+import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
+import 'package:agresell_app/features/buyer/profile/data/buyer_avatar_repository.dart';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:agresell_app/core/constants/agrisell_routes.dart';
 import 'package:agresell_app/core/models/user_profile.dart';
@@ -29,10 +33,7 @@ part 'profile_screen_actions.dart';
 part 'profile_screen_follow_counts.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({
-    this.showSettingsIcon = false,
-    super.key,
-  });
+  const ProfileScreen({this.showSettingsIcon = false, super.key});
 
   final bool showSettingsIcon;
 
@@ -49,6 +50,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Uint8List? _avatarImageBytes;
   var _followCounts = const ProfileFollowCounts();
   bool _returnToSettings = false;
+  bool _avatarSaving = false;
 
   void _updateUi(VoidCallback update) => setState(update);
 
@@ -102,16 +104,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         : null,
                     profile: _profile,
                     followingCount: _followCounts.followingCount,
-                    followerCount: _followCounts.followerCount,
                     isVerified:
                         AuthSessionService.instance.currentAccount?.isActive ??
                         false,
                     showSettingsIcon: widget.showSettingsIcon,
-                    onSettingsTap:
-                        widget.showSettingsIcon ? _openSettings : null,
+                    onSettingsTap: widget.showSettingsIcon
+                        ? _openSettings
+                        : null,
                     showAvatarEditBadge: _mode == _BuyerProfileMode.edit,
                     avatarImageBytes: _avatarImageBytes,
-                    onAvatarEdit: _pickAvatarImage,
+                    onAvatarEdit: _mode == _BuyerProfileMode.edit
+                        ? _pickAvatarImage
+                        : null,
                     onBasketTap: () =>
                         Navigator.of(context).pushNamed(AgrisellRoutes.basket),
                   ),

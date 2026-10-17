@@ -17,6 +17,7 @@ RiderProfile riderProfileFromEntities(
     licenseNumber: rider.licenseNumber,
     fullName: rider.fullName,
     firstName: rider.firstName,
+    middleName: rider.middleName,
     lastName: rider.lastName,
     vehicleType: RiderVehicleType.values.firstWhere(
       (item) => item.name == rider.vehicleType,

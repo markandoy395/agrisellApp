@@ -44,8 +44,11 @@ abstract final class RiderEntityValidator {
         value.vehicleColor.trim().isEmpty) {
       _invalid('Complete all required vehicle fields.');
     }
-    if (value.plateNumber.trim().isEmpty ||
-        !_plate.hasMatch(value.plateNumber.trim().toUpperCase())) {
+    final requiresPlate =
+        value.vehicleType != 'bicycle' && value.vehicleType != 'eBike';
+    if (requiresPlate &&
+        (value.plateNumber.trim().isEmpty ||
+            !_plate.hasMatch(value.plateNumber.trim().toUpperCase()))) {
       _invalid('Enter a valid vehicle plate number.');
     }
     final capacityError = RiderCargoCapacityPolicy.error(

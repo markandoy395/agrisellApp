@@ -137,9 +137,10 @@ extension _FarmerSignUpActions on _FarmerSignUpScreenState {
     });
   }
 
-  Future<void> _submit() async {
+  Future<void> _submit({bool skipFarmDetails = false}) async {
+    if (_isSubmitting) return;
     _refresh(() => _isSubmitting = true);
-    final data = _controllers.data();
+    final data = _controllers.data(skipFarmDetails: skipFarmDetails);
     try {
       final service = AuthRegistrationService.instance;
       final account = service.usesSupabase

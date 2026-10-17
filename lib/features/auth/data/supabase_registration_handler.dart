@@ -102,6 +102,7 @@ class SupabaseRegistrationHandler {
           'date_of_birth': data.dateOfBirth?.trim(),
           'gender': data.gender?.trim(),
           'shipping_address': data.shippingAddress?.trim(),
+          'accepted_policy': data.acceptedPolicy,
         },
       },
     );

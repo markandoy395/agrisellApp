@@ -2,7 +2,7 @@ import 'package:agresell_app/features/rider/dashboard/presentation/screens/rider
 import 'package:agresell_app/features/rider/presentation/widgets/rider_safe_scaffold.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_safe_sheet.dart';
 import 'package:agresell_app/features/rider/profile/presentation/styles/rider_profile_edit_styles.dart';
-import 'package:agresell_app/features/shared/widgets/navigation/custom_bottom_nav_bar.dart';
+import 'package:agresell_app/features/rider/dashboard/presentation/widgets/rider_home_bottom_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -38,12 +38,13 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      final bar = find.byType(CustomBottomNavBar);
+      final bar = find.byType(RiderHomeBottomNav);
+      expect(bar, findsOneWidget);
       expect(
         tester.getBottomRight(find.byType(PageView)).dy,
         lessThanOrEqualTo(tester.getTopLeft(bar).dy),
       );
-      final mapButton = find.text('Map');
+      final mapButton = find.descendant(of: bar, matching: find.text('Map'));
       expect(
         tester.getBottomRight(mapButton).dy,
         lessThanOrEqualTo(700 - inset),

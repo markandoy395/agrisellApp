@@ -7,6 +7,7 @@ import 'package:agresell_app/features/buyer/home/presentation/styles/home_produc
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/buyer_home_categories.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_banner_carousel.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_catalog_footer.dart';
+import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_catalog_pagination.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_catalog_status.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_deals_quick_banner.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_empty_catalog_sliver.dart';
@@ -56,17 +57,6 @@ class HomeProductScrollView extends StatelessWidget {
   final bool isLoadingMore;
   final bool hasMore;
 
-  bool _onScrollNotification(ScrollNotification notification) {
-    if (notification.depth != 0) return false;
-    if (notification.metrics.axis != Axis.vertical) return false;
-    if (isLoadingMore || !hasMore || isLoading || loadFailed) return false;
-    final maxScroll = notification.metrics.maxScrollExtent;
-    if (maxScroll > 0 && (notification.metrics.pixels / maxScroll) >= 0.80) {
-      onLoadMore?.call();
-    }
-    return false;
-  }
-
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
@@ -82,8 +72,9 @@ class HomeProductScrollView extends StatelessWidget {
       onRefresh: onRefresh,
       child: SafeArea(
         bottom: false,
-        child: NotificationListener<ScrollNotification>(
-          onNotification: _onScrollNotification,
+        child: HomeCatalogPagination(
+          enabled: !isLoadingMore && hasMore && !isLoading && !loadFailed,
+          onLoadMore: onLoadMore,
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [

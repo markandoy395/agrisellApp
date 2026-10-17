@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:agresell_app/features/auth/presentation/styles/forgot_password_styles.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_button.dart';
@@ -20,7 +21,7 @@ class ForgotPasswordResetStep extends StatelessWidget {
 
   final TextEditingController passwordController;
   final TextEditingController confirmationController;
-  final String? confirmationError;
+  final ValueListenable<String?> confirmationError;
   final bool loading;
   final ValueChanged<String> onPasswordChanged;
   final ValueChanged<String> onConfirmationChanged;
@@ -48,7 +49,10 @@ class ForgotPasswordResetStep extends StatelessWidget {
         autofillHints: const [AutofillHints.newPassword],
         onChanged: onPasswordChanged,
       ),
-      AuthPasswordRequirements(controller: passwordController),
+      AuthPasswordRequirements(
+        controller: passwordController,
+        alwaysShow: true,
+      ),
       const SizedBox(height: 14),
       AuthTextField(
         controller: confirmationController,
@@ -58,11 +62,13 @@ class ForgotPasswordResetStep extends StatelessWidget {
         autofillHints: const [AutofillHints.newPassword],
         onChanged: onConfirmationChanged,
       ),
-      if (confirmationError case final error?)
-        Padding(
+      ValueListenableBuilder<String?>(
+        valueListenable: confirmationError,
+        builder: (context, error, _) => Padding(
           padding: const EdgeInsets.only(top: 6, left: 12),
-          child: Text(error, style: ForgotPasswordStyles.errorTextStyle),
+          child: Text(error ?? ' ', style: ForgotPasswordStyles.errorTextStyle),
         ),
+      ),
       const SizedBox(height: 20),
       AuthPrimaryButton(
         label: 'Update password',

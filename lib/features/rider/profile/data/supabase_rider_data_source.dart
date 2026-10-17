@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:agresell_app/core/services/query_owner.dart';
+import 'package:agresell_app/core/services/profile_rpc.dart';
 import 'package:agresell_app/core/services/authenticated_storage_image.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -87,17 +88,13 @@ class SupabaseRiderDataSource
     String vehicleId,
     Map<String, Object?> values,
   ) async {
-    final rider = await updateRider(vehicleId, {
-      if (values.containsKey('vehicle_type'))
-        'vehicle_type': values['vehicle_type'],
-      if (values.containsKey('plate_number'))
-        'vehicle_plate_number': values['plate_number'],
-    });
-    if (values['capacity_kg'] case final num capacity when capacity > 0) {
-      await setCapacity(capacity.toDouble());
-      return _embeddedVehicle((await getCurrentRider())!);
-    }
-    return _embeddedVehicle(rider);
+    await QueryOwner(_client).requireRiderId(vehicleId);
+    final row = await invokeProfileRpc(
+      _client,
+      'update_current_rider_vehicle',
+      {'vehicle_payload': values},
+    );
+    return _embeddedVehicle(Rider.fromJson(_map(row)));
   }
 
   Future<void> setCapacity(double capacityKg) async {

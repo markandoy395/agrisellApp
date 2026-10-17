@@ -38,6 +38,7 @@ class RiderProfile {
     this.capacityKg,
     this.handlingCapabilityKeys = const <String>{},
     this.maximumActiveDeliveries = 1,
+    this.middleName = '',
   });
 
   factory RiderProfile.fromRegistration(
@@ -54,6 +55,7 @@ class RiderProfile {
       licenseNumber: registration.licenseNumber.trim().toUpperCase(),
       fullName: registration.fullName,
       firstName: registration.firstName.trim(),
+      middleName: registration.middleName.trim(),
       lastName: registration.lastName.trim(),
       vehicleType: vehicleType,
       vehiclePlateNumber: registration.vehiclePlateNumber.trim().toUpperCase(),
@@ -80,6 +82,7 @@ class RiderProfile {
   final String licenseNumber;
   final String fullName;
   final String firstName;
+  final String middleName;
   final String lastName;
   final RiderVehicleType vehicleType;
   final String vehiclePlateNumber;
@@ -119,6 +122,8 @@ class RiderProfile {
 
   RiderProfile copyWith({
     String? fullName,
+    String? firstName,
+    String? lastName,
     String? contactNumber,
     String? logisticCompanyId,
     String? licenseNumber,
@@ -135,16 +140,17 @@ class RiderProfile {
     double? gpsLatitude,
     double? gpsLongitude,
   }) {
-    final names = _splitName(fullName ?? this.fullName);
+    final names = fullName == null ? null : _splitName(fullName);
     return RiderProfile(
       id: id,
       logisticCompanyId: _blankToNull(
         logisticCompanyId ?? this.logisticCompanyId ?? '',
       ),
       licenseNumber: licenseNumber ?? this.licenseNumber,
-      fullName: names.fullName,
-      firstName: names.firstName,
-      lastName: names.lastName,
+      fullName: names?.fullName ?? this.fullName,
+      firstName: firstName?.trim() ?? names?.firstName ?? this.firstName,
+      middleName: middleName,
+      lastName: lastName?.trim() ?? names?.lastName ?? this.lastName,
       vehicleType: vehicleType,
       vehiclePlateNumber: vehiclePlateNumber ?? this.vehiclePlateNumber,
       availabilityStatus: availabilityStatus ?? this.availabilityStatus,

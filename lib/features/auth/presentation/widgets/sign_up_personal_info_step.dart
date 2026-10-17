@@ -5,6 +5,7 @@ import 'package:agresell_app/features/auth/presentation/styles/sign_up_screen_st
 import 'package:agresell_app/features/auth/presentation/widgets/auth_button.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_checkbox.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/sign_up_identity_fields.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/sign_up_shipping_address_fields.dart';
 
 class SignUpPersonalInfoStep extends StatelessWidget {
   const SignUpPersonalInfoStep({
@@ -46,10 +47,11 @@ class SignUpPersonalInfoStep extends StatelessWidget {
           contactNumberController: form.contactNumber,
           dateOfBirthController: form.dateOfBirth,
           genderController: form.gender,
-          shippingAddressController: form.shippingAddress,
           emailController: form.email,
           showEmail: false,
         ),
+        const SizedBox(height: SignUpScreenStyles.fieldGap),
+        SignUpShippingAddressFields(form: form, enabled: !isSubmitting),
         const SizedBox(height: SignUpScreenStyles.policyCheckboxGap),
         AuthPolicyCheckbox(
           value: agreesToPolicy,

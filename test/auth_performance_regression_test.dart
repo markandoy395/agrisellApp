@@ -2,6 +2,7 @@ import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_background.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_scaffold.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_text_field.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/logo_header.dart';
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -43,6 +44,7 @@ void main() {
     );
     final providerBefore = tester.widget<Image>(imageFinder).image;
     final sizeBefore = tester.getSize(backgroundFinder);
+    final headerBefore = tester.widget<LogoHeader>(find.byType(LogoHeader));
 
     await tester.tap(find.byType(TextField));
     tester.view.viewInsets = const FakeViewPadding(bottom: 330);
@@ -51,6 +53,10 @@ void main() {
     final providerAfter = tester.widget<Image>(imageFinder).image;
     expect(tester.getSize(backgroundFinder), sizeBefore);
     expect(providerAfter, providerBefore);
+    expect(
+      tester.widget<LogoHeader>(find.byType(LogoHeader)),
+      same(headerBefore),
+    );
     expect(tester.takeException(), isNull);
   });
 

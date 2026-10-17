@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_background.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/keyboard_adaptive_scroll_view.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_keyboard_viewport.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/logo_header.dart';
 
 class LoginPageLayout extends StatelessWidget {
@@ -44,9 +44,6 @@ class LoginPageLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final keyboardHeight = MediaQuery.viewInsetsOf(context).bottom;
-    final bottomPadding = MediaQuery.paddingOf(context).bottom;
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: LayoutBuilder(
@@ -101,62 +98,33 @@ class LoginPageLayout extends StatelessWidget {
                   width: double.infinity,
                   height: effectiveCardHeight.clamp(0, size.height).toDouble(),
                   decoration: LoginPageLayoutStyles.containerDecoration,
-                  child: Builder(
-                    builder: (context) {
-                      final padding = EdgeInsets.fromLTRB(
-                        28,
-                        keyboardHeight > 0 ? 22 : cardTopPadding,
-                        28,
-                        26 + bottomPadding,
-                      );
-                      final content = ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: keyboardHeight > 0
-                              ? 0
-                              : effectiveCardHeight -
-                                    cardTopPadding -
-                                    26 -
-                                    bottomPadding,
+                  child: AuthKeyboardViewport(
+                    topPadding: cardTopPadding,
+                    scrollable: scrollable,
+                    scrollViewKey: scrollViewKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style:
+                              titleStyle ??
+                              LoginPageLayoutStyles.titleText(titleColor),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              title,
-                              style:
-                                  titleStyle ??
-                                  LoginPageLayoutStyles.titleText(titleColor),
-                            ),
-                            if (subtitleWidget != null)
-                              subtitleWidget!
-                            else if (subtitle != null &&
-                                subtitle!.isNotEmpty) ...[
-                              const SizedBox(height: 2),
-                              Text(
-                                subtitle!,
-                                style: LoginPageLayoutStyles.textStyle,
-                              ),
-                              const SizedBox(height: 22),
-                            ] else
-                              const SizedBox(height: 16),
-                            if (expandChild) Expanded(child: child) else child,
-                          ],
-                        ),
-                      );
-
-                      final formBody = scrollable
-                          ? KeyboardAdaptiveScrollView(
-                              key: scrollViewKey,
-                              padding: padding,
-                              child: content,
-                            )
-                          : Padding(padding: padding, child: content);
-
-                      return Padding(
-                        padding: EdgeInsets.only(bottom: keyboardHeight),
-                        child: formBody,
-                      );
-                    },
+                        if (subtitleWidget != null)
+                          subtitleWidget!
+                        else if (subtitle != null && subtitle!.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            subtitle!,
+                            style: LoginPageLayoutStyles.textStyle,
+                          ),
+                          const SizedBox(height: 22),
+                        ] else
+                          const SizedBox(height: 16),
+                        if (expandChild) Expanded(child: child) else child,
+                      ],
+                    ),
                   ),
                 ),
               ),

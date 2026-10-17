@@ -87,7 +87,25 @@ extension _AddProductScreenActions on _AddProductScreenState {
     } else if (_inventoryDateType == ProductInventoryDateType.nonPerishable) {
       _inventoryDateType = ProductInventoryDateType.freshProduce;
     }
+    if (ProductDescriptionSamples.isKnownSample(_descriptionController.text)) {
+      _applyNextSampleDescription();
+    }
   });
+
+  void _generateSampleDescription() => _refresh(_applyNextSampleDescription);
+
+  void _applyNextSampleDescription() {
+    final next = ProductDescriptionSamples.nextSample(
+      category: _category,
+      currentDescription: _descriptionController.text,
+      seed: _sampleDescriptionSeed++,
+    );
+    _descriptionController.value = TextEditingValue(
+      text: next,
+      selection: TextSelection.collapsed(offset: next.length),
+    );
+    _errors.remove(AddProductField.description);
+  }
 
   void _changeUnitType(String? value) {
     if (value != null) _refresh(() => _unitType = value);

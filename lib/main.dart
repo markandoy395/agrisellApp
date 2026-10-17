@@ -15,6 +15,7 @@ import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/presentation/auth_dashboard_router.dart';
 import 'package:agresell_app/features/auth/presentation/auth_role_gate.dart';
 import 'package:agresell_app/features/auth/presentation/auth_navigation_scope.dart';
+import 'package:agresell_app/features/auth/presentation/auth_navigation_observer.dart';
 import 'package:agresell_app/features/auth/presentation/screens/splash_screen.dart';
 import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:agresell_app/features/buyer/home/domain/farmer_profile.dart';
@@ -72,11 +73,13 @@ class AgrisellApp extends StatelessWidget {
 
   final Future<bool>? supabaseInitialization;
   static final _navigatorKey = GlobalKey<NavigatorState>();
+  static final _authNavigationObserver = AuthNavigationObserver();
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: _navigatorKey,
+      navigatorObservers: [_authNavigationObserver],
       title: 'AgriSell App',
       debugShowCheckedModeBanner: false,
       theme: AgrisellTheme.light,
@@ -84,6 +87,7 @@ class AgrisellApp extends StatelessWidget {
       builder: (context, child) {
         return AuthNavigationScope(
           navigatorKey: _navigatorKey,
+          observer: _authNavigationObserver,
           child: DefaultTextStyle.merge(
             style: MainStyles.textStyle,
             child: SystemUiScope(child: child ?? const SizedBox.shrink()),

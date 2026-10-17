@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:agresell_app/features/shared/location/data/psgc_fallback_provinces.dart';
+
 class PsgcAddressOption {
   const PsgcAddressOption({
     required this.code,
@@ -23,6 +25,9 @@ class PsgcAddressOption {
 abstract interface class PhilippineAddressLookup {
   Future<List<PsgcAddressOption>> provinces();
   Future<List<PsgcAddressOption>> citiesMunicipalities();
+  Future<List<PsgcAddressOption>> provinceCitiesMunicipalities(
+    String provinceCode,
+  );
   Future<List<PsgcAddressOption>> barangays(String localityCode);
 }
 
@@ -32,27 +37,58 @@ class PsgcAddressService implements PhilippineAddressLookup {
 
   static final PsgcAddressService instance = PsgcAddressService();
   static const _defaultBaseUrl = 'https://psgc.cloud/api/v2';
+  static const _computeByteThreshold = 32768;
 
   final http.Client _client;
   final String baseUrl;
   Future<List<PsgcAddressOption>>? _provinces;
   Future<List<PsgcAddressOption>>? _localities;
+  final Map<String, Future<List<PsgcAddressOption>>> _provinceLocalities = {};
   final Map<String, Future<List<PsgcAddressOption>>> _barangays = {};
 
   @override
-  Future<List<PsgcAddressOption>> provinces() =>
-      _provinces ??= _load('/provinces');
+  Future<List<PsgcAddressOption>> provinces() async {
+    final future = _provinces ??= _load('/provinces');
+    final values = await future;
+    if (values.isNotEmpty) return values;
+    if (identical(_provinces, future)) _provinces = null;
+    return baseUrl == _defaultBaseUrl ? psgcFallbackProvinces : const [];
+  }
 
   @override
-  Future<List<PsgcAddressOption>> citiesMunicipalities() =>
-      _localities ??= _load('/cities-municipalities');
+  Future<List<PsgcAddressOption>> citiesMunicipalities() async {
+    final future = _localities ??= _load('/cities-municipalities');
+    final values = await future;
+    if (values.isEmpty && identical(_localities, future)) _localities = null;
+    return values;
+  }
 
   @override
-  Future<List<PsgcAddressOption>> barangays(String localityCode) =>
-      _barangays.putIfAbsent(
-        localityCode,
-        () => _load('/cities-municipalities/$localityCode/barangays'),
-      );
+  Future<List<PsgcAddressOption>> provinceCitiesMunicipalities(
+    String provinceCode,
+  ) => _loadKeyed(
+    _provinceLocalities,
+    provinceCode,
+    '/provinces/$provinceCode/cities-municipalities',
+  );
+
+  @override
+  Future<List<PsgcAddressOption>> barangays(String localityCode) => _loadKeyed(
+    _barangays,
+    localityCode,
+    '/cities-municipalities/$localityCode/barangays',
+  );
+
+  Future<List<PsgcAddressOption>> _loadKeyed(
+    Map<String, Future<List<PsgcAddressOption>>> cache,
+    String key,
+    String path,
+  ) async {
+    final future = cache.putIfAbsent(key, () => _load(path));
+    final values = await future;
+    if (values.isEmpty && identical(cache[key], future)) cache.remove(key);
+    return values;
+  }
 
   Future<List<PsgcAddressOption>> _load(String path) async {
     try {
@@ -60,8 +96,12 @@ class PsgcAddressService implements PhilippineAddressLookup {
           .get(Uri.parse('$baseUrl$path'))
           .timeout(const Duration(seconds: 12));
       if (response.statusCode != 200) return const [];
-      return await compute(_parseAddressOptions, response.bodyBytes);
-    } on Exception {
+      final bytes = response.bodyBytes;
+      if (bytes.length <= _computeByteThreshold) {
+        return _parseAddressOptions(bytes);
+      }
+      return await compute(_parseAddressOptions, bytes);
+    } catch (_) {
       return const [];
     }
   }

@@ -31,7 +31,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          const AuthBackground(),
+          const RepaintBoundary(child: AuthBackground()),
           SafeArea(
             bottom: false,
             child: Align(

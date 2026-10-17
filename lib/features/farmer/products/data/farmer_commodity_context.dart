@@ -2,11 +2,25 @@ import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/features/farmer/products/data/farmer_commodity_format.dart';
 
 class FarmerCommodityContext {
-  const FarmerCommodityContext(this.authUserId, this.farmId, this.isVerified);
+  const FarmerCommodityContext(
+    this.authUserId,
+    this.farmId, {
+    required this.accountStatus,
+    required this.verificationStatus,
+  });
 
   final String authUserId;
   final int farmId;
-  final bool isVerified;
+  final String accountStatus;
+  final String verificationStatus;
+
+  bool get canPostProducts =>
+      accountStatus == 'active' &&
+      const [
+        'pending',
+        'verified',
+        'needs_information',
+      ].contains(verificationStatus);
 
   static Future<FarmerCommodityContext> load() async {
     final client = AgrisellSupabase.client;
@@ -16,7 +30,7 @@ class FarmerCommodityContext {
     }
     final farmer = await client
         .from('farmers')
-        .select('farmer_user_id, verification_status')
+        .select('farmer_user_id, verification_status, account_status')
         .eq('auth_user_id', authUserId)
         .maybeSingle();
     if (farmer == null) {
@@ -33,16 +47,17 @@ class FarmerCommodityContext {
     return FarmerCommodityContext(
       authUserId,
       FarmerCommodityFormat.integer(farm['farm_id']),
-      FarmerCommodityFormat.text(farmer['verification_status']).toLowerCase() ==
-          'verified',
+      accountStatus: FarmerCommodityFormat.text(
+        farmer['account_status'],
+      ).toLowerCase(),
+      verificationStatus: FarmerCommodityFormat.text(
+        farmer['verification_status'],
+      ).toLowerCase(),
     );
   }
 
   static Future<void> createFarm(String name) async {
     final farmName = name.trim();
-    if (farmName.isEmpty) {
-      throw const FarmerCommodityException('Enter a farm name.');
-    }
     final client = AgrisellSupabase.client;
     final authUserId = client.auth.currentUser?.id;
     if (authUserId == null) {
@@ -58,7 +73,7 @@ class FarmerCommodityContext {
     }
     await client.from('farms').insert({
       'farmer_user_id': farmer['farmer_user_id'],
-      'farm_name': farmName,
+      if (farmName.isNotEmpty) 'farm_name': farmName,
     });
   }
 

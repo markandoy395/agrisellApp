@@ -11,11 +11,7 @@ import 'package:agresell_app/features/farmer/reviews/presentation/widgets/farmer
 import 'package:agresell_app/features/farmer/reviews/presentation/widgets/farmer_reviews_widgets.dart';
 
 class FarmerReviewsScreen extends StatefulWidget {
-  const FarmerReviewsScreen({
-    this.farmerId,
-    this.controller,
-    super.key,
-  });
+  const FarmerReviewsScreen({this.farmerId, this.controller, super.key});
 
   final String? farmerId;
   final FarmerReviewsController? controller;
@@ -51,6 +47,7 @@ class _FarmerReviewsScreenState extends State<FarmerReviewsScreen> {
     return Scaffold(
       backgroundColor: FarmerReviewsScreenStyles.screenBackground,
       body: SafeArea(
+        top: false,
         bottom: false,
         child: Column(
           children: [
@@ -100,9 +97,8 @@ class _FarmerReviewsScreenState extends State<FarmerReviewsScreen> {
         const SizedBox(height: 30),
         FarmerReviewsErrorCard(
           errorMessage: _controller.errorMessage!,
-          onRetry: () => unawaited(
-            _controller.loadReviews(farmerId: widget.farmerId),
-          ),
+          onRetry: () =>
+              unawaited(_controller.loadReviews(farmerId: widget.farmerId)),
         ),
       ];
     }
@@ -138,8 +134,7 @@ class _FarmerReviewsScreenState extends State<FarmerReviewsScreen> {
         ...filtered.map(
           (r) => FarmerReviewCard(
             review: r,
-            onReportReview: (review) =>
-                FarmerReviewsAppealHandler.handleReport(
+            onReportReview: (review) => FarmerReviewsAppealHandler.handleReport(
               context: context,
               review: review,
               controller: _controller,
@@ -147,11 +142,11 @@ class _FarmerReviewsScreenState extends State<FarmerReviewsScreen> {
             ),
             onAppealModeration: (review) =>
                 FarmerReviewsAppealHandler.handleAppeal(
-              context: context,
-              review: review,
-              controller: _controller,
-              farmerId: widget.farmerId,
-            ),
+                  context: context,
+                  review: review,
+                  controller: _controller,
+                  farmerId: widget.farmerId,
+                ),
           ),
         ),
     ];

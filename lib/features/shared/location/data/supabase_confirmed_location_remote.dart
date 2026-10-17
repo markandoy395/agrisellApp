@@ -6,9 +6,11 @@ import 'package:agresell_app/features/shared/location/domain/confirmed_location.
 
 class SupabaseConfirmedLocationRemoteDataSource
     implements ConfirmedLocationRemoteDataSource {
-  const SupabaseConfirmedLocationRemoteDataSource(this.client);
+  SupabaseConfirmedLocationRemoteDataSource(this.client)
+    : _owner = client.auth.currentUser?.id;
 
   final SupabaseClient client;
+  final String? _owner;
 
   static SupabaseConfirmedLocationRemoteDataSource? currentOrNull() {
     if (!AgrisellSupabase.isInitialized) return null;
@@ -19,6 +21,14 @@ class SupabaseConfirmedLocationRemoteDataSource
 
   @override
   Future<void> save(LocationOwnerRole role, ConfirmedLocation location) async {
+    final session = client.auth.currentSession;
+    if (_owner == null ||
+        session == null ||
+        session.isExpired ||
+        session.user.isAnonymous ||
+        session.user.id != _owner) {
+      throw const AuthException('Sign in again before saving this location.');
+    }
     await client.rpc<void>(
       'save_current_confirmed_location',
       params: {

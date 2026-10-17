@@ -42,7 +42,7 @@ class FarmerRegistrationSubmittedScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Your farm and identity details were submitted. Please wait for admin confirmation before selling products.',
+                  'Your farmer account is ready. Log in to upload products. You can complete your farm details in your profile.',
                   textAlign: TextAlign.center,
                   style: FarmerRegistrationSubmittedScreenStyles.textStyle,
                 ),

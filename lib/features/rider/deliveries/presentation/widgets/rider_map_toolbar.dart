@@ -45,6 +45,11 @@ class RiderMapToolbar extends StatelessWidget {
               onPressed: onOpenList,
               icon: const Icon(Icons.search),
             ),
+            IconButton(
+              tooltip: loading ? 'Refreshing map' : 'Refresh map',
+              onPressed: loading ? null : onRefresh,
+              icon: const Icon(Icons.refresh_rounded),
+            ),
             if (onOpenNotifications != null)
               IconButton(
                 tooltip: 'Notifications',

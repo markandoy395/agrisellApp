@@ -32,6 +32,7 @@ part 'package:agresell_app/features/farmer/dashboard/presentation/widgets/farmer
 part 'package:agresell_app/features/farmer/dashboard/presentation/widgets/farmer_dashboard_empty_state.dart';
 part 'package:agresell_app/features/farmer/dashboard/presentation/widgets/farmer_dashboard_tab_content.dart';
 part 'package:agresell_app/features/farmer/dashboard/presentation/widgets/farmer_dashboard_body.dart';
+part 'farmer_dashboard_verification.dart';
 
 class FarmerDashboardScreen extends StatefulWidget {
   const FarmerDashboardScreen({
@@ -181,26 +182,9 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
     ..clearSnackBars()
     ..showAppSnackBar(SnackBar(content: Text(message)));
 
-  Future<void> _loadVerificationDetails() async {
-    final details = await FarmerProductCoordinator.loadVerificationDetails(
-      widget.verificationRepository,
-    );
-    if (mounted && details != null) {
-      setState(() => _verificationDetails = details);
-    }
-  }
-
-  Future<void> _openResubmitInformation() async {
-    final updated = await FarmerProductCoordinator.resubmitInformation(
-      context: context,
-      repository: widget.verificationRepository,
-      details: _verificationDetails,
-    );
-    if (updated != null && mounted) {
-      setState(() => _verificationDetails = updated);
-    }
-  }
+  void _refresh(VoidCallback update) => setState(update);
 
   bool get _canPostProducts =>
-      AuthSessionService.instance.currentAccount?.isFarmerVerified ?? true;
+      AuthSessionService.instance.currentAccount?.canUploadProducts ??
+      !widget.commodityRepository.isAvailable;
 }

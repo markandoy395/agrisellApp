@@ -101,3 +101,13 @@ Rider pickup product image (2026-10-15, deployment pending): migration 202610151
 
 2026-10-16 concurrency hardening (prepared, not deployed): owner-scoped retry receipts for buyer/farmer messages and farmer cash-out, independent session/participant/farmer checks, transaction advisory locks, default-deny private receipt RLS, bound/static SQL and caller JWT gateway transport. Shared order queues/cache writes reject account changes; stale callbacks and duplicate submissions are guarded across buyer/farmer/rider/shared flows. Consolidated order bundle retains existing owner RPCs and only falls back when missing. See docs/concurrency_hardening.md for exact scope, isolated fixture verification and outstanding full-schema/hosted/load checks.
 
+
+Profile persistence repair (2026-10-17): signup/vehicle payloads and avatar owner
+queries use structured bound arguments. New fixed-search-path SQL uses static
+statements and derives ownership from auth.uid()/auth_identities. No new dynamic
+SQL, anonymous grant or arbitrary query RPC. Hosted SQL-injection assertions and
+rolled-back hostile-literal retry/read-back checks passed; see
+`profile_edit_persistence_audit.md` for exact coverage and limits.
+
+
+2026-10-17: Optional farmer signup uses the existing bound JSON payload and static SQL; product context adds account_status without changing structured owner filters. Literal hostile name/category fixture values remain data. See farmer_optional_signup_uploads.md.

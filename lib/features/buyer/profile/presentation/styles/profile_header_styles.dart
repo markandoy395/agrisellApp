@@ -92,7 +92,9 @@ abstract final class ProfileHeaderStyles {
   static final BorderRadius navButtonBorderRadius = BorderRadius.circular(
     navButtonRadius,
   );
-  static final BorderRadius heroBorderRadius = BorderRadius.circular(heroRadius);
+  static final BorderRadius heroBorderRadius = BorderRadius.circular(
+    heroRadius,
+  );
   static final BorderRadius editBadgeRadius = BorderRadius.circular(15);
 
   static final BoxDecoration navButtonDecoration = BoxDecoration(
@@ -102,7 +104,7 @@ abstract final class ProfileHeaderStyles {
   );
 
   static const BoxDecoration heroDecoration = BoxDecoration(
-    gradient: BuyerProfileStyle.heroGradient,
+    color: BuyerProfileStyle.green,
   );
 
   static final BoxDecoration avatarGlowDecoration = BoxDecoration(
@@ -111,32 +113,15 @@ abstract final class ProfileHeaderStyles {
       color: Colors.white.withValues(alpha: 0.25),
       width: avatarGlowBorderWidth,
     ),
-    boxShadow: [
-      BoxShadow(
-        color: avatarGlowColor.withValues(alpha: 0.6),
-        blurRadius: 20,
-        spreadRadius: 2,
-      ),
-    ],
   );
 
   static const BoxDecoration avatarPlaceholderDecoration = BoxDecoration(
     shape: BoxShape.circle,
-    gradient: LinearGradient(
-      colors: [Color(0xFF1A7A52), Color(0xFF0E5C38)],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    ),
-  );
-
-  static const LinearGradient badgeGradient = LinearGradient(
-    colors: [Color(0xFF1BB871), Color(0xFF08683F)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
+    color: BuyerProfileStyle.deepGreen,
   );
 
   static const BoxDecoration editBadgeDecoration = BoxDecoration(
-    gradient: badgeGradient,
+    color: BuyerProfileStyle.richGreen,
     shape: BoxShape.circle,
     border: Border.fromBorderSide(
       BorderSide(color: Colors.white, width: editBadgeBorderWidth),
@@ -144,7 +129,7 @@ abstract final class ProfileHeaderStyles {
   );
 
   static const BoxDecoration verifiedBadgeDecoration = BoxDecoration(
-    gradient: badgeGradient,
+    color: BuyerProfileStyle.richGreen,
     shape: BoxShape.circle,
     border: Border.fromBorderSide(
       BorderSide(color: Colors.white, width: verifiedBadgeBorderWidth),

@@ -1,32 +1,31 @@
 import 'package:flutter/material.dart';
 
-import 'package:agresell_app/core/constants/agrisell_assets.dart';
 import 'package:agresell_app/core/models/home_bottom_nav_item.dart';
 
 const homeBottomNavItems = [
   HomeBottomNavItem(
     label: 'Home',
-    icon: AgrisellAssets.iconHome,
-    activeIcon: AgrisellAssets.iconHomeActive,
+    iconData: Icons.home_outlined,
+    activeIconData: Icons.home_rounded,
   ),
   HomeBottomNavItem(
     label: 'Messages',
-    iconData: Icons.sms_outlined,
-    activeIconData: Icons.sms_rounded,
+    iconData: Icons.chat_bubble_outline_rounded,
+    activeIconData: Icons.chat_bubble_rounded,
   ),
   HomeBottomNavItem(
     label: 'Farmers',
-    icon: AgrisellAssets.iconFarmers,
-    activeIcon: AgrisellAssets.iconFarmersActive,
+    iconData: Icons.storefront_outlined,
+    activeIconData: Icons.storefront_rounded,
   ),
   HomeBottomNavItem(
     label: 'Alerts',
-    icon: AgrisellAssets.iconNotifications,
-    activeIcon: AgrisellAssets.iconNotificationsActive,
+    iconData: Icons.notifications_none_rounded,
+    activeIconData: Icons.notifications_rounded,
   ),
   HomeBottomNavItem(
     label: 'Account',
-    icon: AgrisellAssets.iconMe,
-    activeIcon: AgrisellAssets.iconMeActive,
+    iconData: Icons.account_circle_outlined,
+    activeIconData: Icons.account_circle_rounded,
   ),
 ];

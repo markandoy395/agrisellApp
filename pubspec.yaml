@@ -79,8 +79,6 @@ flutter:
     - assets/images/farm.jpg
     - assets/images/vege.jpeg
     - assets/images/home/
-    - assets/images/farmerImage/
-    - assets/images/sample fruits and vegetable/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

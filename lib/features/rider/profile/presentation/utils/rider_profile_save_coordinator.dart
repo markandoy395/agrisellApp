@@ -27,7 +27,8 @@ abstract final class RiderProfileSaveCoordinator {
       if (profile.vehicleType.requiresLicense) license,
       if (profile.vehicleType.requiresPlate) plate,
     ];
-    return !requiredFields.any((item) => item.trim().isEmpty) && completeAddress;
+    return !requiredFields.any((item) => item.trim().isEmpty) &&
+        completeAddress;
   }
 
   static RiderProfile buildUpdatedProfile({
@@ -45,7 +46,13 @@ abstract final class RiderProfileSaveCoordinator {
     required double? latitude,
     required double? longitude,
   }) => original.copyWith(
-    fullName: '${firstName.trim()} ${lastName.trim()}',
+    firstName: firstName,
+    lastName: lastName,
+    fullName: [
+      firstName.trim(),
+      original.middleName.trim(),
+      lastName.trim(),
+    ].where((part) => part.isNotEmpty).join(' '),
     contactNumber: contact.trim(),
     licenseNumber: original.vehicleType.requiresLicense
         ? license.trim().toUpperCase()

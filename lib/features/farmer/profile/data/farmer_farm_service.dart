@@ -121,6 +121,7 @@ class FarmEditDraft {
     'farming_type': farmingType,
     'irrigation_type': irrigationType,
     'main_crops': mainCrops,
+    'total_crops': mainCrops.length,
   };
 }
 
@@ -139,7 +140,8 @@ class _FarmOwner {
 const _farmFields =
     'farm_id,farmer_user_id,farm_name,farm_location,barangay,'
     'city_municipality,province,gps_lat,gps_long,main_crops,'
-    'farm_size_hectares,farming_type,irrigation_type';
+    'farm_size_hectares,farm_size_unit,ownership_type,farm_images,'
+    'farming_type,irrigation_type';
 
 String _message(PostgrestException error) => switch (error.code) {
   '42501' => 'You are not authorized to edit this farm.',

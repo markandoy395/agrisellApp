@@ -32,6 +32,11 @@ class Rider {
     this.maximumCapacityKg,
     this.employmentStatus = RiderEmploymentStatus.inactive,
     this.profilePhotoPath,
+    this.vehicleBrand,
+    this.vehicleModel = '',
+    this.vehicleColor = '',
+    this.registrationNumber,
+    this.middleName = '',
   });
 
   final String riderId;
@@ -60,6 +65,11 @@ class Rider {
   final double? maximumCapacityKg;
   final RiderEmploymentStatus employmentStatus;
   final String? profilePhotoPath;
+  final String? vehicleBrand;
+  final String vehicleModel;
+  final String vehicleColor;
+  final String? registrationNumber;
+  final String middleName;
 
   RiderVerificationStatus get verificationStatus => switch (employmentStatus) {
     RiderEmploymentStatus.active => RiderVerificationStatus.verified,
@@ -125,6 +135,11 @@ class Rider {
     maximumCapacityKg: maximumCapacityKg,
     employmentStatus: employmentStatus ?? this.employmentStatus,
     profilePhotoPath: profilePhotoPath ?? this.profilePhotoPath,
+    vehicleBrand: vehicleBrand,
+    vehicleModel: vehicleModel,
+    vehicleColor: vehicleColor,
+    registrationNumber: registrationNumber,
+    middleName: middleName,
   );
 
   @override

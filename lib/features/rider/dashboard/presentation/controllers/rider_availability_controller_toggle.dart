@@ -18,9 +18,17 @@ extension RiderAvailabilityControllerToggle on RiderAvailabilityController {
       }
       await _repository.saveAvailability(_riderId!, target);
       _lastObservedAvailability = target;
-      await deliveryController.applyAuthoritativeAvailability(target);
+      await deliveryController.applyAuthoritativeAvailability(
+        target,
+        loadRequests: false,
+      );
       _syncState = RiderAvailabilitySyncState.idle;
       _notify();
+      // Nearby requests have their own loading/error state. They should not
+      // keep a successfully saved availability change waiting.
+      if (value && !_isDisposed) {
+        unawaited(deliveryController.load(riderId: _riderId!));
+      }
       return const RiderAvailabilityUpdateResult.success();
     } catch (_) {
       return _fail(RiderAvailabilityWarning.synchronizationFailed);

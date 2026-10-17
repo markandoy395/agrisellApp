@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_exception.dart';
@@ -10,11 +11,24 @@ import 'package:agresell_app/features/auth/domain/buyer_shipping_address.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 
 class SupabaseAuthService {
-  const SupabaseAuthService();
+  const SupabaseAuthService()
+    : _clientOverride = null,
+      _accountLoaderOverride = null;
 
-  SupabaseClient get _client => AgrisellSupabase.client;
+  @visibleForTesting
+  const SupabaseAuthService.forTesting({
+    required SupabaseClient client,
+    SupabaseAccountLoader? accountLoader,
+  }) : _clientOverride = client,
+       _accountLoaderOverride = accountLoader;
 
-  SupabaseAccountLoader get _accountLoader => SupabaseAccountLoader(_client);
+  final SupabaseClient? _clientOverride;
+  final SupabaseAccountLoader? _accountLoaderOverride;
+
+  SupabaseClient get _client => _clientOverride ?? AgrisellSupabase.client;
+
+  SupabaseAccountLoader get _accountLoader =>
+      _accountLoaderOverride ?? SupabaseAccountLoader(_client);
 
   SupabaseRegistrationHandler get _registrationHandler =>
       SupabaseRegistrationHandler(_client, accountLoader: _accountLoader);
@@ -30,17 +44,24 @@ class SupabaseAuthService {
   ) async {
     final value = identifier.trim();
     if (!value.contains('@')) return null;
+    if (kDebugMode) debugPrint('[auth] sign_in started');
     final response = await _client.auth.signInWithPassword(
       email: value.toLowerCase(),
       password: password,
     );
-    if (response.user == null) return null;
+    if (response.user == null || response.session == null) {
+      throw const AuthRegistrationException(
+        'The sign-in service returned an incomplete response. Please try again.',
+      );
+    }
+    if (kDebugMode) debugPrint('[auth] credentials accepted');
     final account = await loadCurrentAccount();
     if (account == null) {
       throw const AuthRegistrationException(
         'The account profile could not be loaded.',
       );
     }
+    if (kDebugMode) debugPrint('[auth] profile loaded');
     return account;
   }
 

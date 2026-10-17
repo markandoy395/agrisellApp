@@ -8,6 +8,7 @@ import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/auth/presentation/auth_navigation_scope.dart';
+import 'package:agresell_app/features/auth/presentation/auth_navigation_observer.dart';
 import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:agresell_app/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/otp_verification_screen.dart';
@@ -51,12 +52,17 @@ void main() {
         return response.future;
       });
       final key = GlobalKey<NavigatorState>();
+      final observer = AuthNavigationObserver();
       await tester.pumpWidget(
         MaterialApp(
           navigatorKey: key,
+          navigatorObservers: [observer],
           theme: AgrisellTheme.light,
-          builder: (_, child) =>
-              AuthNavigationScope(navigatorKey: key, child: child!),
+          builder: (_, child) => AuthNavigationScope(
+            navigatorKey: key,
+            observer: observer,
+            child: child!,
+          ),
           home: const LoginScreen(),
         ),
       );

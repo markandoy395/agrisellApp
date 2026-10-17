@@ -53,6 +53,8 @@ class BuyerCatalogGrid extends StatelessWidget {
   Widget build(BuildContext context) => SliverLayoutBuilder(
     builder: (context, constraints) => SliverGrid.builder(
       itemCount: products.length,
+      // Cards have no editable state to retain after leaving the viewport.
+      addAutomaticKeepAlives: false,
       gridDelegate: _delegate(context, constraints.crossAxisExtent),
       itemBuilder: _card,
     ),

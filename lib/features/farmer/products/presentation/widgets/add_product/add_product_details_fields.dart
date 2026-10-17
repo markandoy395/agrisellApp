@@ -10,6 +10,7 @@ class _AdditionalCommodityFields extends StatelessWidget {
     required this.isOrganic,
     required this.errors,
     required this.onDescriptionChanged,
+    required this.onGenerateDescription,
     required this.onGradeQualityChanged,
     required this.onOrganicChanged,
   });
@@ -22,6 +23,7 @@ class _AdditionalCommodityFields extends StatelessWidget {
   final bool isOrganic;
   final Map<AddProductField, String> errors;
   final ValueChanged<String> onDescriptionChanged;
+  final VoidCallback onGenerateDescription;
   final ValueChanged<String?> onGradeQualityChanged;
   final ValueChanged<bool> onOrganicChanged;
 
@@ -39,6 +41,11 @@ class _AdditionalCommodityFields extends StatelessWidget {
             maxLines: 3,
             maxLength: 300,
             onChanged: onDescriptionChanged,
+            suffixIcon: _DescriptionSampleButton(
+              onPressed: onGenerateDescription,
+            ),
+            suffixIconConstraints:
+                AddProductFormFieldsStyles.suffixIconConstraints,
           ),
         ),
         const SizedBox(height: 24),
@@ -93,6 +100,28 @@ class _AdditionalCommodityFields extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _DescriptionSampleButton extends StatelessWidget {
+  const _DescriptionSampleButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: Tooltip(
+        message: 'Generate sample description',
+        child: IconButton(
+          key: const Key('description-sample-button'),
+          onPressed: onPressed,
+          style: AddProductFormFieldsStyles.sampleDescriptionButtonStyle,
+          icon: const Icon(Icons.auto_awesome_rounded, size: 16),
+        ),
+      ),
     );
   }
 }

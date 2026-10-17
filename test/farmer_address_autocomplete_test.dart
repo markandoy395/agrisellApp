@@ -182,6 +182,58 @@ void main() {
     expect(find.text('Esperanza \u2014 Agusan del Sur'), findsOneWidget);
     expect(find.text('Esperanza \u2014 Masbate'), findsNothing);
   });
+  test(
+    'PSGC service retries after a failed request instead of caching empty',
+    () async {
+      var attempts = 0;
+      final service = PsgcAddressService(
+        baseUrl: 'https://example.test/api/v2',
+        client: MockClient((_) async {
+          attempts++;
+          if (attempts == 1) {
+            return http.Response('gateway timeout', 504);
+          }
+          return http.Response(
+            '{"data":[{"code":"1030500010","name":"Lapasan"}]}',
+            200,
+          );
+        }),
+      );
+
+      final first = await service.barangays('1030500000');
+      final second = await service.barangays('1030500000');
+
+      expect(first, isEmpty);
+      expect(second.single.name, 'Lapasan');
+      expect(attempts, 2);
+    },
+  );
+  test(
+    'PSGC service retries after a failed request instead of caching empty',
+    () async {
+      var attempts = 0;
+      final service = PsgcAddressService(
+        baseUrl: 'https://example.test/api/v2',
+        client: MockClient((_) async {
+          attempts++;
+          if (attempts == 1) {
+            return http.Response('gateway timeout', 504);
+          }
+          return http.Response(
+            '{"data":[{"code":"1030500010","name":"Lapasan"}]}',
+            200,
+          );
+        }),
+      );
+
+      final first = await service.barangays('1030500000');
+      final second = await service.barangays('1030500000');
+
+      expect(first, isEmpty);
+      expect(second.single.name, 'Lapasan');
+      expect(attempts, 2);
+    },
+  );
 }
 
 class _AddressLookup implements PhilippineAddressLookup {
@@ -205,6 +257,11 @@ class _AddressLookup implements PhilippineAddressLookup {
       region: 'Region X (Northern Mindanao)',
     ),
   ];
+
+  @override
+  Future<List<PsgcAddressOption>> provinceCitiesMunicipalities(
+    String provinceCode,
+  ) async => const [];
 
   @override
   Future<List<PsgcAddressOption>> barangays(String localityCode) async =>
@@ -239,6 +296,11 @@ class _DuplicateLocalityLookup implements PhilippineAddressLookup {
       region: 'Caraga',
     ),
   ];
+
+  @override
+  Future<List<PsgcAddressOption>> provinceCitiesMunicipalities(
+    String provinceCode,
+  ) async => const [];
 
   @override
   Future<List<PsgcAddressOption>> barangays(String localityCode) async =>

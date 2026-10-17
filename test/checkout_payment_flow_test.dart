@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:agresell_app/features/shared/location/data/confirmed_location_repository.dart';
 
 import 'package:agresell_app/features/buyer/cart/data/checkout_payment_repository.dart';
 import 'package:agresell_app/features/shared/payments/domain/farmer_gcash_details.dart';
@@ -30,7 +31,7 @@ void main() {
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({
-      'confirmed_location_buyer_v1': jsonEncode({
+      'confirmed_location_checkout-owner_buyer_v2': jsonEncode({
         'latitude': 8.1575,
         'longitude': 125.1277,
         'accuracyMeters': 6.0,
@@ -44,10 +45,13 @@ void main() {
     basket.addProduct(_product);
 
     await tester.pumpWidget(
-      const MaterialApp(
+      MaterialApp(
         home: CheckoutScreen(
           initialDeliveryAddress: 'Test delivery address',
-          paymentRepository: _FakeCheckoutPaymentRepository(),
+          paymentRepository: const _FakeCheckoutPaymentRepository(),
+          locationRepository: ConfirmedLocationRepository(
+            accountId: () => 'checkout-owner',
+          ),
           gcashReceiptImagePicker: _pickReceiptImage,
         ),
       ),

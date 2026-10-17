@@ -11,10 +11,15 @@ void main() {
       'supabase/migrations/'
       '20260809130000_expire_stale_rider_availability.sql',
     ).readAsStringSync();
-    lifecycleSource = File(
-      'lib/features/rider/dashboard/presentation/screens/'
-      'rider_home_lifecycle.dart',
-    ).readAsStringSync();
+    lifecycleSource =
+        File(
+          'lib/features/rider/dashboard/presentation/screens/'
+          'rider_home_lifecycle.dart',
+        ).readAsStringSync() +
+        File(
+          'lib/features/rider/dashboard/presentation/screens/'
+          'rider_home_location_lifecycle.dart',
+        ).readAsStringSync();
   });
 
   test('keeps a Rider requestable for five minutes after the heartbeat', () {

@@ -39,7 +39,13 @@ extension _ProfileScreenActions on _ProfileScreenState {
   }
 
   Future<void> _pickAvatarImage() async {
+    if (_mode != _BuyerProfileMode.edit || _avatarSaving) return;
+    _avatarSaving = true;
     try {
+      if (!AgrisellSupabase.isInitialized) {
+        throw Exception('Sign in before changing your photo.');
+      }
+      final owner = AgrisellSupabase.client.auth.currentUser?.id;
       final image = await _imagePicker.pickImage(
         source: ImageSource.gallery,
         maxWidth: 900,
@@ -48,7 +54,7 @@ extension _ProfileScreenActions on _ProfileScreenState {
       );
       if (image == null) return;
       final bytes = await image.readAsBytes();
-      if (!mounted) return;
+      if (!mounted || _mode != _BuyerProfileMode.edit) return;
       final error = ProfileEditValidator.validateProfileImage(
         fileName: _imageFileName(image),
         fileSizeBytes: bytes.length,
@@ -57,10 +63,33 @@ extension _ProfileScreenActions on _ProfileScreenState {
         _showMessage(error);
         return;
       }
-      _updateUi(() => _avatarImageBytes = bytes);
+      if (owner != AgrisellSupabase.client.auth.currentUser?.id) return;
+      final url = await BuyerAvatarRepository(
+        AgrisellSupabase.client,
+      ).save(bytes);
+      await AuthRegistrationService.instance.loadCurrentAccount();
+      if (!mounted || owner != AgrisellSupabase.client.auth.currentUser?.id)
+        return;
+      _updateUi(() {
+        _avatarImageBytes = bytes;
+        _profile = _profile.copyWith(avatarUrl: url);
+      });
       _showMessage('Profile image updated.');
+    } on FunctionException catch (error) {
+      if (mounted) {
+        _showMessage(
+          error.status == 429
+              ? 'Too many photo updates. Please wait and try again.'
+              : 'Photo saving is unavailable. Please try again later.',
+        );
+      }
+    } on AuthException {
+      if (mounted) _showMessage('Sign in again before updating your photo.');
     } on Exception {
-      if (mounted) _showMessage('Unable to choose profile image.');
+      if (mounted)
+        _showMessage('Your profile image could not be saved. Please retry.');
+    } finally {
+      _avatarSaving = false;
     }
   }
 

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/services/authenticated_storage_image.dart';
 
 import '../styles/profile_header_styles.dart';
 
@@ -10,6 +11,7 @@ class BuyerHeroAvatar extends StatelessWidget {
     required this.isVerified,
     this.showEditBadge = false,
     this.imageBytes,
+    this.imageUrl,
     this.onEdit,
     super.key,
   });
@@ -18,6 +20,7 @@ class BuyerHeroAvatar extends StatelessWidget {
   final bool isVerified;
   final bool showEditBadge;
   final Uint8List? imageBytes;
+  final String? imageUrl;
   final VoidCallback? onEdit;
 
   @override
@@ -32,11 +35,9 @@ class BuyerHeroAvatar extends StatelessWidget {
           width: ProfileHeaderStyles.avatarSize,
           height: ProfileHeaderStyles.avatarSize,
           decoration: ProfileHeaderStyles.avatarGlowDecoration,
-          child: ClipOval(
-            child: _avatarImage(),
-          ),
+          child: ClipOval(child: _avatarImage()),
         ),
-        if (showEditBadge || onEdit != null)
+        if (showEditBadge && onEdit != null)
           Positioned(
             right: ProfileHeaderStyles.badgeRightOffset,
             bottom: ProfileHeaderStyles.badgeBottomOffset,
@@ -88,8 +89,23 @@ class BuyerHeroAvatar extends StatelessWidget {
         width: ProfileHeaderStyles.avatarSize,
         height: ProfileHeaderStyles.avatarSize,
         fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _placeholder(),
       );
     }
+    final url = imageUrl?.trim();
+    if (url != null && url.isNotEmpty) {
+      return authenticatedNetworkImage(
+        url,
+        width: ProfileHeaderStyles.avatarSize,
+        height: ProfileHeaderStyles.avatarSize,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _placeholder(),
+      );
+    }
+    return _placeholder();
+  }
+
+  Widget _placeholder() {
     return Container(
       width: ProfileHeaderStyles.avatarSize,
       height: ProfileHeaderStyles.avatarSize,

@@ -124,8 +124,17 @@ void main() {
       await tester.pumpWidget(
         _host(_evidence('local-secure://pickup/7/pickup-productPhoto-123.jpg')),
       );
-      await Future<void>.delayed(const Duration(milliseconds: 100));
     });
+    // Real file I/O runs outside the fake test clock. Wait for the loader's
+    // observable result rather than assuming it finishes within 100 ms.
+    final deadline = DateTime.now().add(const Duration(seconds: 5));
+    while (find.byType(Image).evaluate().isEmpty &&
+        DateTime.now().isBefore(deadline)) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 20)),
+      );
+      await tester.pump();
+    }
     await tester.pumpAndSettle();
     expect(find.byType(Image), findsOneWidget);
     final provider =

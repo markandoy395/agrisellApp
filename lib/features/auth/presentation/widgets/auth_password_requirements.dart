@@ -5,19 +5,25 @@ import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/password_policy.dart';
 
 class AuthPasswordRequirements extends StatelessWidget {
-  const AuthPasswordRequirements({required this.controller, super.key});
+  const AuthPasswordRequirements({
+    required this.controller,
+    this.alwaysShow = false,
+    super.key,
+  });
 
   final TextEditingController controller;
+  final bool alwaysShow;
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: controller,
       builder: (context, value, _) {
-        if (value.text.isEmpty) return const SizedBox.shrink();
+        if (!alwaysShow && value.text.isEmpty) return const SizedBox.shrink();
 
         final requirements = PasswordPolicy.evaluate(value.text);
-        if (requirements.every((requirement) => requirement.isMet)) {
+        if (!alwaysShow &&
+            requirements.every((requirement) => requirement.isMet)) {
           return const SizedBox.shrink();
         }
         return Padding(

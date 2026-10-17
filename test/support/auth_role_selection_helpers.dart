@@ -47,11 +47,12 @@ Future<void> enterValidSignUpDetails(
   await _enterText(tester, 'Last Name', 'Reyes');
   await _enterText(tester, 'Name Extension (Optional)', 'Jr.');
   await _enterText(tester, 'Phone Number (09XXXXXXXXX)', '09171234567');
-  await _enterText(
-    tester,
-    'Shipping Address',
-    'Purok 5, Lianga, Surigao del Sur',
-  );
+  await _enterText(tester, 'House / street / purok', 'Purok 5');
+  await _enterText(tester, 'Province (select or type)', 'Surigao del Sur');
+  await _enterText(tester, 'City or municipality (select or type)', 'Lianga');
+  await _enterText(tester, 'Barangay (select or type)', 'Poblacion');
+  FocusManager.instance.primaryFocus?.unfocus();
+  await tester.pumpAndSettle();
 
   final birthDate = find.widgetWithText(TextField, 'Date of Birth');
   await tester.ensureVisible(birthDate);

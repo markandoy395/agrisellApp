@@ -95,6 +95,10 @@ void main() {
       );
       await pump(_profile(null));
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.byType(RiderCapacitySetupBanner),
+        300,
+      );
       expect(find.byType(RiderCapacitySetupBanner), findsOneWidget);
       expect(find.text('Set capacity'), findsOneWidget);
       expect(
@@ -102,6 +106,10 @@ void main() {
         findsOneWidget,
       );
       await pump(_profile(3));
+      await tester.pumpAndSettle();
+      // Check the end of the lazy list, where the prompt was displayed.
+      final scroll = tester.state<ScrollableState>(find.byType(Scrollable));
+      scroll.position.jumpTo(scroll.position.maxScrollExtent);
       await tester.pumpAndSettle();
       expect(find.byType(RiderCapacitySetupBanner), findsNothing);
       expect(tester.takeException(), isNull);

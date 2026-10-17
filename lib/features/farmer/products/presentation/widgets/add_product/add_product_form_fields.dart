@@ -36,6 +36,8 @@ class _RoundedTextField extends StatelessWidget {
     this.textInputAction,
     this.prefixText,
     this.suffixText,
+    this.suffixIcon,
+    this.suffixIconConstraints,
     this.hintText,
     this.errorText,
     this.maxLines = 1,
@@ -48,6 +50,8 @@ class _RoundedTextField extends StatelessWidget {
   final TextInputAction? textInputAction;
   final String? prefixText;
   final String? suffixText;
+  final Widget? suffixIcon;
+  final BoxConstraints? suffixIconConstraints;
   final String? hintText;
   final String? errorText;
   final int maxLines;
@@ -73,6 +77,8 @@ class _RoundedTextField extends StatelessWidget {
         _textFieldBorder(AgrisellColors.authGreen, width: 1.4),
         _textFieldBorder(AgrisellColors.statusRedText),
         _textFieldBorder(AgrisellColors.statusRedText, width: 1.4),
+        suffixIcon: suffixIcon,
+        suffixIconConstraints: suffixIconConstraints,
       ),
     );
   }

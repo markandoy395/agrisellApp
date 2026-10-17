@@ -59,7 +59,13 @@ class AuthRegistrationService {
     } on AuthRegistrationException {
       rethrow;
     } on AuthException catch (error) {
-      if (AuthLoginErrorMapper.isInvalidCredentials(error)) return null;
+      if (AuthLoginErrorMapper.isInvalidCredentials(error)) {
+        AuthLoginFailureMapper.diagnose(
+          'authentication',
+          'invalid_credentials',
+        );
+        return null;
+      }
       throw AuthLoginErrorMapper.toRegistrationException(error);
     } catch (error) {
       throw AuthLoginFailureMapper.map(error);

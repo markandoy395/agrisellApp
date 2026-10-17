@@ -6,6 +6,7 @@ import 'package:agresell_app/features/rider/deliveries/data/rider_delivery_repos
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_delivery_controller.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_tabs.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_batch_delivery_summary.dart';
 import 'support/rider_batch_fixture.dart';
 
 void main() {
@@ -56,6 +57,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      await tester.tap(find.text('Route and handling details'));
+      await tester.pumpAndSettle();
       expect(find.text('2-delivery batch'), findsOneWidget);
       expect(find.textContaining('Total route:'), findsOneWidget);
       expect(
@@ -65,7 +68,13 @@ void main() {
       expect(find.textContaining('Capacity left: 60.0 kg'), findsOneWidget);
       expect(find.textContaining('Pickup sequence:'), findsOneWidget);
       expect(find.textContaining('Delivery sequence:'), findsOneWidget);
-      expect(find.textContaining('deadline'), findsNWidgets(2));
+      expect(
+        find.descendant(
+          of: find.byType(RiderBatchDeliverySummary),
+          matching: find.textContaining('deadline'),
+        ),
+        findsNWidgets(2),
+      );
       expect(controller.activeDeliveryRequests, hasLength(2));
       await tester.scrollUntilVisible(find.text('Product b'), 300);
       expect(find.text('Product b'), findsOneWidget);

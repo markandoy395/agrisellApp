@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../data/auth_session_service.dart';
+import 'auth_navigation_observer.dart';
 import 'screens/login_screen.dart';
 
 /// Clears private pages and open dialogs when authentication is lost.
@@ -9,11 +10,13 @@ class AuthNavigationScope extends StatefulWidget {
   const AuthNavigationScope({
     required this.navigatorKey,
     required this.child,
+    this.observer,
     super.key,
   });
 
   final GlobalKey<NavigatorState> navigatorKey;
   final Widget child;
+  final AuthNavigationObserver? observer;
 
   @override
   State<AuthNavigationScope> createState() => _AuthNavigationScopeState();
@@ -43,6 +46,7 @@ class _AuthNavigationScopeState extends State<AuthNavigationScope> {
       if (!mounted || _session.isAuthenticated) return;
       final navigator = widget.navigatorKey.currentState;
       if (navigator == null) return;
+      if (widget.observer?.retainPublicFlow(navigator) == true) return;
       var showingLogin = false;
       navigator.popUntil((route) {
         showingLogin = route.settings.name == 'auth.login';

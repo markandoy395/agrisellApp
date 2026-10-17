@@ -40,6 +40,7 @@ class RiderAvailabilityCard extends StatelessWidget {
                   availability: availability,
                   gpsStatus: controller.gpsStatus,
                   internetStatus: controller.internetStatus,
+                  isUpdating: controller.isUpdating,
                 ),
               ),
               const SizedBox(width: 10),
@@ -50,6 +51,10 @@ class RiderAvailabilityCard extends StatelessWidget {
               ),
             ],
           ),
+          if (controller.isUpdating) ...[
+            const SizedBox(height: 10),
+            const LinearProgressIndicator(),
+          ],
           RiderEnvironmentRow(
             gps: controller.gpsStatus,
             internet: controller.internetStatus,

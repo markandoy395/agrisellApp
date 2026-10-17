@@ -5,7 +5,7 @@ import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_search_bar.dart';
 
 class HomePinnedSearchHeaderDelegate extends SliverPersistentHeaderDelegate {
-  const HomePinnedSearchHeaderDelegate({
+  HomePinnedSearchHeaderDelegate({
     required this.horizontalPadding,
     required this.bottomGap,
     required this.searchController,
@@ -13,7 +13,22 @@ class HomePinnedSearchHeaderDelegate extends SliverPersistentHeaderDelegate {
     required this.searchSuggestions,
     required this.onQueryChanged,
     required this.onFilterTap,
-  });
+  }) : _child = ColoredBox(
+         color: AgrisellColors.homeBackground,
+         child: Padding(
+           padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+           child: Align(
+             alignment: Alignment.topCenter,
+             child: HomeSearchBar(
+               controller: searchController,
+               activeFilterCount: activeFilterCount,
+               suggestions: searchSuggestions,
+               onChanged: onQueryChanged,
+               onFilterTap: onFilterTap,
+             ),
+           ),
+         ),
+       );
 
   static const searchHeight = 48.0;
 
@@ -24,6 +39,7 @@ class HomePinnedSearchHeaderDelegate extends SliverPersistentHeaderDelegate {
   final List<String> searchSuggestions;
   final ValueChanged<String> onQueryChanged;
   final VoidCallback onFilterTap;
+  final Widget _child;
 
   @override
   double get minExtent => searchHeight + bottomGap;
@@ -36,24 +52,7 @@ class HomePinnedSearchHeaderDelegate extends SliverPersistentHeaderDelegate {
     BuildContext context,
     double shrinkOffset,
     bool overlapsContent,
-  ) {
-    return ColoredBox(
-      color: AgrisellColors.homeBackground,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: HomeSearchBar(
-            controller: searchController,
-            activeFilterCount: activeFilterCount,
-            suggestions: searchSuggestions,
-            onChanged: onQueryChanged,
-            onFilterTap: onFilterTap,
-          ),
-        ),
-      ),
-    );
-  }
+  ) => _child;
 
   @override
   bool shouldRebuild(covariant HomePinnedSearchHeaderDelegate oldDelegate) {

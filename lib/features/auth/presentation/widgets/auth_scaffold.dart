@@ -31,7 +31,6 @@ class AuthScaffold extends StatelessWidget {
     final widthScale = authScale(size.width);
     final heightScale = ((size.height - 568) / 364).clamp(0, 1).toDouble();
     final layoutScale = widthScale < heightScale ? widthScale : heightScale;
-    final keyboardVisible = MediaQuery.viewInsetsOf(context).bottom > 0;
     final compactCardHeight = lerpDouble(430, 480, layoutScale);
 
     return Scaffold(
@@ -73,6 +72,10 @@ class AuthScaffold extends StatelessWidget {
                       }
                       if (!compactCard) return card;
 
+                      // Subscribe only the compact card's layout to inset frames.
+                      // The full-screen header and image keep their widgets.
+                      final keyboardVisible =
+                          MediaQuery.viewInsetsOf(context).bottom > 0;
                       final cardHeight = keyboardVisible
                           ? constraints.maxHeight
                           : compactCardHeight;

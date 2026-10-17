@@ -180,7 +180,7 @@ void main() {
     });
 
     testWidgets(
-      'triggers onLoadMore when scrolled near the bottom (80% depth)',
+      'prefetches near the viewport and ignores horizontal scrolling',
       (tester) async {
         await tester.binding.setSurfaceSize(const Size(430, 932));
         addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -203,7 +203,7 @@ void main() {
                 bannerController: bannerController,
                 searchController: searchController,
                 browseController: browseController,
-                products: testHomeProducts.take(8).toList(),
+                products: testHomeProducts,
                 onBannerTap: (_) {},
                 onViewAll: () {},
                 onShowFilters: () {},

@@ -22,15 +22,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _confirmation = TextEditingController();
+  final _confirmationError = ValueNotifier<String?>(null);
   var _step = _PasswordRecoveryStep.requestOtp;
   var _loading = false;
   var _confirmationTouched = false;
 
-  String? get _confirmationError {
-    if (!_confirmationTouched) return null;
-    if (_confirmation.text.isEmpty) return 'Confirm your new password.';
-    if (_password.text != _confirmation.text) return 'Passwords do not match.';
-    return null;
+  void _validateConfirmation() {
+    _confirmationError.value = !_confirmationTouched
+        ? null
+        : _confirmation.text.isEmpty
+        ? 'Confirm your new password.'
+        : _password.text != _confirmation.text
+        ? 'Passwords do not match.'
+        : null;
   }
 
   @override
@@ -38,6 +42,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     _email.dispose();
     _password.dispose();
     _confirmation.dispose();
+    _confirmationError.dispose();
     super.dispose();
   }
 
@@ -67,11 +72,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               confirmationController: _confirmation,
               confirmationError: _confirmationError,
               loading: _loading,
-              onPasswordChanged: (_) {
-                if (_confirmationTouched) setState(() {});
+              onPasswordChanged: (_) => _validateConfirmation(),
+              onConfirmationChanged: (_) {
+                _confirmationTouched = true;
+                _validateConfirmation();
               },
-              onConfirmationChanged: (_) =>
-                  setState(() => _confirmationTouched = true),
               onUpdatePassword: _updatePassword,
               onBackToLogin: () => Navigator.of(context).pop(),
             ),
@@ -117,7 +122,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       return;
     }
     if (password != _confirmation.text) {
-      setState(() => _confirmationTouched = true);
+      _confirmationTouched = true;
+      _validateConfirmation();
       return;
     }
     setState(() => _loading = true);

@@ -1,5 +1,6 @@
 ﻿Database query inventory - see docs/data_ownership_audit.md and docs/sql_injection_audit.md for scope and guards.
 Literal table/storage accesses:
+2026-10-17: Profile/signup persistence repairs deployed; see docs/profile_edit_persistence_audit.md. New current_signup_profile_complete returns caller completeness only; update_current_rider_vehicle derives mapped ownership and requires the rate-limit gateway. BuyerAvatarRepository invokes application-api/avatar; the handler retains caller JWT/RLS, resolves current_query_owner, uploads to private owner-prefixed storage and saves only that owner's users.profile_photo_url. Vehicle details and license/crop/unit synchronization use fixed-path triggers. Location cache/pending writes are account-scoped and reject stale sessions. Existing-account security and repair mutations roll back in SQL checks. New fields use bound values; no raw input SQL or anonymous grants.
 2026-10-05: _shared/rate_limit.ts calls service-only admin_consume_rate_limit with bound RPC arguments. application-api retains caller JWTs and ownership checks. See docs/rate_limiting_audit.md for staged enforcement and coverage gaps.
 lib\core\services\push_notification_service.dart:124:      await AgrisellSupabase.client.from('notification_devices').upsert({
 lib\features\buyer\deals\data\buyer_deals_repository.dart:30:            .from('product_sales')
@@ -182,3 +183,9 @@ Rider pickup product image (2026-10-15, deployment pending): migration 202610151
 
 2026-10-16 concurrency hardening (prepared, not deployed): owner-scoped retry receipts for buyer/farmer messages and farmer cash-out, independent session/participant/farmer checks, transaction advisory locks, default-deny private receipt RLS, bound/static SQL and caller JWT gateway transport. Shared order queues/cache writes reject account changes; stale callbacks and duplicate submissions are guarded across buyer/farmer/rider/shared flows. Consolidated order bundle retains existing owner RPCs and only falls back when missing. See docs/concurrency_hardening.md for exact scope, isolated fixture verification and outstanding full-schema/hosted/load checks.
 
+2026-10-17: BuyerHeroAvatar renders UserProfile.avatarUrl using existing authenticatedNetworkImage; project storage URLs normalize to authenticated requests and bearer headers remain limited to the configured origin. No query, upload policy or backend ownership boundary changed. See docs/profile_edit_persistence_audit.md.
+
+
+2026-10-17 optional farmer signup/uploads (prepared, not deployed): step 3 skip is caller-owned and persisted through the existing registration RPC; profile completeness recognizes explicit skip. Product inserts allow active pending/verified/needs_information farmers while retaining JWT expiry, anonymous denial, farm/category ownership and existing restrictive RLS. Context query adds account_status. No storage policy or anonymous grants changed. See docs/farmer_optional_signup_uploads.md for local verification and outstanding full-schema/hosted checks.
+
+2026-10-18 rider signup navigation: no query, RPC, ownership, grant or storage changes. Public auth flow state survives previous-session loss; private history/dialog cleanup remains enforced. See docs/rider_signup_continue_navigation.md.

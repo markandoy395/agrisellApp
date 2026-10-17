@@ -35,7 +35,7 @@ class _FarmerAddProductButton extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.only(top: 7),
               child: Text(
-                'Product posting is available after verification.',
+                'Product posting is unavailable for your account status.',
                 textAlign: TextAlign.center,
                 style: SharedPresentationStyles.captionMedium,
               ),

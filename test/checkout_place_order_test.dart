@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:agresell_app/features/shared/location/data/confirmed_location_repository.dart';
 
 import 'package:agresell_app/core/constants/agrisell_routes.dart';
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
@@ -26,7 +27,7 @@ void main() {
     basket.clear();
     orders.clear();
     SharedPreferences.setMockInitialValues({
-      'confirmed_location_buyer_v1': jsonEncode({
+      'confirmed_location_checkout-owner_buyer_v2': jsonEncode({
         'latitude': 8.1575,
         'longitude': 125.1277,
         'accuracyMeters': 6.0,
@@ -57,7 +58,12 @@ void main() {
           AgrisellRoutes.basket: (_) => const BasketScreen(),
           AgrisellRoutes.checkout: (_) => const CheckoutScreen(),
         },
-        home: const CheckoutScreen(initialDeliveryAddress: 'Test address'),
+        home: CheckoutScreen(
+          initialDeliveryAddress: 'Test address',
+          locationRepository: ConfirmedLocationRepository(
+            accountId: () => 'checkout-owner',
+          ),
+        ),
       ),
     );
     await tester.pumpAndSettle();

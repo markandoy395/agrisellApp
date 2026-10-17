@@ -16,6 +16,9 @@ extension _RiderRegistrationServiceProfileUpdater on RiderRegistrationService {
           lastName: profile.lastName,
           contactNumber: profile.contactNumber,
           licenseNumber: profile.licenseNumber,
+          vehiclePlateNumber: profile.vehicleType.requiresPlate
+              ? profile.vehiclePlateNumber
+              : rider.vehiclePlateNumber,
           locationLabel: profile.address,
           addressLine: profile.addressLine,
           barangay: profile.barangay,
@@ -26,25 +29,6 @@ extension _RiderRegistrationServiceProfileUpdater on RiderRegistrationService {
           gpsLongitude: profile.gpsLongitude,
         ),
       );
-      _currentVehicle = await _repository.updateVehicle(
-        vehicle.copyWith(
-          plateNumber: profile.vehicleType.requiresPlate
-              ? profile.vehiclePlateNumber
-              : vehicle.plateNumber,
-        ),
-      );
-      final license = _currentDocuments
-          .where(
-            (item) => item.documentType == RiderDocumentType.driversLicense,
-          )
-          .firstOrNull;
-      if (profile.vehicleType.requiresLicense &&
-          license != null &&
-          profile.licenseNumber != license.documentNumber) {
-        await _repository.saveRiderDocumentRecord(
-          license.copyWith(documentNumber: profile.licenseNumber),
-        );
-      }
       return (await _loadRemoteProfile(force: true))!;
     } on RiderRepositoryException catch (error) {
       throw RiderRegistrationException(error.message);

@@ -45,6 +45,7 @@ class _FarmCreationDialogState extends State<_FarmCreationDialog> {
       ),
       actions: [
         TextButton(onPressed: _cancel, child: const Text('Cancel')),
+        TextButton(onPressed: _skip, child: const Text('Skip')),
         FilledButton(
           onPressed: _createFarm,
           style: FarmerRestockDialogStyles.confirmButtonStyle,
@@ -57,6 +58,11 @@ class _FarmCreationDialogState extends State<_FarmCreationDialog> {
   void _cancel() {
     FocusManager.instance.primaryFocus?.unfocus();
     Navigator.of(context).pop();
+  }
+
+  void _skip() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    Navigator.of(context).pop('');
   }
 
   void _createFarm() {

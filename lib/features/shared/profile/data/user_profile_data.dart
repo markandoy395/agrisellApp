@@ -29,7 +29,7 @@ UserProfile currentAuthenticatedUserProfile() {
     email: account.email,
     address: account.shippingAddress ?? '',
     phoneNumber: PhilippinePhoneNumber.display(account.phoneNumber ?? ''),
-    gender: '',
+    gender: account.gender,
     dateOfBirth: ProfileBirthDate.parse(account.dateOfBirth ?? '').formatted,
     firstName: account.firstName,
     lastName: account.lastName,

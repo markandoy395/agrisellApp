@@ -265,3 +265,15 @@ Rider pickup product image (2026-10-15, deployment pending): migration 202610151
 
 2026-10-16 concurrency hardening (prepared, not deployed): owner-scoped retry receipts for buyer/farmer messages and farmer cash-out, independent session/participant/farmer checks, transaction advisory locks, default-deny private receipt RLS, bound/static SQL and caller JWT gateway transport. Shared order queues/cache writes reject account changes; stale callbacks and duplicate submissions are guarded across buyer/farmer/rider/shared flows. Consolidated order bundle retains existing owner RPCs and only falls back when missing. See docs/concurrency_hardening.md for exact scope, isolated fixture verification and outstanding full-schema/hosted/load checks.
 
+
+Profile persistence repair (2026-10-17): new profile completeness/vehicle RPCs
+resolve auth.uid() through the existing identity mapping. Protected vehicle
+writes require the persistent quota gateway. The buyer avatar handler validates
+current_query_owner against the verified caller and uses caller JWT/RLS for
+profile updates; private owner-prefixed storage rejects ordinary client writes.
+Existing owner boundaries remain. Location cache and pending sync are scoped to
+the current authenticated account. See docs/profile_edit_persistence_audit.md for
+rolled-back hosted isolation/repair assertions and remaining device-test limits.
+
+
+2026-10-17: Active pending farmers may insert their own categories/products. Matching commodity category and farm ownership remain required; skipped signup creates no placeholder farm. See farmer_optional_signup_uploads.md for isolated checks and outstanding full-schema assertions.

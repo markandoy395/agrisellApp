@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:agresell_app/features/shared/location/data/psgc_address_matching.dart';
 import 'package:agresell_app/features/shared/location/data/psgc_address_service.dart';
+import 'package:agresell_app/features/shared/location/data/psgc_fallback_provinces.dart';
 import 'package:agresell_app/features/shared/location/presentation/styles/psgc_address_styles.dart';
 import 'package:agresell_app/features/shared/location/presentation/widgets/address_autocomplete_field.dart';
 
@@ -39,8 +40,7 @@ class PsgcAddressFields extends StatefulWidget {
 
 class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
   late final PhilippineAddressLookup _lookup;
-  List<PsgcAddressOption> _provinces = const [];
-  List<PsgcAddressOption> _localities = const [];
+  final _cache = PsgcLocalityFilterCache();
   List<PsgcAddressOption> _barangays = const [];
   String _region = '';
   String? _loadedLocalityCode;
@@ -49,66 +49,85 @@ class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
   void initState() {
     super.initState();
     _lookup = widget.lookup ?? PsgcAddressService.instance;
-    unawaited(_loadTopLevels());
+    if (widget.lookup == null) _cache.provinces = psgcFallbackProvinces;
+    unawaited(_load(_lookup.provinces(), _setProvinces));
+    unawaited(_load(_lookup.citiesMunicipalities(), _setLocalities));
   }
 
-  Future<void> _loadTopLevels() async {
-    final results = await Future.wait([
-      _lookup.provinces(),
-      _lookup.citiesMunicipalities(),
-    ]);
-    if (!mounted) return;
-    setState(() {
-      _provinces = results[0];
-      _localities = results[1];
-    });
+  void _setProvinces(List<PsgcAddressOption> values) {
+    _cache.provinces = values;
     _provinceChanged(widget.provinceController.text);
+  }
+
+  void _setLocalities(List<PsgcAddressOption> values) {
+    _cache.localities = values;
     _cityChanged(widget.cityController.text);
   }
 
-  List<PsgcAddressOption> get _filteredLocalities {
-    final selected = exactPsgcOption(_provinces, widget.provinceController.text);
-    if (selected == null) return _localities;
-    final matches = _localities
-        .where((option) => psgcBelongsToProvince(option, selected))
-        .toList(growable: false);
-    return matches.isEmpty ? _localities : matches;
+  Future<void> _loadProvinceLocalities(PsgcAddressOption province) =>
+      _load(_lookup.provinceCitiesMunicipalities(province.code), (values) {
+        _cache.provinceLocalities[province.code] = values;
+        _cityChanged(widget.cityController.text);
+      });
+
+  Future<void> _load(
+    Future<List<PsgcAddressOption>> future,
+    ValueChanged<List<PsgcAddressOption>> apply,
+  ) async {
+    final values = await future;
+    if (mounted && values.isNotEmpty) setState(() => apply(values));
   }
 
+  List<PsgcAddressOption> get _filteredLocalities =>
+      _cache.resolve(widget.provinceController.text);
+
   void _provinceChanged(String value) {
-    final match = exactPsgcOption(_provinces, value);
-    if (match != null && match.region != _region) {
-      setState(() => _region = match.region);
+    final match = exactPsgcOption(_cache.provinces, value);
+    if (_cache.shouldRebuildForProvince(match, _region)) {
+      setState(() {
+        if (match != null) _region = match.region;
+      });
     }
+    if (match != null) unawaited(_loadProvinceLocalities(match));
+    widget.onChanged();
+  }
+
+  void _pickProvince(PsgcAddressOption option) {
+    widget.provinceController.text = option.name;
+    widget.cityController.clear();
+    widget.barangayController.clear();
+    setState(() {
+      _region = option.region;
+      _loadedLocalityCode = null;
+      _barangays = const [];
+    });
+    unawaited(_loadProvinceLocalities(option));
     widget.onChanged();
   }
 
   void _cityChanged(String value) {
     final match = exactPsgcOption(_filteredLocalities, value);
-    if (match != null) unawaited(_selectLocality(match, clearBarangay: false));
+    if (match != null) unawaited(_pickLocality(match, clearBarangay: false));
     widget.onChanged();
   }
 
-  Future<void> _selectLocality(
+  Future<void> _pickLocality(
     PsgcAddressOption option, {
     bool clearBarangay = true,
   }) async {
-    final selectedProvince = widget.provinceController.text.trim();
-    final province = exactPsgcOption(_provinces, selectedProvince);
-    if (province != null && !psgcBelongsToProvince(option, province)) {
-      widget.cityController.clear();
-      widget.barangayController.clear();
-      widget.onChanged();
+    final ok = selectPsgcLocality(
+      option: option,
+      provinces: _cache.provinces,
+      provinceController: widget.provinceController,
+      cityController: widget.cityController,
+      barangayController: widget.barangayController,
+      clearBarangay: clearBarangay,
+    );
+    if (ok) setState(() => _region = option.region);
+    widget.onChanged();
+    if (!ok || (_loadedLocalityCode == option.code && _barangays.isNotEmpty)) {
       return;
     }
-    if (selectedProvince.isEmpty && option.province.isNotEmpty) {
-      widget.provinceController.text = option.province;
-    }
-    widget.cityController.text = option.name;
-    if (clearBarangay) widget.barangayController.clear();
-    setState(() => _region = option.region);
-    widget.onChanged();
-    if (_loadedLocalityCode == option.code) return;
     _loadedLocalityCode = option.code;
     final values = await _lookup.barangays(option.code);
     if (mounted && _loadedLocalityCode == option.code) {
@@ -120,56 +139,24 @@ class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      AddressAutocompleteField(
+      _buildField(
         label: 'Province',
-        enabled: widget.enabled,
-        externalLabel: widget.labelBuilder?.call('Province'),
-        decorationTheme: widget.decorationTheme,
-        leadingIcon: widget.showSignupIcons
-            ? _signupIcon(Icons.map_outlined)
-            : null,
         controller: widget.provinceController,
-        options: _provinces,
+        options: _cache.provinces,
         onChanged: _provinceChanged,
-        onSelected: (option) {
-          widget.provinceController.text = option.name;
-          widget.cityController.clear();
-          widget.barangayController.clear();
-          setState(() {
-            _region = option.region;
-            _barangays = const [];
-          });
-          widget.onChanged();
-        },
+        onSelected: _pickProvince,
       ),
-      AddressAutocompleteField(
-        key: ValueKey(
-          'city:${widget.provinceController.text.trim().toLowerCase()}',
-        ),
+      _buildField(
         label: 'City or municipality',
-        enabled: widget.enabled,
-        externalLabel: widget.labelBuilder?.call('City or municipality'),
-        decorationTheme: widget.decorationTheme,
-        leadingIcon: widget.showSignupIcons
-            ? _signupIcon(Icons.location_city_outlined)
-            : null,
         controller: widget.cityController,
         options: _filteredLocalities,
         onChanged: _cityChanged,
-        onSelected: _selectLocality,
+        onSelected: _pickLocality,
       ),
-      AddressAutocompleteField(
-        key: ValueKey('barangay:${_loadedLocalityCode ?? ''}'),
+      _buildField(
         label: 'Barangay',
-        enabled: widget.enabled,
-        externalLabel: widget.labelBuilder?.call('Barangay'),
-        decorationTheme: widget.decorationTheme,
-        leadingIcon: widget.showSignupIcons
-            ? _signupIcon(Icons.home_outlined)
-            : null,
         controller: widget.barangayController,
         options: _barangays,
-        onChanged: (_) => widget.onChanged(),
         onSelected: (option) {
           widget.barangayController.text = option.name;
           widget.onChanged();
@@ -178,15 +165,30 @@ class _PsgcAddressFieldsState extends State<PsgcAddressFields> {
       if (_region.isNotEmpty)
         Padding(
           padding: PsgcAddressStyles.regionPadding,
-          child: Text(
-            'Region: $_region',
-            style: PsgcAddressStyles.regionText,
-          ),
+          child: Text('Region: $_region', style: PsgcAddressStyles.regionText),
         ),
     ],
   );
 
-  Widget _signupIcon(IconData icon) =>
-      widget.leadingIconBuilder?.call(icon) ??
-      Icon(icon, color: PsgcAddressStyles.iconColor);
+  Widget _buildField({
+    required String label,
+    required TextEditingController controller,
+    required List<PsgcAddressOption> options,
+    required ValueChanged<PsgcAddressOption> onSelected,
+    ValueChanged<String>? onChanged,
+  }) => AddressAutocompleteField(
+    label: label,
+    enabled: widget.enabled,
+    externalLabel: widget.labelBuilder?.call(label),
+    decorationTheme: widget.decorationTheme,
+    leadingIcon: PsgcAddressStyles.fieldIcon(
+      label,
+      widget.showSignupIcons,
+      widget.leadingIconBuilder,
+    ),
+    controller: controller,
+    options: options,
+    onChanged: onChanged ?? (_) => widget.onChanged(),
+    onSelected: onSelected,
+  );
 }

@@ -30,6 +30,7 @@ Rider parseRiderJson(Map<String, Object?> json) => Rider(
   ),
   rating: riderNumber(json['rating']),
   firstName: riderText(json['first_name']),
+  middleName: riderText(json['middle_name']),
   lastName: riderText(json['last_name']),
   contactNumber: riderText(json['contact_number']),
   email: riderText(json['email']),
@@ -52,6 +53,10 @@ Rider parseRiderJson(Map<String, Object?> json) => Rider(
     orElse: () => RiderEmploymentStatus.inactive,
   ),
   profilePhotoPath: riderNullableText(json['profile_photo_url']),
+  vehicleBrand: riderNullableText(json['vehicle_brand']),
+  vehicleModel: riderText(json['vehicle_model']),
+  vehicleColor: riderText(json['vehicle_color']),
+  registrationNumber: riderNullableText(json['registration_number']),
 );
 
 Map<String, Object?> serializeRiderJson(Rider rider) => {

@@ -30,18 +30,7 @@ extension _RiderRegistrationServiceRemote on RiderRegistrationService {
           registration,
         ),
       );
-      _currentRider = await _repository.updateRider(
-        entities.rider.copyWith(
-          locationLabel: registration.locationLabel,
-          addressLine: registration.addressLine,
-          barangay: registration.barangay,
-          cityMunicipality: registration.cityMunicipality,
-          province: registration.province,
-          postalCode: registration.postalCode,
-          gpsLatitude: registration.gpsLatitude,
-          gpsLongitude: registration.gpsLongitude,
-        ),
-      );
+      _currentRider = entities.rider;
       _currentVehicle = entities.vehicle;
       _currentLocation = entities.location;
       await _uploadRegistrationFiles(

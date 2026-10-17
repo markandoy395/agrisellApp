@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
+import '../widgets/buyer_profile_style.dart';
 
 abstract final class BuyerDealsCardStyles {
   static final containerDecoration = BoxDecoration(
-    gradient: const LinearGradient(
-      colors: [Color(0xFF0B5435), Color(0xFF0E7A4F), Color(0xFF1AA06A)],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      stops: [0.0, 0.55, 1.0],
-    ),
+    color: BuyerProfileStyle.green,
     borderRadius: BorderRadius.circular(18),
     boxShadow: [
       BoxShadow(

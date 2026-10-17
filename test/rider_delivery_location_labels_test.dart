@@ -1,6 +1,7 @@
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/rider/deliveries/domain/delivery_request.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_request_card.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_delivery_address_pair.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -25,8 +26,30 @@ void main() {
       ),
     );
 
-    expect(find.text('Pick up from: Carmen Public Market'), findsOneWidget);
-    expect(find.text('Deliver to: Uptown Fresh Mart'), findsOneWidget);
+    final addresses = find.byType(RiderDeliveryAddressPair);
+    for (final stop in {
+      'Pick up from': 'Carmen Public Market',
+      'Deliver to': 'Uptown Fresh Mart',
+    }.entries) {
+      final label = find.descendant(
+        of: addresses,
+        matching: find.text(stop.key),
+      );
+      final address = find.descendant(
+        of: addresses,
+        matching: find.text(stop.value),
+      );
+      expect(label, findsOneWidget);
+      expect(address, findsOneWidget);
+      final group = find
+          .ancestor(of: label, matching: find.byType(Column))
+          .first;
+      expect(find.descendant(of: group, matching: address), findsOneWidget);
+      expect(
+        tester.getTopLeft(address).dy,
+        greaterThan(tester.getTopLeft(label).dy),
+      );
+    }
   });
 }
 

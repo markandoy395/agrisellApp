@@ -15,46 +15,51 @@ class FarmerReviewsHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: FarmerReviewsScreenStyles.headerPadding,
     decoration: FarmerReviewsScreenStyles.headerDecoration,
-    child: Row(
-      children: [
-        IconButton(
-          tooltip: 'Back',
-          onPressed: onBack,
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            color: AgrisellColors.surface,
-            size: 24,
-          ),
-        ),
-        const SizedBox(width: 4),
-        const Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Reviews & Ratings',
-                style: FarmerReviewsScreenStyles.headerTitleStyle,
+    child: SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: FarmerReviewsScreenStyles.headerPadding,
+        child: Row(
+          children: [
+            IconButton(
+              tooltip: 'Back',
+              onPressed: onBack,
+              icon: const Icon(
+                Icons.arrow_back_rounded,
+                color: AgrisellColors.surface,
+                size: 24,
               ),
-              SizedBox(height: 2),
-              Text(
-                'Buyer feedback & admin moderation',
-                style: FarmerReviewsScreenStyles.headerSubtitleStyle,
+            ),
+            const SizedBox(width: 4),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Reviews & Ratings',
+                    style: FarmerReviewsScreenStyles.headerTitleStyle,
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    'Buyer feedback & admin moderation',
+                    style: FarmerReviewsScreenStyles.headerSubtitleStyle,
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            IconButton(
+              tooltip: 'Refresh',
+              onPressed: onRefresh,
+              icon: const Icon(
+                Icons.refresh_rounded,
+                color: AgrisellColors.surface,
+                size: 22,
+              ),
+            ),
+          ],
         ),
-        IconButton(
-          tooltip: 'Refresh',
-          onPressed: onRefresh,
-          icon: const Icon(
-            Icons.refresh_rounded,
-            color: AgrisellColors.surface,
-            size: 22,
-          ),
-        ),
-      ],
+      ),
     ),
   );
 }

@@ -181,3 +181,18 @@ Rider pickup product image (2026-10-15, deployment pending): migration 202610151
 
 2026-10-16 concurrency hardening (prepared, not deployed): owner-scoped retry receipts for buyer/farmer messages and farmer cash-out, independent session/participant/farmer checks, transaction advisory locks, default-deny private receipt RLS, bound/static SQL and caller JWT gateway transport. Shared order queues/cache writes reject account changes; stale callbacks and duplicate submissions are guarded across buyer/farmer/rider/shared flows. Consolidated order bundle retains existing owner RPCs and only falls back when missing. See docs/concurrency_hardening.md for exact scope, isolated fixture verification and outstanding full-schema/hosted/load checks.
 
+
+Profile persistence repair (2026-10-17): account completeness is derived from the
+server-mapped owner by a fixed-path boolean RPC requiring a non-anonymous,
+unexpired session. Incomplete active/pending accounts resume existing signup;
+role/status checks remain. Suspended Rider status is preserved. Location pending
+writes are account-scoped and stale sessions are rejected. See
+`profile_edit_persistence_audit.md` for rolled-back hosted and local verification.
+
+
+2026-10-17: Safe login-stage diagnostics and mocked login/recovery contract tests were added. The same-email login failure followed by same_password still needs device reproduction. See docs/login_recovery_investigation.md. No query or authorization boundary changes.
+
+
+2026-10-17: Optional farmer step 3 retains verified email, signed-in caller, requested farmer role and gateway checks. Explicit skip counts as profile completion; product inserts require active owner plus non-anonymous unexpired JWT. See farmer_optional_signup_uploads.md; prepared locally only.
+
+2026-10-18 rider signup Continue: session-loss cleanup retains already allowlisted public auth pages through the installed navigator observer while removing private routes and unknown dialogs. Private/unknown current pages still reset to login. No new public destinations or backend changes. See docs/rider_signup_continue_navigation.md for local coverage and device-verification limits.

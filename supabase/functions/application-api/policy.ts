@@ -4,6 +4,7 @@ export function apiRoute(request: Request): string | null {
   if (!methods.has(request.method)) return null;
   const path = new URL(request.url).pathname;
   const route = path.split("/application-api/")[1];
+  if (route === "avatar" && request.method === "POST") return "avatar";
   return route && /^rest\/(?:[a-z][a-z0-9_]*|rpc\/[a-z][a-z0-9_]*)$/.test(route)
     ? route.slice(5)
     : null;
@@ -11,8 +12,14 @@ export function apiRoute(request: Request): string | null {
 
 export function sensitivePolicy(route: string, method: string) {
   const name = route.replace(/^rpc\//, "");
-  if (name === "current_checkout_voucher") return { scope: "voucher", limit: 20 };
-  if (/withdraw|payout|refund|gcash|payment|pickup_code|delivery_code|confirm.*code/.test(name)) {
+  if (name === "avatar") return { scope: "profile-avatar", limit: 10 };
+  if (name === "current_checkout_voucher") {
+    return { scope: "voucher", limit: 20 };
+  }
+  if (
+    /withdraw|payout|refund|gcash|payment|pickup_code|delivery_code|confirm.*code/
+      .test(name)
+  ) {
     // Read-only summaries retain the general API quota.
     if (
       method === "GET" || method === "HEAD" ||
@@ -25,15 +32,28 @@ export function sensitivePolicy(route: string, method: string) {
   if (/create.*support|submit.*incident|report.*incident/.test(name)) {
     return { scope: "support-and-reports", limit: 10 };
   }
-  if (/send.*message/.test(name) &&
-      !["send_marketplace_message", "send_marketplace_message_once", "send_rider_delivery_message"].includes(name)) {
+  if (
+    /send.*message/.test(name) &&
+    ![
+      "send_marketplace_message",
+      "send_marketplace_message_once",
+      "send_rider_delivery_message",
+    ].includes(name)
+  ) {
     return { scope: "messages", limit: 60 };
   }
   return null;
 }
 
-export function upstreamHeaders(request: Request, apiKey: string, secret: string) {
-  const headers = new Headers({ apikey: apiKey, "x-agrisell-api-gateway": secret });
+export function upstreamHeaders(
+  request: Request,
+  apiKey: string,
+  secret: string,
+) {
+  const headers = new Headers({
+    apikey: apiKey,
+    "x-agrisell-api-gateway": secret,
+  });
   for (
     const name of [
       "authorization",

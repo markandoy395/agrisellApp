@@ -11,6 +11,7 @@ import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 import 'package:agresell_app/features/farmer/products/domain/farmer_dashboard_product.dart';
+import 'package:agresell_app/features/farmer/products/domain/product_description_samples.dart';
 import 'package:agresell_app/features/farmer/products/presentation/controllers/add_product_draft.dart';
 import 'package:agresell_app/features/farmer/products/presentation/controllers/product_image_picker.dart';
 import 'package:agresell_app/features/farmer/products/presentation/controllers/product_form_message.dart';
@@ -63,6 +64,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   ProductSaleStatus _saleStatus = ProductSaleStatus.readyNow;
   String? _gradeQuality;
   var _isOrganic = false;
+  var _sampleDescriptionSeed = 0;
   Map<AddProductField, String> _errors = {};
   @override
   void initState() {
@@ -123,6 +125,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   errors: _errors,
                   onDescriptionChanged: (_) =>
                       _clearError(AddProductField.description),
+                  onGenerateDescription: _generateSampleDescription,
                   pricingFields: _PricingInventoryFields(
                     priceController: _priceController,
                     quantityController: _weightController,

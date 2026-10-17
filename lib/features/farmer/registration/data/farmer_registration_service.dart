@@ -66,7 +66,7 @@ class FarmerRegistrationService {
       final farmer = await client
           .from('farmers')
           .select(
-            'first_name,last_name,suffix,phone_number,date_of_birth,'
+            'first_name,last_name,suffix,phone_number,date_of_birth,gender,'
             'account_status,verification_status,profile_image_url',
           )
           .eq('auth_user_id', user.id)
@@ -83,6 +83,7 @@ class FarmerRegistrationService {
         extensionName: _optionalText(farmer['suffix']),
         phoneNumber: _optionalText(farmer['phone_number']),
         dateOfBirth: _optionalText(farmer['date_of_birth']),
+        gender: _text(farmer['gender']),
         verificationStatus: _optionalText(farmer['verification_status']),
         profileImageUrl: _optionalText(farmer['profile_image_url']),
       );

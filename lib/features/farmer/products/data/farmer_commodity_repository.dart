@@ -33,7 +33,9 @@ class FarmerCommodityRepository {
         growable: false,
       );
       final summaries = await _loadInventorySummaries(rows);
-      final activeSales = await FarmerCommoditySalesLoader.loadActiveSales(rows);
+      final activeSales = await FarmerCommoditySalesLoader.loadActiveSales(
+        rows,
+      );
       return rows
           .map((row) {
             final commodityId = FarmerCommodityFormat.integer(
@@ -65,9 +67,9 @@ class FarmerCommodityRepository {
     if (!isAvailable) return product;
     try {
       final context = await FarmerCommodityContext.load();
-      if (product.commodityId == null && !context.isVerified) {
+      if (product.commodityId == null && !context.canPostProducts) {
         throw const FarmerCommodityException(
-          'Your farmer account is pending verification. You can add products after approval.',
+          'Your farmer account cannot upload products. Please check your account status.',
         );
       }
       final categoryId = await context.resolveCategory(product.category);

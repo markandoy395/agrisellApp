@@ -14,7 +14,6 @@ class SignUpIdentityFields extends StatefulWidget {
     required this.contactNumberController,
     required this.dateOfBirthController,
     required this.genderController,
-    required this.shippingAddressController,
     required this.emailController,
     this.showEmail = true,
     super.key,
@@ -26,7 +25,6 @@ class SignUpIdentityFields extends StatefulWidget {
   final TextEditingController contactNumberController;
   final TextEditingController dateOfBirthController;
   final TextEditingController genderController;
-  final TextEditingController shippingAddressController;
   final TextEditingController emailController;
   final bool showEmail;
 
@@ -68,14 +66,6 @@ class _SignUpIdentityFieldsState extends State<SignUpIdentityFields> {
               ],
             );
           },
-        ),
-        const SizedBox(height: 6),
-        AuthTextField(
-          controller: widget.shippingAddressController,
-          hintText: 'Shipping Address',
-          keyboardType: TextInputType.streetAddress,
-          textInputAction: TextInputAction.next,
-          autofillHints: const [AutofillHints.fullStreetAddress],
         ),
         const SizedBox(height: 6),
         AuthTextField(

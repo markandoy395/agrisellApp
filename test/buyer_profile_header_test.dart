@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:agresell_app/core/models/user_profile.dart';
+import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/features/buyer/profile/presentation/widgets/profile_header.dart';
 
 void main() {
@@ -35,7 +36,6 @@ void main() {
             showSettingsIcon: true,
             onSettingsTap: () => settingsPressed = true,
             followingCount: 15,
-            followerCount: 1,
           ),
         ),
       ),
@@ -45,16 +45,11 @@ void main() {
     expect(find.text('Account'), findsOneWidget);
     expect(find.text('Maria Santos'), findsOneWidget);
     expect(find.text('Verified Buyer'), findsOneWidget);
-    expect(find.text('15 Following  |  1 Follower'), findsOneWidget);
+    expect(find.bySemanticsLabel('15 following'), findsOneWidget);
+    expect(find.textContaining('Follower', findRichText: true), findsNothing);
     expect(
       find.byWidgetPredicate(
         (w) => w is RichText && w.text.toPlainText() == '15 Following',
-      ),
-      findsOneWidget,
-    );
-    expect(
-      find.byWidgetPredicate(
-        (w) => w is RichText && w.text.toPlainText() == '1 Follower',
       ),
       findsOneWidget,
     );
@@ -87,7 +82,6 @@ void main() {
             showAvatarEditBadge: true,
             onAvatarEdit: () => avatarEditPressed = true,
             followingCount: 0,
-            followerCount: 5,
           ),
         ),
       ),
@@ -96,16 +90,11 @@ void main() {
 
     expect(find.text('Edit Profile'), findsOneWidget);
     expect(find.text('Buyer Account'), findsOneWidget);
-    expect(find.text('0 Following  |  5 Followers'), findsOneWidget);
+    expect(find.bySemanticsLabel('0 following'), findsOneWidget);
+    expect(find.textContaining('Follower', findRichText: true), findsNothing);
     expect(
       find.byWidgetPredicate(
         (w) => w is RichText && w.text.toPlainText() == '0 Following',
-      ),
-      findsOneWidget,
-    );
-    expect(
-      find.byWidgetPredicate(
-        (w) => w is RichText && w.text.toPlainText() == '5 Followers',
       ),
       findsOneWidget,
     );
@@ -114,4 +103,63 @@ void main() {
     await tester.tap(find.byIcon(Icons.camera_alt_rounded));
     expect(avatarEditPressed, isTrue);
   });
+
+  testWidgets('overview hides avatar editing even with an edit callback', (
+    tester,
+  ) async {
+    var avatarEditPressed = false;
+    for (final isVerified in [false, true]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ProfileHeader(
+              profile: testProfile,
+              isVerified: isVerified,
+              onAvatarEdit: () => avatarEditPressed = true,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byIcon(Icons.camera_alt_rounded), findsNothing);
+      expect(find.bySemanticsLabel('Change avatar'), findsNothing);
+      await tester.tap(find.byIcon(Icons.person_rounded));
+      expect(avatarEditPressed, isFalse);
+      expect(
+        find.byIcon(Icons.check_rounded),
+        isVerified ? findsOneWidget : findsNothing,
+      );
+    }
+  });
+
+  testWidgets(
+    'loads saved avatar through authenticated storage with fallback',
+    (tester) async {
+      final origin = AgrisellSupabase.projectUrl;
+      const path = 'buyer-avatars/owner/avatar.png';
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ProfileHeader(
+              profile: testProfile.copyWith(
+                avatarUrl: '$origin/storage/v1/object/public/$path',
+              ),
+              isVerified: true,
+            ),
+          ),
+        ),
+      );
+
+      final image = tester.widget<Image>(find.byType(Image));
+      expect(image.image, isA<NetworkImage>());
+      expect(
+        (image.image as NetworkImage).url,
+        '$origin/storage/v1/object/authenticated/$path',
+      );
+      expect(find.byIcon(Icons.camera_alt_rounded), findsNothing);
+      await tester.pumpAndSettle();
+      expect(find.byIcon(Icons.person_rounded), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

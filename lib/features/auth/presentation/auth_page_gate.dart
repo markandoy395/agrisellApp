@@ -18,6 +18,11 @@ class AuthPageGate extends StatelessWidget {
 
   final Widget child;
 
+  static final _publicRoutes = Expando<bool>();
+
+  static bool isPublicRoute(Route<dynamic> route) =>
+      _publicRoutes[route] == true;
+
   static bool isPublic(Widget page) =>
       page is LoginScreen ||
       page is SplashScreen ||
@@ -34,6 +39,8 @@ class AuthPageGate extends StatelessWidget {
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: AuthSessionService.instance,
     builder: (context, _) {
+      final route = ModalRoute.of(context);
+      if (route != null) _publicRoutes[route] = isPublic(child);
       if (isPublic(child) || AuthSessionService.instance.isAuthenticated) {
         return child;
       }

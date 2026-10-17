@@ -19,7 +19,9 @@ void main() {
       tester.view.physicalSize = const Size(320, 640);
       addTearDown(tester.view.reset);
       SharedPreferences.setMockInitialValues({});
-      final repository = ConfirmedLocationRepository();
+      final repository = ConfirmedLocationRepository(
+        accountId: () => 'fixture-owner',
+      );
       await repository.confirm(
         LocationOwnerRole.buyer,
         ConfirmedLocation(

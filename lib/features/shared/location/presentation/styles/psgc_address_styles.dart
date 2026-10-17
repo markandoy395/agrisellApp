@@ -15,4 +15,18 @@ abstract final class PsgcAddressStyles {
 
   // Icon Colors
   static const Color iconColor = AgrisellColors.mutedText;
+
+  static  Widget? fieldIcon(
+    String label,
+    bool show,
+    Widget Function(IconData)? builder,
+  ) {
+    if (!show) return null;
+    final icon = switch (label) {
+      'Province' => Icons.map_outlined,
+      'Barangay' => Icons.home_outlined,
+      _ => Icons.location_city_outlined,
+    };
+    return builder?.call(icon) ?? Icon(icon, color: iconColor);
+  }
 }

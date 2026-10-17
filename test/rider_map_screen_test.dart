@@ -280,9 +280,8 @@ void main() {
       findsNothing,
     );
 
-    await tester.tap(find.byTooltip('Work status and GPS'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Refresh location').last);
+    expect(repository.calls, 1);
+    await tester.tap(find.byTooltip('Refresh map'));
     await tester.pumpAndSettle();
 
     expect(repository.calls, 2);

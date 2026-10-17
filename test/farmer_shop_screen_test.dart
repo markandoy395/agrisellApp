@@ -31,6 +31,24 @@ void main() {
     AuthRegistrationService.instance.clearForTesting();
   });
 
+  testWidgets('pending farmer can open the product upload form', (
+    tester,
+  ) async {
+    final account = AuthSessionService.instance.currentAccount!.copyWith(
+      verificationStatus: 'pending',
+    );
+    AuthRegistrationService.instance.setCurrentAccountForTesting(account);
+    await AuthSessionService.instance.start(account, rememberMe: false);
+    await _pumpDashboard(tester);
+    final add = find.widgetWithText(FilledButton, 'Add new products');
+    expect(tester.widget<FilledButton>(add).onPressed, isNotNull);
+    await tester.tap(add);
+    await tester.pumpAndSettle();
+    expect(find.text('Product details'), findsOneWidget);
+    expect(find.text('Insert photo'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('farmer dashboard starts empty until backend data arrives', (
     tester,
   ) async {

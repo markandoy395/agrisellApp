@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
@@ -29,6 +30,7 @@ import 'package:agresell_app/features/farmer/registration/presentation/widgets/f
 import 'package:agresell_app/features/shared/location/data/gps_location_gateway.dart';
 
 part 'farmer_sign_up_actions.dart';
+part 'farmer_sign_up_steps.dart';
 part 'farmer_sign_up_location_actions.dart';
 part 'farmer_sign_up_validation.dart';
 
@@ -56,6 +58,8 @@ class _FarmerSignUpScreenState extends State<FarmerSignUpScreen> {
   var _isSubmitting = false;
   var _isCapturingLocation = false;
   var _requestedFarmLocation = false;
+  var _isDirty = false;
+  var _sameAsFarmerAddress = false;
   String? _otpStartedFor;
   String? _verifiedEmail;
 
@@ -68,6 +72,7 @@ class _FarmerSignUpScreenState extends State<FarmerSignUpScreen> {
       _controllers.email.text = initialEmail;
       _verifiedEmail = initialEmail;
       _step = 1;
+      _isDirty = _controllers.isDirty;
     }
   }
 
@@ -78,39 +83,44 @@ class _FarmerSignUpScreenState extends State<FarmerSignUpScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => PopScope(
-    canPop: !_controllers.isDirty || _isSubmitting,
-    onPopInvokedWithResult: (didPop, _) {
-      if (!didPop && !_isSubmitting) _confirmDiscard();
-    },
-    child: LoginPageLayout(
-      key: ValueKey(_step),
-      title: 'Farmer Sign Up',
-      titleColor: AgrisellColors.authGreen,
-      subtitle: null,
-      subtitleWidget: _progress(),
-      cardHeightFactor: _step == 1 ? .86 : .73,
-      minimumCardHeight: 560,
-      maximumCardHeight: _step == 1 ? 820 : 720,
-      cardTopPadding: 26,
-      scrollable: true,
-      scrollViewKey: const PageStorageKey('farmer-signup-step-scroll'),
-      onBack: _step > 0 ? _previousStep : null,
-      child: Column(
-        children: [
-          _currentStep(),
-          const SizedBox(height: 14),
-          FarmerSignupControls(
-            step: _step,
-            isSubmitting: _isSubmitting,
-            onPrevious: _previousStep,
-            onNext: _next,
-            onLogin: _goToLogin,
-          ),
-        ],
+  Widget build(BuildContext context) {
+    _isDirty = _controllers.isDirty;
+    _sameAsFarmerAddress = _controllers.sameAsFarmerAddress;
+    return PopScope(
+      canPop: !_isDirty || _isSubmitting,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && !_isSubmitting) _confirmDiscard();
+      },
+      child: LoginPageLayout(
+        key: ValueKey(_step),
+        title: 'Farmer Sign Up',
+        titleColor: AgrisellColors.authGreen,
+        subtitle: null,
+        subtitleWidget: _progress(),
+        cardHeightFactor: _step == 1 ? .86 : .73,
+        minimumCardHeight: 560,
+        maximumCardHeight: _step == 1 ? 820 : 720,
+        cardTopPadding: 26,
+        scrollable: true,
+        scrollViewKey: const PageStorageKey('farmer-signup-step-scroll'),
+        onBack: _step > 0 ? _previousStep : null,
+        child: Column(
+          children: [
+            _currentStep(),
+            const SizedBox(height: 14),
+            FarmerSignupControls(
+              step: _step,
+              isSubmitting: _isSubmitting,
+              onPrevious: _previousStep,
+              onNext: _next,
+              onLogin: _goToLogin,
+              onSkip: () => _submit(skipFarmDetails: true),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 
   Widget _progress() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,51 +156,15 @@ class _FarmerSignUpScreenState extends State<FarmerSignUpScreen> {
     ),
   };
 
-  void _onChanged() => setState(() => _validateCurrent(showEmpty: false));
+  void _onChanged() {
+    final previousErrors = Map<String, String?>.of(_errors);
+    _validateCurrent(showEmpty: false);
+    if (_isDirty != _controllers.isDirty ||
+        _sameAsFarmerAddress != _controllers.sameAsFarmerAddress ||
+        !mapEquals(previousErrors, _errors)) {
+      setState(() {});
+    }
+  }
+
   void _refresh(VoidCallback update) => setState(update);
-
-  Future<void> _next() async {
-    if (_step == 2 && !_hasFarmCoordinates) {
-      await _captureFarmLocation();
-      if (!mounted) return;
-    }
-    setState(() {
-      _showAllErrors = true;
-      _validateCurrent(showEmpty: true);
-    });
-    if (_errors.values.any((error) => error != null)) return;
-    if (_step == 0) {
-      await _verifyEmailBeforePersonalInfo();
-      return;
-    }
-    if (_step < 2) {
-      _advanceStep();
-      return;
-    }
-    _submit();
-  }
-
-  void _advanceStep() {
-    FocusManager.instance.primaryFocus?.unfocus();
-    late final bool enteredFarmStep;
-    setState(() {
-      _step += 1;
-      enteredFarmStep = _step == 2 && !_requestedFarmLocation;
-      _showAllErrors = false;
-      _errors.clear();
-    });
-    if (enteredFarmStep) {
-      _requestedFarmLocation = true;
-      unawaited(_captureFarmLocation());
-    }
-  }
-
-  void _previousStep() {
-    FocusManager.instance.primaryFocus?.unfocus();
-    setState(() {
-      _step -= 1;
-      _showAllErrors = false;
-      _errors.clear();
-    });
-  }
 }

@@ -35,7 +35,7 @@ extension RiderRegistrationServiceDocumentOperations
       );
       try {
         _currentRider = await _repository.updateRider(
-          entities.rider.copyWith(profilePhotoPath: path),
+          (_currentRider ?? entities.rider).copyWith(profilePhotoPath: path),
         );
       } on Exception {
         await _repository.removeRiderFile(path);

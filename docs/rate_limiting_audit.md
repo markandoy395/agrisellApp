@@ -94,3 +94,19 @@ Rider payment flow (2026-10-15, deployment pending): owner-scoped current_rider_
 
 2026-10-16 concurrency hardening (prepared, not deployed): owner-scoped retry receipts for buyer/farmer messages and farmer cash-out, independent session/participant/farmer checks, transaction advisory locks, default-deny private receipt RLS, bound/static SQL and caller JWT gateway transport. Shared order queues/cache writes reject account changes; stale callbacks and duplicate submissions are guarded across buyer/farmer/rider/shared flows. Consolidated order bundle retains existing owner RPCs and only falls back when missing. See docs/concurrency_hardening.md for exact scope, isolated fixture verification and outstanding full-schema/hosted/load checks.
 
+
+## Profile persistence repair - 2026-10-17
+
+The new buyer avatar route always runs verified-user, general write and
+profile-avatar quotas (10/minute), including invalid uploads. Storage uploads
+use a service client only after deriving and matching the caller's Buyer
+identity. Caller JWT/RLS applies to the profile update. Ordinary clients cannot
+mutate buyer-avatars objects directly. The bucket stays private.
+
+The new rider vehicle RPC and detail-column trigger independently require the
+configured gateway marker even while global enforcement is staged. The Flutter
+adapter always invokes application-api for this operation. Existing signup and
+personal/farm edit paths retain the staged gateway coverage described above;
+this repair does not activate global enforcement or alter hosted Auth limits.
+Fifteen Node API regressions and hosted rolled-back profile contracts passed.
+Real file uploads and all older HTTP/storage paths were not end-to-end tested.

@@ -22,13 +22,12 @@ void main() {
         notes: 'Green roadside gate',
       );
 
-      await ConfirmedLocationRepository().confirm(
-        LocationOwnerRole.farmer,
-        location,
-      );
-      final restored = await ConfirmedLocationRepository().load(
-        LocationOwnerRole.farmer,
-      );
+      await ConfirmedLocationRepository(
+        accountId: () => 'fixture-owner',
+      ).confirm(LocationOwnerRole.farmer, location);
+      final restored = await ConfirmedLocationRepository(
+        accountId: () => 'fixture-owner',
+      ).load(LocationOwnerRole.farmer);
 
       expect(restored?.latitude, location.latitude);
       expect(restored?.longitude, location.longitude);
@@ -41,7 +40,10 @@ void main() {
 
   test('failed remote save stays pending and later synchronizes', () async {
     final remote = _RemoteLocation(fails: true);
-    final repository = ConfirmedLocationRepository(remote: remote);
+    final repository = ConfirmedLocationRepository(
+      remote: remote,
+      accountId: () => 'fixture-owner',
+    );
     final location = ConfirmedLocation(
       latitude: 8.48,
       longitude: 124.64,

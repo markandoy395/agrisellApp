@@ -10,12 +10,14 @@ class RiderShiftCopy extends StatelessWidget {
     required this.availability,
     required this.gpsStatus,
     required this.internetStatus,
+    this.isUpdating = false,
     super.key,
   });
 
   final RiderAvailability availability;
   final RiderGpsStatus gpsStatus;
   final RiderInternetStatus internetStatus;
+  final bool isUpdating;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +27,11 @@ class RiderShiftCopy extends StatelessWidget {
         const Text('Work status', style: RiderHomeDesignStyles.caption),
         const SizedBox(height: 5),
         Text(
-          RiderAvailabilityCardStyles.availabilityLabel(availability),
+          isUpdating
+              ? availability.isOnline
+                    ? 'Going offline…'
+                    : 'Going online…'
+              : RiderAvailabilityCardStyles.availabilityLabel(availability),
           style: RiderHomeDesignStyles.title,
         ),
         const SizedBox(height: 3),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:agresell_app/core/utils/async_request_scope.dart';
 
 import 'package:flutter/foundation.dart';
 
@@ -13,6 +14,7 @@ class SupportTicketsController extends ChangeNotifier {
     : _repository = repository ?? _defaultRepository();
 
   final SupportTicketRepository _repository;
+  final _scope = AsyncRequestScope();
 
   List<SupportTicket> _tickets = const [];
   bool _isLoading = false;
@@ -37,13 +39,12 @@ class SupportTicketsController extends ChangeNotifier {
 
     if (_search.trim().isNotEmpty) {
       final q = _search.trim().toLowerCase();
-      result =
-          result.where((t) {
-            return t.ticketNumber.toLowerCase().contains(q) ||
-                t.subject.toLowerCase().contains(q) ||
-                t.category.label.toLowerCase().contains(q) ||
-                (t.lastMessage?.toLowerCase().contains(q) ?? false);
-          }).toList();
+      result = result.where((t) {
+        return t.ticketNumber.toLowerCase().contains(q) ||
+            t.subject.toLowerCase().contains(q) ||
+            t.category.label.toLowerCase().contains(q) ||
+            (t.lastMessage?.toLowerCase().contains(q) ?? false);
+      }).toList();
     }
 
     return result;
@@ -62,20 +63,24 @@ class SupportTicketsController extends ChangeNotifier {
   }
 
   Future<void> loadTickets() async {
+    if (_isLoading) return;
+    final ticket = _scope.begin('load');
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      _tickets = await _repository.getMyTickets();
+      final values = await _repository.getMyTickets();
+      if (ticket.isCurrent) _tickets = values;
     } catch (e) {
+      if (!ticket.isCurrent) return;
       _errorMessage = supportErrorMessage(
         e,
         fallback: 'Could not load support tickets. Please try again.',
       );
     } finally {
       _isLoading = false;
-      notifyListeners();
+      if (ticket.isActive) notifyListeners();
     }
   }
 
@@ -87,6 +92,8 @@ class SupportTicketsController extends ChangeNotifier {
     int? orderId,
     int? deliveryId,
   }) async {
+    if (_isSubmitting) return null;
+    final ticket = _scope.begin('create');
     _isSubmitting = true;
     _errorMessage = null;
     notifyListeners();
@@ -101,12 +108,15 @@ class SupportTicketsController extends ChangeNotifier {
         deliveryId: deliveryId,
       );
 
+      if (!ticket.isCurrent) return null;
+      _scope.invalidate('load');
       _tickets = [
         created,
         ..._tickets.where((t) => t.ticketId != created.ticketId),
       ];
       return created;
     } catch (e) {
+      if (!ticket.isCurrent) return null;
       _errorMessage = supportErrorMessage(
         e,
         fallback: 'Could not submit your ticket. Please try again.',
@@ -114,7 +124,7 @@ class SupportTicketsController extends ChangeNotifier {
       return null;
     } finally {
       _isSubmitting = false;
-      notifyListeners();
+      if (ticket.isCurrent) notifyListeners();
     }
   }
 
@@ -126,6 +136,12 @@ class SupportTicketsController extends ChangeNotifier {
       _tickets = list;
       notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    _scope.dispose();
+    super.dispose();
   }
 
   static SupportTicketRepository _defaultRepository() {

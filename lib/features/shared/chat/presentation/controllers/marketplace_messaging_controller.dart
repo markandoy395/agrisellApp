@@ -1,10 +1,13 @@
 import 'package:flutter/foundation.dart';
+import 'package:agresell_app/core/utils/async_request_scope.dart';
+import 'package:agresell_app/core/utils/async_operation_gate.dart';
 import '../../domain/chat_limits.dart';
 
 import 'package:agresell_app/features/shared/chat/data/marketplace_messaging_repository.dart';
 import 'package:agresell_app/features/shared/chat/domain/marketplace_conversation.dart';
 
 part 'marketplace_messaging_controller_helpers.dart';
+part 'marketplace_messaging_controller_sending.dart';
 
 enum MarketplaceMessagingLoadState { initial, loading, ready, error }
 
@@ -16,6 +19,8 @@ class MarketplaceMessagingController extends ChangeNotifier {
 
   final MarketplaceMessagingRepository repository;
   final MarketplaceActorRole actorRole;
+  final _scope = AsyncRequestScope();
+  final _requests = AsyncOperationGate();
 
   MarketplaceMessagingLoadState _state = MarketplaceMessagingLoadState.initial;
   List<MarketplaceConversation> _conversations = const [];
@@ -38,20 +43,31 @@ class MarketplaceMessagingController extends ChangeNotifier {
   bool isSending(String id) => _sendingMessages.contains(id);
   String? messageErrorFor(String id) => _messageErrors[id];
 
-  Future<void> load({bool silent = false}) async {
+  Future<void> load({bool silent = false}) => _requests.run(
+    'conversations',
+    () => _requests.serialize('inbox', () => _load(silent: silent)),
+  );
+
+  Future<void> _load({bool silent = false}) async {
+    if (_isDisposed) return;
+    final ticket = _scope.begin('conversations');
     if (!silent || _conversations.isEmpty) {
       _state = MarketplaceMessagingLoadState.loading;
       _errorMessage = null;
       notifyListeners();
     }
     try {
-      _conversations = List.of(await repository.loadConversations());
+      final values = await repository.loadConversations();
+      if (!ticket.isCurrent) return;
+      _conversations = List.of(values);
       _state = MarketplaceMessagingLoadState.ready;
       _errorMessage = null;
     } on MarketplaceMessagingException catch (error) {
+      if (!ticket.isCurrent) return;
       _errorMessage = error.message;
       if (_conversations.isEmpty) _state = MarketplaceMessagingLoadState.error;
     } on Object {
+      if (!ticket.isCurrent) return;
       _errorMessage = 'Conversations could not be loaded. Please try again.';
       if (_conversations.isEmpty) _state = MarketplaceMessagingLoadState.error;
     }
@@ -61,17 +77,22 @@ class MarketplaceMessagingController extends ChangeNotifier {
   Future<MarketplaceConversation?> startConversation(
     MarketplaceConversationSeed seed,
   ) async {
+    if (_isStarting || _isDisposed) return null;
+    final ticket = _scope.begin('start');
     _isStarting = true;
     _errorMessage = null;
     notifyListeners();
     try {
       final id = await repository.startConversation(seed);
+      if (!ticket.isCurrent) return null;
       await load(silent: true);
       return _conversations.where((item) => item.id == id).firstOrNull;
     } on MarketplaceMessagingException catch (error) {
+      if (!ticket.isCurrent) return null;
       _errorMessage = error.message;
       return null;
     } on Object {
+      if (!ticket.isCurrent) return null;
       _errorMessage = 'The conversation could not be opened.';
       return null;
     } finally {
@@ -80,7 +101,12 @@ class MarketplaceMessagingController extends ChangeNotifier {
     }
   }
 
-  Future<void> openConversation(String id, {bool refresh = false}) async {
+  Future<void> openConversation(String id, {bool refresh = false}) => _requests
+      .run(('messages', id), () => _openConversation(id, refresh: refresh));
+
+  Future<void> _openConversation(String id, {bool refresh = false}) async {
+    if (_isDisposed) return;
+    final ticket = _scope.begin(('messages', id));
     if (refresh && isSending(id)) return;
     if (_messages.containsKey(id) && !refresh) {
       await _markReadBestEffort(id);
@@ -92,81 +118,21 @@ class MarketplaceMessagingController extends ChangeNotifier {
     notifyListeners();
     try {
       final freshMessages = await repository.loadMessages(id);
+      if (!ticket.isCurrent || isSending(id)) return;
       if (freshMessages.isNotEmpty || !hasCachedMessages) {
         _messages[id] = List.of(freshMessages);
       }
       await _markReadBestEffort(id);
     } on MarketplaceMessagingException catch (error) {
+      if (!ticket.isCurrent) return;
       _messageErrors[id] = error.message;
     } on Object {
+      if (!ticket.isCurrent) return;
       _messageErrors[id] = 'Messages could not be loaded. Please try again.';
     } finally {
       if (!hasCachedMessages) _loadingMessages.remove(id);
       notifyListeners();
     }
-  }
-
-  Future<bool> sendMessage(String conversationId, String rawText) async {
-    final text = rawText.trim();
-    if (!ChatLimits.valid(rawText)) {
-      _messageErrors[conversationId] = ChatLimits.lengthError;
-      notifyListeners();
-      return false;
-    }
-    if (isSending(conversationId)) {
-      return false;
-    }
-    final previousConversation = _conversation(conversationId);
-    final local = MarketplaceMessage(
-      id: 'local-${DateTime.now().microsecondsSinceEpoch}',
-      senderRole: actorRole,
-      text: text,
-      sentAt: DateTime.now(),
-      state: MarketplaceMessageState.sending,
-    );
-    _messages.putIfAbsent(conversationId, () => []).add(local);
-    _sendingMessages.add(conversationId);
-    _messageErrors.remove(conversationId);
-    _updateSummary(conversationId, text, local.sentAt);
-    notifyListeners();
-
-    try {
-      final saved = await repository.sendMessage(
-        conversationId: conversationId,
-        text: text,
-      );
-      _replaceMessage(conversationId, local.id, saved);
-      await _refreshAfterSend(conversationId);
-      return true;
-    } on MarketplaceMessagingException catch (error) {
-      _replaceMessage(
-        conversationId,
-        local.id,
-        local.copyWith(state: MarketplaceMessageState.failed),
-      );
-      _restoreSummary(previousConversation);
-      _messageErrors[conversationId] = error.message;
-      return false;
-    } on Object {
-      _replaceMessage(
-        conversationId,
-        local.id,
-        local.copyWith(state: MarketplaceMessageState.failed),
-      );
-      _restoreSummary(previousConversation);
-      _messageErrors[conversationId] =
-          'Your message was not sent. Tap it to retry.';
-      return false;
-    } finally {
-      _sendingMessages.remove(conversationId);
-      notifyListeners();
-    }
-  }
-
-  Future<bool> retryMessage(String conversationId, MarketplaceMessage message) {
-    _messages[conversationId]?.removeWhere((item) => item.id == message.id);
-    notifyListeners();
-    return sendMessage(conversationId, message.text);
   }
 
   @override
@@ -176,6 +142,7 @@ class MarketplaceMessagingController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _scope.dispose();
     _isDisposed = true;
     super.dispose();
   }

@@ -2,6 +2,8 @@ part of 'order_controller.dart';
 
 extension OrderControllerPersistence on OrderController {
   void clear() {
+    _accountGeneration++;
+    _loadGeneration++;
     if (_orders.isEmpty &&
         _orderNotifications.isEmpty &&
         _readNotificationIds.isEmpty) {
@@ -15,6 +17,13 @@ extension OrderControllerPersistence on OrderController {
 
   Future<void> loadForAccount(String accountId) async {
     final generation = ++_loadGeneration;
+    if (_accountId != accountId) {
+      _accountGeneration++;
+      _orders.clear();
+      _orderNotifications.clear();
+      _readNotificationIds.clear();
+      _commitChange(persist: false);
+    }
     _accountId = accountId;
     try {
       await _pendingPersistence;
@@ -22,14 +31,24 @@ extension OrderControllerPersistence on OrderController {
       // A fresh load can still recover the last successfully saved snapshot.
     }
     if (generation != _loadGeneration || _accountId != accountId) return;
-    final savedOrders = await _repository.load(accountId);
-    if (generation != _loadGeneration || _accountId != accountId) return;
-    _orders
-      ..clear()
-      ..addAll(savedOrders);
-    _orderNotifications.clear();
-    _readNotificationIds.clear();
-    _commitChange(persist: false);
+    await _operations.serialize(('orders', accountId), () async {
+      try {
+        await _pendingPersistence;
+      } on Object {
+        // The server snapshot can reconcile a failed prior mutation.
+      }
+      if (_disposed || generation != _loadGeneration || _accountId != accountId)
+        return;
+      final savedOrders = await _repository.load(accountId);
+      if (_disposed || generation != _loadGeneration || _accountId != accountId)
+        return;
+      _orders
+        ..clear()
+        ..addAll(savedOrders);
+      _orderNotifications.clear();
+      _readNotificationIds.clear();
+      _commitChange(persist: false);
+    });
   }
 
   Future<void> reload() async {
@@ -38,6 +57,7 @@ extension OrderControllerPersistence on OrderController {
   }
 
   void unload() {
+    _accountGeneration++;
     _loadGeneration++;
     _accountId = null;
     _orders.clear();
@@ -56,6 +76,7 @@ extension OrderControllerPersistence on OrderController {
 
   Future<void> _persistOrders() {
     final accountId = _accountId;
+    final generation = _accountGeneration;
     if (accountId == null) return Future<void>.value();
     final previousWrite = _pendingPersistence;
     final snapshot = List<PlacedOrder>.of(_orders);
@@ -64,6 +85,9 @@ extension OrderControllerPersistence on OrderController {
         await previousWrite;
       } on Object {
         // Continue with the newest complete order snapshot.
+      }
+      if (_disposed || generation != _accountGeneration) {
+        throw StateError('The order account changed.');
       }
       await _repository.save(accountId, snapshot);
     }();

@@ -5,7 +5,7 @@ import { enforceRateLimit, type RateLimitClient } from "../_shared/rate_limit.ts
 export async function chatLimits(
   client: RateLimitClient, identity: string, route: string, body?: Uint8Array,
 ): Promise<Response | null> {
-  const send = ["rpc/send_marketplace_message", "rpc/send_rider_delivery_message"].includes(route);
+  const send = ["rpc/send_marketplace_message", "rpc/send_marketplace_message_once", "rpc/send_rider_delivery_message"].includes(route);
   const start = route === "rpc/start_marketplace_conversation";
   if (!send && !start) return null;
   const limited = await enforceRateLimit(client, start ? "chat-start-attempt-day" : "chat-send-attempt-day",
@@ -26,7 +26,7 @@ export async function chatLimits(
       return Response.json({ code: "22001", message: "Messages must contain 1–500 characters." }, { status: 400 });
     }
     return enforceRateLimit(client, "chat-send-attempt-minute",
-      `${identity}:${route}:${conversation}`, 10, 60);
+      `${identity}:${route.replace(/_once$/, "")}:${conversation}`, 10, 60);
   }
   return null;
 }

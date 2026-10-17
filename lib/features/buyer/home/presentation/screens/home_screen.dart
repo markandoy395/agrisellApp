@@ -118,7 +118,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return BuyerResponsiveText(
       child: Scaffold(
-        extendBody: true,
         backgroundColor: HomeScreenStyles.scaffoldBackground,
         bottomNavigationBar: CustomBottomNavBar(
           selectedIndex: _activeNavIndex,

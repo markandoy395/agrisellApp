@@ -26,7 +26,7 @@ export function sensitivePolicy(route: string, method: string) {
     return { scope: "support-and-reports", limit: 10 };
   }
   if (/send.*message/.test(name) &&
-      !["send_marketplace_message", "send_rider_delivery_message"].includes(name)) {
+      !["send_marketplace_message", "send_marketplace_message_once", "send_rider_delivery_message"].includes(name)) {
     return { scope: "messages", limit: 60 };
   }
   return null;

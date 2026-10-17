@@ -1,16 +1,31 @@
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/core/services/query_owner.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:agresell_app/features/shared/orders/data/order_local_repository.dart';
 import 'package:agresell_app/features/shared/orders/data/order_repository.dart';
 import 'package:agresell_app/features/shared/orders/data/supabase_order_repository.dart';
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
 
+part 'cached_order_payments.dart';
+
 class CachedOrderRepository
+    with _CachedOrderPayments
     implements OrderRepository, FarmerOrderCancellationRepository {
   CachedOrderRepository({OrderLocalRepository? local})
     : _local = local ?? OrderLocalRepository();
 
   final OrderLocalRepository _local;
+
+  @override
+  void _requireOwner(String accountId) {
+    if (!AgrisellSupabase.isInitialized) return;
+    final client = AgrisellSupabase.client;
+    final session = client.auth.currentSession;
+    if (session == null || session.isExpired || session.user.isAnonymous) {
+      throw const AuthException('Sign in before accessing orders.');
+    }
+    QueryOwner(client).requireAuthId(accountId);
+  }
 
   bool get _hasRemoteSession =>
       AgrisellSupabase.isInitialized &&
@@ -18,6 +33,7 @@ class CachedOrderRepository
 
   @override
   Future<List<PlacedOrder>> load(String accountId) async {
+    _requireOwner(accountId);
     if (!_hasRemoteSession) return _local.load(accountId);
     QueryOwner(AgrisellSupabase.client).requireAuthId(accountId);
 
@@ -25,11 +41,11 @@ class CachedOrderRepository
       final orders = await SupabaseOrderRepository(
         AgrisellSupabase.client,
       ).load(accountId);
-      QueryOwner(AgrisellSupabase.client).requireAuthId(accountId);
+      _requireOwner(accountId);
       await _local.save(accountId, orders);
       return orders;
     } on Object {
-      QueryOwner(AgrisellSupabase.client).requireAuthId(accountId);
+      _requireOwner(accountId);
       return _local.load(accountId);
     }
   }
@@ -40,6 +56,7 @@ class CachedOrderRepository
     required String orderId,
     required String reason,
   }) async {
+    _requireOwner(accountId);
     if (_hasRemoteSession) {
       await SupabaseOrderRepository(AgrisellSupabase.client).cancelFarmerOrder(
         accountId: accountId,
@@ -47,6 +64,7 @@ class CachedOrderRepository
         reason: reason,
       );
     }
+    _requireOwner(accountId);
     await _local.cancelFarmerOrder(
       accountId: accountId,
       orderId: orderId,
@@ -56,12 +74,14 @@ class CachedOrderRepository
 
   @override
   Future<void> save(String accountId, Iterable<PlacedOrder> orders) async {
+    _requireOwner(accountId);
     final snapshot = List<PlacedOrder>.of(orders);
     if (_hasRemoteSession) {
       await SupabaseOrderRepository(
         AgrisellSupabase.client,
       ).save(accountId, snapshot);
     }
+    _requireOwner(accountId);
     await _local.save(accountId, snapshot);
   }
 
@@ -75,6 +95,7 @@ class CachedOrderRepository
     int? riderRating,
     String riderComment = '',
   }) async {
+    _requireOwner(accountId);
     if (_hasRemoteSession) {
       await SupabaseOrderRepository(AgrisellSupabase.client).submitFeedback(
         accountId: accountId,
@@ -86,6 +107,7 @@ class CachedOrderRepository
         riderComment: riderComment,
       );
     }
+    _requireOwner(accountId);
     await _local.submitFeedback(
       accountId: accountId,
       orderId: orderId,
@@ -103,6 +125,7 @@ class CachedOrderRepository
     required Iterable<PlacedOrder> newOrders,
     required Iterable<PlacedOrder> currentOrders,
   }) async {
+    _requireOwner(accountId);
     final additions = List<PlacedOrder>.of(newOrders);
     final snapshot = List<PlacedOrder>.of(currentOrders);
     if (_hasRemoteSession) {
@@ -112,6 +135,7 @@ class CachedOrderRepository
         currentOrders: snapshot,
       );
     }
+    _requireOwner(accountId);
     await _local.save(accountId, snapshot);
   }
 
@@ -120,81 +144,13 @@ class CachedOrderRepository
     required String accountId,
     required String orderId,
   }) async {
+    _requireOwner(accountId);
     if (_hasRemoteSession) {
       await SupabaseOrderRepository(
         AgrisellSupabase.client,
       ).markReadyForPickup(accountId: accountId, orderId: orderId);
     }
+    _requireOwner(accountId);
     await _local.markReadyForPickup(accountId: accountId, orderId: orderId);
-  }
-
-  @override
-  Future<void> reviewGcashPayment({
-    required String accountId,
-    required String orderId,
-    required bool approved,
-  }) async {
-    if (!_hasRemoteSession) return;
-    await SupabaseOrderRepository(AgrisellSupabase.client).reviewGcashPayment(
-      accountId: accountId,
-      orderId: orderId,
-      approved: approved,
-    );
-  }
-
-  @override
-  Future<void> resubmitGcashReference({
-    required String accountId,
-    required String orderId,
-    required String reference,
-  }) async {
-    if (!_hasRemoteSession) return;
-    await SupabaseOrderRepository(
-      AgrisellSupabase.client,
-    ).resubmitGcashReference(
-      accountId: accountId,
-      orderId: orderId,
-      reference: reference,
-    );
-  }
-
-  @override
-  Future<void> recordGcashRefund({
-    required String accountId,
-    required String orderId,
-    required String reference,
-  }) async {
-    if (!_hasRemoteSession) return;
-    await SupabaseOrderRepository(AgrisellSupabase.client).recordGcashRefund(
-      accountId: accountId,
-      orderId: orderId,
-      reference: reference,
-    );
-  }
-
-  @override
-  Future<void> reportOrderDispute({
-    required String accountId,
-    required String orderId,
-    required String category,
-    required String reason,
-    required String requestedResolution,
-  }) async {
-    if (_hasRemoteSession) {
-      await SupabaseOrderRepository(AgrisellSupabase.client).reportOrderDispute(
-        accountId: accountId,
-        orderId: orderId,
-        category: category,
-        reason: reason,
-        requestedResolution: requestedResolution,
-      );
-    }
-    await _local.reportOrderDispute(
-      accountId: accountId,
-      orderId: orderId,
-      category: category,
-      reason: reason,
-      requestedResolution: requestedResolution,
-    );
   }
 }

@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
 import 'package:agresell_app/features/shared/routing/data/osrm_delivery_route_service.dart';
+import 'package:agresell_app/features/shared/routing/data/cached_delivery_route_service.dart';
 import 'package:agresell_app/features/shared/routing/domain/delivery_route.dart';
 import 'package:agresell_app/features/shared/routing/domain/delivery_route_service.dart';
 import 'package:agresell_app/features/shared/tracking/domain/delivery_tracking_models.dart';
@@ -17,8 +18,18 @@ class DeliveryTrackingService {
   DeliveryTrackingService({
     SupabaseClient? client,
     DeliveryRouteService? routingService,
-  })  : _client = client,
-        _routingService = routingService ?? OsrmDeliveryRouteService();
+  }) : _client = client,
+       _routingService = CachedDeliveryRouteService(
+         routingService ??
+             OsrmDeliveryRouteService(
+               endpoint: Uri.parse(
+                 const String.fromEnvironment(
+                   'RIDER_ROUTING_URL',
+                   defaultValue: 'https://router.project-osrm.org',
+                 ),
+               ),
+             ),
+       );
 
   final SupabaseClient? _client;
   final DeliveryRouteService _routingService;
@@ -39,7 +50,9 @@ class DeliveryTrackingService {
     final destinationLat = order.deliveryLatitude ?? 8.4772;
     final destinationLng = order.deliveryLongitude ?? 124.6459;
     final destination = DeliveryTrackingPoint(
-      name: order.buyerName.isNotEmpty ? order.buyerName : 'Delivery Destination',
+      name: order.buyerName.isNotEmpty
+          ? order.buyerName
+          : 'Delivery Destination',
       latitude: destinationLat,
       longitude: destinationLng,
       address: order.deliveryAddress.isNotEmpty
@@ -49,7 +62,9 @@ class DeliveryTrackingService {
     );
 
     final pickup = DeliveryTrackingPoint(
-      name: order.items.isNotEmpty ? order.items.first.sellerName : 'Farmer Farm',
+      name: order.items.isNotEmpty
+          ? order.items.first.sellerName
+          : 'Farmer Farm',
       latitude: 8.4912,
       longitude: 124.6591,
       address: 'AgriSell Certified Farm',
@@ -69,7 +84,8 @@ class DeliveryTrackingService {
     double distanceKm = 0.0;
     int estimatedMinutes = 0;
 
-    final startPoint = (live.riderLatitude != null && live.riderLongitude != null)
+    final startPoint =
+        (live.riderLatitude != null && live.riderLongitude != null)
         ? DeliveryRoutePoint(
             latitude: live.riderLatitude!,
             longitude: live.riderLongitude!,
@@ -102,10 +118,12 @@ class DeliveryTrackingService {
         end: LatLng(endPoint.latitude, endPoint.longitude),
         pickup: isShipping ? LatLng(pickup.latitude, pickup.longitude) : null,
       );
-      distanceKm =
-          DeliveryTrackingFallbackRoute.calculateDistanceKm(routePoints);
-      estimatedMinutes =
-          DeliveryTrackingFallbackRoute.estimateMinutes(distanceKm);
+      distanceKm = DeliveryTrackingFallbackRoute.calculateDistanceKm(
+        routePoints,
+      );
+      estimatedMinutes = DeliveryTrackingFallbackRoute.estimateMinutes(
+        distanceKm,
+      );
     }
 
     final estimatedArrival = estimatedMinutes > 0

@@ -1,7 +1,7 @@
 part of 'order_controller.dart';
 
 extension OrderControllerMutations on OrderController {
-  Future<void> acceptOrder(String orderId) {
+  Future<void> _acceptOrder(String orderId) {
     final order = _orders.where((item) => item.id == orderId).firstOrNull;
     if (order?.isAcceptanceOverdue ?? false) {
       return Future<void>.error(
@@ -23,7 +23,8 @@ extension OrderControllerMutations on OrderController {
     );
   }
 
-  Future<void> markReadyForPickup(String orderId) async {
+  Future<void> _markReadyForPickup(String orderId) async {
+    final generation = _accountGeneration;
     final index = _orders.indexWhere((order) => order.id == orderId);
     if (index == -1 || _orders[index].status != PlacedOrderStatus.preparing) {
       return;
@@ -44,6 +45,7 @@ extension OrderControllerMutations on OrderController {
     try {
       await _persistReadyForPickup(orderId);
     } on Object {
+      if (_disposed || generation != _accountGeneration) rethrow;
       _orders[index] = previousOrder;
       if (_orderNotifications.length > previousNotificationCount) {
         _orderNotifications.removeRange(
@@ -58,6 +60,7 @@ extension OrderControllerMutations on OrderController {
 
   Future<void> _persistReadyForPickup(String orderId) {
     final accountId = _accountId;
+    final generation = _accountGeneration;
     if (accountId == null) return Future<void>.value();
     final previousWrite = _pendingPersistence;
     final write = () async {
@@ -66,6 +69,8 @@ extension OrderControllerMutations on OrderController {
       } on Object {
         // Continue with the explicit, server-authorized transition.
       }
+      if (_disposed || generation != _accountGeneration)
+        throw StateError('The order account changed.');
       await _repository.markReadyForPickup(
         accountId: accountId,
         orderId: orderId,
@@ -75,10 +80,14 @@ extension OrderControllerMutations on OrderController {
     return write;
   }
 
-  Future<void> cancelOrder(String orderId) => _cancelBuyerOrder(orderId);
+  Future<void> cancelOrder(String orderId) =>
+      _runOrderAction((orderId, 'cancel'), () => _cancelBuyerOrder(orderId));
 
   Future<void> cancelFarmerOrder(String orderId, String reason) =>
-      _cancelFarmerOrder(orderId, reason);
+      _runOrderAction((
+        orderId,
+        'cancelFarmer',
+      ), () => _cancelFarmerOrder(orderId, reason));
 
   Future<void> _changeFarmerOrderStatus({
     required String orderId,
@@ -88,6 +97,7 @@ extension OrderControllerMutations on OrderController {
     required String description,
     Set<AuthRole> visibleTo = const {AuthRole.buyer, AuthRole.farmer},
   }) async {
+    final generation = _accountGeneration;
     final index = _orders.indexWhere((order) => order.id == orderId);
     if (index == -1 || _orders[index].status != from) return;
     final previousOrder = _orders[index];
@@ -103,6 +113,7 @@ extension OrderControllerMutations on OrderController {
     try {
       await _persistOrders();
     } on Object {
+      if (_disposed || generation != _accountGeneration) rethrow;
       _orders[index] = previousOrder;
       if (_orderNotifications.length > previousNotificationCount) {
         _orderNotifications.removeRange(
@@ -115,12 +126,13 @@ extension OrderControllerMutations on OrderController {
     }
   }
 
-  Future<void> reportOrderDispute({
+  Future<void> _reportOrderDispute({
     required String orderId,
     required OrderDisputeCategory category,
     required String reason,
     required OrderDisputeResolution requestedResolution,
   }) async {
+    final generation = _accountGeneration;
     final index = _orders.indexWhere((order) => order.id == orderId);
     if (index == -1) return;
     final cleanReason = reason.trim();
@@ -151,6 +163,7 @@ extension OrderControllerMutations on OrderController {
       requestedResolution: requestedResolution.value,
     );
 
+    if (_disposed || generation != _accountGeneration) return;
     _orders[index] = previousOrder.copyWith(dispute: dispute);
     _addOrderNotification(
       order: _orders[index],

@@ -15,10 +15,6 @@ abstract final class ProfileScreenStyles {
 
   static const EdgeInsets contentPadding = EdgeInsets.only(top: 16);
   static const EdgeInsets sectionHeaderPadding = EdgeInsets.only(left: 4);
-  static const EdgeInsets fontSizeCardPadding = EdgeInsets.symmetric(
-    horizontal: 16,
-    vertical: 4,
-  );
   static const EdgeInsets tilePadding = EdgeInsets.symmetric(
     horizontal: 16,
     vertical: 14,

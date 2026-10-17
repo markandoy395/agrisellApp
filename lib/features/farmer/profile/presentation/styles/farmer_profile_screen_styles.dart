@@ -23,10 +23,6 @@ abstract final class FarmerProfileScreenStyles {
 
   static const verificationMargin = EdgeInsets.only(bottom: 14);
   static const sectionPadding = EdgeInsets.only(left: 4);
-  static const fontControlPadding = EdgeInsets.symmetric(
-    horizontal: 16,
-    vertical: 4,
-  );
   static const tilePadding = EdgeInsets.symmetric(horizontal: 16, vertical: 14);
   static const tileRadius = BorderRadius.all(Radius.circular(18));
   static const divider = Color(0xFFEEF3F0);

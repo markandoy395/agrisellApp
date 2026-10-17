@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:agresell_app/core/models/user_profile.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/shared/support/presentation/screens/support_center_screen.dart';
-import 'package:agresell_app/features/shared/widgets/profile/account_font_size_control.dart';
 import '../styles/buyer_settings_panel_styles.dart';
 import 'buyer_settings_action_tile.dart';
 import 'buyer_settings_group.dart';
@@ -61,10 +60,6 @@ class BuyerSettingsPanel extends StatelessWidget {
                     ),
                   ],
                 ),
-                const BuyerSettingsGroup(
-                  title: 'Display',
-                  children: [AccountFontSizeControl()],
-                ),
                 BuyerSettingsGroup(
                   title: 'Safety',
                   children: [
@@ -88,7 +83,8 @@ class BuyerSettingsPanel extends StatelessWidget {
                     BuyerSettingsActionTile(
                       icon: Icons.support_agent_rounded,
                       title: 'Customer support tickets',
-                      onTap: onSupport ??
+                      onTap:
+                          onSupport ??
                           () {
                             Navigator.of(context).push(
                               agrisellPageRoute<void>(

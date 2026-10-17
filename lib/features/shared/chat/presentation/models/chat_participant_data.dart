@@ -4,12 +4,14 @@ class ChatParticipantData {
     required this.initials,
     required this.imageSemanticLabel,
     this.imageUrl,
+    this.imageAsset,
   });
 
   final String name;
   final String initials;
   final String imageSemanticLabel;
   final String? imageUrl;
+  final String? imageAsset;
 }
 
 class ChatConversationTileData {

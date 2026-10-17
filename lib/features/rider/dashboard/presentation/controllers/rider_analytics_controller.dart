@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:agresell_app/core/utils/async_request_scope.dart';
+import 'package:agresell_app/core/utils/async_operation_gate.dart';
 import '../../domain/rider_wallet.dart';
 
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
@@ -9,6 +11,8 @@ import 'package:agresell_app/features/rider/dashboard/domain/rider_history_model
 import 'package:agresell_app/features/rider/dashboard/domain/rider_rating_models.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_withdrawal_models.dart';
 
+part 'rider_analytics_wallet.dart';
+
 enum RiderAnalyticsLoadState { idle, loading, ready, error }
 
 class RiderAnalyticsController extends ChangeNotifier {
@@ -16,6 +20,13 @@ class RiderAnalyticsController extends ChangeNotifier {
     : _repository = repository ?? _defaultAnalyticsRepository();
 
   final RiderAnalyticsRepository _repository;
+  final _scope = AsyncRequestScope();
+  final _operations = AsyncOperationGate();
+  bool _disposed = false;
+  void _notify() {
+    if (!_disposed) notifyListeners();
+  }
+
   var _earningsState = RiderAnalyticsLoadState.idle;
   var _historyState = RiderAnalyticsLoadState.idle;
   var _ratingsState = RiderAnalyticsLoadState.idle;
@@ -48,16 +59,20 @@ class RiderAnalyticsController extends ChangeNotifier {
     required String riderId,
     required RiderDateRange dateRange,
   }) async {
+    final ticket = _scope.begin('earnings');
     _earningsState = RiderAnalyticsLoadState.loading;
     _earningsError = null;
     notifyListeners();
     try {
-      _earnings = await _repository.fetchEarnings(
+      final value = await _repository.fetchEarnings(
         riderId: riderId,
         dateRange: dateRange,
       );
+      if (!ticket.isCurrent) return;
+      _earnings = value;
       _earningsState = RiderAnalyticsLoadState.ready;
     } catch (_) {
+      if (!ticket.isCurrent) return;
       _earningsState = RiderAnalyticsLoadState.error;
       _earningsError = 'Earnings could not be loaded.';
     }
@@ -68,15 +83,19 @@ class RiderAnalyticsController extends ChangeNotifier {
     required String riderId,
     RiderHistoryQuery query = const RiderHistoryQuery(),
   }) async {
+    final ticket = _scope.begin('history');
     _historyState = RiderAnalyticsLoadState.loading;
     _historyError = null;
     notifyListeners();
     try {
-      _history = List.unmodifiable(
+      final values = List<RiderDeliveryHistoryEntry>.unmodifiable(
         await _repository.fetchHistory(riderId: riderId, query: query),
       );
+      if (!ticket.isCurrent) return;
+      _history = values;
       _historyState = RiderAnalyticsLoadState.ready;
     } catch (_) {
+      if (!ticket.isCurrent) return;
       _historyState = RiderAnalyticsLoadState.error;
       _historyError = 'Delivery history could not be loaded.';
     }
@@ -84,90 +103,28 @@ class RiderAnalyticsController extends ChangeNotifier {
   }
 
   Future<void> loadRatings({required String riderId}) async {
+    final ticket = _scope.begin('ratings');
     _ratingsState = RiderAnalyticsLoadState.loading;
     _ratingsError = null;
     notifyListeners();
     try {
-      _ratings = await _repository.fetchRatings(riderId: riderId);
+      final value = await _repository.fetchRatings(riderId: riderId);
+      if (!ticket.isCurrent) return;
+      _ratings = value;
       _ratingsState = RiderAnalyticsLoadState.ready;
     } catch (_) {
+      if (!ticket.isCurrent) return;
       _ratingsState = RiderAnalyticsLoadState.error;
       _ratingsError = 'Ratings could not be loaded.';
     }
     notifyListeners();
   }
 
-  Future<void> loadWithdrawalMethods({required String riderId}) async {
-    try {
-      _withdrawalMethods = await _repository.fetchWithdrawalMethods(
-        riderId: riderId,
-      );
-      notifyListeners();
-    } catch (_) {}
-  }
-
-  Future<void> loadWallet({required String riderId}) async {
-    wallet = null;
-    walletError = null;
-    try {
-      final repository = _repository;
-      if (repository is! RiderWalletRepository) {
-        throw StateError('Wallet unavailable');
-      }
-      wallet = await (repository as RiderWalletRepository).fetchWallet();
-      _withdrawalRequests = await _repository.fetchWithdrawalRequests(
-        riderId: riderId,
-      );
-    } catch (_) {
-      wallet = null;
-      _withdrawalRequests = const [];
-      walletError = 'Cash-out balance could not be verified. Please retry.';
-    }
-    notifyListeners();
-  }
-
-  Future<RiderWithdrawalMethod> saveWithdrawalMethod({
-    required String riderId,
-    required RiderWithdrawalMethod method,
-  }) async {
-    final saved = await _repository.saveWithdrawalMethod(
-      riderId: riderId,
-      method: method,
-    );
-    await loadWithdrawalMethods(riderId: riderId);
-    return saved;
-  }
-
-  Future<void> deleteWithdrawalMethod({
-    required String riderId,
-    required String methodId,
-  }) async {
-    await _repository.deleteWithdrawalMethod(
-      riderId: riderId,
-      methodId: methodId,
-    );
-    await loadWithdrawalMethods(riderId: riderId);
-  }
-
-  Future<RiderWithdrawalRequest> submitWithdrawalRequest({
-    required String riderId,
-    required RiderWithdrawalRequest request,
-  }) async {
-    final saved = await _repository.submitWithdrawalRequest(
-      riderId: riderId,
-      request: request,
-    );
-    await loadWithdrawalRequests(riderId: riderId);
-    return saved;
-  }
-
-  Future<void> loadWithdrawalRequests({required String riderId}) async {
-    try {
-      _withdrawalRequests = await _repository.fetchWithdrawalRequests(
-        riderId: riderId,
-      );
-      notifyListeners();
-    } catch (_) {}
+  @override
+  void dispose() {
+    _disposed = true;
+    _scope.dispose();
+    super.dispose();
   }
 }
 

@@ -8,7 +8,6 @@ import 'package:agresell_app/features/buyer/profile/presentation/widgets/buyer_d
 import 'package:agresell_app/features/buyer/profile/presentation/widgets/buyer_profile_style.dart';
 import 'package:agresell_app/features/buyer/profile/presentation/widgets/orders_card.dart';
 import 'package:agresell_app/features/buyer/profile/presentation/widgets/shipping_address_card.dart';
-import 'package:agresell_app/features/shared/widgets/profile/account_font_size_control.dart';
 
 /// Builds the overview section widgets for the buyer profile list.
 abstract final class BuyerProfileOverviewSections {
@@ -55,34 +54,19 @@ abstract final class BuyerProfileOverviewSections {
             title: 'Safety & Emergency SOS',
             onTap: onOpenSafety,
           ),
-          const Divider(
-            height: 1,
-            color: ProfileScreenStyles.normalDivider,
-          ),
+          const Divider(height: 1, color: ProfileScreenStyles.normalDivider),
           BuyerAccountTile(
             icon: Icons.history_rounded,
             title: 'Incident History & Status',
             onTap: onOpenIncidentHistory,
           ),
-          const Divider(
-            height: 1,
-            color: ProfileScreenStyles.normalDivider,
-          ),
+          const Divider(height: 1, color: ProfileScreenStyles.normalDivider),
           BuyerAccountTile(
             icon: Icons.support_agent_rounded,
             title: 'Customer Support Tickets',
             onTap: onOpenSupport,
           ),
         ],
-      ),
-    ),
-    const SizedBox(height: ProfileScreenStyles.sectionSpacing),
-    const BuyerSectionHeader('Display Preferences'),
-    const SizedBox(height: ProfileScreenStyles.sectionHeaderGap),
-    const BuyerProfileCard(
-      child: Padding(
-        padding: ProfileScreenStyles.fontSizeCardPadding,
-        child: AccountFontSizeControl(),
       ),
     ),
     const SizedBox(height: ProfileScreenStyles.sectionSpacing),
@@ -96,10 +80,7 @@ abstract final class BuyerProfileOverviewSections {
             title: 'Switch Account',
             onTap: onOpenSwitchAccount,
           ),
-          const Divider(
-            height: 1,
-            color: ProfileScreenStyles.sessionDivider,
-          ),
+          const Divider(height: 1, color: ProfileScreenStyles.sessionDivider),
           BuyerAccountTile(
             icon: Icons.logout_rounded,
             title: 'Log Out',

@@ -22,10 +22,7 @@ extension _RiderMapScreenContent on _RiderMapScreenState {
       visibility: _visibility,
       onVisibilityChanged: (value) =>
           _updateMapState(() => _visibility = value),
-      online: widget.availabilityController?.availability.isOnline,
-      onOnlineChanged: widget.availabilityController == null
-          ? null
-          : _setMapOnline,
+      online: widget.deliveryController.status.availability.isOnline,
       onOpenNotifications: widget.onOpenNotifications,
       unreadNotifications: widget.unreadNotifications,
       onOpenDelivery: _openMapDelivery,
@@ -50,14 +47,6 @@ extension _RiderMapScreenContent on _RiderMapScreenState {
       onPositionChanged: _onPositionChanged,
     ),
   );
-
-  Future<void> _setMapOnline(bool online) async {
-    final result = await widget.availabilityController?.setOnline(online);
-    if (!mounted || result == null || result.isSuccess) return;
-    _showMapMessage(
-      'Work status could not be changed. Review the status on Home.',
-    );
-  }
 
   void _openMapDelivery(DeliveryRequest request) {
     final riderId = widget.profile?.id;

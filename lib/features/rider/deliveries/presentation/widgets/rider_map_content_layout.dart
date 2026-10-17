@@ -68,11 +68,7 @@ extension _RiderMapContentLayout on RiderMapContent {
                       Positioned(
                         left: 12,
                         top: 12,
-                        child: RiderMapStatusControl(
-                          online: online,
-                          onChanged: onOnlineChanged,
-                          onRefresh: onRefresh,
-                        ),
+                        child: RiderMapStatusControl(online: online),
                       ),
                     Positioned(
                       right: 12,
@@ -142,4 +138,3 @@ extension _RiderMapContentLayout on RiderMapContent {
           );
   }
 }
-

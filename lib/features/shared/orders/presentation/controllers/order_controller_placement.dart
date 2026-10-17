@@ -27,7 +27,28 @@ extension OrderControllerPlacement on OrderController {
     double? deliveryLatitude,
     double? deliveryLongitude,
     OrderPayment payment = const OrderPayment.cashOnDelivery(),
+  }) => _runOrderAction(
+    'checkout',
+    () => _placeToShipOrders(
+      items: List.of(items),
+      deliveryAddress: deliveryAddress,
+      phoneNumber: phoneNumber,
+      deliveryLatitude: deliveryLatitude,
+      deliveryLongitude: deliveryLongitude,
+      payment: payment,
+    ),
+  );
+
+  Future<List<PlacedOrder>> _placeToShipOrders({
+    required Iterable<BasketCartItem> items,
+    required String deliveryAddress,
+    required String phoneNumber,
+    double? deliveryLatitude,
+    double? deliveryLongitude,
+    required OrderPayment payment,
   }) async {
+    final account = _accountId;
+    final generation = _accountGeneration;
     final groups = <String, List<BasketCartItem>>{};
     for (final item in items) {
       groups.putIfAbsent(_sellerKey(item), () => []).add(item);
@@ -39,7 +60,7 @@ extension OrderControllerPlacement on OrderController {
 
     final placedAt = DateTime.now();
     final checkoutId = 'ORD-${placedAt.microsecondsSinceEpoch}';
-    final newOrders = groups.entries
+    var newOrders = groups.entries
         .map((entry) {
           return PlacedOrder(
             id: '$checkoutId-${entry.key}',
@@ -58,6 +79,32 @@ extension OrderControllerPlacement on OrderController {
         })
         .toList(growable: false);
 
+    CheckoutAttempt? attempt;
+    if (account != null) {
+      attempt = await _checkoutAttempts.prepare(account, newOrders);
+      if (_disposed || generation != _accountGeneration) {
+        throw StateError('The checkout account changed.');
+      }
+      newOrders = attempt.orders;
+      if (attempt.operation.isRetry) {
+        final saved = await _repository.load(account);
+        if (_disposed || generation != _accountGeneration) {
+          throw StateError('The checkout account changed.');
+        }
+        final ids = newOrders.map((order) => order.id).toSet();
+        final confirmed = saved
+            .where((order) => ids.contains(order.id))
+            .toList();
+        if (confirmed.length == ids.length) {
+          _orders.removeWhere((order) => ids.contains(order.id));
+          _orders.insertAll(0, confirmed);
+          await _checkoutAttempts.complete(attempt);
+          _commitChange(persist: false);
+          return confirmed;
+        }
+      }
+    }
+
     final previousNotificationCount = _orderNotifications.length;
     _orders.insertAll(0, newOrders);
     for (final order in newOrders.reversed) {
@@ -72,7 +119,14 @@ extension OrderControllerPlacement on OrderController {
     _commitChange(persist: false);
     try {
       await _persistNewOrders(newOrders);
-    } on Object {
+      if (attempt != null) await _checkoutAttempts.complete(attempt);
+    } on Object catch (error) {
+      if (attempt != null &&
+          error is OrderPlacementException &&
+          error.definitivelyRejected) {
+        await _checkoutAttempts.complete(attempt);
+      }
+      if (_disposed || generation != _accountGeneration) rethrow;
       _orders.removeWhere(newOrders.contains);
       final addedNotificationCount =
           _orderNotifications.length - previousNotificationCount;
@@ -82,11 +136,15 @@ extension OrderControllerPlacement on OrderController {
       _commitChange(persist: false);
       rethrow;
     }
+    if (_disposed || generation != _accountGeneration) {
+      throw StateError('The checkout account changed.');
+    }
     return List<PlacedOrder>.unmodifiable(newOrders);
   }
 
   Future<void> _persistNewOrders(Iterable<PlacedOrder> newOrders) {
     final accountId = _accountId;
+    final generation = _accountGeneration;
     if (accountId == null) return Future<void>.value();
     final previousWrite = _pendingPersistence;
     final additions = List<PlacedOrder>.of(newOrders);
@@ -96,6 +154,9 @@ extension OrderControllerPlacement on OrderController {
         await previousWrite;
       } on Object {
         // A new checkout must not be blocked by an older stale snapshot.
+      }
+      if (_disposed || generation != _accountGeneration) {
+        throw StateError('The checkout account changed.');
       }
       await _repository.createOrders(
         accountId: accountId,

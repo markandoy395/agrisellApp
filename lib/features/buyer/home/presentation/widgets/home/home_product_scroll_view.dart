@@ -14,9 +14,8 @@ import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_header.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_pinned_search_header.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_product_results_header.dart';
-import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_sale_products_section.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
-import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_grid.dart';
+import '../catalog/buyer_catalog_grid.dart';
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_grid_skeleton.dart';
 
 class HomeProductScrollView extends StatelessWidget {
@@ -25,9 +24,8 @@ class HomeProductScrollView extends StatelessWidget {
     required this.searchController,
     required this.browseController,
     required this.products,
-    required this.saleProducts,
     required this.onBannerTap,
-    required this.onViewAllSales,
+    required this.onViewAll,
     required this.onShowFilters,
     required this.onReset,
     required this.onProductTap,
@@ -45,9 +43,8 @@ class HomeProductScrollView extends StatelessWidget {
   final TextEditingController searchController;
   final HomeProductBrowseController browseController;
   final List<HomeProduct> products;
-  final List<HomeProduct> saleProducts;
   final ValueChanged<HomeBanner> onBannerTap;
-  final VoidCallback onViewAllSales;
+  final VoidCallback onViewAll;
   final VoidCallback onShowFilters;
   final VoidCallback onReset;
   final ValueChanged<HomeProduct> onProductTap;
@@ -125,16 +122,6 @@ class HomeProductScrollView extends StatelessWidget {
                 ),
                 SliverToBoxAdapter(child: SizedBox(height: contentGap)),
               ],
-              if (saleProducts.isNotEmpty) ...[
-                SliverToBoxAdapter(
-                  child: HomeSaleProductsSection(
-                    products: saleProducts,
-                    onViewAll: onViewAllSales,
-                    onProductTap: onProductTap,
-                  ),
-                ),
-                SliverToBoxAdapter(child: SizedBox(height: contentGap)),
-              ],
               SliverPadding(
                 padding: EdgeInsets.symmetric(horizontal: contentPadding),
                 sliver: SliverToBoxAdapter(
@@ -151,6 +138,7 @@ class HomeProductScrollView extends StatelessWidget {
                 ),
                 sliver: SliverToBoxAdapter(
                   child: HomeProductResultsHeader(
+                    onViewAll: onViewAll,
                     resultCount: products.length,
                     savedCount: browseController.savedCount,
                     savedOnly: browseController.savedOnly,
@@ -176,8 +164,10 @@ class HomeProductScrollView extends StatelessWidget {
               else ...[
                 SliverPadding(
                   padding: EdgeInsets.symmetric(horizontal: contentPadding),
-                  sliver: HomeProductGrid(
+                  sliver: BuyerCatalogGrid(
                     products: products,
+                    browseController: browseController,
+                    sale: true,
                     onProductTap: onProductTap,
                   ),
                 ),

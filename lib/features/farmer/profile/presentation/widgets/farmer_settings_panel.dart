@@ -3,17 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:agresell_app/core/models/user_profile.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/shared/support/presentation/screens/support_center_screen.dart';
-import 'package:agresell_app/features/shared/widgets/profile/account_font_size_control.dart';
 import '../styles/farmer_settings_panel_styles.dart';
 import 'farmer_gcash_settings_sheet.dart';
 import 'farmer_settings_action_tile.dart';
 import 'farmer_settings_group.dart';
 import 'farmer_settings_header.dart';
 import 'farmer_settings_identity_card.dart';
-
-export 'package:agresell_app/features/shared/widgets/profile/account_font_size_control.dart';
-
-typedef FarmerFontSizeControl = AccountFontSizeControl;
 
 class FarmerSettingsPanel extends StatelessWidget {
   const FarmerSettingsPanel({
@@ -89,10 +84,6 @@ class FarmerSettingsPanel extends StatelessWidget {
                       ),
                   ],
                 ),
-                const FarmerSettingsGroup(
-                  title: 'Display',
-                  children: [FarmerFontSizeControl()],
-                ),
                 FarmerSettingsGroup(
                   title: 'Safety',
                   children: [
@@ -131,7 +122,8 @@ class FarmerSettingsPanel extends StatelessWidget {
                       title: 'Customer support tickets',
                       subtitle:
                           'Open and track helpdesk inquiries with Agrisell',
-                      onTap: onSupport ??
+                      onTap:
+                          onSupport ??
                           () {
                             Navigator.of(context).push(
                               agrisellPageRoute<void>(

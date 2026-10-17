@@ -10,8 +10,6 @@ abstract final class SignUpScreenStyles {
   static const double headerToFieldsGap = 12.0;
   static const double lockedNoticeGap = 8.0;
   static const double sectionActionsGap = 20.0;
-  static const double socialDividerGap = 20.0;
-  static const double socialButtonsGap = 12.0;
   static const double policyCheckboxGap = 18.0;
   static const double backButtonGap = 10.0;
   static const double bottomLinkGap = 20.0;
@@ -27,13 +25,9 @@ abstract final class SignUpScreenStyles {
     fontWeight: FontWeight.w700,
   );
 
-  static const TextStyle sectionSubtitle = TextStyle(
-    fontSize: 12,
-  );
+  static const TextStyle sectionSubtitle = TextStyle(fontSize: 12);
 
-  static const TextStyle lockedNoticeText = TextStyle(
-    fontSize: 12,
-  );
+  static const TextStyle lockedNoticeText = TextStyle(fontSize: 12);
 
   // Content Strings
   static const String credentialsTitle = 'Account credentials';

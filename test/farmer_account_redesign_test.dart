@@ -1,4 +1,3 @@
-import 'package:agresell_app/core/services/app_font_size_controller.dart';
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/features/farmer/profile/presentation/screens/farmer_profile_screen.dart';
 import 'package:agresell_app/features/farmer/profile/presentation/widgets/farmer_profile_edit_card.dart';
@@ -12,8 +11,6 @@ void main() {
       'farmer account screen displays all features and toggles personal info at $width',
       (tester) async {
         SharedPreferences.setMockInitialValues({});
-        await AppFontSizeController.instance.setTextScale(1);
-        addTearDown(() => AppFontSizeController.instance.setTextScale(1));
         await tester.binding.setSurfaceSize(Size(width, 1000));
         addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -85,19 +82,9 @@ void main() {
         expect(find.text('Incident History & Status'), findsOneWidget);
         expect(find.text('Customer Support Tickets'), findsOneWidget);
 
-        await tester.scrollUntilVisible(
-          find.byTooltip('Increase font size'),
-          100,
-          scrollable: scrollable,
-        );
-        await tester.tap(find.byTooltip('Increase font size'));
-        await tester.pumpAndSettle();
-        expect(find.text('110%'), findsOneWidget);
-        expect(AppFontSizeController.instance.textScale, 1.1);
-
-        await tester.tap(find.byTooltip('Decrease font size'));
-        await tester.pumpAndSettle();
-        expect(find.text('100%'), findsOneWidget);
+        expect(find.byTooltip('Increase font size'), findsNothing);
+        expect(find.byTooltip('Decrease font size'), findsNothing);
+        expect(find.text('Display Preferences'), findsNothing);
 
         await tester.scrollUntilVisible(
           find.text('Log Out'),

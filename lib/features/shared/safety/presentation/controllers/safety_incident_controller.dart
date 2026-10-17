@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:agresell_app/core/utils/async_request_scope.dart';
 
 import 'package:flutter/foundation.dart';
 
@@ -9,9 +10,10 @@ import 'package:agresell_app/features/shared/safety/domain/safety_incident.dart'
 
 class SafetyIncidentController extends ChangeNotifier {
   SafetyIncidentController({SafetyIncidentRepository? repository})
-      : _repository = repository ?? _defaultRepository();
+    : _repository = repository ?? _defaultRepository();
 
   final SafetyIncidentRepository _repository;
+  final _scope = AsyncRequestScope();
 
   List<SafetyIncident> _incidents = const [];
   bool _isLoading = false;
@@ -38,17 +40,21 @@ class SafetyIncidentController extends ChangeNotifier {
   }
 
   Future<void> loadIncidents() async {
+    if (_isLoading) return;
+    final ticket = _scope.begin('load');
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      _incidents = await _repository.getMyIncidents(status: 'all');
+      final values = await _repository.getMyIncidents(status: 'all');
+      if (ticket.isCurrent) _incidents = values;
     } catch (error) {
+      if (!ticket.isCurrent) return;
       _errorMessage = 'Could not load safety incidents: $error';
     } finally {
       _isLoading = false;
-      notifyListeners();
+      if (ticket.isActive) notifyListeners();
     }
   }
 
@@ -102,6 +108,8 @@ class SafetyIncidentController extends ChangeNotifier {
     List<String> requestedActions = const [],
     String reportType = 'safety_report',
   }) async {
+    if (_isSubmitting) return null;
+    final ticket = _scope.begin('submit');
     if (description.trim().isEmpty) {
       _errorMessage = 'A description is required for this incident report.';
       notifyListeners();
@@ -113,7 +121,8 @@ class SafetyIncidentController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final reportId = 'INC-${DateTime.now().microsecondsSinceEpoch}-${++_idCounter}';
+      final reportId =
+          'INC-${DateTime.now().microsecondsSinceEpoch}-${++_idCounter}';
       final incident = await _repository.submitIncident(
         reportId: reportId,
         category: category,
@@ -133,15 +142,27 @@ class SafetyIncidentController extends ChangeNotifier {
         reportType: reportType,
       );
 
-      _incidents = [incident, ..._incidents.where((i) => i.reportId != incident.reportId)];
+      if (!ticket.isCurrent) return null;
+      _scope.invalidate('load');
+      _incidents = [
+        incident,
+        ..._incidents.where((i) => i.reportId != incident.reportId),
+      ];
       return incident;
     } catch (error) {
+      if (!ticket.isCurrent) return null;
       _errorMessage = 'Safety report could not be submitted: $error';
       return null;
     } finally {
       _isSubmitting = false;
-      notifyListeners();
+      if (ticket.isCurrent) notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    _scope.dispose();
+    super.dispose();
   }
 
   static SafetyIncidentRepository _defaultRepository() {

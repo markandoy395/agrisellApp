@@ -6,6 +6,8 @@ import 'package:agresell_app/features/shared/products/presentation/controllers/h
 import 'package:agresell_app/features/buyer/home/presentation/controllers/home_product_browse_controller.dart';
 import 'package:agresell_app/features/buyer/home/domain/home_banner.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/sale_products_screen.dart';
+import 'package:agresell_app/features/buyer/home/presentation/screens/all_products_screen.dart';
+import '../../styles/buyer_catalog_styles.dart';
 import 'package:agresell_app/features/buyer/deals/presentation/screens/deals_and_promos_screen.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_product_filter_sheet.dart';
 import 'package:agresell_app/features/buyer/home/presentation/widgets/home/home_product_scroll_view.dart';
@@ -14,6 +16,8 @@ class HomeDashboardContent extends StatefulWidget {
   const HomeDashboardContent({
     required this.onProductTap,
     required this.catalogController,
+    this.onSelectTab,
+    this.badgeCounts = const {},
     super.key,
   });
 
@@ -23,6 +27,8 @@ class HomeDashboardContent extends StatefulWidget {
   )
   onProductTap;
   final HomeProductCatalogController catalogController;
+  final ValueChanged<int>? onSelectTab;
+  final Map<int, int> badgeCounts;
 
   @override
   State<HomeDashboardContent> createState() => _HomeDashboardContentState();
@@ -61,9 +67,7 @@ class _HomeDashboardContentState extends State<HomeDashboardContent> {
       context: context,
       isScrollControlled: true,
       backgroundColor: AgrisellColors.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
-      ),
+      shape: BuyerCatalogStyles.filtersShape,
       builder: (_) => HomeProductFilterSheet(
         controller: _browseController,
         onReset: _resetDiscovery,
@@ -84,15 +88,19 @@ class _HomeDashboardContentState extends State<HomeDashboardContent> {
     );
   }
 
-  void _openAllSaleProducts(List<HomeProduct> products) {
-    Navigator.of(context).push(
-      agrisellMaterialPageRoute<void>(
-        builder: (_) => SaleProductsScreen(
-          title: 'All sale products',
-          initialProducts: products,
+  Future<void> _openAllProducts() async {
+    final tab = await Navigator.of(context).push<int>(
+      agrisellMaterialPageRoute<int>(
+        builder: (_) => AllProductsScreen(
+          catalogController: widget.catalogController,
+          browseController: _browseController,
+          badgeCounts: widget.badgeCounts,
+          onProductTap: (product) =>
+              widget.onProductTap(product, _browseController),
         ),
       ),
     );
+    if (mounted && tab != null) widget.onSelectTab?.call(tab);
   }
 
   void _openDealsAndPromos() {
@@ -109,17 +117,13 @@ class _HomeDashboardContentState extends State<HomeDashboardContent> {
       animation: _updates,
       builder: (context, _) {
         final catalog = widget.catalogController;
-        final saleProducts = catalog.products
-            .where((product) => product.canOrder && product.hasSale)
-            .toList(growable: false);
         return HomeProductScrollView(
           bannerController: _bannerController,
           searchController: _searchController,
           browseController: _browseController,
           products: _browseController.visibleProducts(catalog.products),
-          saleProducts: saleProducts,
           onBannerTap: _openCampaignBanner,
-          onViewAllSales: () => _openAllSaleProducts(saleProducts),
+          onViewAll: _openAllProducts,
           onOpenDeals: _openDealsAndPromos,
           isLoading: catalog.status == HomeProductCatalogStatus.loading,
           loadFailed: catalog.status == HomeProductCatalogStatus.error,

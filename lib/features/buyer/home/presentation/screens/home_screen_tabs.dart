@@ -6,6 +6,8 @@ extension _HomeScreenTabs on _HomeScreenState {
       HomeScreen.homeNavIndex => _KeepAliveTab(
         child: HomeDashboardContent(
           catalogController: _productCatalogController,
+          onSelectTab: _selectTab,
+          badgeCounts: _badgeCounts,
           onProductTap: _openProduct,
         ),
       ),

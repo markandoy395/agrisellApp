@@ -11,6 +11,7 @@ class AuthCard extends StatelessWidget {
     this.largeTitle = false,
     this.scrollable = true,
     this.fillRemaining = true,
+    this.fitContent = false,
     super.key,
   });
 
@@ -19,6 +20,7 @@ class AuthCard extends StatelessWidget {
   final bool largeTitle;
   final bool scrollable;
   final bool fillRemaining;
+  final bool fitContent;
 
   @override
   Widget build(BuildContext context) {
@@ -42,14 +44,17 @@ class AuthCard extends StatelessWidget {
       ),
       decoration: AuthCardStyles.containerDecoration,
       child: Column(
+        mainAxisSize: fitContent ? MainAxisSize.min : MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title, style: AuthCardStyles.titleText(largeTitle, scale)),
           SizedBox(height: lerpDouble(18, 22, scale) - keyboardCompaction),
-          Expanded(
+          Flexible(
+            fit: fitContent ? FlexFit.loose : FlexFit.tight,
             child: scrollable
                 ? KeyboardAdaptiveScrollView(
                     fillRemaining: fillRemaining,
+                    fitContent: fitContent,
                     child: child,
                   )
                 : child,

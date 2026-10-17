@@ -3,7 +3,6 @@ import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
 import 'package:agresell_app/features/shared/support/presentation/screens/support_center_screen.dart';
-import 'package:agresell_app/features/shared/widgets/profile/font_size_settings_control.dart';
 import '../styles/rider_profile_design_styles.dart';
 import 'rider_settings_action.dart';
 import 'rider_profile_design_components.dart';
@@ -83,8 +82,6 @@ class RiderSettingsPanel extends StatelessWidget {
                 color: AgrisellColors.statusOrangeText,
                 onTap: onChangePassword,
               ),
-              _heading('Display'),
-              const RiderProfileCard(child: FontSizeSettingsControl()),
               _heading('Safety'),
               RiderProfileCard(
                 child: Column(

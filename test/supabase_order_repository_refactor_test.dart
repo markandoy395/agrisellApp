@@ -142,6 +142,13 @@ void main() {
       final client = _client((request) async {
         final rpc = request.url.pathSegments.last;
         calls.add(rpc);
+        if (rpc == 'current_account_order_bundle') {
+          return _response(
+            request,
+            '{"message":"Missing function","code":"PGRST202"}',
+            status: 404,
+          );
+        }
         final optional = rpc.contains('refund') || rpc.contains('dispute');
         return _response(
           request,
@@ -152,6 +159,7 @@ void main() {
       addTearDown(client.dispose);
       expect(await SupabaseOrderRepository(client).load('account'), isEmpty);
       expect(calls, [
+        'current_account_order_bundle',
         'current_account_orders',
         'current_account_payment_snapshots',
         'current_account_review_snapshots',
@@ -162,6 +170,38 @@ void main() {
       ]);
     },
   );
+  test('bundle loads through one RPC without extra requests', () async {
+    var calls = 0;
+    final client = _client((request) async {
+      calls++;
+      expect(request.url.pathSegments.last, 'current_account_order_bundle');
+      return _response(
+        request,
+        '{"orders":[],"payments":[],"reviews":[],"expirations":[],"cancellations":[],"refunds":[],"disputes":[]}',
+      );
+    });
+    addTearDown(client.dispose);
+    expect(await SupabaseOrderRepository(client).load('account'), isEmpty);
+    expect(calls, 1);
+  });
+
+  test('bundle authorization failure never falls back to other RPCs', () async {
+    var calls = 0;
+    final client = _client((request) async {
+      calls++;
+      return _response(
+        request,
+        '{"message":"Denied","code":"42501"}',
+        status: 403,
+      );
+    });
+    addTearDown(client.dispose);
+    await expectLater(
+      SupabaseOrderRepository(client).load('account'),
+      throwsA(isA<PostgrestException>()),
+    );
+    expect(calls, 1);
+  });
 }
 
 SupabaseClient _client(MockClientHandler handler) => SupabaseClient(

@@ -63,7 +63,14 @@ void main() {
     await tester.pumpAndSettle();
     // Order persistence must complete outside the simulated widget clock so
     // subsequent authenticated fixtures can await the same controller's queue.
-    await tester.runAsync(() => tester.tap(find.text('Place Order')));
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Place Order'));
+      final deadline = DateTime.now().add(const Duration(seconds: 5));
+      while (basket.selectedItems.isNotEmpty &&
+          DateTime.now().isBefore(deadline)) {
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+      }
+    });
     await tester.pumpAndSettle();
 
     expect(orders.toShipOrders, hasLength(1));

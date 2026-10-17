@@ -1,6 +1,8 @@
 import 'package:agresell_app/features/rider/chat/presentation/styles/rider_conversation_list_styles.dart';
 import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/constants/agrisell_assets.dart';
+import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/chat/domain/rider_communication_models.dart';
@@ -145,7 +147,18 @@ class _PartyAvatar extends StatelessWidget {
       width: 40,
       height: 40,
       decoration: SharedPresentationStyles.forestCircle,
-      child: Icon(icon, color: AgrisellColors.authGreen, size: 20),
+      child: party == RiderConversationParty.support
+          ? const Padding(
+              padding: EdgeInsets.all(6.4),
+              child: ResponsiveAssetImage(
+                asset: AgrisellAssets.logoOnly,
+                width: 27.2,
+                height: 27.2,
+                fit: BoxFit.contain,
+                semanticLabel: 'AgriSell support logo',
+              ),
+            )
+          : Icon(icon, color: AgrisellColors.authGreen, size: 20),
     );
   }
 }

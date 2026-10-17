@@ -12,6 +12,34 @@ void main() {
   });
   tearDown(() => controller.dispose());
 
+  test(
+    'concurrent verification sends one request and completes once',
+    () async {
+      final response = Completer<void>();
+      var requests = 0;
+      controller.code.text = '123456';
+      Future<void> verify(String _) {
+        requests++;
+        return response.future;
+      }
+
+      final first = controller.verify(
+        codeLength: 6,
+        maxIncorrectAttempts: 5,
+        onVerify: verify,
+      );
+      final second = controller.verify(
+        codeLength: 6,
+        maxIncorrectAttempts: 5,
+        onVerify: verify,
+      );
+      response.complete();
+      expect(await first, isTrue);
+      expect(await second, isFalse);
+      expect(requests, 1);
+    },
+  );
+
   test('validates the configured length before calling verification', () async {
     var called = false;
     controller.code.text = '123';

@@ -51,7 +51,6 @@ class RiderMapContent extends StatelessWidget {
     this.visibility = const RiderMapVisibility(),
     this.onVisibilityChanged,
     this.online,
-    this.onOnlineChanged,
     this.onOpenNotifications,
     this.unreadNotifications = 0,
     this.onOpenDelivery,
@@ -87,7 +86,6 @@ class RiderMapContent extends StatelessWidget {
   final RiderMapVisibility visibility;
   final ValueChanged<RiderMapVisibility>? onVisibilityChanged;
   final bool? online;
-  final ValueChanged<bool>? onOnlineChanged;
   final VoidCallback? onOpenNotifications;
   final int unreadNotifications;
   final ValueChanged<DeliveryRequest>? onOpenDelivery;

@@ -35,6 +35,10 @@ extension AuthRegistrationServiceVerification on AuthRegistrationService {
     required String email,
     required String otp,
   }) async {
+    final verifier = _emailVerifierForTesting;
+    if (verifier != null && _localStoreEnabledForTesting && !usesSupabase) {
+      return _remoteAccount = await verifier(email, otp);
+    }
     if (!usesSupabase) {
       throw const AuthRegistrationException(
         'Email verification is temporarily unavailable. Please try again later.',

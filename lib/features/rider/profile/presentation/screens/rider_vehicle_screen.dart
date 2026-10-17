@@ -1,6 +1,6 @@
 import '../styles/rider_profile_design_styles.dart';
 import '../widgets/rider_vehicle_overview.dart';
-import '../widgets/rider_vehicle_edit_dialog.dart';
+import '../widgets/rider_vehicle_edit_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
@@ -54,10 +54,7 @@ class _RiderVehicleScreenState extends State<RiderVehicleScreen> {
   }
 
   Future<void> _edit(RiderVehicle vehicle) async {
-    final values = await showDialog<List<String>>(
-      context: context,
-      builder: (context) => RiderVehicleEditDialog(vehicle: vehicle),
-    );
+    final values = await showRiderVehicleEditSheet(context, vehicle);
     if (values == null || !mounted) return;
     setState(() => _saving = true);
     try {

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:agresell_app/core/utils/async_request_scope.dart';
 
 import 'package:flutter/foundation.dart';
 
@@ -18,6 +19,7 @@ class SupportTicketDetailController extends ChangeNotifier {
 
   SupportTicket _ticket;
   final SupportTicketRepository _repository;
+  final _scope = AsyncRequestScope();
 
   List<SupportMessage> _messages = const [];
   bool _isLoading = false;
@@ -31,24 +33,30 @@ class SupportTicketDetailController extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   Future<void> loadMessages() async {
+    if (_isLoading) return;
+    final ticket = _scope.begin('load');
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      _messages = await _repository.getTicketMessages(_ticket.ticketId);
+      final values = await _repository.getTicketMessages(_ticket.ticketId);
+      if (ticket.isCurrent) _messages = values;
     } catch (e) {
+      if (!ticket.isCurrent) return;
       _errorMessage = supportErrorMessage(
         e,
         fallback: 'Could not load messages. Please try again.',
       );
     } finally {
       _isLoading = false;
-      notifyListeners();
+      if (ticket.isActive) notifyListeners();
     }
   }
 
   Future<bool> sendMessage(String text) async {
+    if (_isSending) return false;
+    final ticket = _scope.begin('send');
     final trimmed = text.trim();
     if (trimmed.isEmpty) return false;
 
@@ -62,6 +70,8 @@ class SupportTicketDetailController extends ChangeNotifier {
         body: trimmed,
       );
 
+      if (!ticket.isCurrent) return false;
+      _scope.invalidate('load');
       _messages = [..._messages, newMsg];
 
       // Update ticket status: If ticket was resolved/closed, it re-opens to 'open'
@@ -80,6 +90,7 @@ class SupportTicketDetailController extends ChangeNotifier {
 
       return true;
     } catch (e) {
+      if (!ticket.isCurrent) return false;
       _errorMessage = supportErrorMessage(
         e,
         fallback: 'Could not send your message. Please try again.',
@@ -87,8 +98,14 @@ class SupportTicketDetailController extends ChangeNotifier {
       return false;
     } finally {
       _isSending = false;
-      notifyListeners();
+      if (ticket.isCurrent) notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    _scope.dispose();
+    super.dispose();
   }
 
   static SupportTicketRepository _defaultRepository() {

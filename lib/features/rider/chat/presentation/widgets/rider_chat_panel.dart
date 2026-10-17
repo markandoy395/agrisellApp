@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/constants/agrisell_assets.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/features/rider/presentation/widgets/rider_safe_scaffold.dart';
 import 'package:agresell_app/features/shared/safety/presentation/widgets/app_safety_sheet.dart';
@@ -10,7 +11,6 @@ import 'rider_chat_actions.dart';
 import 'rider_chat_messages.dart';
 import 'rider_conversation_header.dart';
 import 'rider_message_composer.dart';
-import 'rider_protected_chat_banner.dart';
 import 'rider_text_quick_replies.dart';
 
 class RiderConversationPanel extends StatelessWidget {
@@ -38,18 +38,7 @@ class RiderConversationPanel extends StatelessWidget {
               conversation: conversation,
               onSafety: () => _openSafety(context),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
-              child: RiderProtectedChatBanner(
-                deliveryId: conversation.deliveryId,
-              ),
-            ),
             Expanded(child: RiderMessageBody(controller: controller)),
-            if (MediaQuery.viewInsetsOf(context).bottom == 0)
-              const Padding(
-                padding: EdgeInsets.fromLTRB(18, 8, 18, 4),
-                child: RiderProtectedChatBanner(compact: true),
-              ),
             RiderTextQuickReplies(
               replies: quickReplies,
               enabled: controller.canCompose && !controller.isSending,
@@ -112,4 +101,7 @@ ChatParticipantData riderChatParticipant(RiderConversation conversation) =>
           .join()
           .toUpperCase(),
       imageSemanticLabel: '${conversation.participantLabel} profile',
+      imageAsset: conversation.party == RiderConversationParty.support
+          ? AgrisellAssets.logoOnly
+          : null,
     );

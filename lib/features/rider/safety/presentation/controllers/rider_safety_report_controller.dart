@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:agresell_app/core/utils/async_operation_gate.dart';
+import 'package:agresell_app/core/utils/async_request_scope.dart';
 
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/features/rider/deliveries/data/rider_offline_action_queue.dart';
@@ -23,12 +25,16 @@ class RiderSafetyReportController extends ChangeNotifier {
   final Map<String, RiderSafetyReport> _reports = {};
   bool _backendReachable = true;
   String? _riderId;
+  final _operations = AsyncOperationGate();
+  final _scope = AsyncRequestScope();
 
   RiderSafetyReport? reportFor(String deliveryId) => _reports[deliveryId];
 
   Future<void> restore(String riderId) async {
+    final ticket = _scope.begin('restore');
     _riderId = riderId;
     await _offlineQueue.initialize(riderId);
+    if (!ticket.isCurrent) return;
     for (final action in _offlineQueue.actions.where(
       (item) => item.type == OfflineDeliveryActionType.safetyReport,
     )) {
@@ -38,9 +44,14 @@ class RiderSafetyReportController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<RiderSafetyReport> submit(RiderSafetyReport report) async {
+  Future<RiderSafetyReport> submit(RiderSafetyReport report) =>
+      _operations.run(('submit', report.id), () => _submit(report));
+
+  Future<RiderSafetyReport> _submit(RiderSafetyReport report) async {
+    final ticket = _scope.begin(('submit', report.id));
     _riderId = report.riderId;
     await _offlineQueue.initialize(report.riderId);
+    if (!ticket.isCurrent) return report;
     _reports[report.deliveryId] = report;
     notifyListeners();
     if (!_backendReachable) {
@@ -48,11 +59,13 @@ class RiderSafetyReportController extends ChangeNotifier {
       return report;
     }
     try {
-      final saved = await _repository.submitReport(report);
+      final saved = await _sendReport(report);
+      if (!ticket.isCurrent) return report;
       _reports[report.deliveryId] = saved;
       notifyListeners();
       return saved;
     } catch (_) {
+      if (!ticket.isCurrent) return report;
       await _queue(report);
       return report;
     }
@@ -63,7 +76,13 @@ class RiderSafetyReportController extends ChangeNotifier {
     if (value) synchronize();
   }
 
-  Future<void> synchronize() async {
+  Future<RiderSafetyReport> _sendReport(RiderSafetyReport report) => _operations
+      .run(('remote', report.id), () => _repository.submitReport(report));
+
+  Future<void> synchronize() => _operations.run('sync', _synchronize);
+
+  Future<void> _synchronize() async {
+    final ticket = _scope.begin('sync');
     final riderId = _riderId;
     if (!_backendReachable || riderId == null) return;
     for (final action
@@ -76,14 +95,15 @@ class RiderSafetyReportController extends ChangeNotifier {
             .toList()) {
       try {
         final report = _fromAction(action);
-        final saved = await _repository.submitReport(report);
+        final saved = await _sendReport(report);
+        if (!ticket.isCurrent) return;
         _reports[saved.deliveryId] = saved;
         await _offlineQueue.acknowledge(action.localId);
       } on Exception {
         break;
       }
     }
-    notifyListeners();
+    if (ticket.isCurrent) notifyListeners();
   }
 
   Future<void> _queue(RiderSafetyReport report) => _offlineQueue.add(
@@ -130,6 +150,7 @@ class RiderSafetyReportController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _scope.dispose();
     if (_ownsQueue) _offlineQueue.dispose();
     super.dispose();
   }

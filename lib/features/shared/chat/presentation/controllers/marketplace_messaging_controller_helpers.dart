@@ -15,12 +15,15 @@ extension _MarketplaceMessagingControllerHelpers
   }
 
   Future<void> _refreshAfterSend(String id) async {
+    final ticket = _scope.begin(('messages', id));
     try {
       final freshMessages = await repository.loadMessages(id);
+      if (!ticket.isCurrent) return;
       if (freshMessages.isNotEmpty || (_messages[id]?.isEmpty ?? true)) {
         _messages[id] = List.of(freshMessages);
       }
-      _conversations = List.of(await repository.loadConversations());
+      // Queue a post-send snapshot after any older inbox read.
+      await _requests.serialize('inbox', () => _load(silent: true));
     } on Object {
       // The confirmed message remains visible when a follow-up refresh fails.
     }

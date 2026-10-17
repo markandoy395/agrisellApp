@@ -26,6 +26,16 @@ const request = (route = "users", options = {}) =>
     { headers: { authorization: "Bearer user-token" }, ...options },
   );
 
+test("retry-safe chat shares the original attempt quota keys", async () => {
+  const backend = client();
+  const body = new TextEncoder().encode(JSON.stringify({conversation_id:12,body:"Hello"}));
+  await chatLimits(backend,"owner-a","rpc/send_marketplace_message",body);
+  await chatLimits(backend,"owner-a","rpc/send_marketplace_message_once",body);
+  assert.equal(backend.calls.length,4);
+  assert.equal(backend.calls[1].params.p_key_hash,backend.calls[3].params.p_key_hash);
+  assert.equal(backend.calls[0].params.p_key_hash,backend.calls[2].params.p_key_hash);
+});
+
 test("chat quotas use verified identity, persist failed attempts and count Unicode", async () => {
   const backend=client();
   const body=(text)=>new TextEncoder().encode(JSON.stringify({conversation_id:12,body:text,owner_id:"spoof"}));

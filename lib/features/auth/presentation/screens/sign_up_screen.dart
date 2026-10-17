@@ -151,6 +151,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     key: ValueKey(_step),
     title: 'Sign Up',
     fillRemaining: false,
+    fitContent: true,
     child: Column(
       children: [
         SignUpProgressBar(step: _step),

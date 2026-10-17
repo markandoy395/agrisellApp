@@ -1,6 +1,5 @@
 import 'package:agresell_app/main.dart';
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
-import 'package:agresell_app/core/widgets/responsive_asset_image.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/auth/data/auth_registration_service.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
@@ -8,7 +7,6 @@ import 'package:agresell_app/core/utils/profile_edit_validator.dart';
 import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:agresell_app/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_text_field.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/social_sign_in_button.dart';
 import 'package:agresell_app/features/farmer/dashboard/presentation/screens/farmer_home_screen.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/home_screen.dart';
 import 'package:agresell_app/features/shared/widgets/navigation/custom_bottom_nav_bar.dart';
@@ -158,37 +156,6 @@ void main() {
     expect(
       tester.getSize(find.widgetWithText(FilledButton, 'Log In')).height,
       50,
-    );
-    expect(tester.takeException(), isNull);
-  });
-  testWidgets('Facebook social logo keeps wider circular proportions', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: Column(
-            children: [
-              SocialSignInButton(
-                brand: SocialBrand.facebook,
-                label: 'Sign in with Facebook',
-              ),
-              SocialSignInButton(
-                brand: SocialBrand.google,
-                label: 'Sign in with Google',
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-    expect(tester.getSize(find.bySemanticsLabel('Facebook')).width, 34);
-    expect(tester.getSize(find.bySemanticsLabel('Google')).width, 30);
-    expect(
-      tester
-          .widgetList<ResponsiveAssetImage>(find.byType(ResponsiveAssetImage))
-          .every((image) => image.maxDecodedWidth == 0),
-      isTrue,
     );
     expect(tester.takeException(), isNull);
   });

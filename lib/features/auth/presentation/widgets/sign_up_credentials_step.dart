@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:agresell_app/features/auth/presentation/controllers/sign_up_form_controllers.dart';
 import 'package:agresell_app/features/auth/presentation/styles/sign_up_screen_styles.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_button.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/auth_divider.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_password_requirements.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/auth_text_field.dart';
-import 'package:agresell_app/features/auth/presentation/widgets/social_sign_in_button.dart';
 
 class SignUpCredentialsStep extends StatelessWidget {
   const SignUpCredentialsStep({
@@ -81,18 +79,6 @@ class SignUpCredentialsStep extends StatelessWidget {
           label: 'Continue',
           isLoading: isSubmitting,
           onPressed: isSubmitting ? null : onContinue,
-        ),
-        const SizedBox(height: SignUpScreenStyles.socialDividerGap),
-        const AuthDivider(text: 'Or Sign up with'),
-        const SizedBox(height: SignUpScreenStyles.stepGap),
-        const SocialSignInButton(
-          brand: SocialBrand.facebook,
-          label: 'Sign up with Facebook',
-        ),
-        const SizedBox(height: SignUpScreenStyles.socialButtonsGap),
-        const SocialSignInButton(
-          brand: SocialBrand.google,
-          label: 'Sign up with Google',
         ),
       ],
     );

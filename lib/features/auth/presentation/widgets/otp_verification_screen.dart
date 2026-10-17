@@ -37,6 +37,8 @@ class OtpVerificationScreen extends StatefulWidget {
 
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   late final OtpVerificationController _controller;
+  bool _verificationInProgress = false;
+  bool _completed = false;
 
   @override
   void initState() {
@@ -54,12 +56,28 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   }
 
   Future<void> _verify() async {
+    if (_verificationInProgress || _completed) return;
+    _verificationInProgress = true;
+    final route = ModalRoute.of(context);
+    final navigator = Navigator.of(context);
     final verified = await _controller.verify(
       codeLength: widget.codeLength,
       maxIncorrectAttempts: widget.maxIncorrectAttempts,
       onVerify: widget.onVerify,
     );
-    if (verified && mounted) Navigator.of(context).pop(true);
+    if (!mounted) return;
+    if (!verified) {
+      _verificationInProgress = false;
+      return;
+    }
+    _completed = true;
+    // A late callback must never pop signup or another replacement screen.
+    if (route == null || !route.isActive) return;
+    if (route.isCurrent) {
+      navigator.pop(true);
+    } else {
+      navigator.removeRoute(route, true);
+    }
   }
 
   @override

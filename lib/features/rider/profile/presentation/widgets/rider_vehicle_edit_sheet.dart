@@ -3,15 +3,30 @@ import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import '../../domain/rider_vehicle.dart';
 import '../../domain/rider_cargo_capacity_policy.dart';
 import '../styles/rider_vehicle_screen_styles.dart';
+import 'rider_vehicle_edit_sheet_layout.dart';
 
-class RiderVehicleEditDialog extends StatefulWidget {
-  const RiderVehicleEditDialog({required this.vehicle});
+Future<List<String>?> showRiderVehicleEditSheet(
+  BuildContext context,
+  RiderVehicle vehicle,
+) => showModalBottomSheet<List<String>>(
+  context: context,
+  isScrollControlled: true,
+  useSafeArea: true,
+  showDragHandle: true,
+  backgroundColor: RiderVehicleScreenStyles.sheetBackground,
+  shape: RiderVehicleScreenStyles.sheetShape,
+  clipBehavior: Clip.antiAlias,
+  builder: (_) => RiderVehicleEditSheet(vehicle: vehicle),
+);
+
+class RiderVehicleEditSheet extends StatefulWidget {
+  const RiderVehicleEditSheet({required this.vehicle, super.key});
   final RiderVehicle vehicle;
   @override
-  State<RiderVehicleEditDialog> createState() => _RiderVehicleEditDialogState();
+  State<RiderVehicleEditSheet> createState() => _RiderVehicleEditSheetState();
 }
 
-class _RiderVehicleEditDialogState extends State<RiderVehicleEditDialog> {
+class _RiderVehicleEditSheetState extends State<RiderVehicleEditSheet> {
   late final List<TextEditingController> _controllers = [
     TextEditingController(text: widget.vehicle.vehicleBrand),
     TextEditingController(text: widget.vehicle.vehicleModel),
@@ -34,39 +49,27 @@ class _RiderVehicleEditDialogState extends State<RiderVehicleEditDialog> {
   }
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Edit vehicle'),
-    content: SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (var index = 0; index < _labels.length; index++)
-            if (_requiresRegistration || (index != 3 && index != 4))
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: TextField(
-                  key: ValueKey('vehicle-edit-$index'),
-                  controller: _controllers[index],
-                  keyboardType: index == 5
-                      ? const TextInputType.numberWithOptions(decimal: true)
-                      : TextInputType.text,
-                  decoration: RiderVehicleScreenStyles.inputDecoration(
-                    _labels,
-                    index,
-                  ),
-                ),
+  Widget build(BuildContext context) => RiderVehicleEditSheetLayout(
+    onSave: _save,
+    fields: [
+      for (var index = 0; index < _labels.length; index++)
+        if (_requiresRegistration || (index != 3 && index != 4))
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: TextField(
+              key: ValueKey('vehicle-edit-$index'),
+              controller: _controllers[index],
+              keyboardType: index == 5
+                  ? const TextInputType.numberWithOptions(decimal: true)
+                  : TextInputType.text,
+              decoration: RiderVehicleScreenStyles.inputDecoration(
+                _labels,
+                index,
               ),
-          if (_error != null)
-            Text(_error!, style: SharedPresentationStyles.errorCaption),
-        ],
-      ),
-    ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text('Cancel'),
-      ),
-      FilledButton(onPressed: _save, child: const Text('Save')),
+            ),
+          ),
+      if (_error != null)
+        Text(_error!, style: SharedPresentationStyles.errorCaption),
     ],
   );
 

@@ -157,9 +157,8 @@ void main() {
               searchController: searchController,
               browseController: browseController,
               products: testHomeProducts.take(6).toList(),
-              saleProducts: const [],
               onBannerTap: (_) {},
-              onViewAllSales: () {},
+              onViewAll: () {},
               onShowFilters: () {},
               onReset: () {},
               onProductTap: (_) {},
@@ -205,9 +204,8 @@ void main() {
                 searchController: searchController,
                 browseController: browseController,
                 products: testHomeProducts.take(8).toList(),
-                saleProducts: testHomeProducts,
                 onBannerTap: (_) {},
-                onViewAllSales: () {},
+                onViewAll: () {},
                 onShowFilters: () {},
                 onReset: () {},
                 onProductTap: (_) {},
@@ -224,14 +222,22 @@ void main() {
         await tester.pumpAndSettle();
 
         await tester.drag(
-          find.byKey(const ValueKey('home-sale-products-list')),
+          find.byType(CustomScrollView),
           const Offset(-1000, 0),
         );
         await tester.pumpAndSettle();
         expect(loadMoreTriggered, isFalse);
 
-        // Drag significantly down to exceed 80% scroll depth
-        await tester.drag(find.byType(CustomScrollView), const Offset(0, -900));
+        // Scroll the combined catalog to its end.
+        final scroll = tester.state<ScrollableState>(
+          find
+              .descendant(
+                of: find.byType(CustomScrollView),
+                matching: find.byType(Scrollable),
+              )
+              .first,
+        );
+        scroll.position.jumpTo(scroll.position.maxScrollExtent);
         await tester.pumpAndSettle();
 
         expect(loadMoreTriggered, isTrue);

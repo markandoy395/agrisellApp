@@ -7,6 +7,24 @@ import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
 Future<List<PlacedOrder>> loadSupabaseOrderSnapshots(
   SupabaseClient client,
 ) async {
+  try {
+    final bundle = await client.rpc<Object?>('current_account_order_bundle');
+    if (bundle is! Map) throw const FormatException('Invalid order snapshot');
+    return OrderJsonCodec.decodeOrders(
+      OrderSnapshotMerger.merge(
+        bundle['orders'],
+        payments: bundle['payments'],
+        reviews: bundle['reviews'],
+        expirations: bundle['expirations'],
+        cancellations: bundle['cancellations'],
+        refunds: bundle['refunds'],
+        disputes: bundle['disputes'],
+      ),
+    );
+  } on PostgrestException catch (error) {
+    // Older deployments retain the owner-scoped legacy reads only when missing.
+    if (error.code != 'PGRST202' && error.code != '42883') rethrow;
+  }
   final orders = await client.rpc<Object?>('current_account_orders');
   final payments = await client.rpc<Object?>(
     'current_account_payment_snapshots',

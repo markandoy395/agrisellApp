@@ -13,12 +13,42 @@ import 'package:agresell_app/features/rider/deliveries/domain/delivery_stage.dar
 import 'package:agresell_app/features/rider/deliveries/domain/rider_map_visibility.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/controllers/rider_route_controller.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_map_content.dart';
+import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_map_status_control.dart';
 import 'package:agresell_app/features/rider/deliveries/presentation/widgets/rider_live_map.dart';
 import 'support/rider_availability_fakes.dart';
 import 'support/rider_route_phase7_fakes.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  testWidgets('map status follows updates without a menu or refresh action', (
+    tester,
+  ) async {
+    final online = ValueNotifier<bool>(false);
+    addTearDown(online.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AgrisellTheme.light,
+        home: Scaffold(
+          body: ValueListenableBuilder<bool>(
+            valueListenable: online,
+            builder: (_, value, _) => RiderMapStatusControl(online: value),
+          ),
+        ),
+      ),
+    );
+    expect(find.text('Offline'), findsOneWidget);
+    online.value = true;
+    await tester.pump();
+    expect(find.text('Online'), findsOneWidget);
+    await tester.tap(find.text('Online'));
+    await tester.pumpAndSettle();
+    expect(find.byType(PopupMenuItem<String>), findsNothing);
+    expect(find.byIcon(Icons.keyboard_arrow_down_rounded), findsNothing);
+    expect(find.text('Refresh location'), findsNothing);
+    online.value = false;
+    await tester.pump();
+    expect(find.text('Offline'), findsOneWidget);
+  });
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     final cache = Directory('build/rider_map_test_cache')
@@ -106,7 +136,6 @@ void main() {
                   discoveryRadiusKm: 15,
                   navigationActive: navigation,
                   online: true,
-                  onOnlineChanged: (_) {},
                   onFilterChanged: (_) {},
                   onMarkerTap: (_, _) {},
                   onFarmTap: (_) {},

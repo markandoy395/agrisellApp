@@ -7,7 +7,8 @@ Function secret configuration still requires rollout verification.
 
 Buyer, farmer and rider composers use `ChatMessageField` and `ChatLimits`.
 The old duplicated text fields and 1,000-character limit were replaced. The
-shared component retains Poppins/theme styling, a visible counter and quota hint.
+shared component retains Poppins/theme styling and a visible 10sp character
+counter. The rate-limit helper text is hidden in all three role composers.
 Controller/repository validation also covers quick replies and retries.
 
 | Limit | Scope |

@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/core/theme/app_typography.dart';
-import 'package:agresell_app/core/widgets/app_font_size_scope.dart';
 
 void main() {
   group('AppTypography Token Scale', () {
@@ -69,29 +68,6 @@ void main() {
 
       final buttonStyle = theme.filledButtonTheme.style;
       expect(buttonStyle?.textStyle?.resolve({})?.fontSize, 13);
-    });
-  });
-
-  group('AppFontSizeScope compound scaling safety', () {
-    testWidgets('clamps text scale factor to max 1.35x to prevent overflow', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: MediaQuery(
-            data: const MediaQueryData(
-              textScaler: TextScaler.linear(1.4), // OS high scale
-            ),
-            child: const AppFontSizeScope(
-              child: Text('Test scaling'),
-            ),
-          ),
-        ),
-      );
-
-      final BuildContext context = tester.element(find.text('Test scaling'));
-      final scaler = MediaQuery.textScalerOf(context);
-
-      // Even with 1.4x base scale, scale should be clamped to 14 * 1.35 = 18.9
-      expect(scaler.scale(14), lessThanOrEqualTo(14 * 1.35 + 0.01));
     });
   });
 }

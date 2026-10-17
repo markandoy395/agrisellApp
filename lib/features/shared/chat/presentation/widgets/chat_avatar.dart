@@ -13,6 +13,23 @@ class ChatAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final imageAsset = participant.imageAsset;
+    if (imageAsset != null) {
+      return CircleAvatar(
+        radius: style.diameter / 2,
+        backgroundColor: style.backgroundColor,
+        child: Padding(
+          padding: EdgeInsets.all(style.diameter * .16),
+          child: ResponsiveAssetImage(
+            asset: imageAsset,
+            width: style.diameter * .68,
+            height: style.diameter * .68,
+            fit: BoxFit.contain,
+            semanticLabel: participant.imageSemanticLabel,
+          ),
+        ),
+      );
+    }
     final imageUrl = participant.imageUrl;
     if (imageUrl != null) {
       return ClipOval(

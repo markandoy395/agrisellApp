@@ -6,11 +6,41 @@ import 'package:agresell_app/features/shared/products/data/home_product_reposito
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:agresell_app/features/buyer/home/presentation/widgets/catalog/buyer_catalog_card.dart';
+import 'package:agresell_app/features/shared/widgets/navigation/custom_bottom_nav_bar.dart';
 
 import 'support/home_product_fixture.dart';
 
 void main() {
   configureAuthenticatedTests();
+  for (final inset in [0.0, 34.0]) {
+    testWidgets(
+      'product and basket action clear bottom navigation at inset $inset',
+      (tester) async {
+        tester.view.padding = FakeViewPadding(bottom: inset);
+        addTearDown(tester.view.resetPadding);
+        final product = testHomeProducts.first;
+        await _pumpHome(
+          tester,
+          productRepository: _FakeHomeProductRepository([product]),
+        );
+        final navTop = tester.getTopLeft(find.byType(CustomBottomNavBar)).dy;
+        final scroll = find.byType(CustomScrollView).first;
+        expect(tester.getBottomLeft(scroll).dy, lessThanOrEqualTo(navTop));
+        final card = find.byType(BuyerCatalogCard);
+        await tester.ensureVisible(card);
+        await tester.drag(scroll, const Offset(0, -1200));
+        await tester.pumpAndSettle();
+        expect(tester.getBottomLeft(card).dy, lessThan(navTop));
+        final add = find.byTooltip('Add ${product.name} to basket');
+        expect(tester.getBottomLeft(add).dy, lessThan(navTop));
+        await tester.tap(add);
+        await tester.pumpAndSettle();
+        expect(find.text('${product.name} added to basket.'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
   testWidgets('buyer home starts empty until backend products arrive', (
     tester,
   ) async {

@@ -3,6 +3,7 @@ import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:agresell_app/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:agresell_app/features/auth/presentation/widgets/keyboard_adaptive_scroll_view.dart';
+import 'package:agresell_app/features/auth/presentation/widgets/auth_card.dart';
 import 'package:agresell_app/features/farmer/registration/presentation/screens/farmer_sign_up_screen.dart';
 import 'package:agresell_app/features/rider/profile/presentation/screens/rider_sign_up_screen.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
+
+  testWidgets('signup sheet fits form and anchors its footer near the bottom', (
+    tester,
+  ) async {
+    await _setScreen(tester, const Size(430, 932));
+    await _pumpScreen(tester, const SignUpScreen(role: AuthRole.buyer));
+    final card = find.byType(AuthCard);
+    expect(tester.getBottomLeft(card).dy, closeTo(932, 1));
+    final footerBottom = tester
+        .getBottomLeft(find.text('Already have an account?'))
+        .dy;
+    expect(932 - footerBottom, lessThan(60));
+    expect(find.text('Sign up with Facebook'), findsNothing);
+    expect(find.text('Sign up with Google'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('auth forms use no closed-keyboard scroll when space is ample', (
     tester,

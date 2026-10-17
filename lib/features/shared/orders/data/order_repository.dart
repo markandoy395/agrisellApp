@@ -62,9 +62,13 @@ abstract interface class FarmerOrderCancellationRepository {
 }
 
 class OrderPlacementException implements Exception {
-  const OrderPlacementException(this.message);
+  const OrderPlacementException(
+    this.message, {
+    this.definitivelyRejected = false,
+  });
 
   final String message;
+  final bool definitivelyRejected;
 
   @override
   String toString() => message;

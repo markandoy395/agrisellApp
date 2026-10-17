@@ -7,7 +7,6 @@ import 'farmer_profile_style.dart';
 import 'farmer_stats_card.dart';
 import 'farmer_profile_info_card.dart';
 import 'farmer_history_card.dart';
-import 'farmer_settings_panel.dart';
 import 'farmer_gcash_settings_sheet.dart';
 import 'farmer_profile_account_tile.dart';
 
@@ -96,15 +95,6 @@ List<Widget> buildFarmerProfileOverview({
             onTap: onSupport,
           ),
         ],
-      ),
-    ),
-    const SizedBox(height: 18),
-    _sectionHeader('Display Preferences'),
-    const SizedBox(height: 8),
-    const FarmerProfileCard(
-      child: Padding(
-        padding: FarmerProfileScreenStyles.fontControlPadding,
-        child: FarmerFontSizeControl(),
       ),
     ),
     const SizedBox(height: 18),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:agresell_app/core/utils/async_request_scope.dart';
 
 import 'package:flutter/foundation.dart';
 
@@ -17,6 +18,9 @@ class FarmerRiderAssignmentController extends ChangeNotifier {
       FarmerRiderAssignmentLoadState.loading;
   String? _errorMessage;
   final Set<String> _cancelling = {};
+  final _scope = AsyncRequestScope();
+  bool _disposed = false;
+  bool _refreshing = false;
 
   FarmerRiderAssignmentLoadState get state => _state;
   String? get errorMessage => _errorMessage;
@@ -26,11 +30,17 @@ class FarmerRiderAssignmentController extends ChangeNotifier {
   bool isCancelling(String requestId) => _cancelling.contains(requestId);
 
   void start() {
-    if (_subscription != null) return;
+    if (_disposed || _subscription != null) return;
+    final ticket = _scope.begin('watch');
     _state = FarmerRiderAssignmentLoadState.loading;
     _subscription = repository.watchCurrentRequests().listen(
-      _replaceAll,
+      (values) {
+        if (!ticket.isCurrent) return;
+        _scope.invalidate('refresh');
+        _replaceAll(values);
+      },
       onError: (Object error) {
+        if (!ticket.isCurrent) return;
         _state = FarmerRiderAssignmentLoadState.error;
         _errorMessage = _message(error);
         notifyListeners();
@@ -39,16 +49,25 @@ class FarmerRiderAssignmentController extends ChangeNotifier {
   }
 
   Future<void> refresh() async {
+    if (_disposed || _refreshing) return;
+    _refreshing = true;
+    final ticket = _scope.begin('refresh');
     try {
-      _replaceAll(await repository.loadCurrentRequests());
+      final values = await repository.loadCurrentRequests();
+      if (ticket.isCurrent) _replaceAll(values);
     } on Object catch (error) {
+      if (!ticket.isCurrent) return;
       _state = FarmerRiderAssignmentLoadState.error;
       _errorMessage = _message(error);
       notifyListeners();
+    } finally {
+      _refreshing = false;
     }
   }
 
   void apply(FarmerRiderRequest request) {
+    if (_disposed) return;
+    _scope.invalidate('refresh');
     final current = _latestByOrder[request.orderId];
     if (current == null || !current.requestedAt.isAfter(request.requestedAt)) {
       _latestByOrder[request.orderId] = request;
@@ -59,16 +78,18 @@ class FarmerRiderAssignmentController extends ChangeNotifier {
   }
 
   Future<FarmerRiderRequest> cancel(FarmerRiderRequest request) async {
+    if (_disposed) throw StateError('This rider request screen is closed.');
     if (_cancelling.contains(request.id)) return request;
     _cancelling.add(request.id);
+    final ticket = _scope.begin(('cancel', request.id));
     notifyListeners();
     try {
       final updated = await repository.cancelRequest(request.id);
-      apply(updated);
+      if (ticket.isCurrent) apply(updated);
       return updated;
     } finally {
       _cancelling.remove(request.id);
-      notifyListeners();
+      if (ticket.isCurrent) notifyListeners();
     }
   }
 
@@ -91,6 +112,8 @@ class FarmerRiderAssignmentController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
+    _scope.dispose();
     unawaited(_subscription?.cancel());
     super.dispose();
   }

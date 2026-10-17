@@ -95,10 +95,16 @@ extension RiderDeliveryControllerPersistence on RiderDeliveryController {
     return true;
   }
 
-  Future<void> refreshActiveDelivery() async {
+  Future<void> refreshActiveDelivery() =>
+      _refreshOperations.run(('active', _riderId), _refreshActiveDelivery);
+
+  Future<void> _refreshActiveDelivery() async {
     final riderId = _riderId;
-    if (riderId == null) return;
+    final generation = _requestGeneration;
+    if (riderId == null || _isDisposed) return;
     final snapshots = await _repository.fetchActiveDeliveryStatuses(riderId);
+    if (_isDisposed || _riderId != riderId || generation != _requestGeneration)
+      return;
     final serverIds = snapshots.map((item) => item.request.id).toSet();
     final pendingIds = _offlineQueue.actions
         .where((item) => item.status == OfflineDeliveryActionStatus.pending)

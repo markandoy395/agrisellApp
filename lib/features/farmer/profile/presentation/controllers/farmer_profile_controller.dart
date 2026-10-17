@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:agresell_app/core/utils/async_request_scope.dart';
 
 import 'package:agresell_app/core/models/user_profile.dart';
 import 'package:agresell_app/features/shared/profile/data/user_profile_data.dart';
@@ -20,19 +21,23 @@ class FarmerProfileController extends ChangeNotifier {
   ProfileFollowCounts followCounts = const ProfileFollowCounts();
   FarmerVerificationDetails? verificationDetails;
   bool _disposed = false;
+  bool _saving = false;
+  final _scope = AsyncRequestScope();
 
   Future<void> loadVerificationDetails() async {
+    final ticket = _scope.begin('verification');
     final details = await verificationRepository.loadVerificationDetails();
-    if (!_disposed && details != null) {
+    if (ticket.isCurrent && details != null) {
       verificationDetails = details;
       notifyListeners();
     }
   }
 
   Future<void> loadFollowCounts() async {
+    final ticket = _scope.begin('counts');
     try {
       final counts = await const ProfileFollowCountsRepository().load();
-      if (!_disposed) {
+      if (ticket.isCurrent) {
         followCounts = counts;
         notifyListeners();
       }
@@ -57,16 +62,24 @@ class FarmerProfileController extends ChangeNotifier {
   }
 
   Future<bool> saveProfile(UserProfile updatedProfile) async {
-    final saved = await UserProfileService.instance.save(updatedProfile);
-    if (_disposed) return false;
-    profile = saved;
-    showOverview();
-    return true;
+    if (_saving || _disposed) return false;
+    _saving = true;
+    final ticket = _scope.begin('save');
+    try {
+      final saved = await UserProfileService.instance.save(updatedProfile);
+      if (!ticket.isCurrent) return false;
+      profile = saved;
+      showOverview();
+      return true;
+    } finally {
+      _saving = false;
+    }
   }
 
   @override
   void dispose() {
     _disposed = true;
+    _scope.dispose();
     super.dispose();
   }
 }

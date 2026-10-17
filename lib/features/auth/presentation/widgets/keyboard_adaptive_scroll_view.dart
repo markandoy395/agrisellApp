@@ -5,6 +5,7 @@ class KeyboardAdaptiveScrollView extends StatefulWidget {
     required this.child,
     this.padding = EdgeInsets.zero,
     this.fillRemaining = false,
+    this.fitContent = false,
     this.keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.onDrag,
     super.key,
   });
@@ -12,6 +13,7 @@ class KeyboardAdaptiveScrollView extends StatefulWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
   final bool fillRemaining;
+  final bool fitContent;
   final ScrollViewKeyboardDismissBehavior keyboardDismissBehavior;
 
   @override
@@ -68,7 +70,9 @@ class _KeyboardAdaptiveScrollViewState
             padding: widget.padding,
             keyboardDismissBehavior: widget.keyboardDismissBehavior,
             child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: minHeight),
+              constraints: BoxConstraints(
+                minHeight: widget.fitContent ? 0 : minHeight,
+              ),
               child: widget.child,
             ),
           );

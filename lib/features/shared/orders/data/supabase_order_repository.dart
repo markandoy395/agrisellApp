@@ -85,6 +85,19 @@ class SupabaseOrderRepository
         actionableCodes.contains(error.code)
             ? error.message
             : 'The order could not be saved. Please try again.',
+        definitivelyRejected: const {
+          '22023',
+          'P0001',
+          '40001',
+          '42501',
+          '23503',
+          '23505',
+          '23514',
+          'PT400',
+          'PT401',
+          'PT403',
+          'PT429',
+        }.contains(error.code),
       );
     }
   }

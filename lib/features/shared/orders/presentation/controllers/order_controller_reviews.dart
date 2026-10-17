@@ -1,7 +1,7 @@
 part of 'order_controller.dart';
 
 extension OrderControllerReviews on OrderController {
-  Future<void> submitFeedback({
+  Future<void> _submitFeedback({
     required String orderId,
     String? productId,
     required int rating,
@@ -10,6 +10,7 @@ extension OrderControllerReviews on OrderController {
     String riderComment = '',
     bool reviewProduct = true,
   }) async {
+    final generation = _accountGeneration;
     final normalizedComment = comment.trim();
     final feedback = OrderFeedback(
       rating: rating,
@@ -56,6 +57,7 @@ extension OrderControllerReviews on OrderController {
     } on Object {
       rethrow;
     }
+    if (_disposed || generation != _accountGeneration) return;
     final items = [...previousOrder.items];
     final itemIndex = items.indexWhere(
       (item) => item.productId == resolvedProductId,

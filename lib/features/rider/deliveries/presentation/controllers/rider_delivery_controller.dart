@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:agresell_app/core/utils/async_operation_gate.dart';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -147,6 +148,7 @@ class RiderDeliveryController extends ChangeNotifier {
   bool _offlineQueueInitialized = false;
   bool _isRestoring = false;
   bool _isDisposed = false;
+  final _refreshOperations = AsyncOperationGate();
   Map<String, Object?> _recoveryData = const {};
   final Map<String, RiderDeliveryProblemReport> _deliveryProblemReports = {};
 

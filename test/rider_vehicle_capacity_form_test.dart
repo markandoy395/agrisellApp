@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_cargo_capacity_policy.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_vehicle.dart';
-import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_vehicle_edit_dialog.dart';
+import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_vehicle_edit_sheet.dart';
 
 void main() {
   const ceilings = {
@@ -41,19 +41,17 @@ void main() {
           home: Builder(
             builder: (context) => Scaffold(
               body: TextButton(
-                onPressed: () async => saved = await showDialog<List<String>>(
-                  context: context,
-                  builder: (_) => RiderVehicleEditDialog(
-                    vehicle: RiderVehicle(
-                      vehicleId: 'v',
-                      riderId: 'r',
-                      vehicleType: entry.key,
-                      vehicleModel: 'Model',
-                      vehicleColor: 'Green',
-                      plateNumber: 'ABC123',
-                      registrationNumber: 'REG1',
-                      capacityKg: 1,
-                    ),
+                onPressed: () async => saved = await showRiderVehicleEditSheet(
+                  context,
+                  RiderVehicle(
+                    vehicleId: 'v',
+                    riderId: 'r',
+                    vehicleType: entry.key,
+                    vehicleModel: 'Model',
+                    vehicleColor: 'Green',
+                    plateNumber: 'ABC123',
+                    registrationNumber: 'REG1',
+                    capacityKg: 1,
                   ),
                 ),
                 child: const Text('Edit'),
@@ -65,17 +63,37 @@ void main() {
       await tester.tap(find.text('Edit'));
       await tester.pumpAndSettle();
       final capacity = find.byKey(const ValueKey('vehicle-edit-5'));
+      if (entry.key == 'motorcycle') {
+        tester.view.devicePixelRatio = 1;
+        tester.view.physicalSize = const Size(320, 700);
+        tester.view.viewInsets = const FakeViewPadding(bottom: 280);
+        addTearDown(() {
+          tester.view.resetDevicePixelRatio();
+          tester.view.resetPhysicalSize();
+          tester.view.resetViewInsets();
+        });
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(capacity);
+        await tester.pumpAndSettle();
+        expect(
+          tester.getBottomLeft(find.widgetWithText(FilledButton, 'Save')).dy,
+          lessThanOrEqualTo(420),
+        );
+        expect(tester.takeException(), isNull);
+      }
       await tester.enterText(capacity, '${entry.value + 1}');
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
       expect(saved, isNull);
-      expect(find.byType(RiderVehicleEditDialog), findsOneWidget);
+      expect(find.byType(RiderVehicleEditSheet), findsOneWidget);
+      expect(find.byType(BottomSheet), findsOneWidget);
+      expect(find.byType(AlertDialog), findsNothing);
       expect(find.textContaining('allows at most'), findsOneWidget);
       await tester.enterText(capacity, '${entry.value}');
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
       expect(saved?[5], '${entry.value}');
-      expect(find.byType(RiderVehicleEditDialog), findsNothing);
+      expect(find.byType(RiderVehicleEditSheet), findsNothing);
       expect(tester.takeException(), isNull);
     });
   }

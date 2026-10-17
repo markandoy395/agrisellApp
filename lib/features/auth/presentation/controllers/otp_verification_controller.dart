@@ -34,6 +34,12 @@ class OtpVerificationController extends ChangeNotifier {
     required int maxIncorrectAttempts,
     required Future<void> Function(String) onVerify,
   }) async {
+    if (_disposed ||
+        isVerifying ||
+        isResending ||
+        attemptsExhausted(maxIncorrectAttempts)) {
+      return false;
+    }
     final value = code.text.trim();
     if (value.length != codeLength) {
       error = 'Enter the $codeLength-digit code.';

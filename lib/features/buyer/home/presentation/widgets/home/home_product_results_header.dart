@@ -13,6 +13,7 @@ class HomeProductResultsHeader extends StatelessWidget {
     required this.sort,
     required this.onSavedOnlyChanged,
     required this.onSortChanged,
+    this.onViewAll,
     super.key,
   });
 
@@ -22,6 +23,7 @@ class HomeProductResultsHeader extends StatelessWidget {
   final HomeProductSort sort;
   final ValueChanged<bool> onSavedOnlyChanged;
   final ValueChanged<HomeProductSort> onSortChanged;
+  final VoidCallback? onViewAll;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +44,12 @@ class HomeProductResultsHeader extends StatelessWidget {
             ],
           ),
         ),
+        if (onViewAll != null)
+          TextButton(
+            key: const ValueKey('home-products-view-all'),
+            onPressed: onViewAll,
+            child: const Text('View All'),
+          ),
         _SavedButton(
           count: savedCount,
           selected: savedOnly,

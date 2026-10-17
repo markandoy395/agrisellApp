@@ -73,21 +73,7 @@ class RiderMapDiscoverySheet extends StatelessWidget {
               RiderMapDiscoveryError(message: farmError!, onRetry: onRefresh),
             ],
             const SizedBox(height: 18),
-            Row(
-              children: [
-                const Expanded(
-                  child: Text(
-                    'Nearby farms',
-                    style: RiderMapDesignStyles.title,
-                  ),
-                ),
-                IconButton(
-                  tooltip: 'Refresh location',
-                  onPressed: farmsLoading ? null : onRefresh,
-                  icon: const Icon(Icons.refresh),
-                ),
-              ],
-            ),
+            const Text('Nearby farms', style: RiderMapDesignStyles.title),
             if (farmsLoading) const LinearProgressIndicator(),
             for (final farm in farms.take(10))
               ListTile(

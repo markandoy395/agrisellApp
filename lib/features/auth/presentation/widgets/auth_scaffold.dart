@@ -13,6 +13,7 @@ class AuthScaffold extends StatelessWidget {
     this.compactCard = false,
     this.scrollable = true,
     this.fillRemaining = true,
+    this.fitContent = false,
     super.key,
   });
 
@@ -22,6 +23,7 @@ class AuthScaffold extends StatelessWidget {
   final bool compactCard;
   final bool scrollable;
   final bool fillRemaining;
+  final bool fitContent;
 
   @override
   Widget build(BuildContext context) {
@@ -59,9 +61,16 @@ class AuthScaffold extends StatelessWidget {
                         largeTitle: largeTitle,
                         scrollable: scrollable,
                         fillRemaining: fillRemaining,
+                        fitContent: fitContent,
                         child: child,
                       );
 
+                      if (fitContent) {
+                        return Align(
+                          alignment: Alignment.bottomCenter,
+                          child: card,
+                        );
+                      }
                       if (!compactCard) return card;
 
                       final cardHeight = keyboardVisible

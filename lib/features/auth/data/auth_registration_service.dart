@@ -29,6 +29,7 @@ class AuthRegistrationService {
   RegisteredAccount? _remoteAccount;
   bool _localStoreEnabledForTesting = false;
   Future<bool> Function(String, String, AuthRole)? _emailStarterForTesting;
+  Future<RegisteredAccount> Function(String, String)? _emailVerifierForTesting;
 
   bool get usesSupabase => AgrisellSupabase.isInitialized;
   bool get localStoreEnabledForTesting => _localStoreEnabledForTesting;
@@ -91,6 +92,7 @@ class AuthRegistrationService {
     _local.clear();
     _remoteAccount = null;
     _emailStarterForTesting = null;
+    _emailVerifierForTesting = null;
   }
 
   @visibleForTesting
@@ -104,6 +106,16 @@ class AuthRegistrationService {
   void setEmailStarterForTesting(
     Future<bool> Function(String, String, AuthRole)? starter,
   ) => _emailStarterForTesting = starter;
+
+  @visibleForTesting
+  void setEmailVerifierForTesting(
+    Future<RegisteredAccount> Function(String, String)? verifier,
+  ) {
+    if (!_localStoreEnabledForTesting || usesSupabase) {
+      throw StateError('Email fixtures require local testing mode.');
+    }
+    _emailVerifierForTesting = verifier;
+  }
 
   void _requireConfiguredBackend() {
     if (_localStoreEnabledForTesting) return;

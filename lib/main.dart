@@ -4,14 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
-import 'package:agresell_app/core/services/app_font_size_controller.dart';
 import 'package:agresell_app/core/services/push_notification_service.dart';
 import 'package:agresell_app/core/services/system_ui_service.dart';
 import 'package:agresell_app/core/constants/agrisell_routes.dart';
 import 'package:agresell_app/core/theme/agrisell_theme.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/core/widgets/system_ui_scope.dart';
-import 'package:agresell_app/core/widgets/app_font_size_scope.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/auth/data/auth_session_service.dart';
 import 'package:agresell_app/features/auth/presentation/auth_dashboard_router.dart';
@@ -32,7 +30,6 @@ Future<void> main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   _configureImageCache();
   unawaited(AgrisellSystemUi.applyAppSystemUi());
-  unawaited(AppFontSizeController.instance.load());
   final supabaseInitialization = AgrisellSupabase.initialize();
 
   runApp(AgrisellApp(supabaseInitialization: supabaseInitialization));
@@ -87,11 +84,9 @@ class AgrisellApp extends StatelessWidget {
       builder: (context, child) {
         return AuthNavigationScope(
           navigatorKey: _navigatorKey,
-          child: AppFontSizeScope(
-            child: DefaultTextStyle.merge(
-              style: MainStyles.textStyle,
-              child: SystemUiScope(child: child ?? const SizedBox.shrink()),
-            ),
+          child: DefaultTextStyle.merge(
+            style: MainStyles.textStyle,
+            child: SystemUiScope(child: child ?? const SizedBox.shrink()),
           ),
         );
       },

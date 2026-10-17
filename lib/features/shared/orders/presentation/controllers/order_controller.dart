@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'dart:collection';
+import 'package:agresell_app/core/utils/async_operation_gate.dart';
+import 'package:agresell_app/core/services/agrisell_supabase.dart';
+import 'package:agresell_app/features/shared/orders/data/checkout_attempt_store.dart';
 import 'package:flutter/foundation.dart';
 import 'package:agresell_app/features/auth/domain/sign_up_account_data.dart';
 import 'package:agresell_app/features/shared/orders/data/order_notification_factory.dart';
@@ -21,14 +24,19 @@ part 'order_controller_persistence.dart';
 part 'order_controller_placement.dart';
 part 'order_controller_reviews.dart';
 part 'order_controller_payments.dart';
+part 'order_controller_actions.dart';
 
 class OrderController extends ChangeNotifier {
   OrderController({OrderRepository? repository})
     : _repository = repository ?? CachedOrderRepository();
   static final OrderController instance = OrderController();
   final OrderRepository _repository;
+  final _operations = AsyncOperationGate();
+  final _checkoutAttempts = CheckoutAttemptStore();
+  var _disposed = false;
   String? _accountId;
   var _loadGeneration = 0;
+  var _accountGeneration = 0;
   Future<void> _pendingPersistence = SynchronousFuture<void>(null);
   final List<PlacedOrder> _orders = <PlacedOrder>[];
   final List<HomeNotification> _orderNotifications = <HomeNotification>[];
@@ -144,10 +152,18 @@ class OrderController extends ChangeNotifier {
   }
 
   void _commitChange({bool persist = true}) {
+    if (_disposed) return;
     _statusCache.clear();
     _filterCache.clear();
     notifyListeners();
     if (persist) unawaited(_persistOrdersSilently());
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    _loadGeneration++;
+    super.dispose();
   }
 
   @visibleForTesting

@@ -6,7 +6,6 @@ import '../styles/rider_messages_screen_styles.dart';
 import '../styles/rider_messaging_design_styles.dart';
 import 'rider_conversation_card.dart';
 import 'rider_messages_status.dart';
-import 'rider_protected_chat_banner.dart';
 
 enum _InboxFilter { all, unread, support }
 
@@ -129,10 +128,6 @@ class _RiderMessagesInboxState extends State<RiderMessagesInbox> {
                 ),
               ),
             ),
-          ),
-          const SliverPadding(
-            padding: EdgeInsets.fromLTRB(18, 18, 18, 24),
-            sliver: SliverToBoxAdapter(child: RiderProtectedChatBanner()),
           ),
         ],
       );

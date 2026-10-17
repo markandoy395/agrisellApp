@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:agresell_app/core/services/gateway_rpc.dart';
 
 /// Chat mutations always use the gateway so failed attempts are counted too.
 abstract final class ChatRpc {
@@ -6,26 +7,10 @@ abstract final class ChatRpc {
     SupabaseClient client,
     String function,
     Map<String, Object?> parameters,
-  ) async {
-    try {
-      final response = await client.functions.invoke(
-        'application-api/rest/rpc/$function',
-        body: parameters,
-      );
-      return response.data;
-    } on FunctionException catch (error) {
-      final details = error.details;
-      throw PostgrestException(
-        code: details is Map
-            ? details['code']?.toString() ?? '${error.status}'
-            : '${error.status}',
-        message: details is Map
-            ? (details['message'] ??
-                      details['error'] ??
-                      'Chat is temporarily unavailable.')
-                  .toString()
-            : 'Chat is temporarily unavailable.',
-      );
-    }
-  }
+  ) => GatewayRpc.call(
+    client,
+    function,
+    parameters,
+    unavailableMessage: 'Chat is temporarily unavailable.',
+  );
 }

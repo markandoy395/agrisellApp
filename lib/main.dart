@@ -1,5 +1,6 @@
 import 'package:agresell_app/main_styles.dart';
 import 'dart:async';
+import 'package:agresell_app/core/updates/app_update_observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -74,12 +75,13 @@ class AgrisellApp extends StatelessWidget {
   final Future<bool>? supabaseInitialization;
   static final _navigatorKey = GlobalKey<NavigatorState>();
   static final _authNavigationObserver = AuthNavigationObserver();
+  static final _appUpdateObserver = AppUpdateObserver();
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: _navigatorKey,
-      navigatorObservers: [_authNavigationObserver],
+      navigatorObservers: [_authNavigationObserver, _appUpdateObserver],
       title: 'AgriSell App',
       debugShowCheckedModeBanner: false,
       theme: AgrisellTheme.light,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/widgets/app_version_footer.dart';
 
 import 'package:agresell_app/core/models/user_profile.dart';
 import 'package:agresell_app/features/auth/domain/buyer_shipping_address.dart';
@@ -90,5 +91,6 @@ abstract final class BuyerProfileOverviewSections {
         ],
       ),
     ),
+    const AppVersionFooter(),
   ];
 }

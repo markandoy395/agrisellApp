@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/widgets/app_version_footer.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
@@ -140,6 +141,7 @@ class RiderSettingsPanel extends StatelessWidget {
                   ],
                 ),
               ),
+              const AppVersionFooter(),
             ],
           ),
         ),

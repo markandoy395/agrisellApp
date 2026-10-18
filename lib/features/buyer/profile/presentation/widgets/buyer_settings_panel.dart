@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/widgets/app_version_footer.dart';
 
 import 'package:agresell_app/core/models/user_profile.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
@@ -111,6 +112,7 @@ class BuyerSettingsPanel extends StatelessWidget {
                     ),
                   ],
                 ),
+                const AppVersionFooter(),
               ],
             ),
           ),

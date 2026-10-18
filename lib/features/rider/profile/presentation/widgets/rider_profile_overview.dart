@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/widgets/app_version_footer.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
 import 'package:agresell_app/features/rider/dashboard/domain/rider_rating_models.dart';
@@ -136,6 +137,7 @@ class RiderProfileOverview extends StatelessWidget {
       ),
       const SizedBox(height: 12),
       RiderProfileDocumentsSection(onViewAll: onDocuments),
+      const AppVersionFooter(),
     ],
   );
 }

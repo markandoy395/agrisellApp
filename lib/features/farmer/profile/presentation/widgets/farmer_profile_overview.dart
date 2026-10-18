@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/widgets/app_version_footer.dart';
 import 'package:agresell_app/core/models/user_profile.dart';
 import 'package:agresell_app/features/farmer/verification/domain/farmer_verification_details.dart';
 import 'package:agresell_app/features/farmer/verification/presentation/widgets/farmer_information_request_banner.dart';
@@ -121,6 +122,7 @@ List<Widget> buildFarmerProfileOverview({
         ],
       ),
     ),
+    const AppVersionFooter(),
   ];
 }
 

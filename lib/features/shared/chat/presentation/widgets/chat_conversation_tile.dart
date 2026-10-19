@@ -49,8 +49,6 @@ class ChatConversationTile extends StatelessWidget {
                 Expanded(
                   child: _ConversationSummary(data: data, hasUnread: hasUnread),
                 ),
-                const SizedBox(width: 10),
-                _ConversationMeta(data: data, hasUnread: hasUnread),
               ],
             ),
           ),
@@ -71,49 +69,52 @@ class _ConversationSummary extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(
-        data.participant.name,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: ChatConversationTileStyles.textStyle2(hasUnread),
+      LayoutBuilder(
+        builder: (context, constraints) => Row(
+          children: [
+            Expanded(
+              child: Text(
+                data.participant.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: ChatConversationTileStyles.textStyle2(hasUnread),
+              ),
+            ),
+            const SizedBox(width: 10),
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: constraints.maxWidth * 0.75,
+              ),
+              child: Text(
+                data.timeLabel,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: ChatConversationTileStyles.textStyle4(hasUnread),
+              ),
+            ),
+          ],
+        ),
       ),
       const SizedBox(height: 3),
-      Text(
-        data.previewText,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: ChatConversationTileStyles.textStyle3(hasUnread),
+      Row(
+        children: [
+          Expanded(
+            child: Text(
+              data.previewText,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: ChatConversationTileStyles.textStyle3(hasUnread),
+            ),
+          ),
+          if (hasUnread) ...[
+            const SizedBox(width: 10),
+            const CircleAvatar(
+              radius: 4,
+              backgroundColor: AgrisellColors.authGreen,
+            ),
+          ],
+        ],
       ),
     ],
-  );
-}
-
-class _ConversationMeta extends StatelessWidget {
-  const _ConversationMeta({required this.data, required this.hasUnread});
-
-  final ChatConversationTileData data;
-  final bool hasUnread;
-
-  @override
-  Widget build(BuildContext context) => SizedBox(
-    width: 50,
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          data.timeLabel,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: ChatConversationTileStyles.textStyle4(hasUnread),
-        ),
-        const SizedBox(height: 8),
-        if (hasUnread)
-          const CircleAvatar(
-            radius: 4,
-            backgroundColor: AgrisellColors.authGreen,
-          ),
-      ],
-    ),
   );
 }

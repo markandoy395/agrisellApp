@@ -24,6 +24,7 @@ class ChatMessageComposer extends StatelessWidget {
     child: Padding(
       padding: style.padding,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: ChatMessageField(

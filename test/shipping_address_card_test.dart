@@ -1,4 +1,6 @@
 import 'package:agresell_app/features/buyer/profile/presentation/widgets/shipping_address_card.dart';
+import 'package:agresell_app/features/buyer/profile/presentation/widgets/shipping_address_editor.dart';
+import 'package:agresell_app/features/buyer/profile/presentation/widgets/shipping_address_form.dart';
 import 'package:agresell_app/features/auth/domain/buyer_shipping_address.dart';
 import 'package:agresell_app/features/shared/location/data/gps_location_gateway.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,35 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 
 void main() {
+  testWidgets('typing and keyboard resizing retain the shipping form', (
+    tester,
+  ) async {
+    addTearDown(tester.view.resetViewInsets);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: ShippingAddressEditor(onSave: (_) async {})),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final form = tester.widget<ShippingAddressForm>(
+      find.byType(ShippingAddressForm),
+    );
+    final province = find.widgetWithText(
+      TextField,
+      'Province (select or type)',
+    );
+    await tester.ensureVisible(province);
+    await tester.enterText(province, 'Manual province');
+    await tester.pumpAndSettle();
+    expect(tester.widget(find.byType(ShippingAddressForm)), same(form));
+    for (final inset in [100.0, 250.0, 0.0]) {
+      tester.view.viewInsets = FakeViewPadding(bottom: inset);
+      await tester.pump();
+      expect(tester.widget(find.byType(ShippingAddressForm)), same(form));
+      expect(tester.takeException(), isNull);
+    }
+  });
+
   testWidgets('missing shipping address captures GPS when saved', (
     tester,
   ) async {

@@ -114,7 +114,6 @@ class _FarmerSignUpScreenState extends State<FarmerSignUpScreen> {
               onPrevious: _previousStep,
               onNext: _next,
               onLogin: _goToLogin,
-              onSkip: () => _submit(skipFarmDetails: true),
             ),
           ],
         ),

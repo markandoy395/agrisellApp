@@ -2,25 +2,11 @@ import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/features/farmer/products/data/farmer_commodity_format.dart';
 
 class FarmerCommodityContext {
-  const FarmerCommodityContext(
-    this.authUserId,
-    this.farmId, {
-    required this.accountStatus,
-    required this.verificationStatus,
-  });
+  const FarmerCommodityContext(this.authUserId, this.farmId, this.isVerified);
 
   final String authUserId;
   final int farmId;
-  final String accountStatus;
-  final String verificationStatus;
-
-  bool get canPostProducts =>
-      accountStatus == 'active' &&
-      const [
-        'pending',
-        'verified',
-        'needs_information',
-      ].contains(verificationStatus);
+  final bool isVerified;
 
   static Future<FarmerCommodityContext> load() async {
     final client = AgrisellSupabase.client;
@@ -30,7 +16,7 @@ class FarmerCommodityContext {
     }
     final farmer = await client
         .from('farmers')
-        .select('farmer_user_id, verification_status, account_status')
+        .select('farmer_user_id, verification_status')
         .eq('auth_user_id', authUserId)
         .maybeSingle();
     if (farmer == null) {
@@ -47,12 +33,8 @@ class FarmerCommodityContext {
     return FarmerCommodityContext(
       authUserId,
       FarmerCommodityFormat.integer(farm['farm_id']),
-      accountStatus: FarmerCommodityFormat.text(
-        farmer['account_status'],
-      ).toLowerCase(),
-      verificationStatus: FarmerCommodityFormat.text(
-        farmer['verification_status'],
-      ).toLowerCase(),
+      FarmerCommodityFormat.text(farmer['verification_status']).toLowerCase() ==
+          'verified',
     );
   }
 

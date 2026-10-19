@@ -80,7 +80,7 @@ abstract final class FarmerProductEditorCoordinator {
   }) async {
     if (!canPostProducts) {
       onMessage(
-        'Your farmer account cannot upload products. Please check your account status.',
+        'Your farmer account must be verified before you can add products.',
       );
       return;
     }

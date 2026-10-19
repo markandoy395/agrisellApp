@@ -17,9 +17,7 @@ class _AppVersionFooterState extends State<AppVersionFooter> {
     try {
       final info = await PackageInfo.fromPlatform();
       if (info.version.trim().isEmpty) return 'App version unavailable';
-      final build = info.buildNumber.trim();
-      return 'App version ${info.version}'
-          '${build.isEmpty ? '' : ' (build $build)'}';
+      return 'App version ${info.version}';
     } catch (_) {
       return 'App version unavailable';
     }

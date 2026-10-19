@@ -51,15 +51,6 @@ class RegisteredAccount {
       assignedRole == AuthRole.farmer &&
       verificationStatus?.trim().toLowerCase() == 'pending';
 
-  bool get canUploadProducts =>
-      assignedRole == AuthRole.farmer &&
-      isActive &&
-      const [
-        'pending',
-        'verified',
-        'needs_information',
-      ].contains(verificationStatus?.trim().toLowerCase());
-
   bool get isFarmerVerified =>
       assignedRole == AuthRole.farmer &&
       verificationStatus?.trim().toLowerCase() == 'verified';

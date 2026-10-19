@@ -36,6 +36,16 @@ begin
   end if;
 end $$;
 
+-- Remove seeded inbox threads only when both parties are mock accounts and
+-- every message is a sample. Other conversation dependencies still abort.
+delete from public.marketplace_conversations c
+where c.buyer_user_id in (select buyer_user_id from mock_profiles)
+  and c.farmer_user_id in (select farmer_user_id from mock_profiles)
+  and exists (select 1 from public.marketplace_messages m
+    where m.conversation_id = c.conversation_id and m.body like '[Sample]%')
+  and not exists (select 1 from public.marketplace_messages m
+    where m.conversation_id = c.conversation_id and m.body not like '[Sample]%');
+
 delete from public.commodity_inventory_lots
 where commodity_id in (select commodity_id from mock_products);
 delete from public.cart_items

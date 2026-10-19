@@ -81,17 +81,14 @@ class FarmerSignupControllers {
   bool get isDirty =>
       all.any((controller) => controller.text.trim().isNotEmpty);
 
-  FarmerSignupData data({bool skipFarmDetails = false}) => FarmerSignupData(
-    farmDetailsSkipped: skipFarmDetails,
+  FarmerSignupData data() => FarmerSignupData(
     email: email.text,
     password: password.text,
     firstName: firstName.text,
     lastName: lastName.text,
     phoneNumber: PhilippinePhoneNumber.normalize(phone.text) ?? phone.text,
-    farmName: skipFarmDetails ? '' : farmName.text,
-    mainCrops: skipFarmDetails
-        ? const []
-        : PhilippineCrops.parseSelection(mainCrops.text),
+    farmName: farmName.text,
+    mainCrops: PhilippineCrops.parseSelection(mainCrops.text),
     middleName: middleName.text,
     suffix: suffix.text,
     dateOfBirth: dateOfBirth.text,
@@ -101,22 +98,20 @@ class FarmerSignupControllers {
     cityMunicipality: city.text,
     province: province.text,
     postalCode: postalCode.text,
-    farmLocation: skipFarmDetails ? null : farmAddress.text,
-    farmBarangay: skipFarmDetails ? null : farmBarangay.text,
-    farmCityMunicipality: skipFarmDetails ? null : farmCity.text,
-    farmProvince: skipFarmDetails ? null : farmProvince.text,
-    latitude: skipFarmDetails ? null : double.tryParse(latitude.text),
-    longitude: skipFarmDetails ? null : double.tryParse(longitude.text),
-    yearsOfExperience: skipFarmDetails
-        ? null
-        : int.tryParse(yearsOfExperience.text),
-    farmSize: skipFarmDetails ? null : double.tryParse(farmSize.text),
-    farmSizeUnit: skipFarmDetails ? null : farmSizeUnit.text,
-    farmingType: skipFarmDetails ? null : farmingType.text,
-    irrigationType: skipFarmDetails ? null : irrigationType.text,
-    ownershipType: skipFarmDetails ? null : ownershipType.text,
+    farmLocation: farmAddress.text,
+    farmBarangay: farmBarangay.text,
+    farmCityMunicipality: farmCity.text,
+    farmProvince: farmProvince.text,
+    latitude: double.tryParse(latitude.text),
+    longitude: double.tryParse(longitude.text),
+    yearsOfExperience: int.tryParse(yearsOfExperience.text),
+    farmSize: double.tryParse(farmSize.text),
+    farmSizeUnit: farmSizeUnit.text,
+    farmingType: farmingType.text,
+    irrigationType: irrigationType.text,
+    ownershipType: ownershipType.text,
     profileImage: profileImage,
-    farmImage: skipFarmDetails ? null : farmImage,
+    farmImage: farmImage,
   );
 
   void setFarmCoordinates({

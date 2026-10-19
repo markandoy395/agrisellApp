@@ -1,5 +1,6 @@
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_profile_edit_dialog.dart';
+import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_profile_edit_form_fields.dart';
 import 'package:agresell_app/features/shared/location/data/gps_location_gateway.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -46,6 +47,20 @@ void main() {
       ),
       findsOneWidget,
     );
+
+    // Address edits and keyboard animation must keep the whole form stable.
+    final formFinder = find.byType(RiderProfileEditFormFields);
+    final form = tester.widget<RiderProfileEditFormFields>(formFinder);
+    form.onPsgcChanged();
+    await tester.pump();
+    expect(tester.widget(formFinder), same(form));
+    addTearDown(tester.view.resetViewInsets);
+    for (final inset in [100.0, 300.0, 0.0]) {
+      tester.view.viewInsets = FakeViewPadding(bottom: inset);
+      await tester.pumpAndSettle();
+      expect(tester.widget(formFinder), same(form));
+      expect(tester.takeException(), isNull);
+    }
 
     await tester.tap(find.widgetWithText(FilledButton, 'Save changes'));
     await tester.pumpAndSettle();

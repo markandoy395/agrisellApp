@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:agresell_app/features/shared/waybills/domain/delivery_waybill.dart';
 import 'package:agresell_app/features/shared/waybills/services/waybill_html_template.dart';
+import 'package:agresell_app/features/shared/waybills/services/waybill_html_styles.dart';
 import 'package:agresell_app/features/shared/waybills/services/waybill_text_formatter.dart';
 
 class WaybillHtmlService {
@@ -18,11 +19,14 @@ class WaybillHtmlService {
 
   static String formatCurrency(double amount) => formatWaybillCurrency(amount);
 
-  static String generateHtml(DeliveryWaybill waybill) =>
-      buildWaybillHtml(waybill);
+  static Future<String> generateHtml(DeliveryWaybill waybill) async =>
+      buildWaybillHtml(
+        waybill,
+        stylesheetUri: await WaybillHtmlStyles.loadUri(),
+      );
 
   static Future<bool> openPrintableWaybill(DeliveryWaybill waybill) async {
-    final html = generateHtml(waybill);
+    final html = await generateHtml(waybill);
     if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
       return await const MethodChannel(
             'agrisell/waybill_print',
@@ -37,7 +41,7 @@ class WaybillHtmlService {
   }
 
   static Future<File> saveWaybillHtml(DeliveryWaybill waybill) async {
-    final html = generateHtml(waybill);
+    final html = await generateHtml(waybill);
     final dir = await getTemporaryDirectory();
     final sanitizedId = waybill.orderId.replaceAll(
       RegExp(r'[^a-zA-Z0-9_\-]'),

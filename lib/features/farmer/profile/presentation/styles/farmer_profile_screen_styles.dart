@@ -17,7 +17,7 @@ abstract final class FarmerProfileScreenStyles {
       horizontal,
       16,
       horizontal,
-      154 + MediaQuery.paddingOf(context).bottom,
+      8 + MediaQuery.paddingOf(context).bottom,
     );
   }
 

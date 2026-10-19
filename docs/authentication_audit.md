@@ -137,7 +137,7 @@ before privileged reads. No anonymous execution grants were added. Local
 PostgreSQL tests and the hosted existing-rider smoke test verify anonymous and
 expired-session rejection. See `docs/rider_request_loading.md` for rollout scope.
 
-## Rider capacity setup — 2026-10-13 (deployment pending)
+## Rider capacity setup ï¿½ 2026-10-13 (deployment pending)
 
 The prepared set_current_rider_capacity numeric RPC independently requires a
 non-anonymous unexpired caller, resolves private.current_rider_id server-side,
@@ -146,7 +146,7 @@ helpers are not executable by end users. Trigger defaults preserve table RLS;
 trusted count/ceiling columns remain read-only. Local checks passed; no hosted
 migration was applied. See docs/rider_capacity_batching.md for approval and tests.
 
-## Rider home capacity navigation — 2026-10-13
+## Rider home capacity navigation ï¿½ 2026-10-13
 
 The Home setup CTA uses agrisellPageRoute/AuthPageGate for the existing private
 Vehicle details destination. Capacity status is an operational eligibility rule,
@@ -154,7 +154,7 @@ not a new authentication role. No public navigation exception or account-ID
 parameter was introduced. Backend migration deployment remains pending; see
 rider_capacity_batching.md for the independent RPC authorization checks.
 
-## Rider status update RPC — 2026-10-13 (deployment pending)
+## Rider status update RPC ï¿½ 2026-10-13 (deployment pending)
 
 Flutter previously called the revoked generic update_delivery_status. The new
 update_current_rider_delivery_status independently rejects missing, anonymous
@@ -193,6 +193,11 @@ writes are account-scoped and stale sessions are rejected. See
 2026-10-17: Safe login-stage diagnostics and mocked login/recovery contract tests were added. The same-email login failure followed by same_password still needs device reproduction. See docs/login_recovery_investigation.md. No query or authorization boundary changes.
 
 
-2026-10-17: Optional farmer step 3 retains verified email, signed-in caller, requested farmer role and gateway checks. Explicit skip counts as profile completion; product inserts require active owner plus non-anonymous unexpired JWT. See farmer_optional_signup_uploads.md; prepared locally only.
 
 2026-10-18 rider signup Continue: session-loss cleanup retains already allowlisted public auth pages through the installed navigator observer while removing private routes and unknown dialogs. Private/unknown current pages still reset to login. No new public destinations or backend changes. See docs/rider_signup_continue_navigation.md for local coverage and device-verification limits.
+
+2026-10-19: Rider sample-data testing exposed stale rider verification columns. The verification-details RPC now resolves private.current_rider_id(), returns only caller-owned documents and review actions, requires the existing profile-session and gateway guards, and maps employment status as the app already does. No new public destination or anonymous grant. See docs/mock_rider_testing.md and supabase/tests/rider_verification_identity.sql.
+
+
+2026-10-19: Nearby rider deliveries exclude completed/cancelled/failed rows before applying the existing response limit. Owner checks, session guards, distance filters, and RPC grants are unchanged. History remains on current_rider_deliveries. Mock-only load fixtures add active deliveries and fresh assignment requests; see docs/mock_rider_testing.md and supabase/tests/rider_nearby_active_requests.sql.
+

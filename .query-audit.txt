@@ -186,6 +186,11 @@ Rider pickup product image (2026-10-15, deployment pending): migration 202610151
 2026-10-17: BuyerHeroAvatar renders UserProfile.avatarUrl using existing authenticatedNetworkImage; project storage URLs normalize to authenticated requests and bearer headers remain limited to the configured origin. No query, upload policy or backend ownership boundary changed. See docs/profile_edit_persistence_audit.md.
 
 
-2026-10-17 optional farmer signup/uploads (prepared, not deployed): step 3 skip is caller-owned and persisted through the existing registration RPC; profile completeness recognizes explicit skip. Product inserts allow active pending/verified/needs_information farmers while retaining JWT expiry, anonymous denial, farm/category ownership and existing restrictive RLS. Context query adds account_status. No storage policy or anonymous grants changed. See docs/farmer_optional_signup_uploads.md for local verification and outstanding full-schema/hosted checks.
 
 2026-10-18 rider signup navigation: no query, RPC, ownership, grant or storage changes. Public auth flow state survives previous-session loss; private history/dialog cleanup remains enforced. See docs/rider_signup_continue_navigation.md.
+
+2026-10-19: Rider sample-data testing exposed stale rider verification columns. The verification-details RPC now resolves private.current_rider_id(), returns only caller-owned documents and review actions, requires the existing profile-session and gateway guards, and maps employment status as the app already does. No new public destination or anonymous grant. See docs/mock_rider_testing.md and supabase/tests/rider_verification_identity.sql.
+
+
+2026-10-19: Nearby rider deliveries exclude completed/cancelled/failed rows before applying the existing response limit. Owner checks, session guards, distance filters, and RPC grants are unchanged. History remains on current_rider_deliveries. Mock-only load fixtures add active deliveries and fresh assignment requests; see docs/mock_rider_testing.md and supabase/tests/rider_nearby_active_requests.sql.
+

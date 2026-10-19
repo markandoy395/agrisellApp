@@ -1,9 +1,8 @@
-import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
-import 'package:agresell_app/features/shared/location/presentation/styles/address_autocomplete_field_styles.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/features/shared/location/data/psgc_address_service.dart';
 import 'address_suggestion_entries.dart';
+import 'address_suggestion_menu.dart';
 
 class AddressAutocompleteField extends StatefulWidget {
   const AddressAutocompleteField({
@@ -40,6 +39,7 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
   final _suggestionEntries = AddressSuggestionEntries();
   late String _text;
   String _query = '';
+  bool _selecting = false;
 
   @override
   void initState() {
@@ -79,16 +79,42 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
   void _textChanged() {
     final text = widget.controller.text;
     // Cursor/composing changes are not address edits.
-    if (text == _text) return;
+    if (_selecting || text == _text) return;
     setState(() {
       _text = text;
       _query = _focusNode.hasFocus ? text.trim().toLowerCase() : '';
     });
     widget.onChanged(text);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted &&
+          widget.enabled &&
+          _focusNode.hasFocus &&
+          _suggestionEntries.resolve(widget.options, _query).isNotEmpty) {
+        _menuController.open();
+      }
+    });
   }
 
   void _focusChanged() {
     if (!_focusNode.hasFocus && _query.isNotEmpty) setState(() => _query = '');
+  }
+
+  void _select(PsgcAddressOption option) {
+    _selecting = true;
+    try {
+      widget.controller.value = TextEditingValue(
+        text: option.name,
+        selection: TextSelection.collapsed(offset: option.name.length),
+      );
+      widget.onSelected(option);
+    } finally {
+      _selecting = false;
+    }
+    _menuController.close();
+    setState(() {
+      _text = widget.controller.text;
+      _query = '';
+    });
   }
 
   @override
@@ -112,36 +138,17 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
             widget.externalLabel!,
             const SizedBox(height: 8),
           ],
-          DropdownMenu<PsgcAddressOption>(
+          AddressSuggestionMenu(
             controller: widget.controller,
             menuController: _menuController,
             enabled: widget.enabled,
             focusNode: _focusNode,
-            expandedInsets: EdgeInsets.zero,
-            enableFilter: false,
-            enableSearch: false,
-            requestFocusOnTap: true,
-            menuHeight: 240,
             leadingIcon: widget.leadingIcon,
-            label: widget.externalLabel != null
-                ? null
-                : Text(
-                    '${widget.label} (select or type)',
-                    style: SharedPresentationStyles.caption,
-                  ),
-            textStyle: AddressAutocompleteFieldStyles.textStyle(
-              widget.externalLabel,
-            ),
-            inputDecorationTheme:
-                widget.decorationTheme ??
-                AddressAutocompleteFieldStyles.inputTheme,
-            menuStyle: SharedPresentationStyles.dropdownMenu,
-            dropdownMenuEntries: entries,
-            onSelected: (option) {
-              if (option == null) return;
-              widget.onSelected(option);
-              setState(() => _query = '');
-            },
+            label: widget.label,
+            externalLabel: widget.externalLabel,
+            decorationTheme: widget.decorationTheme,
+            entries: entries,
+            onSelected: _select,
           ),
         ],
       ),

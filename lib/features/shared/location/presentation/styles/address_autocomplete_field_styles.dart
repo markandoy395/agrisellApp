@@ -17,4 +17,22 @@ abstract final class AddressAutocompleteFieldStyles {
     contentPadding: const EdgeInsets.symmetric(horizontal: 14),
     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
   );
+
+  static InputDecoration decoration({
+    required String label,
+    required Widget? externalLabel,
+    required Widget? leadingIcon,
+    required InputDecorationTheme? theme,
+    required VoidCallback? onToggle,
+  }) => InputDecoration(
+    label: externalLabel == null
+        ? Text('$label (select or type)', style: compactText)
+        : null,
+    prefixIcon: leadingIcon,
+    suffixIcon: IconButton(
+      tooltip: 'Show suggestions',
+      onPressed: onToggle,
+      icon: const Icon(Icons.arrow_drop_down),
+    ),
+  ).applyDefaults(theme ?? inputTheme);
 }

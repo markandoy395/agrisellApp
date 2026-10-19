@@ -55,7 +55,7 @@ class RiderSettingsPanel extends StatelessWidget {
         ),
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(18, 4, 18, 24),
+            padding: const EdgeInsets.fromLTRB(18, 4, 18, 8),
             children: [
               RiderSettingsAction(
                 icon: Icons.edit_outlined,

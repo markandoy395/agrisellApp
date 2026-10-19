@@ -175,7 +175,7 @@ void main() {
   });
 
   group('WaybillHtmlService', () {
-    test('generateHtml produces complete waybill with all sections', () {
+    test('generateHtml produces complete waybill with all sections', () async {
       final waybill = DeliveryWaybill(
         orderId: '500',
         waybillNumber: 'WB-500',
@@ -204,7 +204,7 @@ void main() {
         instructions: 'Handle with care - fragile fruit',
       );
 
-      final html = WaybillHtmlService.generateHtml(waybill);
+      final html = await WaybillHtmlService.generateHtml(waybill);
 
       expect(html, contains('AgriSell Delivery Waybill'));
       expect(html, contains('ORD-500'));
@@ -219,7 +219,11 @@ void main() {
       expect(html, contains('PREPAID'));
       expect(html, contains('Handle with care'));
       expect(html, contains('window.print()'));
-      expect(html, contains('@media print'));
+      final stylesheet = RegExp('href="([^"]+)"').firstMatch(html)!.group(1)!;
+      expect(
+        Uri.parse(stylesheet).data!.contentAsString(),
+        contains('@media print'),
+      );
     });
 
     test('formatPlainText formats plain text summary correctly', () {
@@ -295,9 +299,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: DeliveryWaybillSheet(waybill: waybill),
-          ),
+          home: Scaffold(body: DeliveryWaybillSheet(waybill: waybill)),
         ),
       );
 
@@ -317,112 +319,129 @@ void main() {
   });
 
   group('Screen integration', () {
-    testWidgets('FarmerOrderDetailsScreen displays print waybill actions and opens sheet', (tester) async {
-      final order = PlacedOrder(
-        id: '701',
-        buyerName: 'David Lee',
-        phoneNumber: '09551234567',
-        deliveryAddress: 'Central Market, Malaybalay',
-        status: PlacedOrderStatus.readyForPickup,
-        placedAt: DateTime.utc(2026, 8, 28),
-        items: const [
-          PlacedOrderItem(
-            productId: 'p-1',
-            productName: 'Carrots',
-            image: '',
-            sellerName: 'Lee Vegetable Farm',
-            pricePerKg: 50,
-            unit: 'kg',
-            quantity: 10,
+    testWidgets(
+      'FarmerOrderDetailsScreen displays print waybill actions and opens sheet',
+      (tester) async {
+        final order = PlacedOrder(
+          id: '701',
+          buyerName: 'David Lee',
+          phoneNumber: '09551234567',
+          deliveryAddress: 'Central Market, Malaybalay',
+          status: PlacedOrderStatus.readyForPickup,
+          placedAt: DateTime.utc(2026, 8, 28),
+          items: const [
+            PlacedOrderItem(
+              productId: 'p-1',
+              productName: 'Carrots',
+              image: '',
+              sellerName: 'Lee Vegetable Farm',
+              pricePerKg: 50,
+              unit: 'kg',
+              quantity: 10,
+            ),
+          ],
+        );
+
+        SharedPreferences.setMockInitialValues({});
+        final preferences = await SharedPreferences.getInstance();
+        final orderRepository = OrderLocalRepository(preferences: preferences);
+        await orderRepository.save('farmer-1', [order]);
+        final orderController = OrderController(repository: orderRepository);
+        await orderController.loadForAccount('farmer-1');
+
+        final riderController = FarmerRiderAssignmentController(
+          const UnavailableFarmerRiderSelectionRepository(),
+        );
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: FarmerOrderDetailsScreen(
+              order: order,
+              controller: orderController,
+              riderController: riderController,
+              onChooseRider: (_) async {},
+              onCancelRiderRequest: (_) async {},
+              onCancelOrder: (_) async {},
+            ),
           ),
-        ],
-      );
+        );
 
-      SharedPreferences.setMockInitialValues({});
-      final preferences = await SharedPreferences.getInstance();
-      final orderRepository = OrderLocalRepository(preferences: preferences);
-      await orderRepository.save('farmer-1', [order]);
-      final orderController = OrderController(repository: orderRepository);
-      await orderController.loadForAccount('farmer-1');
+        expect(
+          find.byKey(const Key('farmer-print-waybill-appbar-button')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('farmer-open-waybill-button')),
+          findsOneWidget,
+        );
 
-      final riderController = FarmerRiderAssignmentController(
-        const UnavailableFarmerRiderSelectionRepository(),
-      );
+        await tester.tap(
+          find.byKey(const Key('farmer-print-waybill-appbar-button')),
+        );
+        await tester.pumpAndSettle();
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: FarmerOrderDetailsScreen(
-            order: order,
-            controller: orderController,
-            riderController: riderController,
-            onChooseRider: (_) async {},
-            onCancelRiderRequest: (_) async {},
-            onCancelOrder: (_) async {},
+        expect(find.byKey(const Key('waybill-preview-card')), findsOneWidget);
+        expect(find.text('WB-701'), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('waybill-preview-card')),
+            matching: find.text('David Lee'),
           ),
-        ),
-      );
+          findsOneWidget,
+        );
+      },
+    );
 
-      expect(find.byKey(const Key('farmer-print-waybill-appbar-button')), findsOneWidget);
-      expect(find.byKey(const Key('farmer-open-waybill-button')), findsOneWidget);
-
-      await tester.tap(find.byKey(const Key('farmer-print-waybill-appbar-button')));
-      await tester.pumpAndSettle();
-
-      expect(find.byKey(const Key('waybill-preview-card')), findsOneWidget);
-      expect(find.text('WB-701'), findsOneWidget);
-      expect(
-        find.descendant(
-          of: find.byKey(const Key('waybill-preview-card')),
-          matching: find.text('David Lee'),
-        ),
-        findsOneWidget,
-      );
-    });
-
-    testWidgets('RiderDeliveryDetailsScreen includes waybill action in quick actions and header', (tester) async {
-      final request = DeliveryRequest(
-        id: 'del-801',
-        orderNumber: 'ORD-801',
-        productName: 'Organic Potatoes',
-        sellerName: 'Potato Farm',
-        buyerName: 'Grace Hopper',
-        pickupLocation: const DeliveryLocation(
-          address: 'Manolo Fortich',
-          contactNumber: '09123456789',
-          latitude: 8.37,
-          longitude: 124.86,
-        ),
-        deliveryLocation: const DeliveryLocation(
-          address: 'CDO City',
-          contactNumber: '09987654321',
-          latitude: 8.48,
-          longitude: 124.65,
-        ),
-        pickupDeadline: DateTime.utc(2026, 9, 1),
-        deliveryFee: 120.0,
-      );
-
-      final repository = InMemoryRiderDeliveryRepository(requests: [request]);
-      final controller = RiderDeliveryController(repository: repository);
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: RiderDeliveryDetailsScreen(
-            request: request,
-            controller: controller,
-            riderId: 'rider-1',
+    testWidgets(
+      'RiderDeliveryDetailsScreen includes waybill action in quick actions and header',
+      (tester) async {
+        final request = DeliveryRequest(
+          id: 'del-801',
+          orderNumber: 'ORD-801',
+          productName: 'Organic Potatoes',
+          sellerName: 'Potato Farm',
+          buyerName: 'Grace Hopper',
+          pickupLocation: const DeliveryLocation(
+            address: 'Manolo Fortich',
+            contactNumber: '09123456789',
+            latitude: 8.37,
+            longitude: 124.86,
           ),
-        ),
-      );
+          deliveryLocation: const DeliveryLocation(
+            address: 'CDO City',
+            contactNumber: '09987654321',
+            latitude: 8.48,
+            longitude: 124.65,
+          ),
+          pickupDeadline: DateTime.utc(2026, 9, 1),
+          deliveryFee: 120.0,
+        );
 
-      expect(find.byKey(const Key('rider-print-waybill-button')), findsOneWidget);
+        final repository = InMemoryRiderDeliveryRepository(requests: [request]);
+        final controller = RiderDeliveryController(repository: repository);
 
-      await tester.tap(find.byKey(const Key('rider-print-waybill-button')));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(
+          MaterialApp(
+            home: RiderDeliveryDetailsScreen(
+              request: request,
+              controller: controller,
+              riderId: 'rider-1',
+            ),
+          ),
+        );
 
-      expect(find.byKey(const Key('waybill-preview-card')), findsOneWidget);
-      expect(find.text('WB-ORD-801'), findsOneWidget);
-      expect(find.text('Grace Hopper'), findsOneWidget);
-    });
+        expect(
+          find.byKey(const Key('rider-print-waybill-button')),
+          findsOneWidget,
+        );
+
+        await tester.tap(find.byKey(const Key('rider-print-waybill-button')));
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('waybill-preview-card')), findsOneWidget);
+        expect(find.text('WB-ORD-801'), findsOneWidget);
+        expect(find.text('Grace Hopper'), findsOneWidget);
+      },
+    );
   });
 }

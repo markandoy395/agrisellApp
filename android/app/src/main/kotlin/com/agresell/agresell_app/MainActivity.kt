@@ -28,6 +28,7 @@ open class MainActivity : FlutterActivity() {
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+        SecureStorageMigration.prepare(applicationContext)
         super.configureFlutterEngine(flutterEngine)
         waybillPrinter = WaybillPrinter(this).also { printer ->
             MethodChannel(

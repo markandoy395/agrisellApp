@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/theme/app_typography.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 
@@ -12,24 +13,27 @@ abstract final class DeliveryWaybillStyles {
   static const double handleRadius = 2.0;
   static const EdgeInsets handleMargin = EdgeInsets.only(top: 10, bottom: 4);
 
-  static const EdgeInsets headerPadding =
-      EdgeInsets.symmetric(horizontal: 16, vertical: 8);
+  static const EdgeInsets headerPadding = EdgeInsets.symmetric(
+    horizontal: 16,
+    vertical: 8,
+  );
   static const EdgeInsets scrollPadding = EdgeInsets.all(16);
   static const EdgeInsets previewPadding = EdgeInsets.all(14);
-  static const EdgeInsets actionsPadding =
-      EdgeInsets.fromLTRB(16, 12, 16, 12);
+  static const EdgeInsets actionsPadding = EdgeInsets.fromLTRB(16, 12, 16, 12);
 
   static const double previewBorderRadius = 12.0;
   static const double previewBorderWidth = 1.5;
 
-  static const EdgeInsets badgePadding =
-      EdgeInsets.symmetric(horizontal: 9, vertical: 4);
-  static const EdgeInsets barcodePadding =
-      EdgeInsets.symmetric(vertical: 6);
-  static const EdgeInsets infoBoxPadding =
-      EdgeInsets.symmetric(horizontal: 10, vertical: 8);
-  static const EdgeInsets itemRowPadding =
-      EdgeInsets.symmetric(vertical: 2);
+  static const EdgeInsets badgePadding = EdgeInsets.symmetric(
+    horizontal: 9,
+    vertical: 4,
+  );
+  static const EdgeInsets barcodePadding = EdgeInsets.symmetric(vertical: 6);
+  static const EdgeInsets infoBoxPadding = EdgeInsets.symmetric(
+    horizontal: 10,
+    vertical: 8,
+  );
+  static const EdgeInsets itemRowPadding = EdgeInsets.symmetric(vertical: 2);
 
   static const double primaryActionHeight = 44.0;
   static const double secondaryActionHeight = 40.0;
@@ -123,7 +127,7 @@ abstract final class DeliveryWaybillStyles {
       isCod ? codBadgeText : prepaidBadgeText;
 
   static const TextStyle barcodeText = TextStyle(
-    fontFamily: 'monospace',
+    fontFamily: AppTypography.fontFamily,
     fontSize: 15,
     fontWeight: FontWeight.bold,
     letterSpacing: 4,
@@ -185,10 +189,10 @@ abstract final class DeliveryWaybillStyles {
 
   static final ButtonStyle secondaryActionButtonStyle =
       OutlinedButton.styleFrom(
-    foregroundColor: AgrisellColors.authGreen,
-    side: const BorderSide(color: AgrisellColors.borderLine),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(secondaryButtonRadius),
-    ),
-  );
+        foregroundColor: AgrisellColors.authGreen,
+        side: const BorderSide(color: AgrisellColors.borderLine),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(secondaryButtonRadius),
+        ),
+      );
 }

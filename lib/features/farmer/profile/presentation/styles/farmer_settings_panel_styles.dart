@@ -35,10 +35,7 @@ abstract final class FarmerSettingsPanelStyles {
   static final closeButtonDecoration = BoxDecoration(
     color: FarmerProfileStyle.mint,
     borderRadius: closeButtonRadius,
-    border: Border.all(
-      color: FarmerProfileStyle.borderSubtle,
-      width: 1,
-    ),
+    border: Border.all(color: FarmerProfileStyle.borderSubtle, width: 1),
   );
 
   // Identity hero card
@@ -61,10 +58,7 @@ abstract final class FarmerSettingsPanelStyles {
   static final avatarDecoration = BoxDecoration(
     color: Colors.white.withValues(alpha: 0.15),
     shape: BoxShape.circle,
-    border: Border.all(
-      color: Colors.white.withValues(alpha: 0.25),
-      width: 2,
-    ),
+    border: Border.all(color: Colors.white.withValues(alpha: 0.25), width: 2),
   );
   static const identityTextSpacing = SizedBox(width: 14);
   static const identityNameStyle = TextStyle(
@@ -81,7 +75,7 @@ abstract final class FarmerSettingsPanelStyles {
 
   // Layout & list
   static const spacingIdentityToList = SizedBox(height: 6);
-  static const listPadding = EdgeInsets.fromLTRB(20, 0, 20, 28);
+  static const listPadding = EdgeInsets.fromLTRB(20, 0, 20, 8);
 
   // Group container
   static const groupPadding = EdgeInsets.only(top: 18);
@@ -128,10 +122,7 @@ abstract final class FarmerSettingsPanelStyles {
       end: Alignment.bottomRight,
     ),
     borderRadius: iconRadius,
-    border: Border.all(
-      color: FarmerProfileStyle.borderSubtle,
-      width: 1,
-    ),
+    border: Border.all(color: FarmerProfileStyle.borderSubtle, width: 1),
   );
 
   static final destructiveIconDecoration = BoxDecoration(
@@ -141,10 +132,7 @@ abstract final class FarmerSettingsPanelStyles {
       end: Alignment.bottomRight,
     ),
     borderRadius: iconRadius,
-    border: Border.all(
-      color: const Color(0xFFFFCCCC),
-      width: 1,
-    ),
+    border: Border.all(color: const Color(0xFFFFCCCC), width: 1),
   );
 
   static const titleStyle = TextStyle(

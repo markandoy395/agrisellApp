@@ -266,7 +266,7 @@ void main() {
     },
   );
 
-  testWidgets('Farmer submitted screen explains product access', (
+  testWidgets('Farmer submitted screen explains admin confirmation', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -279,7 +279,7 @@ void main() {
     expect(find.text('Reference: farmer-123'), findsOneWidget);
     expect(
       find.text(
-        'Your farmer account is ready. Log in to upload products. You can complete your farm details in your profile.',
+        'Your farm and identity details were submitted. Please wait for admin confirmation before selling products.',
       ),
       findsOneWidget,
     );

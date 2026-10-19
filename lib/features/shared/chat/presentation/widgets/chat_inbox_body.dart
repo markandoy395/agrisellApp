@@ -49,7 +49,7 @@ class ChatInboxBody extends StatelessWidget {
                 physics: const AlwaysScrollableScrollPhysics(),
                 keyboardDismissBehavior:
                     ScrollViewKeyboardDismissBehavior.onDrag,
-                padding: const EdgeInsets.fromLTRB(0, 4, 0, 112),
+                padding: const EdgeInsets.fromLTRB(0, 4, 0, 12),
                 itemCount: conversations.length,
                 separatorBuilder: (_, _) => const SizedBox.shrink(),
                 itemBuilder: (context, index) {

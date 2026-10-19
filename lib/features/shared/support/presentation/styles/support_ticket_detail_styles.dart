@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/theme/app_typography.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/support/domain/support_ticket.dart';
@@ -22,7 +23,7 @@ abstract final class SupportTicketDetailStyles {
   static const ticketNumber = TextStyle(
     fontWeight: FontWeight.w800,
     fontSize: 15,
-    fontFamily: 'monospace',
+    fontFamily: AppTypography.fontFamily,
   );
   static const userMessage = TextStyle(
     fontSize: 14,

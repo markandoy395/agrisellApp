@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/theme/app_typography.dart';
 
 import '../widgets/farmer_profile_style.dart';
 
@@ -36,10 +37,7 @@ abstract final class FarmerProfileHeaderStyles {
   static const avatarOuterSize = 88.0;
   static final avatarGlowDecoration = BoxDecoration(
     shape: BoxShape.circle,
-    border: Border.all(
-      color: Colors.white.withValues(alpha: 0.25),
-      width: 2.5,
-    ),
+    border: Border.all(color: Colors.white.withValues(alpha: 0.25), width: 2.5),
     boxShadow: [
       BoxShadow(
         color: const Color(0xFF0E6B43).withValues(alpha: 0.6),
@@ -106,11 +104,13 @@ abstract final class FarmerProfileHeaderStyles {
     vertical: 4,
   );
   static const statValueStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: Colors.white,
     fontSize: 13,
     fontWeight: FontWeight.w800,
   );
   static final statLabelStyle = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: Colors.white.withValues(alpha: 0.7),
     fontSize: 12,
     fontWeight: FontWeight.w500,

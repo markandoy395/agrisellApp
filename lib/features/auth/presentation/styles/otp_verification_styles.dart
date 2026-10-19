@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/theme/app_typography.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/auth/presentation/styles/otp_verification_code_styles.dart';
@@ -78,12 +79,14 @@ abstract final class OtpVerificationStyles {
   );
 
   static const description = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.mutedText,
     fontSize: 14,
     height: 1.45,
   );
 
   static const destination = TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: AgrisellColors.headingGreen,
     fontWeight: FontWeight.w700,
   );

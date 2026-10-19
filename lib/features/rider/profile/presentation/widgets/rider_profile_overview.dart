@@ -36,7 +36,7 @@ class RiderProfileOverview extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ListView(
     key: const PageStorageKey('rider-profile-overview'),
-    padding: const EdgeInsets.fromLTRB(14, 0, 14, 24),
+    padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
     children: [
       RiderProfileIdentityCard(profile: profile),
       const SizedBox(height: 14),

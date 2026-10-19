@@ -1,25 +1,41 @@
-/// Embedded in the standalone printable document so data/file URLs work offline.
-const waybillHtmlStyles = '''
-    body { font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 32px; color: #17231b; }
-    h1 { margin: 0 0 2px; font-size: 22px; color: #0F743B; font-weight: 800; }
-    .subhead { font-size: 12px; color: #607064; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .id { font-size: 20px; font-weight: 700; color: #0B0B0B; }
-    .barcode { font-family: monospace; font-size: 18px; letter-spacing: 5px; background: #EEF7E0; padding: 6px 14px; display: inline-block; border-radius: 6px; margin: 8px 0 16px; border: 1px dashed #0F743B; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
-    .box { border: 1px solid #b8c4ba; border-radius: 8px; padding: 12px 14px; background: #fafcfa; font-size: 13px; line-height: 1.4; }
-    .wide { grid-column: 1 / -1; }
-    .box strong { display: block; font-size: 11px; text-transform: uppercase; color: #607064; margin-bottom: 4px; letter-spacing: 0.5px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 14px; }
-    th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid #e2e8e3; font-size: 13px; }
-    th { background: #E5F0E9; color: #0F743B; font-weight: 700; font-size: 11px; text-transform: uppercase; }
-    .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; text-transform: uppercase; background: #E5F0E9; color: #0F743B; }
-    .badge-cod { background: #FFF3E0; color: #A15D13; }
-    .totals { margin-top: 12px; text-align: right; font-size: 16px; font-weight: 800; color: #0F743B; }
-    .footer { margin-top: 28px; padding-top: 12px; border-top: 1px dashed #b8c4ba; font-size: 11px; color: #77817D; text-align: center; }
-    @media print {
-      body { margin: 10mm; }
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
+
+/// Standalone documents carry their stylesheet and fonts without network access.
+abstract final class WaybillHtmlStyles {
+  static Future<String>? _stylesheetUri;
+
+  static Future<String> loadUri() => _stylesheetUri ??= _loadUri();
+
+  static Future<String> _loadUri() async {
+    try {
+      var css = await rootBundle.loadString('assets/styles/waybill.css');
+      const fonts = {
+        'REGULAR': 'Regular',
+        'SEMIBOLD': 'SemiBold',
+        'BOLD': 'Bold',
+        'EXTRABOLD': 'ExtraBold',
+      };
+      for (final font in fonts.entries) {
+        final data = await rootBundle.load(
+          'assets/fonts/Poppins/Poppins-${font.value}.ttf',
+        );
+        final uri = Uri.dataFromBytes(
+          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
+          mimeType: 'font/ttf',
+        );
+        css = css.replaceAll('{{POPPINS_${font.key}}}', uri.toString());
+      }
+      return Uri.dataFromString(
+        css,
+        mimeType: 'text/css',
+        encoding: utf8,
+        base64: true,
+      ).toString();
+    } catch (_) {
+      _stylesheetUri = null;
+      rethrow;
     }
-    .quantity { text-align: center; }
-    .price { text-align: right; }
-    .item-total { text-align: right; font-weight: 600; }
-''';
+  }
+}

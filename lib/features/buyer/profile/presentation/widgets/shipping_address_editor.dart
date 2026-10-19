@@ -168,7 +168,7 @@ class _ShippingAddressEditorState extends State<ShippingAddressEditor> {
     isSaving: _isSaving || _isCapturingLocation,
     error: _error,
     onAddressChanged: () {
-      setState(() => _error = null);
+      if (_error != null) setState(() => _error = null);
     },
     onSave: _save,
   );

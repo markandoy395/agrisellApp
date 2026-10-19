@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/theme/app_typography.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/support/domain/support_ticket.dart';
 
@@ -9,7 +10,7 @@ abstract final class SupportTicketCardStyles {
   );
 
   static const textStyle = TextStyle(
-    fontFamily: 'monospace',
+    fontFamily: AppTypography.fontFamily,
     fontSize: 12,
     fontWeight: FontWeight.w700,
     color: AgrisellColors.mutedText,

@@ -50,7 +50,7 @@ void main() {
     );
   });
 
-  test('verification badges remain accurate', () {
+  test('only verified farmers may create products', () {
     expect(
       _account(role: 'farmer', verificationStatus: 'pending').isFarmerVerified,
       isFalse,
@@ -61,36 +61,6 @@ void main() {
     );
     expect(
       _account(role: 'buyer', verificationStatus: 'pending').isFarmerVerified,
-      isFalse,
-    );
-  });
-
-  test('active pending farmers may upload while blocked accounts cannot', () {
-    for (final verification in ['pending', 'verified', 'needs_information']) {
-      expect(
-        _account(
-          role: 'farmer',
-          verificationStatus: verification,
-        ).canUploadProducts,
-        isTrue,
-      );
-    }
-    for (final status in ['pending', 'suspended', 'disabled', 'rejected']) {
-      expect(
-        _account(
-          role: 'farmer',
-          status: status,
-          verificationStatus: 'verified',
-        ).canUploadProducts,
-        isFalse,
-      );
-    }
-    expect(_account(role: 'buyer').canUploadProducts, isFalse);
-    expect(
-      _account(
-        role: 'farmer',
-        verificationStatus: 'rejected',
-      ).canUploadProducts,
       isFalse,
     );
   });

@@ -11,7 +11,7 @@ abstract final class FarmerDashboardStyles {
   static double horizontalPadding(double width) => width < 380 ? 12.0 : 14.0;
   static double gridSpacing(double width) => width < 380 ? 9.0 : 11.0;
   static double productRatio(double width) => width < 380 ? 0.72 : 0.75;
-  static double navClearance(double bottomPadding) => 148.0 + bottomPadding;
+  static double navClearance(double bottomPadding) => 8.0 + bottomPadding;
 
   // Spacing & Offsets
   static const double tabsTopSpacing = 14.0;
@@ -21,22 +21,33 @@ abstract final class FarmerDashboardStyles {
 
   // Paddings
   static EdgeInsets tabsPadding(double horizontalPadding) =>
-      EdgeInsets.fromLTRB(horizontalPadding, tabsTopSpacing, horizontalPadding, 0);
+      EdgeInsets.fromLTRB(
+        horizontalPadding,
+        tabsTopSpacing,
+        horizontalPadding,
+        0,
+      );
 
   static EdgeInsets contentPadding(double horizontalPadding) =>
-      EdgeInsets.fromLTRB(horizontalPadding, contentTopSpacing, horizontalPadding, 0);
+      EdgeInsets.fromLTRB(
+        horizontalPadding,
+        contentTopSpacing,
+        horizontalPadding,
+        0,
+      );
 
-  static const EdgeInsets loadingPadding = EdgeInsets.only(top: loadingTopSpacing);
+  static const EdgeInsets loadingPadding = EdgeInsets.only(
+    top: loadingTopSpacing,
+  );
 
   // Grid Delegates
   static SliverGridDelegateWithFixedCrossAxisCount gridDelegate({
     required double gridSpacing,
     required double productRatio,
-  }) =>
-      SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: gridCrossAxisCount,
-        crossAxisSpacing: gridSpacing,
-        mainAxisSpacing: gridSpacing + 2,
-        childAspectRatio: productRatio,
-      );
+  }) => SliverGridDelegateWithFixedCrossAxisCount(
+    crossAxisCount: gridCrossAxisCount,
+    crossAxisSpacing: gridSpacing,
+    mainAxisSpacing: gridSpacing + 2,
+    childAspectRatio: productRatio,
+  );
 }

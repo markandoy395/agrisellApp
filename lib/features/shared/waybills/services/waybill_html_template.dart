@@ -1,4 +1,3 @@
-import 'package:agresell_app/features/shared/waybills/services/waybill_html_styles.dart';
 import 'package:agresell_app/features/shared/waybills/domain/delivery_waybill.dart';
 
 String escapeHtml(Object? value) {
@@ -16,7 +15,10 @@ String formatWaybillCurrency(double amount) {
   return 'PHP ${amount.toStringAsFixed(2)}';
 }
 
-String buildWaybillHtml(DeliveryWaybill waybill) {
+String buildWaybillHtml(
+  DeliveryWaybill waybill, {
+  required String stylesheetUri,
+}) {
   final orderIdEscaped = escapeHtml(waybill.orderId);
   final waybillNumberEscaped = escapeHtml(waybill.waybillNumber);
   final buyerNameEscaped = escapeHtml(waybill.buyerName);
@@ -58,7 +60,7 @@ String buildWaybillHtml(DeliveryWaybill waybill) {
 <head>
   <meta charset="utf-8">
   <title>Waybill $waybillNumberEscaped</title>
-  <style>$waybillHtmlStyles</style>
+  <link rel="stylesheet" href="${escapeHtml(stylesheetUri)}">
 </head>
 <body>
   <h1>AgriSell Delivery Waybill</h1>
@@ -121,7 +123,12 @@ String buildWaybillHtml(DeliveryWaybill waybill) {
     AgriSell Delivery Network &middot; Keep this waybill attached to the produce package &middot; Generated $scheduleEscaped
   </div>
 
-  <script>window.addEventListener('load',()=>{window.print();});</script>
+  <script>
+    window.addEventListener('load', async () => {
+      await document.fonts.ready;
+      window.print();
+    });
+  </script>
 </body>
 </html>''';
 }

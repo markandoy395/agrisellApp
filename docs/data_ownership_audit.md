@@ -217,7 +217,7 @@ It does not establish coverage of every production participant path. Full
 `account_data_isolation.sql` still requires a migrated local/test database;
 synthetic account fixtures were not run on production.
 
-## Rider capacity setup — 2026-10-13 (deployment pending)
+## Rider capacity setup ï¿½ 2026-10-13 (deployment pending)
 
 Capacity updates identify the current rider from the session; no owner or role
 parameter is accepted. Combined active cargo weight is scoped to that rider.
@@ -233,7 +233,7 @@ authorization remains in the capacity validator. Local tests exclude another
 buyer's and another farm's rows. See rider_capacity_batching.md for unsupported
 non-kg mass and the unapproved deployment.
 
-## Rider status update RPC — 2026-10-13 (deployment pending)
+## Rider status update RPC ï¿½ 2026-10-13 (deployment pending)
 
 The new current-rider status endpoint checks private.rider_delivery_assignments
 against the server current-rider mapping before reading/mutating a delivery or
@@ -276,4 +276,9 @@ the current authenticated account. See docs/profile_edit_persistence_audit.md fo
 rolled-back hosted isolation/repair assertions and remaining device-test limits.
 
 
-2026-10-17: Active pending farmers may insert their own categories/products. Matching commodity category and farm ownership remain required; skipped signup creates no placeholder farm. See farmer_optional_signup_uploads.md for isolated checks and outstanding full-schema assertions.
+
+2026-10-19: Rider sample-data testing exposed stale rider verification columns. The verification-details RPC now resolves private.current_rider_id(), returns only caller-owned documents and review actions, requires the existing profile-session and gateway guards, and maps employment status as the app already does. No new public destination or anonymous grant. See docs/mock_rider_testing.md and supabase/tests/rider_verification_identity.sql.
+
+
+2026-10-19: Nearby rider deliveries exclude completed/cancelled/failed rows before applying the existing response limit. Owner checks, session guards, distance filters, and RPC grants are unchanged. History remains on current_rider_deliveries. Mock-only load fixtures add active deliveries and fresh assignment requests; see docs/mock_rider_testing.md and supabase/tests/rider_nearby_active_requests.sql.
+

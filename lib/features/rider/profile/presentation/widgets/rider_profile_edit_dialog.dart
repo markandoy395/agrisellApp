@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'package:agresell_app/features/rider/profile/domain/rider_profile.dart';
-import 'package:agresell_app/features/rider/profile/presentation/styles/rider_profile_edit_styles.dart';
 import 'package:agresell_app/features/rider/profile/presentation/utils/rider_profile_location_coordinator.dart';
 import 'package:agresell_app/features/rider/profile/presentation/utils/rider_profile_save_coordinator.dart';
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_profile_edit_actions.dart';
 import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_profile_edit_form_fields.dart';
-import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_profile_edit_header.dart';
+import 'package:agresell_app/features/rider/profile/presentation/widgets/rider_profile_edit_layout.dart';
 import 'package:agresell_app/features/shared/location/data/gps_location_gateway.dart';
 
 part 'rider_profile_edit_save.dart';
@@ -87,43 +86,28 @@ class _RiderProfileEditSheetState extends State<_RiderProfileEditSheet> {
   }
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-    height: MediaQuery.sizeOf(context).height,
-    child: SafeArea(
-      child: Padding(
-        padding: RiderProfileEditStyles.sheetPadding(context),
-        child: Column(
-          children: [
-            const RiderProfileEditHeader(),
-            RiderProfileEditStyles.spacingLarge,
-            Expanded(
-              child: SingleChildScrollView(
-                child: RiderProfileEditFormFields(
-                  profile: widget.profile,
-                  firstNameController: _firstName,
-                  lastNameController: _lastName,
-                  contactController: _contact,
-                  streetController: _street,
-                  provinceController: _province,
-                  cityController: _city,
-                  barangayController: _barangay,
-                  postalController: _postal,
-                  licenseController: _license,
-                  plateController: _plate,
-                  error: _error,
-                  onPsgcChanged: () => setState(() {}),
-                ),
-              ),
-            ),
-            RiderProfileEditStyles.spacingLarge,
-            RiderProfileEditActions(
-              isSaving: _isSaving,
-              onCancel: () => Navigator.pop(context),
-              onSave: _save,
-            ),
-          ],
-        ),
-      ),
+  Widget build(BuildContext context) => RiderProfileEditLayout(
+    form: RiderProfileEditFormFields(
+      profile: widget.profile,
+      firstNameController: _firstName,
+      lastNameController: _lastName,
+      contactController: _contact,
+      streetController: _street,
+      provinceController: _province,
+      cityController: _city,
+      barangayController: _barangay,
+      postalController: _postal,
+      licenseController: _license,
+      plateController: _plate,
+      error: _error,
+      onPsgcChanged: () {
+        if (_error != null) setState(() => _error = null);
+      },
+    ),
+    actions: RiderProfileEditActions(
+      isSaving: _isSaving,
+      onCancel: () => Navigator.pop(context),
+      onSave: _save,
     ),
   );
 }

@@ -23,7 +23,7 @@ abstract final class ProfileScreenStyles {
   static double horizontalPadding(double width) => width < 380 ? 12.0 : 16.0;
 
   static double navClearance(BuildContext context) =>
-      154.0 + MediaQuery.paddingOf(context).bottom;
+      8.0 + MediaQuery.paddingOf(context).bottom;
 
   // --- Dimensions & Radii ---
   static const double iconBoxSize = 44.0;

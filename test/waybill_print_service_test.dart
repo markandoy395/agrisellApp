@@ -36,7 +36,23 @@ void main() {
       expect(received?.method, 'printHtml');
       final arguments = received!.arguments as Map;
       expect(arguments['jobName'], 'AgriSell Waybill ${waybill.orderId}');
-      expect(arguments['html'], WaybillHtmlService.generateHtml(waybill));
+      final html = await WaybillHtmlService.generateHtml(waybill);
+      expect(arguments['html'], html);
+      expect(html, isNot(contains('<style>')));
+      expect(html, contains('await document.fonts.ready'));
+      final stylesheet = RegExp('href="([^"]+)"').firstMatch(html)!.group(1)!;
+      final css = Uri.parse(stylesheet).data!.contentAsString();
+      expect(css, contains('14px Poppins, sans-serif'));
+      expect(css, isNot(contains('monospace')));
+      expect(css, isNot(contains('{{POPPINS_')));
+      final fontUrls = RegExp('url\\("([^"]+)"\\)').allMatches(css);
+      expect(fontUrls, hasLength(4));
+      for (final match in fontUrls) {
+        final data = Uri.parse(match.group(1)!).data!;
+        expect(data.mimeType, 'font/ttf');
+        // TrueType sfnt header proves the document contains font bytes.
+        expect(data.contentAsBytes().take(4), [0, 1, 0, 0]);
+      }
       expect(arguments.containsKey('path'), isFalse);
     },
   );
@@ -91,7 +107,11 @@ void main() {
           ),
         ),
       );
-      await tester.tap(find.text('Print'));
+      // Font assets load through real asynchronous bundle I/O.
+      await tester.runAsync(() async {
+        await tester.tap(find.text('Print'));
+        await WaybillHtmlService.generateHtml(waybill);
+      });
       await tester.pumpAndSettle();
       expect(
         find.text(

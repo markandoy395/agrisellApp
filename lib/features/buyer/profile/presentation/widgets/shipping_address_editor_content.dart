@@ -34,13 +34,7 @@ class ShippingAddressEditorContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SafeArea(
     top: false,
-    child: SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(
-        20,
-        20,
-        20,
-        20 + MediaQuery.viewInsetsOf(context).bottom,
-      ),
+    child: _KeyboardScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,5 +66,23 @@ class ShippingAddressEditorContent extends StatelessWidget {
         ],
       ),
     ),
+  );
+}
+
+/// Keep the form widget stable while the keyboard animates the scroll padding.
+class _KeyboardScrollView extends StatelessWidget {
+  const _KeyboardScrollView({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => SingleChildScrollView(
+    padding: EdgeInsets.fromLTRB(
+      20,
+      20,
+      20,
+      20 + MediaQuery.viewInsetsOf(context).bottom,
+    ),
+    child: child,
   );
 }

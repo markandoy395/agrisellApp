@@ -101,7 +101,7 @@ class _FarmerScreenState extends State<FarmerScreen> {
                           horizontalPadding,
                           16,
                           horizontalPadding,
-                          138,
+                          8 + MediaQuery.paddingOf(context).bottom,
                         ),
                         sliver: SliverList.builder(
                           itemCount: itemCount,

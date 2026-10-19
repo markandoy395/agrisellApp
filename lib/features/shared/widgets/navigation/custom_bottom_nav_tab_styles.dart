@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
+import 'package:agresell_app/core/theme/app_typography.dart';
 
 abstract final class CustomBottomNavTabStyles {
   static TextStyle textStyle(
@@ -8,6 +9,7 @@ abstract final class CustomBottomNavTabStyles {
     Color labelColor,
     double labelFontSize,
   ) => TextStyle(
+    fontFamily: AppTypography.fontFamily,
     color: isSelected ? activeBackground : labelColor,
     fontSize: labelFontSize,
     height: 1,

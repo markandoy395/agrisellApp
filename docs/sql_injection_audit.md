@@ -71,7 +71,7 @@ HTTP bodies/query parameters and caller JWTs, adding no SQL execution interface.
 The new pre-request function uses static SQL and fixed schema names. Hosted
 injection assertions passed after deployment. See [the staged rollout audit](rate_limiting_audit.md).
 
-## Rider capacity setup — 2026-10-13 (deployment pending)
+## Rider capacity setup ï¿½ 2026-10-13 (deployment pending)
 
 set_current_rider_capacity uses a Supabase numeric parameter map and static SQL;
 hostile text cannot become executable commands. The migration patches a trusted
@@ -110,4 +110,3 @@ rolled-back hostile-literal retry/read-back checks passed; see
 `profile_edit_persistence_audit.md` for exact coverage and limits.
 
 
-2026-10-17: Optional farmer signup uses the existing bound JSON payload and static SQL; product context adds account_status without changing structured owner filters. Literal hostile name/category fixture values remain data. See farmer_optional_signup_uploads.md.

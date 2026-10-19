@@ -9,7 +9,6 @@ class FarmerSignupData {
     required this.phoneNumber,
     required this.farmName,
     required this.mainCrops,
-    this.farmDetailsSkipped = false,
     this.middleName,
     this.suffix,
     this.dateOfBirth,
@@ -35,7 +34,6 @@ class FarmerSignupData {
     this.farmImage,
   });
 
-  final bool farmDetailsSkipped;
   final String email;
   final String password;
   final String firstName;
@@ -71,7 +69,6 @@ class FarmerSignupData {
     final crops = mainCrops.where((crop) => crop.trim().isNotEmpty).toList();
     return {
       'requested_role': 'farmer',
-      if (farmDetailsSkipped) 'farm_details_skipped': true,
       'first_name': firstName.trim(),
       'middle_name': _blankToNull(middleName),
       'last_name': lastName.trim(),

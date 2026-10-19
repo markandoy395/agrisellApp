@@ -86,11 +86,9 @@ void main() {
       ),
     );
 
-    final addressDropdown = tester.widget<DropdownMenu<PsgcAddressOption>>(
-      find.byType(DropdownMenu<PsgcAddressOption>),
-    );
+    final addressDropdown = tester.widget<TextField>(find.byType(TextField));
     expect(
-      addressDropdown.inputDecorationTheme?.floatingLabelStyle,
+      addressDropdown.decoration?.floatingLabelStyle,
       AgrisellTheme.floatingInputLabelStyle,
     );
   });

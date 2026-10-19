@@ -185,6 +185,5 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
   void _refresh(VoidCallback update) => setState(update);
 
   bool get _canPostProducts =>
-      AuthSessionService.instance.currentAccount?.canUploadProducts ??
-      !widget.commodityRepository.isAvailable;
+      AuthSessionService.instance.currentAccount?.isFarmerVerified ?? true;
 }

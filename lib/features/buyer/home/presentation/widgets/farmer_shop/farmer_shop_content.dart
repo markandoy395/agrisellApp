@@ -34,7 +34,7 @@ class FarmerShopContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottomPadding = MediaQuery.paddingOf(context).bottom + 24;
+    final bottomPadding = MediaQuery.paddingOf(context).bottom + 8;
 
     return Container(
       clipBehavior: Clip.antiAlias,

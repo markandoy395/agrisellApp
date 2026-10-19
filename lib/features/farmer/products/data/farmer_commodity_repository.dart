@@ -67,9 +67,9 @@ class FarmerCommodityRepository {
     if (!isAvailable) return product;
     try {
       final context = await FarmerCommodityContext.load();
-      if (product.commodityId == null && !context.canPostProducts) {
+      if (product.commodityId == null && !context.isVerified) {
         throw const FarmerCommodityException(
-          'Your farmer account cannot upload products. Please check your account status.',
+          'Your farmer account is pending verification. You can add products after approval.',
         );
       }
       final categoryId = await context.resolveCategory(product.category);

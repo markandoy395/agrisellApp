@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_loading_skeleton.dart';
+import '../../domain/rider_communication_state.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import '../../domain/rider_communication_models.dart';
 import '../controllers/rider_messages_controller.dart';
@@ -39,6 +41,9 @@ class _RiderMessagesInboxState extends State<RiderMessagesInbox> {
     animation: widget.controller,
     builder: (context, _) {
       final all = widget.controller.conversations;
+      final loading =
+          all.isEmpty &&
+          widget.controller.state == RiderCommunicationLoadState.loading;
       final query = _search.text.trim().toLowerCase();
       final filtered = all
           .where(
@@ -100,35 +105,39 @@ class _RiderMessagesInboxState extends State<RiderMessagesInbox> {
                       ],
                     ),
                   ),
-                  RiderMessagesStatus(
-                    controller: widget.controller,
-                    onRetry: widget.onRetry,
-                  ),
+                  if (!loading)
+                    RiderMessagesStatus(
+                      controller: widget.controller,
+                      onRetry: widget.onRetry,
+                    ),
                   const SizedBox(height: 18),
                   Text(
                     'RECENT CONVERSATIONS',
                     style: RiderMessagingDesignStyles.section,
                   ),
                   const SizedBox(height: 12),
-                  if (filtered.isEmpty) const RiderMessagesEmpty(),
+                  if (filtered.isEmpty && !loading) const RiderMessagesEmpty(),
                 ],
               ),
             ),
           ),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 18),
-            sliver: SliverList.builder(
-              itemCount: filtered.length,
-              itemBuilder: (context, index) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: RiderConversationCard(
-                  key: ValueKey(filtered[index].id),
-                  conversation: filtered[index],
-                  onTap: () => widget.onOpen(filtered[index]),
+          if (loading)
+            const SliverFillRemaining(child: ChatLoadingSkeleton())
+          else
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              sliver: SliverList.builder(
+                itemCount: filtered.length,
+                itemBuilder: (context, index) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: RiderConversationCard(
+                    key: ValueKey(filtered[index].id),
+                    conversation: filtered[index],
+                    onTap: () => widget.onOpen(filtered[index]),
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       );
     },

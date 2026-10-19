@@ -1,6 +1,7 @@
 import 'package:agresell_app/features/buyer/home/presentation/styles/farmer_product_grid_styles.dart';
 import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_grid_skeleton.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/products/domain/home_product.dart';
@@ -25,9 +26,13 @@ class FarmerProductGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const SliverFillRemaining(
-        hasScrollBody: false,
-        child: Center(child: CircularProgressIndicator()),
+      return const HomeProductGridSkeleton(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          mainAxisExtent: FarmerProductCard.cardHeight,
+        ),
       );
     }
     if (products.isEmpty) {

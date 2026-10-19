@@ -2,6 +2,7 @@ import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_loading_skeleton.dart';
 
 import 'package:agresell_app/features/farmer/chat/presentation/styles/farmer_chat_detail_styles.dart';
 import 'package:agresell_app/features/farmer/chat/presentation/widgets/farmer_message_product_preview.dart';
@@ -111,10 +112,7 @@ class _FarmerChatDetailScreenState extends State<FarmerChatDetailScreen> {
           ),
           Expanded(
             child: loading && messages.isEmpty
-                ? const ChatLoadingState(
-                    semanticLabel: 'Loading messages',
-                    color: null,
-                  )
+                ? const ChatLoadingSkeleton(conversations: false)
                 : error != null && messages.isEmpty
                 ? ChatContentState(
                     data: const ChatContentStateData(),

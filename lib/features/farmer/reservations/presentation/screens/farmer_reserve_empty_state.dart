@@ -1,24 +1,5 @@
 part of 'farmer_reserve_screen.dart';
 
-class _ReservationLoadingState extends StatelessWidget {
-  const _ReservationLoadingState();
-
-  @override
-  Widget build(BuildContext context) => const Center(
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CircularProgressIndicator(),
-        FarmerReserveStyles.spacingLarge,
-        Text(
-          'Loading reservations',
-          style: FarmerReserveStyles.loadingTitleStyle,
-        ),
-      ],
-    ),
-  );
-}
-
 class _ReservationLoadFailure extends StatelessWidget {
   const _ReservationLoadFailure({required this.onRetry});
 

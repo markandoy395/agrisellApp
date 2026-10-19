@@ -5,6 +5,7 @@ import 'package:agresell_app/features/farmer/dashboard/presentation/styles/farme
 import 'package:agresell_app/features/farmer/dashboard/presentation/styles/farmer_product_card_styles.dart';
 import 'package:agresell_app/features/farmer/dashboard/presentation/styles/farmer_product_details_content_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_grid_skeleton.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/core/constants/agrisell_assets.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';

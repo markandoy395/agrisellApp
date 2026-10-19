@@ -6,9 +6,16 @@ import 'package:agresell_app/features/shared/products/presentation/widgets/home_
 
 /// Loading placeholder that preserves the final product grid's layout.
 class HomeProductGridSkeleton extends StatefulWidget {
-  const HomeProductGridSkeleton({this.itemCount = 6, super.key});
+  const HomeProductGridSkeleton({
+    this.itemCount = 6,
+    this.gridDelegate,
+    this.imageAspectRatio,
+    super.key,
+  });
 
   final int itemCount;
+  final SliverGridDelegate? gridDelegate;
+  final double? imageAspectRatio;
 
   @override
   State<HomeProductGridSkeleton> createState() =>
@@ -54,18 +61,21 @@ class _HomeProductGridSkeletonState extends State<HomeProductGridSkeleton>
 
     return SliverGrid.builder(
       itemCount: widget.itemCount,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: width < 380 ? 10 : 12,
-        mainAxisSpacing: width < 380 ? 12 : 14,
-        mainAxisExtent: HomeProductCard.heightForWidth(width),
-      ),
+      gridDelegate:
+          widget.gridDelegate ??
+          SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: width < 380 ? 10 : 12,
+            mainAxisSpacing: width < 380 ? 12 : 14,
+            mainAxisExtent: HomeProductCard.heightForWidth(width),
+          ),
       itemBuilder: (_, index) => Semantics(
         label: 'Loading product',
         child: ExcludeSemantics(
           child: AnimatedBuilder(
             animation: _controller,
             builder: (_, child) => _SkeletonCard(
+              imageAspectRatio: widget.imageAspectRatio,
               animationValue: MediaQuery.disableAnimationsOf(context)
                   ? 0.5
                   : _controller.value,
@@ -78,15 +88,13 @@ class _HomeProductGridSkeletonState extends State<HomeProductGridSkeleton>
 }
 
 class _SkeletonCard extends StatelessWidget {
-  const _SkeletonCard({required this.animationValue});
+  const _SkeletonCard({required this.animationValue, this.imageAspectRatio});
 
   final double animationValue;
+  final double? imageAspectRatio;
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
-    final detailsHeight =
-        HomeProductCard.heightForWidth(width) - HomeProductCard.imageHeight;
     final baseColor = Color.lerp(
       AgrisellColors.borderLine,
       AgrisellColors.searchBackground,
@@ -101,9 +109,14 @@ class _SkeletonCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(height: HomeProductCard.imageHeight, color: baseColor),
-            SizedBox(
-              height: detailsHeight,
+            if (imageAspectRatio != null)
+              AspectRatio(
+                aspectRatio: imageAspectRatio!,
+                child: ColoredBox(color: baseColor),
+              )
+            else
+              Container(height: HomeProductCard.imageHeight, color: baseColor),
+            Expanded(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
                 child: Column(

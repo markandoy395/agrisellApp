@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:agresell_app/features/farmer/reservations/presentation/widgets/farmer_reserve_skeleton.dart';
 
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
@@ -106,7 +107,7 @@ class _FarmerReserveScreenState extends State<FarmerReserveScreen> {
               animation: _screenListenable,
               builder: (context, _) {
                 if (_isLoading) {
-                  return const _ReservationLoadingState();
+                  return const FarmerReserveSkeleton();
                 }
                 if (_loadError != null) {
                   return _ReservationLoadFailure(onRetry: _reloadOrders);

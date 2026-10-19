@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_loading_skeleton.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
 import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_profile_intro.dart';
 import '../../domain/rider_communication_models.dart';
@@ -14,7 +15,7 @@ class RiderMessageBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (controller.isLoadingMessages)
-      return const Center(child: CircularProgressIndicator());
+      return const ChatLoadingSkeleton(conversations: false);
     if (controller.messages.isEmpty) {
       final conversation = controller.selectedConversation!;
       return ListView(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:agresell_app/features/farmer/reservations/presentation/screens/farmer_reserve_screen.dart';
+import 'package:agresell_app/features/farmer/reservations/presentation/widgets/farmer_reserve_skeleton.dart';
 import 'package:agresell_app/features/shared/orders/data/order_repository.dart';
 import 'package:agresell_app/features/shared/orders/domain/placed_order.dart';
 import 'package:agresell_app/features/shared/orders/presentation/controllers/order_controller.dart';
@@ -19,11 +20,14 @@ void main() {
       repository.pendingLoad = Completer<List<PlacedOrder>>();
 
       await _pumpScreen(tester, controller);
-      expect(find.text('Loading reservations'), findsOneWidget);
+      expect(find.bySemanticsLabel('Loading reservations'), findsOneWidget);
+      expect(find.byType(FarmerReserveSkeleton), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
 
       repository.pendingLoad!.complete(const []);
       await tester.pumpAndSettle();
       expect(find.text('No reservations'), findsOneWidget);
+      expect(find.byType(FarmerReserveSkeleton), findsNothing);
     },
   );
 

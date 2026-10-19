@@ -2,6 +2,7 @@ import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:agresell_app/features/shared/chat/presentation/widgets/chat_loading_skeleton.dart';
 
 import 'package:agresell_app/features/buyer/chat/presentation/widgets/buyer_chat_product_context.dart';
 import 'package:agresell_app/features/shared/chat/domain/marketplace_conversation.dart';
@@ -82,7 +83,7 @@ class _BuyerChatScreenState extends State<BuyerChatScreen> {
           ),
           Expanded(
             child: isLoading && messages.isEmpty
-                ? const ChatLoadingState(semanticLabel: 'Loading messages')
+                ? const ChatLoadingSkeleton(conversations: false)
                 : error != null && messages.isEmpty
                 ? ChatContentState(
                     data: ChatContentStateData(

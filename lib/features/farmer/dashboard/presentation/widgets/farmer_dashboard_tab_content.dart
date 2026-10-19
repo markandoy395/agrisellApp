@@ -35,10 +35,14 @@ class _FarmerDashboardTabContent extends StatelessWidget {
   Widget build(BuildContext context) {
     if (activeTab == _FarmerDashboardTab.products) {
       if (!hasProducts && isLoadingProducts) {
-        return const SliverToBoxAdapter(
-          child: Padding(
-            padding: FarmerDashboardStyles.loadingPadding,
-            child: Center(child: CircularProgressIndicator()),
+        return SliverPadding(
+          padding: FarmerDashboardStyles.contentPadding(horizontalPadding),
+          sliver: HomeProductGridSkeleton(
+            imageAspectRatio: 1.55,
+            gridDelegate: FarmerDashboardStyles.gridDelegate(
+              gridSpacing: gridSpacing,
+              productRatio: productRatio,
+            ),
           ),
         );
       }

@@ -194,3 +194,6 @@ Rider pickup product image (2026-10-15, deployment pending): migration 202610151
 
 2026-10-19: Nearby rider deliveries exclude completed/cancelled/failed rows before applying the existing response limit. Owner checks, session guards, distance filters, and RPC grants are unchanged. History remains on current_rider_deliveries. Mock-only load fixtures add active deliveries and fresh assignment requests; see docs/mock_rider_testing.md and supabase/tests/rider_nearby_active_requests.sql.
 
+
+2026-10-20 farmer publication: restrictive verified-owner product/category insert and product-image policies; internal stock RPC approval guard; publish_current_farmer_product validates session/gateway/status/ownership, creates category/product/initial lot atomically, and uses private owner-scoped retry receipts. All values are static SQL parameters. Verification refresh uses the caller-filtered farmer realtime feed plus guarded polling, and ignores late account/disposal responses. See docs/farmer_publication_fix.md; local behavioral tests and hosted metadata/boundary assertions are distinguished there.
+

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:agresell_app/core/services/agrisell_supabase.dart';
+import 'package:agresell_app/core/services/gateway_rpc.dart';
 import 'package:agresell_app/features/farmer/verification/domain/farmer_verification_details.dart';
 
 class FarmerVerificationRepository {
@@ -19,7 +20,8 @@ class FarmerVerificationRepository {
     Uint8List? profileImageBytes,
     Uint8List? farmImageBytes,
     String? notes,
-  })? customResubmitHandler;
+  })?
+  customResubmitHandler;
 
   bool get isAvailable => AgrisellSupabase.isInitialized;
 
@@ -30,8 +32,10 @@ class FarmerVerificationRepository {
     if (!isAvailable) return null;
 
     try {
-      final response = await AgrisellSupabase.client.rpc<dynamic>(
+      final response = await GatewayRpc.call(
+        AgrisellSupabase.client,
         'current_farmer_verification_details',
+        {},
       );
       if (response is Map<String, dynamic>) {
         return FarmerVerificationDetails.fromJson(response);
@@ -121,14 +125,16 @@ class FarmerVerificationRepository {
   ) async {
     const bucket = 'farmer-media';
     final path = '$authUserId/$filename';
-    await client.storage.from(bucket).uploadBinary(
-      path,
-      bytes,
-      fileOptions: const FileOptions(
-        upsert: true,
-        contentType: 'image/jpeg',
-      ),
-    );
+    await client.storage
+        .from(bucket)
+        .uploadBinary(
+          path,
+          bytes,
+          fileOptions: const FileOptions(
+            upsert: true,
+            contentType: 'image/jpeg',
+          ),
+        );
     return client.storage.from(bucket).getPublicUrl(path);
   }
 }

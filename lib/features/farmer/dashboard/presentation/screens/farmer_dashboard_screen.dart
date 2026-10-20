@@ -4,7 +4,10 @@ import 'package:agresell_app/features/farmer/dashboard/presentation/styles/farme
 import 'package:agresell_app/features/farmer/dashboard/presentation/styles/farmer_dashboard_tabs_styles.dart';
 import 'package:agresell_app/features/farmer/dashboard/presentation/styles/farmer_product_card_styles.dart';
 import 'package:agresell_app/features/farmer/dashboard/presentation/styles/farmer_product_details_content_styles.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:agresell_app/core/services/agrisell_supabase.dart';
 import 'package:agresell_app/features/shared/products/presentation/widgets/home_product_grid_skeleton.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 import 'package:agresell_app/core/constants/agrisell_assets.dart';
@@ -62,16 +65,20 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
   var _isLoadingProducts = false;
   final _restockingProductIds = <int>{};
   FarmerVerificationDetails? _verificationDetails;
+  Timer? _verificationTimer;
+  RealtimeChannel? _verificationChannel;
+  int _verificationGeneration = 0;
 
   @override
   void initState() {
     super.initState();
     _loadProducts();
-    _loadVerificationDetails();
+    _watchVerification();
   }
 
   @override
   void dispose() {
+    _disposeVerificationUpdates();
     _searchController.dispose();
     super.dispose();
   }
@@ -184,7 +191,4 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
     ..showAppSnackBar(SnackBar(content: Text(message)));
 
   void _refresh(VoidCallback update) => setState(update);
-
-  bool get _canPostProducts =>
-      AuthSessionService.instance.currentAccount?.isFarmerVerified ?? true;
 }

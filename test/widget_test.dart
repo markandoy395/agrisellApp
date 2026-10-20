@@ -9,6 +9,7 @@ import 'package:agresell_app/features/auth/presentation/screens/sign_up_screen.d
 import 'package:agresell_app/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:agresell_app/features/farmer/dashboard/presentation/screens/farmer_home_screen.dart';
 import 'package:agresell_app/features/buyer/home/presentation/screens/home_screen.dart';
+import 'package:agresell_app/features/buyer/profile/presentation/screens/profile_screen.dart';
 import 'package:agresell_app/features/shared/widgets/navigation/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -230,10 +231,24 @@ void main() {
     expect(find.text('Personal information'), findsOneWidget);
     expect(find.text('Edit Profile'), findsNothing);
     expect(find.text('Logout'), findsNothing);
-    await tester.tap(find.bySemanticsLabel('Settings').hitTestable());
+    expect(find.byTooltip('Settings'), findsNothing);
+    final profileScrollable = find.descendant(
+      of: find.byType(CustomScrollView),
+      matching: find.byType(Scrollable),
+    );
+    await tester.scrollUntilVisible(
+      find.text('Display'),
+      150,
+      scrollable: profileScrollable,
+    );
+    await tester.tap(find.text('Display'));
     await tester.pumpAndSettle();
-    await _pumpUntilFound(tester, find.text('Edit buyer profile'));
-    await tester.tap(find.text('Edit buyer profile'));
+    await tester.scrollUntilVisible(
+      find.text('Edit'),
+      150,
+      scrollable: profileScrollable,
+    );
+    await tester.tap(find.text('Edit'));
     await tester.pumpAndSettle();
     await _pumpUntilFound(tester, find.text('Save changes'));
     expect(find.text('Edit Profile'), findsOneWidget);
@@ -262,18 +277,18 @@ void main() {
     await _ensureVisibleCentered(tester, find.text('Save changes'));
     await tester.tap(find.text('Save changes'));
     await tester.pumpAndSettle();
+    tester.state<ScrollableState>(profileScrollable).position.jumpTo(0);
+    await tester.pumpAndSettle();
     await _pumpUntilFound(tester, find.text('New Account'));
     expect(find.text('New Account'), findsAtLeastNWidgets(1));
-    await tester.tap(find.byTooltip('Close settings'));
-    await tester.pumpAndSettle();
     expect(find.text('August 1, 2024'), findsNothing);
-    await tester.drag(find.byType(CustomScrollView), const Offset(0, 500));
-    await tester.pumpAndSettle();
-    await tester.tap(find.bySemanticsLabel('Settings').hitTestable());
-    await tester.pumpAndSettle();
-    await _pumpUntilFound(tester, find.text('Logout'));
-    await _ensureVisibleCentered(tester, find.text('Logout'));
-    await tester.tap(find.text('Logout'));
+    await tester.scrollUntilVisible(
+      find.text('Log Out'),
+      150,
+      scrollable: profileScrollable,
+    );
+    await _ensureVisibleCentered(tester, find.text('Log Out'));
+    await tester.tap(find.text('Log Out'));
     await tester.pumpAndSettle();
     expect(find.text('Are you sure you want to log out?'), findsOneWidget);
     await tester.runAsync(() async {
@@ -284,13 +299,16 @@ void main() {
     expect(find.text('Log In'), findsAtLeastNWidgets(1));
     expect(find.text('Email or phone number'), findsOneWidget);
   });
-  testWidgets('buyer settings opens profile account actions', (tester) async {
+  testWidgets('optional buyer settings opens profile account actions', (
+    tester,
+  ) async {
     await _startProfileSession(AuthRole.buyer, 'buyer.settings@example.com');
     await tester.binding.setSurfaceSize(const Size(430, 932));
     addTearDown(() => tester.binding.setSurfaceSize(null));
-    await _pumpScreen(tester, const HomeScreen());
-    await _pumpUntilFound(tester, find.text('Account'));
-    await tester.tap(find.text('Account'));
+    await _pumpScreen(
+      tester,
+      const Scaffold(body: ProfileScreen(showSettingsIcon: true)),
+    );
     await _pumpUntilFound(tester, find.text('My orders').hitTestable());
     await tester.tap(find.bySemanticsLabel('Settings').hitTestable());
     await tester.pumpAndSettle();

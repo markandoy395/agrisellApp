@@ -11,6 +11,7 @@ class _FormPanel extends StatelessWidget {
     required this.onCategoryChanged,
     required this.onCancel,
     required this.onPublish,
+    this.isPublishing = false,
   });
 
   final TextEditingController nameController;
@@ -22,6 +23,7 @@ class _FormPanel extends StatelessWidget {
   final ValueChanged<String?> onCategoryChanged;
   final VoidCallback onCancel;
   final VoidCallback onPublish;
+  final bool isPublishing;
 
   @override
   Widget build(BuildContext context) {
@@ -99,8 +101,8 @@ class _FormPanel extends StatelessWidget {
                     onPressed: onPublish,
                     style: AddProductFormPanelStyles.filledButtonStyle,
                     icon: const Icon(Icons.publish_rounded, size: 17),
-                    label: const Text(
-                      'Publish Product',
+                    label: Text(
+                      isPublishing ? 'Publishing…' : 'Publish Product',
                       style: SharedPresentationStyles.captionExtraBold,
                     ),
                   ),

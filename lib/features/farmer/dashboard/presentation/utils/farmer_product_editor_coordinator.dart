@@ -12,11 +12,14 @@ abstract final class FarmerProductEditorCoordinator {
   static Future<FarmerDashboardProduct> saveToDatabase({
     required FarmerCommodityRepository repository,
     required FarmerDashboardProduct product,
+    String? requestKey,
   }) {
     if (!repository.isAvailable) {
       return Future.value(product);
     }
-    return repository.save(product);
+    return requestKey == null
+        ? repository.save(product)
+        : repository.publish(product, requestKey);
   }
 
   static Future<FarmerDashboardProduct?> saveProduct({
@@ -24,16 +27,25 @@ abstract final class FarmerProductEditorCoordinator {
     required FarmerCommodityRepository repository,
     required FarmerDashboardProduct product,
     required void Function(String message) onMessage,
+    String? requestKey,
   }) async {
     try {
-      return await saveToDatabase(repository: repository, product: product);
+      return await saveToDatabase(
+        repository: repository,
+        product: product,
+        requestKey: requestKey,
+      );
     } on FarmRequiredException {
       if (!context.mounted) return null;
       final farmName = await showFarmCreationDialog(context);
       if (farmName == null || !context.mounted) return null;
       try {
         await repository.createFarm(farmName);
-        return await saveToDatabase(repository: repository, product: product);
+        return await saveToDatabase(
+          repository: repository,
+          product: product,
+          requestKey: requestKey,
+        );
       } on FarmerCommodityException catch (error) {
         if (context.mounted) onMessage(error.message);
         return null;
@@ -55,18 +67,19 @@ abstract final class FarmerProductEditorCoordinator {
     required ProductImagePicker? pickProductImageBytes,
     required void Function(String message) onMessage,
   }) async {
-    final product = await Navigator.of(context).push<FarmerDashboardProduct>(
+    return Navigator.of(context).push<FarmerDashboardProduct>(
       agrisellPageRoute<FarmerDashboardProduct>(
-        builder: (_) =>
-            AddProductScreen(pickProductImageBytes: pickProductImageBytes),
+        builder: (_) => AddProductScreen(
+          pickProductImageBytes: pickProductImageBytes,
+          onPublish: (formContext, product, requestKey) => saveProduct(
+            context: formContext,
+            repository: repository,
+            product: product,
+            onMessage: onMessage,
+            requestKey: requestKey,
+          ),
+        ),
       ),
-    );
-    if (product == null || !context.mounted) return null;
-    return saveProduct(
-      context: context,
-      repository: repository,
-      product: product,
-      onMessage: onMessage,
     );
   }
 

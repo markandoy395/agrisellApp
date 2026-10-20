@@ -5,6 +5,8 @@ import 'package:agresell_app/features/farmer/products/presentation/styles/add_pr
 import 'package:agresell_app/features/farmer/products/presentation/styles/add_product_media_widgets_styles.dart';
 import 'package:agresell_app/core/theme/shared_presentation_styles.dart';
 import 'dart:typed_data';
+import '../../data/farmer_product_publisher.dart';
+import '../controllers/product_publish_callback.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:agresell_app/core/theme/app_dropdown_style.dart';
@@ -30,15 +32,19 @@ part 'package:agresell_app/features/farmer/products/presentation/widgets/add_pro
 part 'package:agresell_app/features/farmer/products/presentation/widgets/add_product/add_product_inventory_lot_fields.dart';
 part 'package:agresell_app/features/farmer/products/presentation/controllers/add_product_screen_actions.dart';
 part 'package:agresell_app/features/farmer/products/presentation/controllers/add_product_date_actions.dart';
+part 'package:agresell_app/features/farmer/products/presentation/controllers/add_product_publish_action.dart';
+part 'package:agresell_app/features/farmer/products/presentation/widgets/add_product/add_product_content.dart';
 
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({
     this.pickProductImageBytes,
     this.initialPhotoBytes,
+    this.onPublish,
     super.key,
   });
   final ProductImagePicker? pickProductImageBytes;
   final Uint8List? initialPhotoBytes;
+  final ProductPublishCallback? onPublish;
   @override
   State<AddProductScreen> createState() => _AddProductScreenState();
 }
@@ -53,6 +59,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final _storageInstructionsController = TextEditingController();
   final _imagePicker = ImagePicker();
   Uint8List? _photoBytes;
+  bool _isPublishing = false;
+  final String _publishRequestKey = FarmerProductPublisher.newRequestKey();
   DateTime? _expectedDate;
   DateTime? _lotHarvestedAt;
   DateTime? _marketableUntil;
@@ -86,105 +94,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
-    return Scaffold(
-      backgroundColor: AgrisellColors.homeBackground,
-      body: SafeArea(
-        bottom: false,
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(18, 12, 18, 24 + bottomInset),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  _BackButton(onTap: () => Navigator.of(context).pop()),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'Create product listing',
-                    style: SharedPresentationStyles.headingTitleExtraBold,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              _PhotoPicker(
-                photoBytes: _photoBytes,
-                errorText: _errors[AddProductField.photo],
-                onTap: _pickPhoto,
-              ),
-              const SizedBox(height: 14),
-              _FormPanel(
-                nameController: _nameController,
-                category: _category,
-                categories: _categories,
-                errors: _errors,
-                onNameChanged: (_) => _clearError(AddProductField.name),
-                onCategoryChanged: _changeCategory,
-                details: _AdditionalCommodityFields(
-                  descriptionController: _descriptionController,
-                  errors: _errors,
-                  onDescriptionChanged: (_) =>
-                      _clearError(AddProductField.description),
-                  onGenerateDescription: _generateSampleDescription,
-                  pricingFields: _PricingInventoryFields(
-                    priceController: _priceController,
-                    quantityController: _weightController,
-                    minimumOrderController: _minimumOrderController,
-                    unitType: _unitType,
-                    errors: _errors,
-                    onPriceChanged: (_) => _clearError(AddProductField.price),
-                    onQuantityChanged: (_) =>
-                        _clearError(AddProductField.quantity),
-                    onMinimumOrderChanged: (_) =>
-                        _clearError(AddProductField.minimumOrder),
-                    onUnitTypeChanged: _changeUnitType,
-                  ),
-                  availabilityFields: _AvailabilityFields(
-                    productionStage: _productionStage,
-                    sellingOption: _saleStatus,
-                    showExpectedDate: _requiresExpectedDate,
-                    expectedDate: _expectedDate,
-                    dateWindow: _dateWindow,
-                    errors: _errors,
-                    onProductionStageChanged: _changeProductionStage,
-                    onSellingOptionChanged: _changeSellingOption,
-                    onSelectExpectedDate: _pickExpectedDate,
-                  ),
-                  inventoryLotFields: _InventoryLotFields(
-                    dateType: _inventoryDateType,
-                    allowedDateTypes: _allowedInventoryDateTypes,
-                    harvestedAt: _lotHarvestedAt,
-                    marketableUntil: _marketableUntil,
-                    lotCodeController: _lotCodeController,
-                    storageInstructionsController:
-                        _storageInstructionsController,
-                    errors: _errors,
-                    onDateTypeChanged: _changeInventoryDateType,
-                    onSelectHarvestDate: _pickLotHarvestDate,
-                    onSelectMarketableUntil: _pickMarketableUntil,
-                    onLotCodeChanged: (_) =>
-                        _clearError(AddProductField.lotCode),
-                    onStorageChanged: (_) =>
-                        _clearError(AddProductField.storageInstructions),
-                  ),
-                  gradeQuality: _gradeQuality,
-                  isOrganic: _isOrganic,
-                  onGradeQualityChanged: (value) {
-                    setState(() => _gradeQuality = value);
-                  },
-                  onOrganicChanged: (value) {
-                    setState(() => _isOrganic = value);
-                  },
-                ),
-                onCancel: () => Navigator.of(context).pop(),
-                onPublish: _publishProduct,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => PopScope(
+    canPop: !_isPublishing,
+    child: AbsorbPointer(
+      absorbing: _isPublishing,
+      child: _buildContent(context),
+    ),
+  );
 
   void _refresh(VoidCallback change) => setState(change);
 }

@@ -64,3 +64,14 @@ cancelled, and failed history rows from consuming that nearby limit. Delivery
 history remains on its existing endpoint. With 31 active jobs, the default nearby
 response contains 19 requests; the supported `p_limit=100` returns all 81 current
 jobs/requests. The seed does not change the app's configured fetch limit.
+
+## Cleanup status (2026-10-20)
+
+All 90 tagged buyer/farmer/rider accounts and their linked fixtures were removed
+from the connected database, together with 30 private sample previews. The cleanup
+was validated with rollback and preserved unrelated account/product/delivery/admin
+counts. The scripts above remain available to recreate test fixtures intentionally.
+Use supabase/manual/remove_all_mock_data.sql for the combined account graph;
+Storage objects must first be removed with the owner-scoped cleanup manifest and
+scripts/maintenance/remove_mock_storage.cjs. No schema or security fix was reverted.
+

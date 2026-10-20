@@ -110,3 +110,6 @@ rolled-back hostile-literal retry/read-back checks passed; see
 `profile_edit_persistence_audit.md` for exact coverage and limits.
 
 
+
+2026-10-20 farmer publication: restrictive verified-owner product/category insert and product-image policies; internal stock RPC approval guard; publish_current_farmer_product validates session/gateway/status/ownership, creates category/product/initial lot atomically, and uses private owner-scoped retry receipts. All values are static SQL parameters. Verification refresh uses the caller-filtered farmer realtime feed plus guarded polling, and ignores late account/disposal responses. See docs/farmer_publication_fix.md; local behavioral tests and hosted metadata/boundary assertions are distinguished there.
+

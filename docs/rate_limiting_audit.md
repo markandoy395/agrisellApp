@@ -110,3 +110,6 @@ personal/farm edit paths retain the staged gateway coverage described above;
 this repair does not activate global enforcement or alter hosted Auth limits.
 Fifteen Node API regressions and hosted rolled-back profile contracts passed.
 Real file uploads and all older HTTP/storage paths were not end-to-end tested.
+
+2026-10-20: publish_current_farmer_product and farmer verification refresh use GatewayRpc and retain authenticated persistent general/read-write quotas. Publication independently requires the existing gateway secret guard; no direct API bypass was introduced. See docs/farmer_publication_fix.md.
+

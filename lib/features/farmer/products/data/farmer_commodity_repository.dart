@@ -9,6 +9,7 @@ import 'package:agresell_app/features/farmer/products/data/farmer_commodity_sale
 import 'package:agresell_app/features/farmer/products/data/farmer_commodity_write_values.dart';
 import 'package:agresell_app/features/farmer/products/domain/farmer_dashboard_product.dart';
 import 'package:agresell_app/features/shared/products/domain/product_inventory_lot.dart';
+import 'farmer_product_publisher.dart';
 
 export 'package:agresell_app/features/farmer/products/data/farmer_commodity_format.dart';
 
@@ -65,6 +66,9 @@ class FarmerCommodityRepository {
 
   Future<FarmerDashboardProduct> save(FarmerDashboardProduct product) async {
     if (!isAvailable) return product;
+    if (product.commodityId == null) {
+      return publish(product, FarmerProductPublisher.newRequestKey());
+    }
     try {
       final context = await FarmerCommodityContext.load();
       if (product.commodityId == null && !context.isVerified) {
@@ -80,21 +84,13 @@ class FarmerCommodityRepository {
         categoryId,
         imageUrl,
       );
-      final isNewProduct = product.commodityId == null;
       final row = await _saveValues(product, context.farmId, values);
       final savedProduct = product.copyWith(
         commodityId: FarmerCommodityFormat.integer(row['commodity_id']),
         farmId: context.farmId,
         imageUrl: imageUrl,
       );
-      if (!isNewProduct || product.availableQuantity <= 0) return savedProduct;
-      return restock(
-        product: savedProduct.copyWith(
-          availableWeight: '0 ${product.unitType}',
-        ),
-        quantity: product.availableQuantity,
-        inventoryLot: product.inventoryLot,
-      );
+      return savedProduct;
     } on FarmerCommodityException {
       rethrow;
     } on PostgrestException catch (error) {
@@ -107,6 +103,15 @@ class FarmerCommodityRepository {
       );
     }
   }
+
+  Future<FarmerDashboardProduct> publish(
+    FarmerDashboardProduct product,
+    String requestKey,
+  ) async => !isAvailable
+      ? product
+      : FarmerProductPublisher(
+          AgrisellSupabase.client,
+        ).publish(product, requestKey);
 
   Future<FarmerDashboardProduct> restock({
     required FarmerDashboardProduct product,
@@ -163,17 +168,12 @@ class FarmerCommodityRepository {
     Map<String, Object?> values,
   ) {
     final commodities = AgrisellSupabase.client.from('commodities');
-    return product.commodityId == null
-        ? commodities
-              .insert(<String, Object?>{...values, 'available_quantity': 0})
-              .select()
-              .single()
-        : commodities
-              .update(FarmerCommodityWriteValues.forUpdate(values))
-              .eq('commodity_id', product.commodityId!)
-              .eq('farm_id', farmId)
-              .select()
-              .single();
+    return commodities
+        .update(FarmerCommodityWriteValues.forUpdate(values))
+        .eq('commodity_id', product.commodityId!)
+        .eq('farm_id', farmId)
+        .select()
+        .single();
   }
 
   Future<Map<int, Map<String, dynamic>>> _loadInventorySummaries(

@@ -22,57 +22,6 @@ extension _AddProductScreenActions on _AddProductScreenState {
     }
   }
 
-  void _publishProduct() {
-    final name = _nameController.text.trim();
-    final description = _descriptionController.text.trim();
-    final price = _priceController.text.trim();
-    final quantity = _weightController.text.trim();
-    final minimumOrder = _minimumOrderController.text.trim();
-    final inventoryLot = _inventoryLotDraft;
-    final errors = AddProductDraft.validationErrors(
-      photoBytes: _photoBytes,
-      name: name,
-      category: _category ?? '',
-      description: description,
-      price: price,
-      quantity: quantity,
-      minimumOrderQuantity: minimumOrder,
-      productionStage: _productionStage,
-      sellingOption: _saleStatus,
-      expectedDate: _expectedDate,
-      inventoryLot: inventoryLot,
-    );
-    if (errors.isNotEmpty) {
-      _refresh(() => _errors = errors);
-      showProductFormMessage(context, 'Review the highlighted fields.');
-      return;
-    }
-    Navigator.of(context).pop(
-      FarmerDashboardProduct(
-        name: name,
-        price: '\u20B1$price',
-        unit: 'per $_unitType',
-        harvestDate: _displayDate,
-        category: _category!,
-        availableWeight: '$quantity $_unitType',
-        imageBytes: _photoBytes!,
-        description: description,
-        unitType: _unitType,
-        minimumOrderQuantity: minimumOrder,
-        gradeQuality: _gradeQuality,
-        isOrganic: _isOrganic,
-        productionStatus: _productionStage.databaseValue,
-        saleStatus: _saleStatus,
-        inventoryDateType: inventoryLot.dateType,
-        harvestedAt: inventoryLot.harvestedAt,
-        sellUntil: inventoryLot.sellUntil,
-        expiresAt: inventoryLot.expiresAt,
-        lotCode: inventoryLot.lotCode,
-        storageInstructions: inventoryLot.storageInstructions,
-      ),
-    );
-  }
-
   void _clearError(AddProductField field) {
     if (!_errors.containsKey(field)) return;
     _refresh(() => _errors = Map.of(_errors)..remove(field));

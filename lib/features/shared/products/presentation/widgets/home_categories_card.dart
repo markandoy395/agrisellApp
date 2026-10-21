@@ -38,12 +38,13 @@ class HomeCategoriesCard extends StatelessWidget {
                       style: SharedPresentationStyles.mutedCaption,
                     ),
                   )
-                : Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (final category in homeCategories)
-                        Expanded(
-                          child: _CategoryTile(
+                : SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        for (final category in homeCategories) ...[
+                          _CategoryTile(
                             category: category,
                             selected:
                                 selectedCategory == _normalized(category.label),
@@ -52,8 +53,10 @@ class HomeCategoriesCard extends StatelessWidget {
                                 : () =>
                                       onSelected!(_normalized(category.label)),
                           ),
-                        ),
-                    ],
+                          const SizedBox(width: 8),
+                        ],
+                      ],
+                    ),
                   ),
           ),
         ],
@@ -141,9 +144,10 @@ class _CategoryTile extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                category.label,
+                category.label.replaceAll('\n', ' '),
                 textAlign: TextAlign.center,
-                maxLines: 2,
+                maxLines: 1,
+                softWrap: false,
                 overflow: TextOverflow.ellipsis,
                 style: HomeCategoriesCardStyles.textStyle(selected),
               ),

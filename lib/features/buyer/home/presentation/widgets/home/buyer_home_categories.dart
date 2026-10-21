@@ -137,11 +137,12 @@ class _CircleCategoryButton extends StatelessWidget {
                 child: circleChild,
               ),
               const SizedBox(height: 6),
-              SizedBox(
-                width: 64,
+              ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 64),
                 child: Text(
                   label,
-                  maxLines: 2,
+                  maxLines: 1,
+                  softWrap: false,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                   style: BuyerHomeCategoriesStyles.labelText(

@@ -6,7 +6,12 @@ Android version code, using package_info_plus. Subsequent page navigation can re
 a failed check after five minutes. An update is offered once per app launch.
 Offline, invalid metadata, and already-current installs continue normally.
 
-The optional dialog offers Later and Update now. Update now opens the APK in the
+The optional bottom sheet offers Later and Update now. It uses a rounded card
+with 12-pixel outer margins and a drag handle, matching buyer Home quick access.
+The card respects safe areas, caps its width on larger screens, and scrolls for
+long release notes or larger text. Tap outside, swipe down, or choose Later to
+dismiss it. Dismissal keeps the once-per-launch behavior.
+Update now opens the APK in the
 external browser using url_launcher. The user must finish downloading, open the
 APK, and approve Update in Android. No silent installation is attempted.
 
@@ -20,7 +25,7 @@ place. No database, private-storage, or query permissions change.
 From `get-agrisell`, run (choose a higher build number each time):
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tool\prepare_android_update.ps1 -Version 1.0.7 -BuildNumber 8 -Notes 'Improvements and bug fixes.'
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tool\prepare_android_update.ps1 -Version 1.0.8 -BuildNumber 9 -Notes 'Improvements and bug fixes.'
 npm.cmd run build
 ```
 
@@ -47,13 +52,13 @@ sources are under 200 lines and introduce no inline Flutter styling.
 Install `https://markandoy395.github.io/get-agrisell/downloads/agrisell-1.0.2-3.apk`
 first. This APK includes the popup, with installed build number 3. Open the app
 with internet access and wait for the login or home screen. Published release
-metadata advertises version 1.0.6/build 7, so the update dialog should appear.
+metadata advertises version 1.0.7/build 8, so the update prompt should appear.
 
-Tap Later to continue using the app, or Update now to download build 7. Open that
+Tap Later to continue using the app, or Update now to download build 8. Open that
 APK and approve Update in Android. Reopen the upgraded app: the popup should no
 longer appear because the installed build matches the published release.
 
-Install build 3 before build 7 when testing. Android normally prevents downgrading
+Install build 3 before build 8 when testing. Android normally prevents downgrading
 to a lower build number. Use a device that has build 2 or lower, or a separate
 test device. The device upgrade still needs manual verification.
 
@@ -81,6 +86,6 @@ https://pub.dev/packages/url_launcher.
 
 Buyer, farmer and rider Account overviews and Settings display the installed
 version in a shared footer. For this release it reads
-`App version 1.0.6`. It uses package_info_plus rather than a hardcoded
+`App version 1.0.7`. It uses package_info_plus rather than a hardcoded
 version, so older and future APKs display their own package metadata. Version
 loading does not block the page; unavailable metadata shows a neutral fallback.

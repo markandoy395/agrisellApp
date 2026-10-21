@@ -47,7 +47,7 @@ class AppUpdateObserver extends NavigatorObserver {
       return;
     _checking = true;
     try {
-      // Let the destination finish its transition before adding a dialog.
+      // Let the destination finish its transition before showing the sheet.
       await Future<void>.delayed(const Duration(seconds: 1));
       final release = await _service.check();
       _lastCheck = DateTime.now();
@@ -58,10 +58,7 @@ class AppUpdateObserver extends NavigatorObserver {
           !route.isCurrent)
         return;
       _prompted = true;
-      await showDialog<void>(
-        context: state.overlay!.context,
-        builder: (_) => AppUpdateDialog(release: release),
-      );
+      await AppUpdateDialog.show(state.overlay!.context, release);
     } finally {
       _checking = false;
     }

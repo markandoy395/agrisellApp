@@ -59,6 +59,13 @@ void main() {
     expect(find.text('Update available'), findsOneWidget);
     expect(find.text('Faster checkout'), findsOneWidget);
     expect(find.text('Update now'), findsOneWidget);
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.byType(BottomSheet), findsOneWidget);
+    final card = tester.getRect(find.byKey(const ValueKey('app-update-card')));
+    final screen = tester.view.physicalSize / tester.view.devicePixelRatio;
+    expect(card.left, greaterThan(0));
+    expect(card.right, lessThan(screen.width));
+    expect(card.bottom, closeTo(screen.height - 12, 1));
     await tester.tap(find.text('Later'));
     await tester.pumpAndSettle();
     expect(find.text('Update available'), findsNothing);
@@ -96,17 +103,13 @@ void main() {
           builder: (context) {
             return Scaffold(
               body: TextButton(
-                onPressed: () => showDialog<void>(
-                  context: context,
-                  builder: (_) => AppUpdateDialog(
-                    release: AppRelease(
-                      version: '1.0.2',
-                      buildNumber: 3,
-                      apkUri: Uri.parse(
-                        'https://markandoy395.github.io/app.apk',
-                      ),
-                      notes: '',
-                    ),
+                onPressed: () => AppUpdateDialog.show(
+                  context,
+                  AppRelease(
+                    version: '1.0.2',
+                    buildNumber: 3,
+                    apkUri: Uri.parse('https://markandoy395.github.io/app.apk'),
+                    notes: '',
                   ),
                 ),
                 child: const Text('Show'),
@@ -128,5 +131,63 @@ void main() {
     await tester.tap(find.text('Later'));
     await tester.pumpAndSettle();
     expect(find.text('Update available'), findsNothing);
+  });
+
+  testWidgets('update sheet scrolls on small screens with large text', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: const TextScaler.linear(2)),
+          child: child!,
+        ),
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: TextButton(
+              onPressed: () => AppUpdateDialog.show(
+                context,
+                AppRelease(
+                  version: '1.0.7',
+                  buildNumber: 8,
+                  apkUri: Uri.parse('https://markandoy395.github.io/app.apk'),
+                  notes: List.filled(
+                    30,
+                    'Improved product publishing.',
+                  ).join(' '),
+                ),
+              ),
+              child: const Text('Show'),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Show'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    final card = tester.getRect(find.byKey(const ValueKey('app-update-card')));
+    expect(card.left, 12);
+    expect(card.right, 308);
+    expect(card.bottom, 556);
+    await tester.scrollUntilVisible(
+      find.text('Later'),
+      300,
+      scrollable: find.descendant(
+        of: find.byType(AppUpdateDialog),
+        matching: find.byType(Scrollable),
+      ),
+      maxScrolls: 50,
+    );
+    await tester.tap(find.text('Later'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AppUpdateDialog), findsNothing);
+    expect(tester.takeException(), isNull);
   });
 }

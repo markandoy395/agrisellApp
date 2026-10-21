@@ -82,7 +82,7 @@ class AgrisellApp extends StatelessWidget {
     return MaterialApp(
       navigatorKey: _navigatorKey,
       navigatorObservers: [_authNavigationObserver, _appUpdateObserver],
-      title: 'AgriSell App',
+      title: 'AgriSell',
       debugShowCheckedModeBanner: false,
       theme: AgrisellTheme.light,
       themeMode: ThemeMode.light,

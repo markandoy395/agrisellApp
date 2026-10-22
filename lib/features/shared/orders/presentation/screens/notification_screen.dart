@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/widgets/notification_permission_card.dart';
+import 'package:agresell_app/core/widgets/notification_permission_benefit.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -149,6 +151,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
           return NotificationLayout(
             header: [
               NotificationHeader(unreadCount: unreadCount),
+              NotificationPermissionCard(
+                benefit: widget.role == AuthRole.farmer
+                    ? NotificationPermissionBenefit.farmer
+                    : NotificationPermissionBenefit.buyer,
+              ),
               NotificationFilterTabs(
                 selected: _filter,
                 onSelected: _selectFilter,

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'query_owner.dart';
+import 'notification_permission_gateway.dart';
 import 'dart:convert';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -88,7 +89,9 @@ class PushNotificationService {
       _pendingAction = null;
     }
     try {
-      await _requestPermission();
+      final permission = await DeviceNotificationPermissionGateway.instance
+          .read();
+      if (permission != NotificationPermissionState.enabled) return;
       final token = await FirebaseMessaging.instance.getToken();
       if (token != null) await _saveToken(userId, token);
       await _tokenRefreshSubscription?.cancel();
@@ -103,17 +106,6 @@ class PushNotificationService {
       // Push registration is optional; a missing Firebase configuration must
       // not leave an unhandled error in the account activation flow.
       debugPrint('Push notification registration failed: $error');
-    }
-  }
-
-  Future<void> _requestPermission() async {
-    await FirebaseMessaging.instance.requestPermission();
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      await _localNotifications
-          .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >()
-          ?.requestNotificationsPermission();
     }
   }
 

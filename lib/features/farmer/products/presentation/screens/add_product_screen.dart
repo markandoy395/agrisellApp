@@ -8,6 +8,8 @@ import 'dart:typed_data';
 import '../../data/farmer_product_publisher.dart';
 import '../controllers/product_publish_callback.dart';
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/widgets/notification_permission_prompt.dart';
+import 'package:agresell_app/core/widgets/notification_permission_benefit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:agresell_app/core/theme/app_dropdown_style.dart';
 import 'package:agresell_app/core/theme/agrisell_colors.dart';

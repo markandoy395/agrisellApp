@@ -69,7 +69,7 @@ void main() {
       ),
       findsOneWidget,
     );
-    expect(find.text('Complete address'), findsOneWidget);
+    expect(find.text('House number, street, or sitio/purok'), findsOneWidget);
     expect(find.text('Tap to select the delivery pin'), findsNothing);
 
     await _enterEditable(tester, 0, 'Purok 5');
@@ -79,9 +79,50 @@ void main() {
     await _tapSaveAddress(tester);
 
     expect(gps.currentPositionCalls, 1);
+    expect(
+      savedAddress?.address,
+      'Purok 5, Barangay Hubang, San Francisco, Agusan del Sur, Philippines',
+    );
     expect(savedAddress?.latitude, 8.4822);
     expect(savedAddress?.longitude, 124.6472);
     expect(find.text('Shipping address saved.'), findsWidgets);
+  });
+
+  testWidgets('editing a saved address fills its fields and uses changed areas', (
+    tester,
+  ) async {
+    BuyerShippingAddress? savedAddress;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ShippingAddressCard(
+            address:
+                'House 12, Purok 5, Barangay Hubang, San Francisco, Agusan del Sur, 8501, Philippines',
+            gpsGateway: _FakeGpsGateway(),
+            onSave: (address) async => savedAddress = address,
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Edit address'));
+    await tester.pumpAndSettle();
+    final form = tester.widget<ShippingAddressForm>(
+      find.byType(ShippingAddressForm),
+    );
+    expect(form.streetController.text, 'House 12, Purok 5');
+    expect(form.provinceController.text, 'Agusan del Sur');
+    expect(form.cityController.text, 'San Francisco');
+    expect(form.barangayController.text, 'Hubang');
+    expect(form.postalCodeController.text, '8501');
+    await _enterEditable(tester, 1, 'Surigao del Sur');
+    await _enterEditable(tester, 2, 'Lianga');
+    await _enterEditable(tester, 3, 'Poblacion');
+    await _enterEditable(tester, 4, '8307');
+    await _tapSaveAddress(tester);
+    expect(
+      savedAddress?.address,
+      'House 12, Purok 5, Barangay Poblacion, Lianga, Surigao del Sur, 8307, Philippines',
+    );
   });
 }
 

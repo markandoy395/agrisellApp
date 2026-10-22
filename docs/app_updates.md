@@ -25,7 +25,7 @@ place. No database, private-storage, or query permissions change.
 From `get-agrisell`, run (choose a higher build number each time):
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tool\prepare_android_update.ps1 -Version 1.0.9 -BuildNumber 10 -Notes 'Improvements and bug fixes.'
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tool\prepare_android_update.ps1 -Version 1.0.10 -BuildNumber 11 -Notes 'Improvements and bug fixes.'
 npm.cmd run build
 ```
 
@@ -52,13 +52,13 @@ sources are under 200 lines and introduce no inline Flutter styling.
 Install `https://markandoy395.github.io/get-agrisell/downloads/agrisell-1.0.2-3.apk`
 first. This APK includes the popup, with installed build number 3. Open the app
 with internet access and wait for the login or home screen. Published release
-metadata advertises version 1.0.8/build 9, so the update prompt should appear.
+metadata advertises version 1.0.9/build 10, so the update prompt should appear.
 
-Tap Later to continue using the app, or Update now to download build 9. Open that
+Tap Later to continue using the app, or Update now to download build 10. Open that
 APK and approve Update in Android. Reopen the upgraded app: the popup should no
 longer appear because the installed build matches the published release.
 
-Install build 3 before build 9 when testing. Android normally prevents downgrading
+Install build 3 before build 10 when testing. Android normally prevents downgrading
 to a lower build number. Use a device that has build 2 or lower, or a separate
 test device. The device upgrade still needs manual verification.
 
@@ -86,6 +86,6 @@ https://pub.dev/packages/url_launcher.
 
 Buyer, farmer and rider Account overviews and Settings display the installed
 version in a shared footer. For this release it reads
-`App version 1.0.8`. It uses package_info_plus rather than a hardcoded
+`App version 1.0.9`. It uses package_info_plus rather than a hardcoded
 version, so older and future APKs display their own package metadata. Version
 loading does not block the page; unavailable metadata shows a neutral fallback.

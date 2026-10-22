@@ -30,6 +30,7 @@ open class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         SecureStorageMigration.prepare(applicationContext)
         super.configureFlutterEngine(flutterEngine)
+        NotificationSettingsChannel.register(this, flutterEngine.dartExecutor.binaryMessenger)
         waybillPrinter = WaybillPrinter(this).also { printer ->
             MethodChannel(
                 flutterEngine.dartExecutor.binaryMessenger,

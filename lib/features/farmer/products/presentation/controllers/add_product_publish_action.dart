@@ -58,6 +58,11 @@ extension _AddProductPublishAction on _AddProductScreenState {
     try {
       final saved = await publish(context, product, _publishRequestKey);
       if (mounted && saved != null) {
+        await NotificationPermissionPrompt.offer(
+          context,
+          benefit: NotificationPermissionBenefit.farmer,
+        );
+        if (!mounted) return;
         _refresh(() => _isPublishing = false);
         Navigator.of(context).pop(saved);
       }

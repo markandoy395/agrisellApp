@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/widgets/notification_permission_prompt.dart';
+import 'package:agresell_app/core/widgets/notification_permission_benefit.dart';
 import 'rider_environment_row.dart';
 import '../styles/rider_home_design_styles.dart';
 
@@ -84,5 +86,11 @@ class RiderAvailabilityCard extends StatelessWidget {
     ScaffoldMessenger.of(
       context,
     ).showAppSnackBar(SnackBar(content: Text(label)));
+    if (value) {
+      await NotificationPermissionPrompt.offer(
+        context,
+        benefit: NotificationPermissionBenefit.rider,
+      );
+    }
   }
 }

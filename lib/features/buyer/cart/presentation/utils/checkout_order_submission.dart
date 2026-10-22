@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/widgets/notification_permission_prompt.dart';
+import 'package:agresell_app/core/widgets/notification_permission_benefit.dart';
 
 import 'package:agresell_app/core/utils/agrisell_page_route.dart';
 import 'package:agresell_app/core/utils/written_address.dart';
@@ -111,6 +113,11 @@ abstract final class CheckoutOrderSubmission {
         CheckoutScreenStyles.orderPlacedSuccessNotice,
       ),
     );
+    await NotificationPermissionPrompt.offer(
+      context,
+      benefit: NotificationPermissionBenefit.buyer,
+    );
+    if (!context.mounted) return true;
     Navigator.of(context).pushReplacement(
       agrisellPageRoute<void>(builder: (_) => const OrderTrackingScreen()),
     );

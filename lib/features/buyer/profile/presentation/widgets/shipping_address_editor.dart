@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 
 import 'package:agresell_app/core/utils/written_address.dart';
 import 'package:agresell_app/features/auth/domain/buyer_shipping_address.dart';
+import 'package:agresell_app/features/buyer/profile/domain/shipping_address_fields.dart';
 import 'package:agresell_app/features/buyer/profile/presentation/widgets/shipping_address_editor_content.dart';
 import 'package:agresell_app/features/shared/location/data/gps_location_gateway.dart';
 
@@ -45,7 +46,12 @@ class _ShippingAddressEditorState extends State<ShippingAddressEditor> {
   void initState() {
     super.initState();
     _gpsGateway = widget.gpsGateway ?? GeolocatorGpsLocationGateway();
-    _streetController.text = widget.initialAddress;
+    final address = ShippingAddressFields.fromAddress(widget.initialAddress);
+    _streetController.text = address.street;
+    _provinceController.text = address.province;
+    _cityController.text = address.city;
+    _barangayController.text = address.barangay;
+    _postalCodeController.text = address.postalCode;
     _latitude = widget.latitude;
     _longitude = widget.longitude;
   }
@@ -60,22 +66,13 @@ class _ShippingAddressEditorState extends State<ShippingAddressEditor> {
     super.dispose();
   }
 
-  String get _address {
-    final completeAddress = _streetController.text.trim();
-    if (_isResolvedAddress(completeAddress)) return completeAddress;
-    return [
-      completeAddress,
-      'Barangay ${_barangayController.text.trim()}',
-      _cityController.text.trim(),
-      _provinceController.text.trim(),
-      _postalCodeController.text.trim(),
-      'Philippines',
-    ].where((value) => value.isNotEmpty).join(', ');
-  }
-
-  bool _isResolvedAddress(String value) =>
-      value.toLowerCase().contains('philippines') ||
-      value.split(',').length >= 4;
+  String get _address => ShippingAddressFields(
+    street: _streetController.text,
+    province: _provinceController.text,
+    city: _cityController.text,
+    barangay: _barangayController.text,
+    postalCode: _postalCodeController.text,
+  ).formatted;
 
   bool get _isComplete =>
       _streetController.text.trim().isNotEmpty &&

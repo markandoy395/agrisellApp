@@ -2,6 +2,8 @@ import 'package:agresell_app/features/rider/presentation/widgets/rider_safe_scaf
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:agresell_app/core/widgets/notification_permission_card.dart';
+import 'package:agresell_app/core/widgets/notification_permission_benefit.dart';
 import 'package:agresell_app/core/widgets/app_snack_bar.dart';
 
 import 'package:agresell_app/core/theme/agrisell_colors.dart';
@@ -96,6 +98,9 @@ class _RiderNotificationsScreenState extends State<RiderNotificationsScreen> {
           NotificationFilterTabs(
             selected: _filter,
             onSelected: (value) => setState(() => _filter = value),
+          ),
+          const NotificationPermissionCard(
+            benefit: NotificationPermissionBenefit.rider,
           ),
         ],
         body: _content(),
